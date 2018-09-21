@@ -119,6 +119,9 @@ bootdiff <- function(data, control, test, paired, ci = 0.95, reps = 5000,
   result$pct_ci_high = ci$percent[5]
   result$bootstraps = boot$t
 
-  return(result)
+  class(result) <- "boot.diff"
+  result
+
+}
 }
 
