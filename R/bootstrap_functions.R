@@ -106,17 +106,19 @@ bootdiff <- function(data, control, test, paired, ci = 0.95, reps = 5000,
     boot <- simpleboot::one.boot(paired_diff, FUN = func, R = reps)
   }
 
-  ci <- boot::boot.ci(boot, conf = ci, type = c("perc", "bca"))
+  bootci <- boot::boot.ci(boot, conf = ci, type = c("perc", "bca"))
 
   result = list()
 
-  result$func = func
+  # convert the name of `func` to a string.
+  result$func = as.character(substitute(func))
+  result$paired = paired
   result$difference = diff
   result$ci = ci
-  result$bca_ci_low = ci$bca[4]
-  result$bca_ci_high = ci$bca[5]
-  result$pct_ci_low = ci$percent[4]
-  result$pct_ci_high = ci$percent[5]
+  result$bca_ci_low = bootci$bca[4]
+  result$bca_ci_high = bootci$bca[5]
+  result$pct_ci_low = bootci$percent[4]
+  result$pct_ci_high = bootci$percent[5]
   result$bootstraps = boot$t
 
   class(result) <- "boot.diff"
