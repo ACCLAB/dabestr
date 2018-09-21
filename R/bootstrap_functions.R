@@ -123,5 +123,27 @@ bootdiff <- function(data, control, test, paired, ci = 0.95, reps = 5000,
   result
 
 }
+
+
+
+print.boot.diff <- function(result, ...) {
+  #  Print the intervals
+  cat("Effect Size with Bootstrap Confidence Intervals\n")
+  cat("-----------------------------------------------\n\n")
+
+  cat(paste("Using", length(result$bootstraps), "bootstrap replicates"))
+  cat(sprintf(" and the function %s().\n\n", result$func))
+
+  if (identical(result$paired, TRUE)) p <- "Paired" else p <- "Unpaired"
+
+  cat(sprintf("%s Difference with BCa Confidence Intervals:\n", p))
+  cat(sprintf("%.3f [%iCI %.2f, %.2f]\n",
+          result$difference, result$ci * 100,
+          result$bca_ci_low, result$bca_ci_high))
+
+  cat(sprintf("%s Difference with Percentile Confidence Intervals:\n", p))
+  cat(sprintf("%.3f [%iCI %.2f, %.2f]\n",
+          result$difference, result$ci * 100,
+          result$pct_ci_low, result$pct_ci_high))
 }
 
