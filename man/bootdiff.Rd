@@ -69,8 +69,36 @@ interval.}
 }
 
 \examples{
-# Use the preloaded data.
+# Performing unpaired (two independent groups) analysis.
+# We will analyse the `wellbeing_ind` dataset that comes with dabestr.
+unpaired_mean_diff <- bootdiff(data = wellbeing_ind,
+                               control = "control", test = "test",
+                               paired = FALSE)
 
+
+# Performing paired analysis.
+# We will demonstrate this with the paired dataset `wellbeing_ind`.
+unpaired_mean_diff <- bootdiff(data = wellbeing_paired,
+                               control = "control", test = "test",
+                               paired = TRUE)
+
+
+# Computing the median difference.
+unpaired_median_diff <- bootdiff(data = wellbeing_paired,
+                                control = "control", test = "test",
+                                paired = FALSE, func = median)
+
+
+# Producing a 90 percent CI instead of 95 percent.
+unpaired_mean_diff_90_ci <- bootdiff(data = wellbeing_paired,
+                                     control = "control", test = "test",
+                                     paired = FALSE, ci = 0.90)
+
+
+# Constructing the confidence intervals on 10000 bootstrap resamples.
+unpaired_mean_diff_n10000 <- bootdiff(data = wellbeing_paired,
+                                      control = "control", test = "test",
+                                      paired = FALSE, reps = 10000)
 }
 \seealso{
 \url{https://www.google.com}

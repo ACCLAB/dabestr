@@ -51,8 +51,36 @@ bootdiff <- function(data, control, test, paired, ci = 0.95, reps = 5000,
   #'   The array of bootstrap resamples generated.}
   #'
   #' @examples
-  #' # Use the preloaded data.
+  #' # Performing unpaired (two independent groups) analysis.
+  #' # We will analyse the `wellbeing_ind` dataset that comes with dabestr.
+  #' unpaired_mean_diff <- bootdiff(data = wellbeing_ind,
+  #'                                control = "control", test = "test",
+  #'                                paired = FALSE)
   #'
+  #'
+  #' # Performing paired analysis.
+  #' # We will demonstrate this with the paired dataset `wellbeing_ind`.
+  #' unpaired_mean_diff <- bootdiff(data = wellbeing_paired,
+  #'                                control = "control", test = "test",
+  #'                                paired = TRUE)
+  #'
+  #'
+  #' # Computing the median difference.
+  #' unpaired_median_diff <- bootdiff(data = wellbeing_paired,
+  #'                                 control = "control", test = "test",
+  #'                                 paired = FALSE, func = median)
+  #'
+  #'
+  #' # Producing a 90 percent CI instead of 95 percent.
+  #' unpaired_mean_diff_90_ci <- bootdiff(data = wellbeing_paired,
+  #'                                      control = "control", test = "test",
+  #'                                      paired = FALSE, ci = 0.90)
+  #'
+  #'
+  #' # Constructing the confidence intervals on 10000 bootstrap resamples.
+  #' unpaired_mean_diff_n10000 <- bootdiff(data = wellbeing_paired,
+  #'                                       control = "control", test = "test",
+  #'                                       paired = FALSE, reps = 10000)
   #' @section References:
   #' 1. What is bootstrap resampling?
   #' 2. What are BCa confidence intervals?
@@ -67,7 +95,7 @@ bootdiff <- function(data, control, test, paired, ci = 0.95, reps = 5000,
   if (identical(paired, FALSE)) {
     diff <- func(t) - func(c)
     # For two.boot, note that the first vector is the test vector.
-    boot <- simpleboot::two.boot(t, c, FUN = diff_func, R = reps)
+    boot <- simpleboot::two.boot(t, c, FUN = func, R = reps)
 
   } else {
     if (length(c) != length(t)) {
@@ -75,7 +103,7 @@ bootdiff <- function(data, control, test, paired, ci = 0.95, reps = 5000,
     }
     paired_diff <- t - c
     diff <- func(paired_diff)
-    boot <- simpleboot::one.boot(paired_diff, FUN = diff_func, R = reps)
+    boot <- simpleboot::one.boot(paired_diff, FUN = func, R = reps)
   }
 
   ci <- boot::boot.ci(boot, conf = ci, type = c("perc", "bca"))
@@ -94,15 +122,3 @@ bootdiff <- function(data, control, test, paired, ci = 0.95, reps = 5000,
   return(result)
 }
 
-
-#' create_padded_data_frame <- function(x1, x2, name1, name2) {
-#'   #' DOCSTRING
-#'   #'
-#'   max_len = max(length(x1), length(x2))
-#'   c = c(x1, rep(NA, max_len - length(x1)))
-#'   t = c(x2, rep(NA, max_len - length(x2)))
-#'
-#'   df <- data.frame(list(c, t))
-#'   colnames(df) <- c(name1, name2)
-#'   return(df)
-#' }
