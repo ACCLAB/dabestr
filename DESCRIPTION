@@ -1,0 +1,11 @@
+Package: dabestr
+Type: Package
+Title: What the Package Does (Title Case)
+Version: 0.0.9999
+Author: Joses Ho and Tayfun Tumkaya
+Maintainer: Joses Ho <joseshowh@somewhere.net>
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
