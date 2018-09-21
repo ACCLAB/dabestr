@@ -1,6 +1,6 @@
 # dabestr
 
-dabestr is a package for **D**ta **A**nalysis using **B**ootstrap-Coupled **EST**imation in R.
+dabestr is a package for **D**ata **A**nalysis using **B**ootstrap-Coupled **EST**imation in R.
 
 ## About
 [Estimation statistics](https://en.wikipedia.org/wiki/Estimation_statistics "Estimation Stats on Wikipedia") is a [simple framework](https://thenewstatistics.com/itns/ "Introduction to the New Statistics") that avoids the [pitfalls](https://www.nature.com/articles/nmeth.3288 "The fickle P value generates irreproducible results, Halsey et al 2015") of significance testing. It uses familiar statistical concepts: means, mean differences, and error bars. More importantly, it focuses on the effect size of one's experiment/intervention, as opposed to a false dichotomy engendered by P values.
@@ -26,11 +26,9 @@ my_plot <- dabestr.plot(...)
 
 ## How to Cite
 
-**Moving beyond P values: Everyday data analysis with estimation plots**
+[**Moving beyond P values: Everyday data analysis with estimation plots**](https://doi.org/10.1101/377978 "Our BioRxiv preprint")
 
 Joses Ho, Tayfun Tumkaya, Sameer Aryal, Hyungwon Choi, Adam Claridge-Chang
-
-https://doi.org/10.1101/377978
 
 ## dabest In Other Languages
 
