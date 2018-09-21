@@ -6,20 +6,18 @@ Author: Joses Ho and Tayfun Tumkaya
 Maintainer: Joses Ho <joseshowh@icloud.com>
 Description: dabestr is a package for Data Analysis using Bootstrap-Coupled 
     ESTimation.
-    
     Estimation statistics is a simple framework that avoids the pitfalls of 
     significance testing. It uses familiar statistical concepts: means, 
     mean differences, and error bars. More importantly, it focuses on the 
     effect size of one's experiment/intervention, as opposed to a false 
     dichotomy engendered by P values.
-    
     An estimation plot has two key features:
-    
     1. It presents all datapoints as a swarmplot, which orders each point to 
     display the underlying distribution.
-    
     2. It presents the effect size as a bootstrap 95% confidence interval on a 
     separate but aligned axes.
 License: BSD 3-Clause Clear
 Encoding: UTF-8
 LazyData: true
+Imports: boot,
+    simpleboot
