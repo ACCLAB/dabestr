@@ -29,7 +29,7 @@ will be generated.}
 saved as a single bootstrap resample.}
 }
 \value{
-A list with the following 8 elements:
+A list of the class "boot.diff", with the following 9 elements:
 
 \item{func}{
 The \code{func} passed to \code{bootdiff}.
@@ -64,8 +64,13 @@ interval.}
 }
 \section{References}{
 
-1. What is bootstrap resampling?
-2. What are BCa confidence intervals?
+DiCiccio, Thomas J., and Bradley Efron. Bootstrap Confidence Intervals.
+  Statistical Science: vol. 11, no. 3, 1996, pp. 189–228,
+  http://www.jstor.org/stable/2246110.
+
+Efron, Bradley, and R. J. Tibshirani. An Introduction to the Bootstrap.
+  CRC Press, 1994.
+  https://www.crcpress.com/An-Introduction-to-the-Bootstrap/Efron-Tibshirani/p/book/9780412042317
 }
 
 \examples{
@@ -75,31 +80,35 @@ unpaired_mean_diff <- bootdiff(data = wellbeing_ind,
                                control = "control", test = "test",
                                paired = FALSE)
 
+# Display the results in a user-friendly format.
+unpaired_mean_diff
+
+# Plot the bootstrap resamples as a histogram, along with the CI.
+plot(unpaired_mean_diff)
+
 
 # Performing paired analysis.
 # We will demonstrate this with the paired dataset `wellbeing_ind`.
-unpaired_mean_diff <- bootdiff(data = wellbeing_paired,
-                               control = "control", test = "test",
-                               paired = TRUE)
+paired_mean_diff <- bootdiff(data = wellbeing_paired,
+                             control = "before", test = "after",
+                             paired = TRUE)
 
 
 # Computing the median difference.
-unpaired_median_diff <- bootdiff(data = wellbeing_paired,
+unpaired_median_diff <- bootdiff(data = wellbeing_ind,
                                 control = "control", test = "test",
                                 paired = FALSE, func = median)
 
 
 # Producing a 90 percent CI instead of 95 percent.
-unpaired_mean_diff_90_ci <- bootdiff(data = wellbeing_paired,
+unpaired_mean_diff_90_ci <- bootdiff(data = wellbeing_ind,
                                      control = "control", test = "test",
                                      paired = FALSE, ci = 0.90)
 
 
 # Constructing the confidence intervals on 10000 bootstrap resamples.
-unpaired_mean_diff_n10000 <- bootdiff(data = wellbeing_paired,
+unpaired_mean_diff_n10000 <- bootdiff(data = wellbeing_ind,
                                       control = "control", test = "test",
                                       paired = FALSE, reps = 10000)
-}
-\seealso{
-\url{https://www.google.com}
+
 }
