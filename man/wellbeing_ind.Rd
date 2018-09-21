@@ -4,14 +4,24 @@
 \name{wellbeing_ind}
 \alias{wellbeing_ind}
 \title{Wellbeing Scores (2 independent groups).}
-\format{A list with two elements: \code{pretest} and \code{posttest}.}
+\format{A list with two elements: \code{control} and \code{test}.}
 \source{
-This was obtained from xxxyyy
+Cumming, G. Understanding the New Statistics: Effect Sizes,
+Confidence Intervals, and Meta-Analysis. Routledge, 2012,
+https://books.google.com.sg/books?id=AVBDYgEACAAJ.
 }
 \usage{
 wellbeing_ind
 }
 \description{
-Describe the experiment and the dataset.
+This is a synthetic dataset from Geoff Cumming. 20 students were randomly
+assigned to spend the afternoon reading in the library—the Control condition
+—or reading in the local botanical gardens—the Test condition. At the end of
+the session, each student completed a measure of his or her perceived
+well-being.
+}
+\details{
+It is found in Chapter 11 "The Paired Design" (page 286) of
+Understanding the New Statistics (Routledge, 2012) by Geoff Cumming.
 }
 \keyword{datasets}
