@@ -21,3 +21,4 @@ Encoding: UTF-8
 LazyData: true
 Imports: boot,
     simpleboot
+RoxygenNote: 6.1.0
