@@ -147,3 +147,15 @@ print.boot.diff <- function(result, ...) {
           result$pct_ci_low, result$pct_ci_high))
 }
 
+
+
+plot.boot.diff <- function(result, ...) {
+  bootstrap_resamples = result$bootstraps
+  hist(bootstrap_resamples, ...)
+  # Draw the mean difference.
+  abline(v = result$difference, col='red')
+
+  # Draw the CIs.
+  abline(v = result$bca_ci_low)
+  abline(v = result$bca_ci_high)
+}
