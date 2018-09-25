@@ -25,7 +25,7 @@ samples. The group first passed to \code{idx} is treated as pre-intervention
 while the second group is considered post-intervention.}
 
 \item{ci}{float, default 0.95. The level of the confidence intervals
-produced. The default \code{ci = 0.95} produces 95 percent CIs.}
+produced. The default \code{ci = 0.95} produces 95\% CIs.}
 }
 \value{
 a \code{ggplot} object.
