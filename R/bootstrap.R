@@ -7,15 +7,17 @@
 #' confidence interval is constructed for the difference.
 #'
 #'
-#' @param data default NULL. A data.frame or list.
-#' @param control,test If `data` is supplied, `control` and `data` must be
-#' columns or items in the data.frame or list. If not, both of these must
-#' be numeric vectors.
+#' @param data A data.frame or tibble.
+#' @param x,y Columns in \code{data}.
+#' @param control_group,test_group Factors or strings in the \code{x} columns.
+#' These must be quoted (ie surrounded by quotation marks), and will be used to
+#' identify the control group and the test group. Any NaNs will be removed with
+#' \code{na.omit}.
 #' @param paired boolean. If TRUE, the two groups are treated as paired
-#' samples. The \code{control} group is treated as pre-intervention
-#' and the \code{control} group is considered post-intervention.
+#' samples. The \code{control_group} group is treated as pre-intervention
+#' and the \code{test_group} group is considered post-intervention.
 #' @param ci float, default 0.95. The level of the confidence intervals
-#' produced. The default \code{ci = 0.95} produces 95 percent CIs.
+#' produced. The default \code{ci = 0.95} produces 95\% CIs.
 #' @param reps integer, default 5000. The number of bootstrap resamples that
 #' will be generated.
 #' @param func function, default mean. This function will be applied to
@@ -54,10 +56,8 @@
 #'
 #' @examples
 #' # Performing unpaired (two independent groups) analysis.
-#' # We will analyse the `wellbeing_ind` dataset that comes with dabestr.
-#' unpaired_mean_diff <- bootdiff(data = wellbeing_ind,
-#'                                control = "control", test = "test",
-#'                                paired = FALSE)
+#' unpaired_mean_diff <- bootdiff(iris, Species, Petal.Width,
+#'                                "setosa", "versicolor", paired = FALSE)
 #'
 #' # Display the results in a user-friendly format.
 #' unpaired_mean_diff
@@ -67,28 +67,26 @@
 #'
 #'
 #' # Performing paired analysis.
-#' # We will demonstrate this with the paired dataset `wellbeing_paired`.
-#' paired_mean_diff <- bootdiff(data = wellbeing_paired,
-#'                              control = "before", test = "after",
-#'                              paired = TRUE)
+#' paired_mean_diff <- bootdiff(iris, Species, Petal.Width,
+#'                              "setosa", "versicolor", paired = FALSE)
 #'
 #'
 #' # Computing the median difference.
-#' unpaired_median_diff <- bootdiff(data = wellbeing_ind,
-#'                                 control = "control", test = "test",
-#'                                 paired = FALSE, func = median)
+#' unpaired_median_diff <- bootdiff(iris, Species, Petal.Width,
+#'                                  "setosa", "versicolor", paired = FALSE,
+#'                                  func = median)
 #'
 #'
-#' # Producing a 90 percent CI instead of 95 percent.
-#' unpaired_mean_diff_90_ci <- bootdiff(data = wellbeing_ind,
-#'                                      control = "control", test = "test",
-#'                                      paired = FALSE, ci = 0.90)
+#' # Producing a 90\% CI instead of 95\%
+#' unpaired_mean_diff_90_ci <- bootdiff(iris, Species, Petal.Width,
+#'                                      "setosa", "versicolor", paired = FALSE,
+#'                                      ci = 0.90)
 #'
 #'
 #' # Constructing the confidence intervals on 10000 bootstrap resamples.
-#' unpaired_mean_diff_n10000 <- bootdiff(data = wellbeing_ind,
-#'                                       control = "control", test = "test",
-#'                                       paired = FALSE, reps = 10000)
+#' unpaired_mean_diff_n10000 <- bootdiff(iris, Species, Petal.Width,
+#'                                       "setosa", "versicolor", paired = FALSE,
+#'                                       reps = 10000)
 #'
 #' @section References:
 #' DiCiccio, Thomas J., and Bradley Efron. Bootstrap Confidence Intervals.
@@ -103,16 +101,42 @@
 #'   \url{https://www.crcpress.com/An-Introduction-to-the-Bootstrap/Efron-Tibshirani/p/book/9780412042317}
 #'
 #' @export
-bootdiff <- function(control, test, paired, data = NULL, ci = 0.95,
-                     reps = 5000, func = mean) {
-  if (is.null(data)) {
-    c <- control
-    t <- test
-  } else {
-    c <- data[[control]]
-    t <- data[[test]]
-  }
+bootdiff <- function(data, x, y, control_group, test_group, paired,
+                     ci = 0.95, reps = 5000, func = mean) {
+  # Create quosures and quonames to pass variables along properly.
+  x_enquo       <-  enquo(x)
+  x_quoname     <-  quo_name(x_enquo)
 
+  y_enquo       <-  enquo(y)
+  y_quoname     <-  quo_name(y_enquo)
+
+  func_enquo    <-  enquo(func)
+  func_quoname  <-  quo_name(func_enquo)
+
+
+  # Get only the columns we need.
+  data_for_diff <-
+    as_tibble(data) %>%
+    select(!!x_enquo, !!y_enquo)
+
+
+  # Get ctrl and exp groups data
+  ctrl <- data_for_diff %>%
+    filter(!!x_enquo == control_group)
+
+  test <- data_for_diff %>%
+    filter(!!x_enquo == test_group)
+
+  ctrl = ctrl[[y_quoname]]
+  test = test[[y_quoname]]
+
+
+  # Remove NaNs.
+  c <- na.omit(ctrl)
+  t <- na.omit(test)
+
+
+  # Compute bootstrap.
   if (identical(paired, FALSE)) {
     diff <- func(t) - func(c)
     # For two.boot, note that the first vector is the test vector.
@@ -127,12 +151,15 @@ bootdiff <- function(control, test, paired, data = NULL, ci = 0.95,
     boot <- simpleboot::one.boot(paired_diff, FUN = func, R = reps)
   }
 
+
+  # Compute confidence interval.
   bootci <- boot::boot.ci(boot, conf = ci, type = c("perc", "bca"))
 
-  result = list()
 
-  # convert the name of `func` to a string.
-  result$func = as.character(substitute(func))
+  # Save result.
+  result = list()
+  # Convert the name of `func` to a string.
+  result$func = func_quoname
   result$paired = paired
   result$difference = diff
   result$ci = ci
@@ -140,11 +167,13 @@ bootdiff <- function(control, test, paired, data = NULL, ci = 0.95,
   result$bca_ci_high = bootci$bca[5]
   result$pct_ci_low = bootci$percent[4]
   result$pct_ci_high = bootci$percent[5]
-  result$bootstraps = boot$t
-
+  result$bootstraps = as.vector(boot$t)
+  # Create our own class.
   class(result) <- "boot.diff"
-  result
 
+
+  # Return the result.
+  return(result)
 }
 
 
@@ -173,13 +202,29 @@ print.boot.diff <- function(result, ...) {
 
 #' @export
 plot.boot.diff <- function(result, ...) {
-  bootstrap_resamples = result$bootstraps
-  hist(bootstrap_resamples,
-       main = "Bootstrap Distribution of Two-group Difference", ...)
-  # Draw the mean difference.
-  abline(v = result$difference, col='red')
 
-  # Draw the CIs.
+  bootstrap_resamples = result$bootstraps
+
+  # Capitalise the function for a prettier title.
+  funct <- result$func
+  substr(funct, 1, 1) <- toupper(substr(funct, 1, 1))
+
+  # Is this paired or unpaired?
+  if (identical(result$paired, TRUE)) {
+    is.paired <- "Paired"
+    } else {
+      is.paired <- "Unpaired"
+    }
+
+  # Stitch the title.
+  hist.title <- stringr::str_interp(
+    "Bootstrap Distribution of ${is.paired} Two-group ${funct} Difference")
+
+  # Plot the histogram.
+  hist(bootstrap_resamples, main = hist.title, xlab = "", ...)
+  # Plot the mean difference.
+  abline(v = result$difference, col='red')
+  # Plot the CIs.
   abline(v = result$bca_ci_low)
   abline(v = result$bca_ci_high)
 }
