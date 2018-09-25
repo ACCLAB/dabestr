@@ -28,7 +28,7 @@ Imports: boot,
     gridExtra,
     patchwork,
     simpleboot,
-    tidyverse
+    stringr
 Remotes: thomasp85/patchwork,
     tidyverse/ggplot2
 RoxygenNote: 6.1.0
