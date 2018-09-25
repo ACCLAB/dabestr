@@ -2,7 +2,7 @@ Package: dabestr
 Type: Package
 Title: Data Analysis using Bootstrap-Coupled Estimation in R.
 Version: 0.0.9999
-Author: Joses W. Ho and Tayfun Tumkaya
+Author: Joses W. Ho [aut, cre], Tayfun Tumkaya [aut]
 Maintainer: Joses W. Ho <joseshowh@icloud.com>
 Description: dabestr is a package for Data Analysis using Bootstrap-Coupled 
     ESTimation in R.
