@@ -4,11 +4,11 @@
 \alias{bootdiff}
 \title{Difference between Two Groups with Bootstrap Confidence Intervals}
 \usage{
-bootdiff(data, x, y, control_group, test_group, paired, ci = 0.95,
+bootdiff(.data, x, y, control_group, test_group, paired, ci = 0.95,
   reps = 5000, func = mean)
 }
 \arguments{
-\item{data}{A data.frame or tibble.}
+\item{.data}{A data.frame or tibble.}
 
 \item{x, y}{Columns in \code{data}.}
 
@@ -115,5 +115,19 @@ unpaired_mean_diff_90_ci <- bootdiff(iris, Species, Petal.Width,
 unpaired_mean_diff_n10000 <- bootdiff(iris, Species, Petal.Width,
                                       "setosa", "versicolor", paired = FALSE,
                                       reps = 10000)
+
+# Using pipes to munge data and then to pass to `bootdiff`.
+# First, we generate some synthetic data.
+set.seed(12345)
+N = 70
+c <- rnorm(N, mean = 50, sd = 20)
+t1 <- rnorm(N, mean = 200, sd = 20)
+long.data <- tibble(Control = c, Test1 = t1)
+# Munge the data using `gather`, then pass it directly to `bootdiff`
+meandiff <- long.data \%>\%
+              tidyr::gather(key = Group, value = Measurement) \%>\%
+              bootdiff(x = Group, y = Measurement,
+                       control_group = "Control", test_group = "Test2",
+                       paired = FALSE)
 
 }

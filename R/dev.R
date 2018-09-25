@@ -18,7 +18,7 @@
 #' by \emph{P} values.
 #'
 #'
-#' @param data A tidy data.frame.
+#' @param .data A tidy data.frame or tibble.
 #' @param x,y Columns in the data.frame.
 #' @param idx Categories in the column \code{x}.
 #' @param paired boolean. If TRUE, the two groups are treated as paired
@@ -66,7 +66,7 @@
 #'
 #' @export
 dabest.plot.dev <- function(
-  data, x, y, idx, color.col = NULL, paired = TRUE, func = mean,
+  .data, x, y, idx, color.col = NULL, paired = FALSE, func = mean,
   ci = 0.95, reps = 5000, slopegraph = TRUE,
   float.contrast = NULL, color.column = NULL, palette = "Set1",
   theme = theme_classic(), tick.fontsize = 12, axes.title.fontsize = 15,
@@ -258,8 +258,13 @@ dabest.plot.dev <- function(
                  aes(x = 2, y = test_summ,
                      xend = 4, yend = test_summ) )
 
-  # Aesthetic tweaks.
-  if (is.null(swarm.label)) swarm.label <- y_enquo
+  # Label raw data axes.
+  if (is.null(swarm.label)) {
+    swarmylab <- y_enquo
+    swarm.label <- stringr::str_interp("${y_quoname}\n")
+  } else {
+    swarm.label <- stringr::str_interp("${swarm.label}\n")
+  }
 
   # Count and label Ns.
   # TODO create a loop for this for hub-and-spoke plots.
@@ -278,8 +283,16 @@ dabest.plot.dev <- function(
     p <- p + guides(colour = "none", fill = "none")
   }
 
-
-  if (is.null(es.label)) es.label <- "Effect Size"
+  # Include paired status in effect size label.
+  if (identical(boot.result$paired, TRUE)) is.p <- "Paired" else is.p <- "Unpaired"
+  # Include the capitalised func for a prettier title.
+  ff <- boot.result$func
+  substr(ff, 1, 1) <- toupper(substr(ff, 1, 1))
+  if (is.null(es.label)) {
+    es.label <- stringr::str_interp("${is.p} ${ff}\nDifference\n")
+  } else {
+    es.label <- stringr::str_interp("${es.label}\n")
+  }
 
   # Add secondary y-axis for floating side-by-side plots.
   if (control_summ > 0) {
@@ -296,7 +309,7 @@ dabest.plot.dev <- function(
                          axis.ticks.x.bottom = element_blank(),
                          axis.text = element_text(size = tick.fontsize),
                          axis.title = element_text(size = axes.title.fontsize),
-                         axis.ticks.length = unit(5, "points"))
+                         axis.ticks.length = unit(7, "points"))
 
 
   # Return ggplot object!

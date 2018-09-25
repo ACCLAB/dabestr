@@ -4,7 +4,7 @@
 \alias{dabest.plot.dev}
 \title{Estimation Plot (DEV VERSION)}
 \usage{
-dabest.plot.dev(data, x, y, idx, color.col = NULL, paired = TRUE,
+dabest.plot.dev(.data, x, y, idx, color.col = NULL, paired = FALSE,
   func = mean, ci = 0.95, reps = 5000, slopegraph = TRUE,
   float.contrast = NULL, color.column = NULL, palette = "Set1",
   theme = theme_classic(), tick.fontsize = 12,
@@ -14,7 +14,7 @@ dabest.plot.dev(data, x, y, idx, color.col = NULL, paired = TRUE,
   slopegraph.params = NULL)
 }
 \arguments{
-\item{data}{A tidy data.frame.}
+\item{.data}{A tidy data.frame or tibble.}
 
 \item{x, y}{Columns in the data.frame.}
 

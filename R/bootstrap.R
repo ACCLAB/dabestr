@@ -7,7 +7,7 @@
 #' confidence interval is constructed for the difference.
 #'
 #'
-#' @param data A data.frame or tibble.
+#' @param .data A data.frame or tibble.
 #' @param x,y Columns in \code{data}.
 #' @param control_group,test_group Factors or strings in the \code{x} columns.
 #' These must be quoted (ie surrounded by quotation marks), and will be used to
@@ -88,6 +88,20 @@
 #'                                       "setosa", "versicolor", paired = FALSE,
 #'                                       reps = 10000)
 #'
+#' # Using pipes to munge data and then to pass to `bootdiff`.
+#' # First, we generate some synthetic data.
+#' set.seed(12345)
+#' N = 70
+#' c <- rnorm(N, mean = 50, sd = 20)
+#' t1 <- rnorm(N, mean = 200, sd = 20)
+#' long.data <- tibble(Control = c, Test1 = t1)
+#' # Munge the data using `gather`, then pass it directly to `bootdiff`
+#' meandiff <- long.data %>%
+#'               tidyr::gather(key = Group, value = Measurement) %>%
+#'               bootdiff(x = Group, y = Measurement,
+#'                        control_group = "Control", test_group = "Test2",
+#'                        paired = FALSE)
+#'
 #' @section References:
 #' DiCiccio, Thomas J., and Bradley Efron. Bootstrap Confidence Intervals.
 #'   Statistical Science: vol. 11, no. 3, 1996, pp. 189–228,
@@ -101,7 +115,7 @@
 #'   \url{https://www.crcpress.com/An-Introduction-to-the-Bootstrap/Efron-Tibshirani/p/book/9780412042317}
 #'
 #' @export
-bootdiff <- function(data, x, y, control_group, test_group, paired,
+bootdiff <- function(.data, x, y, control_group, test_group, paired,
                      ci = 0.95, reps = 5000, func = mean) {
   # Create quosures and quonames to pass variables along properly.
   x_enquo       <-  enquo(x)
