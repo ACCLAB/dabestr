@@ -4,22 +4,25 @@
 \alias{bootdiff}
 \title{Difference between Two Groups with Bootstrap Confidence Intervals}
 \usage{
-bootdiff(control, test, paired, data = NULL, ci = 0.95, reps = 5000,
-  func = mean)
+bootdiff(data, x, y, control_group, test_group, paired, ci = 0.95,
+  reps = 5000, func = mean)
 }
 \arguments{
-\item{control, test}{If `data` is supplied, `control` and `data` must be
-columns or items in the data.frame or list. If not, both of these must
-be numeric vectors.}
+\item{data}{A data.frame or tibble.}
+
+\item{x, y}{Columns in \code{data}.}
+
+\item{control_group, test_group}{Factors or strings in the \code{x} columns.
+These must be quoted (ie surrounded by quotation marks), and will be used to
+identify the control group and the test group. Any NaNs will be removed with
+\code{na.omit}.}
 
 \item{paired}{boolean. If TRUE, the two groups are treated as paired
-samples. The \code{control} group is treated as pre-intervention
-and the \code{control} group is considered post-intervention.}
-
-\item{data}{default NULL. A data.frame or list.}
+samples. The \code{control_group} group is treated as pre-intervention
+and the \code{test_group} group is considered post-intervention.}
 
 \item{ci}{float, default 0.95. The level of the confidence intervals
-produced. The default \code{ci = 0.95} produces 95 percent CIs.}
+produced. The default \code{ci = 0.95} produces 95\% CIs.}
 
 \item{reps}{integer, default 5000. The number of bootstrap resamples that
 will be generated.}
@@ -81,10 +84,8 @@ Efron, Bradley, and R. J. Tibshirani. An Introduction to the Bootstrap.
 
 \examples{
 # Performing unpaired (two independent groups) analysis.
-# We will analyse the `wellbeing_ind` dataset that comes with dabestr.
-unpaired_mean_diff <- bootdiff(data = wellbeing_ind,
-                               control = "control", test = "test",
-                               paired = FALSE)
+unpaired_mean_diff <- bootdiff(iris, Species, Petal.Width,
+                               "setosa", "versicolor", paired = FALSE)
 
 # Display the results in a user-friendly format.
 unpaired_mean_diff
@@ -94,27 +95,25 @@ plot(unpaired_mean_diff)
 
 
 # Performing paired analysis.
-# We will demonstrate this with the paired dataset `wellbeing_paired`.
-paired_mean_diff <- bootdiff(data = wellbeing_paired,
-                             control = "before", test = "after",
-                             paired = TRUE)
+paired_mean_diff <- bootdiff(iris, Species, Petal.Width,
+                             "setosa", "versicolor", paired = FALSE)
 
 
 # Computing the median difference.
-unpaired_median_diff <- bootdiff(data = wellbeing_ind,
-                                control = "control", test = "test",
-                                paired = FALSE, func = median)
+unpaired_median_diff <- bootdiff(iris, Species, Petal.Width,
+                                 "setosa", "versicolor", paired = FALSE,
+                                 func = median)
 
 
-# Producing a 90 percent CI instead of 95 percent.
-unpaired_mean_diff_90_ci <- bootdiff(data = wellbeing_ind,
-                                     control = "control", test = "test",
-                                     paired = FALSE, ci = 0.90)
+# Producing a 90\\\% CI instead of 95\\\%
+unpaired_mean_diff_90_ci <- bootdiff(iris, Species, Petal.Width,
+                                     "setosa", "versicolor", paired = FALSE,
+                                     ci = 0.90)
 
 
 # Constructing the confidence intervals on 10000 bootstrap resamples.
-unpaired_mean_diff_n10000 <- bootdiff(data = wellbeing_ind,
-                                      control = "control", test = "test",
-                                      paired = FALSE, reps = 10000)
+unpaired_mean_diff_n10000 <- bootdiff(iris, Species, Petal.Width,
+                                      "setosa", "versicolor", paired = FALSE,
+                                      reps = 10000)
 
 }
