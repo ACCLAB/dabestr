@@ -92,7 +92,7 @@ dabest.plot.dev <- function(
 
   # Get only the columns we need.
   data_for_plot <-
-    as_tibble(data) %>%
+    as_tibble(.data) %>%
     select(!!x_enquo, !!y_enquo, !!color.col_enquo) %>%
     filter(!!x_enquo %in% idx) %>%
     mutate(!!x_quoname := factor(!!x_enquo, levels = idx, ordered = TRUE))
@@ -155,7 +155,7 @@ dabest.plot.dev <- function(
 
 
   # Compute bootstrapped results.
-  boot.result <- bootdiff(data, !!x_enquo, !!y_enquo,
+  boot.result <- bootdiff(data_for_plot, !!x_enquo, !!y_enquo,
                           control_groupname, test_groupname,
                           paired = paired, ci = ci, func = func, reps = reps)
   # reassign func for output?

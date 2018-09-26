@@ -8,7 +8,7 @@
 #'
 #'
 #' @param .data A data.frame or tibble.
-#' @param x,y Columns in \code{data}.
+#' @param x,y Columns in \code{.data}.
 #' @param control_group,test_group Factors or strings in the \code{x} columns.
 #' These must be quoted (ie surrounded by quotation marks), and will be used to
 #' identify the control group and the test group. Any NaNs will be removed with
@@ -88,7 +88,7 @@
 #'                                       "setosa", "versicolor", paired = FALSE,
 #'                                       reps = 10000)
 #'
-#' # Using pipes to munge data and then to pass to `bootdiff`.
+#' # Using pipes to munge your data and then passing to `bootdiff`.
 #' # First, we generate some synthetic data.
 #' set.seed(12345)
 #' N = 70
@@ -130,7 +130,7 @@ bootdiff <- function(.data, x, y, control_group, test_group, paired,
 
   # Get only the columns we need.
   data_for_diff <-
-    as_tibble(data) %>%
+    as_tibble(.data) %>%
     select(!!x_enquo, !!y_enquo)
 
 

@@ -10,7 +10,7 @@ bootdiff(.data, x, y, control_group, test_group, paired, ci = 0.95,
 \arguments{
 \item{.data}{A data.frame or tibble.}
 
-\item{x, y}{Columns in \code{data}.}
+\item{x, y}{Columns in \code{.data}.}
 
 \item{control_group, test_group}{Factors or strings in the \code{x} columns.
 These must be quoted (ie surrounded by quotation marks), and will be used to
@@ -116,7 +116,7 @@ unpaired_mean_diff_n10000 <- bootdiff(iris, Species, Petal.Width,
                                       "setosa", "versicolor", paired = FALSE,
                                       reps = 10000)
 
-# Using pipes to munge data and then to pass to `bootdiff`.
+# Using pipes to munge your data and then passing to `bootdiff`.
 # First, we generate some synthetic data.
 set.seed(12345)
 N = 70
