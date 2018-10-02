@@ -21,9 +21,14 @@ of the same name.}
 \item{palette}{default "Set1". Accepts any one of the ggplot2 palettes.
 See the "Palettes" section ins \link{scale_color_brewer}.}
 
-\item{float.contrast}{default NULL}
+\item{float.contrast}{default TRUE.  If \code{idx} in the \code{dabest}
+object contains only 2 groups, \code{float.contrast = TRUE} will plot the
+effect size and the bootstrap confidence interval in a horizontally-aligned
+axes (also known as a \href{https://bit.ly/2NhqUAb}{Gardner-Altman plot.})}
 
-\item{slopegraph}{boolean, default TRUE.}
+\item{slopegraph}{boolean, default TRUE. If the \code{dabest} object contains
+paired comparisons, \code{slopegraph = TRUE} will plot the rawdata as a
+\href{http://charliepark.org/slopegraphs/}{Tufte slopegraph}.}
 
 \item{theme}{default theme_classic()}
 
