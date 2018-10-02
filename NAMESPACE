@@ -3,4 +3,3 @@
 S3method(plot,dabest)
 S3method(print,dabest)
 export(dabest)
-export(geom_flat_violin)
