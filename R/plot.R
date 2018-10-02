@@ -350,6 +350,25 @@ plot.dabest <- function(dabest.object,
                        y = effsize, yend = effsize)) +
       scale_x_discrete(labels = c("\n")) +
       floating.theme
+
+    # spacer <-
+    #   ggplot() +
+    #   coord_cartesian(ylim = swarm.ylims) +
+    #   geom_segment(color = "red", size = horizontal.line.width,
+    #                aes(x = 0, xend = 3,
+    #                    y = 0, yend = 0)) +
+    #   geom_segment(color = "red", size = horizontal.line.width,
+    #                aes(x = 0, xend = 3,
+    #                    y = effsize, yend = effsize)) +
+    #   floating.theme +
+    #   theme(axis.line   = element_blank(),
+    #         axis.title  = element_blank(),
+    #         axis.text.x = element_blank(),
+    #         axis.text.y = element_blank(),
+    #         axis.ticks  = element_blank(),
+    #         plot.margin = unit(c(0, 0, 0, 0), "pt")
+    #         )
+
   } else {
     # Plot nonfloating deltas.
     delta.plot <- delta.plot +
@@ -368,11 +387,15 @@ plot.dabest <- function(dabest.object,
 
   #### Determine layout. ####
   if (isTRUE(float.contrast)) {
+    # Side-by-side floating plot layout.
     # plot.margin declares the top, right, bottom, left margins in order.
     rawdata.plot <- rawdata.plot +
-    theme(plot.margin = unit(c(5.5, 0, 5.5, 5.5), "pt"))
-    delta.plot <- delta.plot +
-    theme(plot.margin = unit(c(5.5, 5.5, 5.5, 0), "pt"))
+      theme(plot.margin = unit(c(5.5, 0, 5.5, 5.5), "pt"))
+
+    delta.plot   <- delta.plot +
+      theme(plot.margin = unit(c(5.5, 5.5, 5.5, 0), "pt"),
+            axis.line.x.bottom = element_blank())
+
 
     aligned_spine = 'b'
     nrows <- 1
@@ -384,10 +407,11 @@ plot.dabest <- function(dabest.object,
     } else {
       plist <- list(rawdata.plot, delta.plot, legend)
       ncols <- 3
-      widths <- c(0.625, 0.255, 0.15)
+      widths <- c(0.7, 0.3, 0.2)
     }
-  } else {
 
+  } else {
+    # Above-below non-floating plot layout.
     aligned_spine = 'lr'
     nrows <- 2
 
