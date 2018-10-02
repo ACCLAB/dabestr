@@ -178,13 +178,12 @@ plot.dabest <- function(dabest.object,
           axis.ticks.x.bottom  =  element_blank(),
           axis.title.x.bottom  =  element_blank())
 
-  floating.theme     <-
+  floating.theme <-
     non.floating.theme +
-    theme(#axis.line.x.bottom   =  element_blank(),
-          axis.title.x.bottom  =  element_blank(),
+    theme(axis.title.x.bottom  =  element_blank(),
           axis.ticks.x.bottom  =  element_blank())
 
-  legend.theme       <-
+  legend.theme <-
     theme(legend.title         =  element_text(size = axes.title.fontsize),
           legend.text          =  element_text(size = tick.fontsize))
 
@@ -494,4 +493,3 @@ GeomFlatViolin <-
                                fill = "grey", size = 0.5,
                                alpha = NA, linetype = "solid"),
 
-    required_aes = c("x", "y")
