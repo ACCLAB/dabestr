@@ -24,16 +24,15 @@ Description: dabestr is a package for Data Analysis using Bootstrap-Coupled
 License: BSD 3-Clause Clear
 Encoding: UTF-8
 LazyData: true
-Depends: ggplot2, 
+Depends: ggplot2 (>= 3.0), 
     dplyr,
     rlang,
+    stringr,
     tibble
 Imports: boot,
+    cowplot,
+    forcats,
     ggforce,
-    gridExtra,
-    patchwork,
     simpleboot,
-    stringr
-Remotes: thomasp85/patchwork,
-    tidyverse/ggplot2
+    tidyr
 RoxygenNote: 6.1.0
