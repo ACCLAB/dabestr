@@ -5,7 +5,7 @@
 \title{Estimation Plot}
 \usage{
 \method{plot}{dabest}(dabest.object, color.column = NULL,
-  palette = "Set1", float.contrast = NULL, slopegraph = NULL,
+  palette = "Set1", float.contrast = TRUE, slopegraph = TRUE,
   theme = theme_classic(), tick.fontsize = 11,
   axes.title.fontsize = 14, swarm.label = NULL, es.label = NULL,
   esmarker.size = 3, rawplot.type = c("swarmplot", "sinaplot"),
