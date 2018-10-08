@@ -377,6 +377,41 @@ plot.dabest <- function(dabest.object,
 
 
 
+  #### Equalize tick label lengths.
+  if (isFALSE(float.contrast)) {
+    rawplot.yticks          <- get_tick_labels(rawdata.plot, axes="y")
+    max_rawplot_ticklength  <- max_nchar_ticks(rawplot.yticks)
+
+    deltaplot.yticks         <- get_tick_labels(delta.plot, axes="y")
+    max_deltaplot_ticklength <- max_nchar_ticks(deltaplot.yticks)
+
+
+    if (max_rawplot_ticklength < max_deltaplot_ticklength) {
+      space.diff <- max_deltaplot_ticklength - max_rawplot_ticklength
+
+      suffix.spacing   <- rep(" ", space.diff)
+
+      rawplot.yticks   <- paste(str_interp(suffix.spacing), rawplot.yticks)
+
+      rawdata.plot     <- rawdata.plot +
+                          scale_y_continuous(labels = rawplot.yticks)
+
+
+    } else if (max_rawplot_ticklength > max_deltaplot_ticklength) {
+      space.diff = max_rawplot_ticklength - max_deltaplot_ticklength
+
+      suffix.spacing   <- rep(" ", space.diff)
+
+      deltaplot.yticks <- paste(str_interp(suffix.spacing), deltaplot.yticks)
+
+      delta.plot       <- delta.plot +
+                          scale_y_continuous(labels = deltaplot.yticks)
+    }
+  }
+
+
+
+
   #### Determine layout. ####
   if (isTRUE(float.contrast)) {
     # Side-by-side floating plot layout.
