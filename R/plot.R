@@ -364,9 +364,12 @@ plot.dabest <- function(dabest.object,
   } else {
     # Plot nonfloating deltas.
     delta.plot <- delta.plot +
+      coord_cartesian(xlim = c(1, length(idx))) +
       scale_x_discrete(labels = Ns$deltaticklabs) +
       non.floating.theme
   }
+
+
 
   #### Handle color legend. ####
   if (!quo_is_null(color.col_enquo)) {
