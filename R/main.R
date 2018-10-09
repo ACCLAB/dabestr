@@ -151,7 +151,7 @@ dabest <- function(
             .data, x, y, idx, paired, id.column = NULL,
             ci = 95, reps = 5000, func = mean) {
 
-  # Create quosures and quonames to pass variables along properly.
+  #### Create quosures and quonames. ####
   x_enquo        <-  enquo(x)
   x_quoname      <-  quo_name(x_enquo)
 
@@ -166,128 +166,171 @@ dabest <- function(
     stop("`paired` is TRUE but no `id.col` was supplied.")
   }
 
-  # Get only the columns we need.
+
+
+  #### Get only the columns we need. ####
   data_for_diff <-
     as_tibble(.data) %>%
     select(!!x_enquo, !!y_enquo, !!id.col_enquo)
 
+
+
+  #### Handled if paired. ####
   if (isTRUE(paired)) {
     id.col_quoname <-  quo_name(id.col_enquo)
     # sort the data by id.col so we can be sure all the observations match up.
     data_for_diff  <-  data_for_diff %>% arrange(!!x_enquo, !!id.col_enquo)
   }
 
-  # Get ctrl group, which is denoted by first item in `idx`.
-  # Simple sanity check I.
-  # check if `idx[1]` is in the columns.
-  if (identical(idx[1] %in% data_for_diff[[x_quoname]], FALSE)) {
-    stop(str_interp("${idx[1]} is not found in the ${x_quoname} column."))
-  }
-  ctrl <- data_for_diff %>%
-    filter(!!x_enquo == idx[1])
-  ctrl <- ctrl[[y_quoname]]
-  c <- na.omit(ctrl)
-  # If ctrl is length 0, stop!
-  if (length(c) == 0) {
-    stop(str_interp(c("There are zero numeric observations in ",
-                      "the group ${idx[1]}."))
-         )
+
+
+  #### Decide if multiplot or not. ####
+  if (class(idx) == "character") {
+    # Not multiplot. Add it to an empty list.
+    group_list <- list(idx)
+  } else if (class(idx) == "list") {
+    # This is a multiplot. Give it a new name.
+    group_list <- idx
   }
 
-  # Get test groups (everything else in idx), loop through them and compute
-  # the difference between idx[1] and each group.
+
+
+  #### Loop through each comparison group. ####
   result <- tibble::tibble() # To capture output.
-  # Test groups are the 2nd element of idx onwards.
-  test_groups <- idx[2: length(idx)]
 
-  for (grp in test_groups) {
-    # Check if `grp` is in the x column!
-    if (identical(grp %in% data_for_diff[[x_quoname]], FALSE)) {
-      stop(str_interp("${grp} is not found in the ${x_quoname} column."))
+  for (idx in group_list) {
+
+    # Check the control group (`idx[1]`) is in the x-column.
+    if (identical(idx[1] %in% data_for_diff[[x_quoname]], FALSE)) {
+      stop(str_interp("${idx[1]} is not found in the ${x_quoname} column."))
     }
-    test <- data_for_diff %>% filter(!!x_enquo == grp)
-    test <- test[[y_quoname]]
-    t <- na.omit(test)
-    # If current test group is length 0, stop!
-    if (length(t) == 0) {
+    ctrl <- data_for_diff %>%
+      filter(!!x_enquo == idx[1])
+    ctrl <- ctrl[[y_quoname]]
+    c <- na.omit(ctrl)
+
+    # If ctrl is length 0, stop!
+    if (length(c) == 0) {
       stop(str_interp(c("There are zero numeric observations in ",
-                        "the group ${grp}."))
+                        "the group ${idx[1]}."))
            )
     }
 
+    # Get test groups (everything else in idx), loop through them and compute
+    # the difference between idx[1] and each group.
+    # Test groups are the 2nd element of idx onwards.
+    test_groups <- idx[2: length(idx)]
 
-    # Compute bootstrap.
-    if (identical(paired, FALSE)) {
-      diff <- func(t) - func(c)
-      # For two.boot, note that the first vector is the test vector.
-      boot <- simpleboot::two.boot(t, c, FUN = func, R = reps)
+    for (grp in test_groups) {
 
-    } else {
-      if (length(c) != length(t)) {
-        stop("The two groups are not the same size, but paired = TRUE.")
+      # Check if the current group is in the x-column.
+      if (identical(grp %in% data_for_diff[[x_quoname]], FALSE)) {
+        stop(str_interp("${grp} is not found in the ${x_quoname} column."))
       }
-      paired_diff <- t - c
-      diff <- func(paired_diff)
-      boot <- simpleboot::one.boot(paired_diff, FUN = func, R = reps)
+
+      test <- data_for_diff %>% filter(!!x_enquo == grp)
+      test <- test[[y_quoname]]
+      t <- na.omit(test)
+
+      # If current test group is length 0, stop!
+      if (length(t) == 0) {
+        stop(str_interp(c("There are zero numeric observations in ",
+                          "the group ${grp}."))
+             )
+      }
+
+
+
+      #### Compute bootstrap. ####
+      if (identical(paired, FALSE)) {
+        diff <- func(t) - func(c)
+        # For two.boot, note that the first vector is the test vector.
+        boot <- simpleboot::two.boot(t, c, FUN = func, R = reps)
+
+      } else {
+        if (length(c) != length(t)) {
+          stop("The two groups are not the same size, but paired = TRUE.")
+        }
+        paired_diff <- t - c
+        diff <- func(paired_diff)
+        boot <- simpleboot::one.boot(paired_diff, FUN = func, R = reps)
+      }
+
+
+
+      #### Compute confidence interval. ####
+      # check CI.
+      if (ci < 0 | ci > 100) {
+        err_string <-
+          str_interp("`ci` must be between 0 and 100, not ${ci}")
+        stop(errstring)
+      }
+
+      bootci <- boot::boot.ci(boot, conf = ci/100, type = c("perc", "bca"))
+
+
+
+      #### Save pairwise result. ####
+      row <- tibble(
+        # Convert the name of `func` to a string.
+        control_group = idx[1],
+        test_group = grp,
+        control_size = length(c),
+        test_size = length(t),
+        func = func_quoname,
+        paired = paired,
+        variable = y_quoname,
+        difference = diff,
+        ci = ci,
+        bca_ci_low = bootci$bca[4],
+        bca_ci_high = bootci$bca[5],
+        pct_ci_low = bootci$percent[4],
+        pct_ci_high = bootci$percent[5],
+        bootstraps = list(as.vector(boot$t)),
+        nboots = length(boot$t)
+      )
+      result <- dplyr::bind_rows(result, row)
+
     }
-
-    # Compute confidence interval.
-    # check CI.
-    if (ci < 0 | ci > 100) {
-      err_string <-
-        str_interp("`ci` must be between 0 and 100, not ${ci}")
-      stop(errstring)
-    }
-
-    bootci <- boot::boot.ci(boot, conf = ci/100, type = c("perc", "bca"))
-
-    # Save result.
-    row <- tibble(
-      # Convert the name of `func` to a string.
-      control_group = idx[1],
-      test_group = grp,
-      control_size = length(c),
-      test_size = length(t),
-      func = func_quoname,
-      paired = paired,
-      variable = y_quoname,
-      difference = diff,
-      ci = ci,
-      bca_ci_low = bootci$bca[4],
-      bca_ci_high = bootci$bca[5],
-      pct_ci_low = bootci$percent[4],
-      pct_ci_high = bootci$percent[5],
-      bootstraps = list(as.vector(boot$t)),
-      nboots = length(boot$t)
-    )
-    result <- dplyr::bind_rows(result, row)
   }
 
 
+
+  #### Compute summaries. ####
   summaries <- .data %>%
                   filter(!!x_enquo %in% idx) %>%
                   group_by(!!x_enquo) %>%
                   summarize(func_quoname = func(!!y_enquo))
   colnames(summaries) <- c(x_quoname, func_quoname)
 
+
+
+  #### Assemble only the data used to create the plot. ####
   data.out <- .data
   data.out[[x_quoname]] <- forcats::as_factor(data.out[[x_quoname]], idx)
   data.out <- filter(data.out, !!x_enquo %in% idx)
 
+
+
+  #### Collate output. ####
   out = list(
     data = data.out,
     x = x_enquo,
     y = y_enquo,
-    idx = idx,
+    idx = group_list,
     id.column = id.col_enquo,
     result = result,
     summary = summaries
   )
 
-  # Append the custom class `dabest`.
+
+
+  #### Append the custom class `dabest`. ####
   class(out) <- c("dabest", "list")
 
-  # Return the result.
+
+
+  #### Return the output. ####
   return(out)
 }
 
