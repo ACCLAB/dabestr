@@ -37,6 +37,10 @@
 #'   \code{control} and \code{test} individually, and the difference will be
 #'   saved as a single bootstrap resample. Any NaNs will be removed
 #'   automatically with \code{na.omit}.
+#' @param seed integer, default 12345. This specifies the seed used to set the
+#' random number generator. Setting a seed ensures that the bootstrap confidence
+#' intervals for the same data will remain stable over seperate runs/calls of
+#' this function. See \link{set.seed} for more details.
 #'
 #'
 #'
@@ -149,7 +153,7 @@
 #' @export
 dabest <- function(
             .data, x, y, idx, paired, id.column = NULL,
-            ci = 95, reps = 5000, func = mean) {
+            ci = 95, reps = 5000, func = mean, seed = 12345) {
 
   #### Create quosures and quonames. ####
   x_enquo        <-  enquo(x)
@@ -187,10 +191,13 @@ dabest <- function(
   #### Decide if multiplot or not. ####
   if (class(idx) == "character") {
     # Not multiplot. Add it to an empty list.
-    group_list <- list(idx)
+    group_list  <-  list(idx)
+    all_groups  <-  idx
+
   } else if (class(idx) == "list") {
     # This is a multiplot. Give it a new name.
-    group_list <- idx
+    group_list  <-  idx
+    all_groups  <-  unique(unlist(group_list)) # Flatten `group_list`.
   }
 
 
@@ -198,28 +205,28 @@ dabest <- function(
   #### Loop through each comparison group. ####
   result <- tibble::tibble() # To capture output.
 
-  for (idx in group_list) {
+  for (group in group_list) {
 
-    # Check the control group (`idx[1]`) is in the x-column.
-    if (identical(idx[1] %in% data_for_diff[[x_quoname]], FALSE)) {
-      stop(str_interp("${idx[1]} is not found in the ${x_quoname} column."))
+    # Check the control group (`group[1]`) is in the x-column.
+    if (identical(group[1] %in% data_for_diff[[x_quoname]], FALSE)) {
+      stop(str_interp("${group[1]} is not found in the ${x_quoname} column."))
     }
     ctrl <- data_for_diff %>%
-      filter(!!x_enquo == idx[1])
+      filter(!!x_enquo == group[1])
     ctrl <- ctrl[[y_quoname]]
     c <- na.omit(ctrl)
 
     # If ctrl is length 0, stop!
     if (length(c) == 0) {
       stop(str_interp(c("There are zero numeric observations in ",
-                        "the group ${idx[1]}."))
+                        "the group ${group[1]}."))
            )
     }
 
-    # Get test groups (everything else in idx), loop through them and compute
-    # the difference between idx[1] and each group.
-    # Test groups are the 2nd element of idx onwards.
-    test_groups <- idx[2: length(idx)]
+    # Get test groups (everything else in group), loop through them and compute
+    # the difference between group[1] and each group.
+    # Test groups are the 2nd element of group onwards.
+    test_groups <- group[2: length(group)]
 
     for (grp in test_groups) {
 
@@ -242,6 +249,8 @@ dabest <- function(
 
 
       #### Compute bootstrap. ####
+      set.seed(seed)
+
       if (identical(paired, FALSE)) {
         diff <- func(t) - func(c)
         # For two.boot, note that the first vector is the test vector.
@@ -273,7 +282,7 @@ dabest <- function(
       #### Save pairwise result. ####
       row <- tibble(
         # Convert the name of `func` to a string.
-        control_group = idx[1],
+        control_group = group[1],
         test_group = grp,
         control_size = length(c),
         test_size = length(t),
@@ -298,7 +307,7 @@ dabest <- function(
 
   #### Compute summaries. ####
   summaries <- .data %>%
-                  filter(!!x_enquo %in% idx) %>%
+                  filter(!!x_enquo %in% all_groups) %>%
                   group_by(!!x_enquo) %>%
                   summarize(func_quoname = func(!!y_enquo))
   colnames(summaries) <- c(x_quoname, func_quoname)
@@ -307,8 +316,11 @@ dabest <- function(
 
   #### Assemble only the data used to create the plot. ####
   data.out <- .data
-  data.out[[x_quoname]] <- forcats::as_factor(data.out[[x_quoname]], idx)
-  data.out <- filter(data.out, !!x_enquo %in% idx)
+
+  data.out[[x_quoname]] <- forcats::as_factor(data.out[[x_quoname]],
+                                              all_groups)
+
+  data.out <- filter(data.out, !!x_enquo %in% all_groups)
 
 
 

@@ -5,7 +5,7 @@
 \title{Differences between Groups with Bootstrap Confidence Intervals}
 \usage{
 dabest(.data, x, y, idx, paired, id.column = NULL, ci = 95,
-  reps = 5000, func = mean)
+  reps = 5000, func = mean, seed = 12345)
 }
 \arguments{
 \item{.data}{A data.frame or tibble.}
@@ -34,6 +34,11 @@ will be generated.}
 \code{control} and \code{test} individually, and the difference will be
 saved as a single bootstrap resample. Any NaNs will be removed
 automatically with \code{na.omit}.}
+
+\item{seed}{integer, default 12345. This specifies the seed used to set the
+random number generator. Setting a seed ensures that the bootstrap confidence
+intervals for the same data will remain stable over seperate runs/calls of
+this function. See \link{set.seed} for more details.}
 }
 \value{
 A list with 7 elements: \code{data}, \code{x}, \code{y}, \code{idx},
