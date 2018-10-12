@@ -320,21 +320,21 @@ plot.dabest <- function(dabest.object,
     func_control <- summary[[func]][1]
     func_test    <- summary[[func]][2]
 
-    # I seem to be having difficulty getting the line thicknesses equal
-    # between the slopegraph and the delta axes? Need this hack...
-    if (isTRUE(slopegraph)) mult <- 1.5 else mult <- 1
+    # # I seem to be having difficulty getting the line thicknesses equal
+    # # between the slopegraph and the delta axes? Need this hack...
+    # if (isTRUE(slopegraph)) mult <- 1.5 else mult <- 1
 
     rawdata.plot <- rawdata.plot +
       # Plot the summary lines for the control group...
       geom_segment(color = "black",
-                   size = horizontal.line.width * mult,
+                   size = horizontal.line.width,
                    aes(x = 1, xend = 3,
                        y = func_control,
                        yend = func_control)) +
 
       # ... and the test group.
       geom_segment(color = "black",
-                   size = horizontal.line.width * mult,
+                   size = horizontal.line.width,
                    aes(x = 2, xend = 3,
                        y = func_test,
                        yend = func_test))
@@ -430,8 +430,9 @@ plot.dabest <- function(dabest.object,
   rawdata.plot.build.panel <- rawdata.plot.build$layout$panel_params[[1]]
   rawdata.plot.ylim        <- rawdata.plot.build.panel$y.range
   segment.ypos             <- rawdata.plot.ylim[1]
-  # rawdata.plot.xlim        <- rawdata.plot.build.panel$x.range
-  # rawdata.plot.lower.xlim  <- rawdata.plot.xlim[1]
+
+  rawdata.plot.xlim        <- rawdata.plot.build.panel$x.range
+  rawdata.plot.lower.xlim  <- rawdata.plot.xlim[1]
 
   if (isTRUE(float.contrast)  && isTRUE(slopegraph)) {
     rawdata.plot.smallest.ytick <-
@@ -567,6 +568,9 @@ plot.dabest <- function(dabest.object,
   segment.ypos             <- delta.plot.ylim[1]
   delta.plot.upper.ylim    <- delta.plot.ylim[2]
 
+  delta.plot.xlim          <- delta.plot.build.panel$x.range
+  delta.plot.lower.xlim    <- delta.plot.xlim[1]
+
   # Set padding to add.
   start.idx          <- 1
 
@@ -575,7 +579,7 @@ plot.dabest <- function(dabest.object,
     end.idx      <- start.idx + size - 1
 
     if (isTRUE(float.contrast)) {
-      xstart     <- rawdata.plot.lower.xlim
+      xstart     <- delta.plot.lower.xlim
       xend       <- end.idx   + padding * 3
 
       delta.plot <- delta.plot +
