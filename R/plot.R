@@ -206,7 +206,7 @@ plot.dabest <- function(dabest.object,
 
 
   #### Create themes. ####
-  horizontal.line.width = 0.1
+  horizontal.line.width = 0.4
 
   non.floating.theme <-
     theme +
@@ -244,7 +244,8 @@ plot.dabest <- function(dabest.object,
     rawdata.plot <- ggplot() +
       ylab(str_interp("${y_quoname}\n")) +
       scale_x_discrete(labels = Ns$swarmticklabs, limits = all.groups)
-      # xlim(all.groups)
+
+    slope.line.width  <- 0.5
 
     for (subplot_groups in idx) {
       subplot  <- filter(raw.data, !!x_enquo %in% subplot_groups)
@@ -256,25 +257,29 @@ plot.dabest <- function(dabest.object,
        if (quo_is_null(color.col_enquo)) {
           rawdata.plot <- rawdata.plot +
             geom_line(data = subplot,
-                      size = horizontal.line.width,
+                      size = slope.line.width,
+                      alpha = 0.8,
                       aes(!!x_enquo, !!y_enquo,
                           group = !!id.col))
         } else {
           rawdata.plot <- rawdata.plot +
             geom_line(data = subplot,
-                      size = horizontal.line.width * 3,
+                      size = slope.line.width,
+                      alpha = 0.75,
                       aes(!!x_enquo, !!y_enquo,
                           group = !!id.col,
                           colour = !!color.col_enquo))
         }
     }
+
     # Add x-labels.
     rawdata.plot <- rawdata.plot +
-      ylab(str_interp("${y_quoname}\n")) #+
-      #scale_x_discrete(labels = Ns$swarmticklabs)
+      ylab(str_interp("${y_quoname}\n"))
 
-  # swarmplot.
   } else {
+
+
+    # swarmplot.
     rawdata.plot <-
       ggplot(data = for.plot,
              aes(!!x_enquo, !!y_enquo)) +
@@ -306,32 +311,35 @@ plot.dabest <- function(dabest.object,
           rawdata.plot <- rawdata.plot + floating.theme
         } else {
           rawdata.plot <- rawdata.plot + non.floating.theme
+          }
         }
-      }
-    }
-
+  }
 
   # Plot the summary lines for each group if `float.contrast` is TRUE.
   if (isTRUE(float.contrast)) {
     func_control <- summary[[func]][1]
-    func_test <- summary[[func]][2]
-    control.summary.line.aes <- aes(x = 1, xend = 3,
-                                    y = func_control,
-                                    yend = func_control)
-    test.summary.line.aes <- aes(x = 2, xend = 3,
-                                 y = func_test,
-                                 yend = func_test)
-    rawdata.plot <- rawdata.plot +
-      # Plot the summary lines for each group.
-      geom_segment(size = horizontal.line.width,
-                   mapping = control.summary.line.aes) +
-      geom_segment(size = horizontal.line.width,
-                   mapping = test.summary.line.aes)
-  }
+    func_test    <- summary[[func]][2]
 
-  # Touch up swarm plot.
-  if (isTRUE(float.contrast)) {
-    # order the categories on the x-axis properly,
+    # I seem to be having difficulty getting the line thicknesses equal
+    # between the slopegraph and the delta axes? Need this hack...
+    if (isTRUE(slopegraph)) mult <- 1.5 else mult <- 1
+
+    rawdata.plot <- rawdata.plot +
+      # Plot the summary lines for the control group...
+      geom_segment(color = "black",
+                   size = horizontal.line.width * mult,
+                   aes(x = 1, xend = 3,
+                       y = func_control,
+                       yend = func_control)) +
+
+      # ... and the test group.
+      geom_segment(color = "black",
+                   size = horizontal.line.width * mult,
+                   aes(x = 2, xend = 3,
+                       y = func_test,
+                       yend = func_test))
+
+    # Apply appropriate theme to swarm plot.
     rawdata.plot <- rawdata.plot + floating.theme
   } else {
     rawdata.plot <- rawdata.plot + non.floating.theme
@@ -371,16 +379,14 @@ plot.dabest <- function(dabest.object,
   #### Plot bootstraps. ####
   if (isTRUE(float.contrast)) {
     es0.trimming       <- 1
-    flat_violin_width  <- 1.25
+    flat_violin_width  <- 1
     flat_violin_adjust <- 5
   } else {
     es0.trimming       <- 0.5
     flat_violin_width  <- 0.75
     flat_violin_adjust <- 3
   }
-  es0.line.aes <- aes(x = 0,
-                      xend = length(all.groups) + es0.trimming,
-                      y = 0, yend = 0)
+
   delta.plot <-
     ggplot(boots.for.plot, na.rm = TRUE) +
     geom_flat_violin(na.rm = TRUE,
@@ -390,7 +396,8 @@ plot.dabest <- function(dabest.object,
                      aes(!!x_enquo, !!y_enquo)) +
     # This is the line representing the null effect size.
     geom_segment(color =  "black", size = horizontal.line.width,
-                 mapping = es0.line.aes)
+                 x = 0, xend = length(all.groups) + es0.trimming,
+                 y = 0, yend = 0)
 
 
 
@@ -415,29 +422,108 @@ plot.dabest <- function(dabest.object,
 
 
 
+  #### Trim rawdata axes. ####
+  rawdata.plot <-  rawdata.plot + remove.axes
+
+  # Get the ylims.
+  rawdata.plot.build       <- ggplot_build(rawdata.plot)
+  rawdata.plot.build.panel <- rawdata.plot.build$layout$panel_params[[1]]
+  rawdata.plot.ylim        <- rawdata.plot.build.panel$y.range
+  segment.ypos             <- rawdata.plot.ylim[1]
+  # rawdata.plot.xlim        <- rawdata.plot.build.panel$x.range
+  # rawdata.plot.lower.xlim  <- rawdata.plot.xlim[1]
+
+  if (isTRUE(float.contrast)  && isTRUE(slopegraph)) {
+    rawdata.plot.smallest.ytick <-
+      rawdata.plot.build.panel$y.major_source[1]
+
+    rawdata.plot.ytick.interval <-
+      abs(abs(rawdata.plot.build.panel$y.major_source[2]) -
+            abs(rawdata.plot.smallest.ytick)
+          )
+
+    segment.ypos <- rawdata.plot.smallest.ytick - rawdata.plot.ytick.interval
+  }
+
+
+  # Set padding to add.
+  start.idx          <- 1
+  padding            <- 0.25
+
+  if (isTRUE(float.contrast)) {
+    segment.thickness <- 0.5
+  } else {
+    segment.thickness <- 0.75
+  }
+
+
+  # Re-draw the trimmed axes.
+  for (size in plot.groups.sizes) {
+    end.idx      <- start.idx + size - 1
+
+    if (isTRUE(float.contrast)) {
+      xstart   <- rawdata.plot.lower.xlim
+    } else {
+      xstart <- start.idx - padding
+    }
+
+    if (isFALSE(slopegraph)) {
+
+      if (isTRUE(float.contrast)) {
+        xend     <- end.idx   + padding * 1.5
+      } else {
+        xend     <- end.idx   + padding
+      }
+
+      rawdata.plot <- rawdata.plot +
+        geom_segment(x    = xstart,
+                     xend = xend,
+                     y    = segment.ypos,
+                     yend = segment.ypos,
+                     size = segment.thickness)
+
+    } else {
+      rawdata.plot <- rawdata.plot +
+        geom_segment(size = segment.thickness,
+                     aes_(x    = xstart,
+                          xend = end.idx + padding,
+                          y    = segment.ypos,
+                          yend = segment.ypos)
+                     )
+    }
+    start.idx  <- start.idx + size
+  }
+
+
+
   #### Touch up delta plot. ####
   if (isTRUE(float.contrast)) {
     # Draw the lone violinplot as a floating contrast.
     # Get rawdata.plot ylims.
     swarm.ylims <-
       ggplot_build(rawdata.plot)$layout$panel_scales_y[[1]]$range$range
+
     # Shift ylims appropriately.
     if (func_control > 0) {
       swarm.ylims <- swarm.ylims - func_control
     } else {
       swarm.ylims <- swarm.ylims + func_control
     }
-    effsize  = func_test - func_control
+
     delta.plot <- delta.plot +
       coord_cartesian(ylim = swarm.ylims) +
       scale_y_continuous(position = "right") +
-      # This is the delta-side effect size line, that aligns with
-      # the central measure of the test group.
-      geom_segment(color =  "black", size = horizontal.line.width,
-                   aes(x = 0, xend = 3,
-                       y = effsize, yend = effsize)) +
+      # This is the delta-side effect size line,
+      # that aligns with the central measure of the test group.
+      geom_segment(color = "black",
+                   size = horizontal.line.width,
+                   x = 0, xend = 3,
+                   y = boot.result$difference[1],
+                   yend = boot.result$difference[1]) +
       # Need to simulate a dummy x-label for plot alignment.
-      scale_x_discrete(labels = c("\n")) +
+      scale_x_discrete(
+        labels = c(str_interp("${all.groups[2]}\nminus ${all.groups[1]}"))
+        ) +
       floating.theme
 
   } else {
@@ -469,27 +555,21 @@ plot.dabest <- function(dabest.object,
       non.floating.theme
   }
 
-  #### Trim axes. ####
-  rawdata.plot <-  rawdata.plot + remove.axes
+
+
+  #### Trim deltaplot axes. ####
   delta.plot   <-  delta.plot   + remove.axes
 
-  # Get the ylims for both plots.
-  rawdata.plot.build       <- ggplot_build(rawdata.plot)
-  rawdata.plot.build.panel <- rawdata.plot.build$layout$panel_params[[1]]
-  rawdata.plot.ylim        <- rawdata.plot.build.panel$y.range
-  rawdata.plot.lower.ylim  <- rawdata.plot.ylim[1]
-  rawdata.plot.xlim        <- rawdata.plot.build.panel$x.range
-  rawdata.plot.lower.xlim  <- rawdata.plot.xlim[1]
-
+  # Get the ylims.
   delta.plot.build         <- ggplot_build(delta.plot)
   delta.plot.build.panel   <- delta.plot.build$layout$panel_params[[1]]
   delta.plot.ylim          <- delta.plot.build.panel$y.range
-  delta.plot.lower.ylim    <- delta.plot.ylim[1]
+  segment.ypos             <- delta.plot.ylim[1]
   delta.plot.upper.ylim    <- delta.plot.ylim[2]
 
   # Set padding to add.
   start.idx          <- 1
-  padding            <- 0.25
+
   # Re-draw the trimmed axes.
   for (size in plot.groups.sizes) {
     end.idx      <- start.idx + size - 1
@@ -501,25 +581,19 @@ plot.dabest <- function(dabest.object,
       delta.plot <- delta.plot +
         geom_segment(x    = 1 - (padding * 3),
                      xend = delta.plot.upper.ylim,
-                     y    = delta.plot.lower.ylim,
-                     yend = delta.plot.lower.ylim)
+                     y    = segment.ypos,
+                     yend = segment.ypos,
+                     size = segment.thickness)
     } else {
       xstart     <- start.idx - padding
       xend       <- end.idx   + padding
       delta.plot <- delta.plot +
         geom_segment(x    = xstart,
                      xend = xend,
-                     y    = delta.plot.lower.ylim,
-                     yend = delta.plot.lower.ylim)
+                     y    = segment.ypos,
+                     yend = segment.ypos,
+                     size = segment.thickness)
 
-    }
-
-    if (isFALSE(slopegraph)) {
-      rawdata.plot <- rawdata.plot +
-        geom_segment(x    = xstart,
-                     xend = xend,
-                     y    = rawdata.plot.lower.ylim,
-                     yend = rawdata.plot.lower.ylim)
     }
     start.idx  <- start.idx + size
   }
