@@ -6,9 +6,9 @@
 \usage{
 \method{plot}{dabest}(dabest.object, color.column = NULL,
   palette = "Set1", float.contrast = TRUE, slopegraph = TRUE,
-  theme = theme_classic(), tick.fontsize = 11,
-  axes.title.fontsize = 14, swarm.label = NULL, es.label = NULL,
-  rawmarker.size = 2, esmarker.size = 4,
+  group.summaries = "mean_sd", theme = theme_classic(),
+  tick.fontsize = 11, axes.title.fontsize = 14, swarm.label = NULL,
+  es.label = NULL, rawmarker.size = 2, esmarker.size = 4,
   rawplot.type = c("swarmplot", "sinaplot"), swarmplot.params = NULL,
   sinaplot.params = NULL, slopegraph.params = NULL)
 }
@@ -29,6 +29,13 @@ axes (also known as a \href{https://bit.ly/2NhqUAb}{Gardner-Altman plot.})}
 \item{slopegraph}{boolean, default TRUE. If the \code{dabest} object contains
 paired comparisons, \code{slopegraph = TRUE} will plot the rawdata as a
 \href{http://charliepark.org/slopegraphs/}{Tufte slopegraph}.}
+
+\item{group.summaries}{"mean_sd", "median_quartiles", or NULL. Plots the
+summary statistics for each group. If 'mean_sd', then the mean and standard
+deviation of each group is plotted as a gapped line beside each group.
+If 'median_quantiles', then the median and 25th and 75th percentiles of each
+group is plotted instead. If group.summaries = NULL, the summaries are not
+shown.}
 
 \item{theme}{default theme_classic()}
 
