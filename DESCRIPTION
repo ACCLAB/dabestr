@@ -33,6 +33,7 @@ Imports: boot,
     cowplot,
     forcats,
     ggforce,
+    ggbeeswarm,
     simpleboot,
     tidyr
 RoxygenNote: 6.1.0
