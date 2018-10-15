@@ -97,6 +97,7 @@ plot.dabest <- function(dabest.object,
                         palette             = "Set1",
                         float.contrast      = TRUE,
                         slopegraph          = TRUE,
+                        group.summaries     = "mean_sd",
                         theme               = theme_classic(),
                         tick.fontsize       = 11,
                         axes.title.fontsize = 14,
@@ -130,7 +131,7 @@ plot.dabest <- function(dabest.object,
   is.paired          <-  boot.result$paired[1]
 
 
-  #### Parse keywords. ####
+  #### Parse if float.contrast/slopegraph. ####
   # float.contrast and slopegraph
   if (isFALSE(is.paired)) slopegraph <- FALSE
 
@@ -174,6 +175,20 @@ plot.dabest <- function(dabest.object,
                                          sep = "\nN = "))
 
 
+  #### Compute stats for Tufte lines. ####
+  for.tufte.lines <-
+    for.plot %>%
+    group_by(!!x_enquo) %>%
+    summarize(mean = mean(!!y_enquo),
+              median = median(!!y_enquo),
+              sd = sd(!!y_enquo),
+              low.quartile = stats::quantile(!!y_enquo)[2],
+              upper.quartile = stats::quantile(!!y_enquo)[4]) %>%
+    mutate(low.sd = mean - sd,
+           upper.sd = mean + sd)
+
+
+  #### Parse keywords. ####
   # color.column
   color.col_enquo      <-  enquo(color.column)
   if (quo_is_null(color.col_enquo)) {
@@ -195,7 +210,7 @@ plot.dabest <- function(dabest.object,
 
   # *plot.params.
   if (isFALSE(slopegraph)) {
-
+    swarm.width = 0.3
     if (rawplot.type == 'swarmplot') {
       if (is.null(swarmplot.params)) {
         if (isTRUE(float.contrast)) {
@@ -204,7 +219,7 @@ plot.dabest <- function(dabest.object,
                                    alpha = 0.95,
                                    cex = 1)
         } else {
-          swarmplot.params <- list(width = 0.25)
+          swarmplot.params <- list(width = swarm.width)
         }
       } else if (class(swarmplot.params) != "list") {
         stop("`swarmplot.params` is not a list.")
@@ -214,6 +229,7 @@ plot.dabest <- function(dabest.object,
     } else if (rawplot.type == 'sinaplot') {
       if (is.null(sinaplot.params)) {
         sinaplot.params <- list(size = rawmarker.size,
+                                maxwidth = swarm.width,
                                 mapping = color.aes)
       } else if (class(sinaplot.params) != "list") {
         stop("`sinaplot.params` is not a list.")
@@ -300,7 +316,6 @@ plot.dabest <- function(dabest.object,
 
   } else {
 
-
     # swarmplot.
     rawdata.plot <-
       ggplot(data = for.plot,
@@ -334,17 +349,58 @@ plot.dabest <- function(dabest.object,
         } else {
           rawdata.plot <- rawdata.plot + non.floating.theme
           }
+      }
+
+    #### Plot group summaries. ####
+    if (isFALSE(float.contrast)) {
+      line.nudge = 0.35
+      pos.nudge = position_nudge(x = line.nudge)
+
+      if (!is.null(group.summaries)) {
+          accepted.summaries <- c('mean_sd', 'median_quartiles')
+
+          not.in.g.summs <- !(group.summaries %in% accepted.summaries)
+
+          if (not.in.g.summs) {
+            err1 <- str_interp("${group.summaries} is not a recognized option.")
+            err2 <- "Accepted `group.summaries` are 'mean_sd' or 'median_quartiles'."
+            stop(paste(err1, err2))
+
+          } else if (group.summaries == 'mean_sd') {
+            rawdata.plot <-
+              rawdata.plot +
+              suppressWarnings(
+                geom_linerange(data = for.tufte.lines, size = 1,
+                             position = pos.nudge,
+                             aes(x = !!x_enquo, y = mean,
+                                 ymin = low.sd,
+                                 ymax = upper.sd)) ) +
+              geom_point(data = for.tufte.lines, size = 0.75,
+                         position = pos.nudge,
+                         colour = "white",
+                         aes(x = !!x_enquo, y = mean))
+
+          } else if (group.summaries == 'median_quartiles') {
+            rawdata.plot <-
+              rawdata.plot +
+              geom_linerange(data = for.tufte.lines, size = 1,
+                             position = pos.nudge,
+                             aes(x = !!x_enquo, y = median,
+                                 ymin = low.quartile,
+                                 ymax = upper.quartile)) +
+              geom_point(data = for.tufte.lines, size = 0.75,
+                         position = pos.nudge,
+                         colour = "white",
+                         aes(x = !!x_enquo, y = median))
         }
+      }
+    }
   }
 
   # Plot the summary lines for each group if `float.contrast` is TRUE.
   if (isTRUE(float.contrast)) {
     func_control <- summary[[func]][1]
     func_test    <- summary[[func]][2]
-
-    # # I seem to be having difficulty getting the line thicknesses equal
-    # # between the slopegraph and the delta axes? Need this hack...
-    # if (isTRUE(slopegraph)) mult <- 1.5 else mult <- 1
 
     rawdata.plot <- rawdata.plot +
       # Plot the summary lines for the control group...
