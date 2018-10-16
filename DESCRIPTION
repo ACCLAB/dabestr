@@ -2,8 +2,13 @@ Package: dabestr
 Type: Package
 Title: Data Analysis using Bootstrap-Coupled Estimation in R.
 Version: 0.0.9999
-Author: Joses W. Ho and Tayfun Tumkaya
-Maintainer: Joses W. Ho <joseshowh@icloud.com>
+Authors@R: c(
+    person("Joses W.", "Ho", 
+          email = "joseshowh@gmail.com", role = c("cre", "aut")),
+    person("Tayfun", "Tumkaya",
+          role = c("aut"))
+          )
+Maintainer: Joses W. Ho <joseshowh@gmail.com>
 Description: dabestr is a package for Data Analysis using Bootstrap-Coupled 
     ESTimation in R.
     Estimation statistics is a simple framework that avoids the pitfalls of 
@@ -19,6 +24,17 @@ Description: dabestr is a package for Data Analysis using Bootstrap-Coupled
 License: BSD 3-Clause Clear
 Encoding: UTF-8
 LazyData: true
-Imports: boot,
-    simpleboot
+Depends: boot,
+    cowplot,
+    ggplot2 (>= 3.0), 
+    dplyr,
+    forcats,
+    ggforce,
+    ggbeeswarm,
+    rlang,
+    simpleboot,
+    stringr,
+    tibble,
+    tidyr
 RoxygenNote: 6.1.0
+Suggests: testthat
