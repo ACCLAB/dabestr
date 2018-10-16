@@ -312,6 +312,9 @@ dabest <- function(
     }
   }
 
+  # Reset seed.
+  set.seed(NULL)
+
 
 
   #### Compute summaries. ####
