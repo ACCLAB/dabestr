@@ -156,17 +156,18 @@ dabest <- function(
             ci = 95, reps = 5000, func = mean, seed = 12345) {
 
   #### Create quosures and quonames. ####
-  x_enquo        <-  enquo(x)
-  x_quoname      <-  quo_name(x_enquo)
+  x_enquo        <-  rlang::enquo(x)
+  x_quoname      <-  rlang::quo_name(x_enquo)
 
-  y_enquo        <-  enquo(y)
-  y_quoname      <-  quo_name(y_enquo)
+  y_enquo        <-  rlang::enquo(y)
+  y_quoname      <-  rlang::quo_name(y_enquo)
 
-  func_enquo     <-  enquo(func)
-  func_quoname   <-  quo_name(func_enquo)
+  func_enquo     <-  rlang::enquo(func)
+  func_quoname   <-  rlang::quo_name(func_enquo)
 
-  id.col_enquo   <-  enquo(id.column)
-  if (identical(paired, TRUE) & quo_is_null(id.col_enquo)) {
+  id.col_enquo   <-  rlang::enquo(id.column)
+
+  if (identical(paired, TRUE) & rlang::quo_is_null(id.col_enquo)) {
     stop("`paired` is TRUE but no `id.col` was supplied.")
   }
 
@@ -174,16 +175,17 @@ dabest <- function(
 
   #### Get only the columns we need. ####
   data_for_diff <-
-    as_tibble(.data) %>%
-    select(!!x_enquo, !!y_enquo, !!id.col_enquo)
+    tibble::as_tibble(.data) %>%
+    dplyr::select(!!x_enquo, !!y_enquo, !!id.col_enquo)
 
 
 
   #### Handled if paired. ####
   if (isTRUE(paired)) {
-    id.col_quoname <-  quo_name(id.col_enquo)
+    id.col_quoname <-  rlang::quo_name(id.col_enquo)
     # sort the data by id.col so we can be sure all the observations match up.
-    data_for_diff  <-  data_for_diff %>% arrange(!!x_enquo, !!id.col_enquo)
+    data_for_diff  <-
+      data_for_diff %>% dplyr::arrange(!!x_enquo, !!id.col_enquo)
   }
 
 
@@ -218,9 +220,11 @@ dabest <- function(
 
     # If ctrl is length 0, stop!
     if (length(c) == 0) {
-      stop(str_interp(c("There are zero numeric observations in ",
-                        "the group ${group[1]}."))
-           )
+      stop(
+        stringr::str_interp(
+          c("There are zero numeric observations in the group ${group[1]}.")
+          )
+        )
     }
 
     # Get test groups (everything else in group), loop through them and compute
@@ -232,18 +236,24 @@ dabest <- function(
 
       # Check if the current group is in the x-column.
       if (identical(grp %in% data_for_diff[[x_quoname]], FALSE)) {
-        stop(str_interp("${grp} is not found in the ${x_quoname} column."))
+        stop(
+          stringr::str_interp(
+            "${grp} is not found in the ${x_quoname} column."
+            )
+          )
       }
 
-      test <- data_for_diff %>% filter(!!x_enquo == grp)
+      test <- data_for_diff %>% dplyr::filter(!!x_enquo == grp)
       test <- test[[y_quoname]]
       t <- na.omit(test)
 
       # If current test group is length 0, stop!
       if (length(t) == 0) {
-        stop(str_interp(c("There are zero numeric observations in ",
-                          "the group ${grp}."))
-             )
+        stop(
+          stringr::str_interp(
+            c("There are zero numeric observations in the group ${grp}.")
+            )
+          )
       }
 
 
@@ -271,7 +281,7 @@ dabest <- function(
       # check CI.
       if (ci < 0 | ci > 100) {
         err_string <-
-          str_interp("`ci` must be between 0 and 100, not ${ci}")
+          stringr::str_interp("`ci` must be between 0 and 100, not ${ci}")
         stop(errstring)
       }
 
@@ -280,7 +290,7 @@ dabest <- function(
 
 
       #### Save pairwise result. ####
-      row <- tibble(
+      row <- tibble::tibble(
         # Convert the name of `func` to a string.
         control_group = group[1],
         test_group = grp,
@@ -306,10 +316,12 @@ dabest <- function(
 
 
   #### Compute summaries. ####
-  summaries <- .data %>%
-                  filter(!!x_enquo %in% all_groups) %>%
-                  group_by(!!x_enquo) %>%
-                  summarize(func_quoname = func(!!y_enquo))
+  summaries <-
+    .data %>%
+    dplyr::filter(!!x_enquo %in% all_groups) %>%
+    dplyr::group_by(!!x_enquo) %>%
+    dplyr::summarize(func_quoname = func(!!y_enquo))
+
   colnames(summaries) <- c(x_quoname, func_quoname)
 
 
@@ -320,7 +332,7 @@ dabest <- function(
   data.out[[x_quoname]] <- forcats::as_factor(data.out[[x_quoname]],
                                               all_groups)
 
-  data.out <- filter(data.out, !!x_enquo %in% all_groups)
+  data.out <- dplyr::filter(data.out, !!x_enquo %in% all_groups)
 
 
 
@@ -355,7 +367,7 @@ dabest <- function(
 print.dabest <- function(dabest.object, signif_digits = 3) {
 
   tbl <- dabest.object$result
-  var <- quo_name(dabest.object$y)
+  var <- rlang::quo_name(dabest.object$y)
   # Header
   dabest_ver = packageVersion("dabestr")
   header = str_interp(
@@ -382,7 +394,7 @@ print.dabest <- function(dabest.object, signif_digits = 3) {
 printrow_dabest <- function(my.row, sigdig = 3) {
   if (identical(my.row$paired, TRUE)) p <- "Paired" else p <- "Unpaired"
   ffunc <- my.row$func
-  line1 <- str_interp(
+  line1 <- stringr::str_interp(
     c(
       "${p} ${ffunc} difference of ",
       "${my.row$test_group} ",
@@ -393,7 +405,7 @@ printrow_dabest <- function(my.row, sigdig = 3) {
   )
 
 
-  line2 <- str_interp(
+  line2 <- stringr::str_interp(
     c("${signif(my.row$difference, sigdig)} ",
       "[${signif(my.row$ci, sigdig)}CI  ",
       "${signif(my.row$bca_ci_low, sigdig)}; ",

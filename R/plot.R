@@ -98,7 +98,7 @@ plot.dabest <- function(dabest.object,
                         float.contrast      = TRUE,
                         slopegraph          = TRUE,
                         group.summaries     = "mean_sd",
-                        theme               = theme_classic(),
+                        theme               = ggplot2::theme_classic(),
                         tick.fontsize       = 11,
                         axes.title.fontsize = 14,
                         swarm.label         = NULL,
@@ -124,8 +124,8 @@ plot.dabest <- function(dabest.object,
   # The variables below should are quosures!
   x_enquo            <-  dabest.object$x
   y_enquo            <-  dabest.object$y
-  x_quoname          <-  quo_name(x_enquo)
-  y_quoname          <-  quo_name(y_enquo)
+  x_quoname          <-  rlang::quo_name(x_enquo)
+  y_quoname          <-  rlang::quo_name(y_enquo)
   # `func` is not a quosure but a string.
   func               <-  boot.result$func[1]
   is.paired          <-  boot.result$paired[1]
@@ -156,7 +156,7 @@ plot.dabest <- function(dabest.object,
     # Reorder the plot data according to idx.
     for.plot <- list()
     for (subplot_groups in idx) {
-      subplot  <- filter(raw.data, !!x_enquo %in% subplot_groups)
+      subplot  <- dplyr::filter(raw.data, !!x_enquo %in% subplot_groups)
       for.plot[[length(for.plot) + 1]] <- subplot
     }
 
@@ -169,34 +169,39 @@ plot.dabest <- function(dabest.object,
 
 
   #### Compute the Ns. ####
-  Ns                 <-  for.plot %>% group_by(!!x_enquo) %>% count()
+  Ns <-
+    for.plot %>%
+    dplyr::group_by(!!x_enquo) %>%
+    dplyr::count()
 
-  Ns$swarmticklabs   <-  do.call(paste, c(Ns[c(x_quoname, "n")],
-                                         sep = "\nN = "))
+  Ns$swarmticklabs <-
+    do.call(paste, c(Ns[c(x_quoname, "n")],
+                     sep = "\nN = "))
 
 
   #### Compute stats for Tufte lines. ####
   for.tufte.lines <-
     for.plot %>%
-    group_by(!!x_enquo) %>%
-    summarize(mean = mean(!!y_enquo),
-              median = median(!!y_enquo),
-              sd = sd(!!y_enquo),
-              low.quartile = stats::quantile(!!y_enquo)[2],
-              upper.quartile = stats::quantile(!!y_enquo)[4]) %>%
-    mutate(low.sd = mean - sd,
+    dplyr::group_by(!!x_enquo) %>%
+    dplyr::summarize(mean           = mean(!!y_enquo),
+                     median         = median(!!y_enquo),
+                     sd             = sd(!!y_enquo),
+                     low.quartile   = stats::quantile(!!y_enquo)[2],
+                     upper.quartile = stats::quantile(!!y_enquo)[4]) %>%
+    dplyr::mutate(low.sd = mean - sd,
            upper.sd = mean + sd)
 
 
   #### Parse keywords. ####
   # color.column
-  color.col_enquo      <-  enquo(color.column)
+  color.col_enquo      <-  rlang::enquo(color.column)
+
   if (quo_is_null(color.col_enquo)) {
-    color.aes          <-  aes(col = !!x_enquo)
+    color.aes          <-  ggplot2::aes(col = !!x_enquo)
     swarm.dodge        <-  0
   } else {
-    color.col_quoname  <-  quo_name(color.col_enquo)
-    color.aes          <-  aes(col = !!color.col_enquo)
+    color.col_quoname  <-  rlang::quo_name(color.col_enquo)
+    color.aes          <-  ggplot2::aes(col = !!color.col_enquo)
     swarm.dodge        <-  0.1
   }
 
@@ -248,20 +253,25 @@ plot.dabest <- function(dabest.object,
 
   non.floating.theme <-
     theme +
-    theme(axis.text            =  element_text(size = tick.fontsize),
-          axis.title           =  element_text(size = axes.title.fontsize),
-          axis.ticks.length    =  unit(7, "points"),
-          axis.ticks.x.bottom  =  element_blank(),
-          axis.title.x.bottom  =  element_blank())
+    ggplot2::theme(
+      axis.text            =  ggplot2::element_text(size = tick.fontsize),
+      axis.title           =  ggplot2::element_text(size = axes.title.fontsize),
+      axis.ticks.length    =  ggplot2::unit(7, "points"),
+      axis.ticks.x.bottom  =  ggplot2::element_blank(),
+      axis.title.x.bottom  =  ggplot2::element_blank()
+      )
 
   floating.theme <-
     non.floating.theme +
-    theme(axis.title.x.bottom  =  element_blank(),
-          axis.ticks.x.bottom  =  element_blank())
+    ggplot2::theme(
+      axis.title.x.bottom  =  ggplot2::element_blank(),
+      axis.ticks.x.bottom  =  ggplot2::element_blank()
+      )
 
   legend.theme <-
-    theme(legend.title         =  element_text(size = axes.title.fontsize),
-          legend.text          =  element_text(size = tick.fontsize))
+    ggplot2::theme(
+      legend.title         =  ggplot2::element_text(size = axes.title.fontsize),
+      legend.text          =  ggplot2::element_text(size = tick.fontsize))
 
 
   non.floating.theme <-  non.floating.theme + legend.theme
@@ -269,9 +279,11 @@ plot.dabest <- function(dabest.object,
 
 
   remove.axes <-
-    theme(axis.line.x          = element_blank(),
-          axis.title.x         = element_blank(),
-          axis.ticks.x.bottom  = element_blank())
+    ggplot2::theme(
+      axis.line.x          = ggplot2::element_blank(),
+      axis.title.x         = ggplot2::element_blank(),
+      axis.ticks.x.bottom  = ggplot2::element_blank()
+      )
 
 
 
@@ -279,50 +291,56 @@ plot.dabest <- function(dabest.object,
   # slopegraph.
   if (rawplot.type == "slopegraph") {
 
-    rawdata.plot <- ggplot() +
-      ylab(str_interp("${y_quoname}\n")) +
-      scale_x_discrete(labels = Ns$swarmticklabs, limits = all.groups)
+    rawdata.plot <-
+      ggplot2::ggplot() +
+      ggplot2::ylab(stringr::str_interp("${y_quoname}\n")) +
+      ggplot2::scale_x_discrete(labels = Ns$swarmticklabs,
+                                limits = all.groups)
 
     slope.line.width  <- 0.5
 
     for (subplot_groups in idx) {
-      subplot  <- filter(raw.data, !!x_enquo %in% subplot_groups)
+      subplot  <- dplyr::filter(raw.data, !!x_enquo %in% subplot_groups)
 
       subplot[[x_quoname]] <-
         subplot[[x_quoname]] %>%
         factor(subplot_groups, ordered = TRUE)
 
        if (quo_is_null(color.col_enquo)) {
-          rawdata.plot <- rawdata.plot +
-            geom_line(data = subplot,
-                      size = slope.line.width,
-                      alpha = 0.8,
-                      aes(!!x_enquo, !!y_enquo,
-                          group = !!id.col))
+          rawdata.plot <-
+            rawdata.plot +
+            ggplot2::geom_line(data = subplot,
+                               size = slope.line.width,
+                               alpha = 0.8,
+                               ggplot2::aes(!!x_enquo, !!y_enquo,
+                                            group = !!id.col)
+                               )
         } else {
-          rawdata.plot <- rawdata.plot +
-            geom_line(data = subplot,
-                      size = slope.line.width,
-                      alpha = 0.75,
-                      aes(!!x_enquo, !!y_enquo,
-                          group = !!id.col,
-                          colour = !!color.col_enquo))
+          rawdata.plot <-
+            rawdata.plot +
+            ggplot2::geom_line(data = subplot,
+                               size = slope.line.width,
+                               alpha = 0.75,
+                               ggplot2::aes(!!x_enquo, !!y_enquo,
+                                            group = !!id.col,
+                                            colour = !!color.col_enquo)
+                               )
         }
     }
 
     # Add x-labels.
     rawdata.plot <- rawdata.plot +
-      ylab(str_interp("${y_quoname}\n"))
+      ggplot2::ylab(stringr::str_interp("${y_quoname}\n"))
 
   } else {
 
     # swarmplot.
     rawdata.plot <-
-      ggplot(data = for.plot,
-             aes(!!x_enquo, !!y_enquo)) +
-      scale_color_brewer(palette = palette) +
-      ylab(str_interp("${y_quoname}\n")) +
-      scale_x_discrete(labels = Ns$swarmticklabs)
+      ggplot2::ggplot(data = for.plot,
+                      ggplot2::aes(!!x_enquo, !!y_enquo)) +
+      ggplot2::scale_color_brewer(palette = palette) +
+      ggplot2::ylab(stringr::str_interp("${y_quoname}\n")) +
+      ggplot2::scale_x_discrete(labels = Ns$swarmticklabs)
 
       if (rawplot.type == 'swarmplot') {
         if (isTRUE(float.contrast)) {
@@ -354,7 +372,7 @@ plot.dabest <- function(dabest.object,
     #### Plot group summaries. ####
     if (isFALSE(float.contrast)) {
       line.nudge = 0.35
-      pos.nudge = position_nudge(x = line.nudge)
+      pos.nudge = ggplot2::position_nudge(x = line.nudge)
 
       if (!is.null(group.summaries)) {
           accepted.summaries <- c('mean_sd', 'median_quartiles')
@@ -362,7 +380,7 @@ plot.dabest <- function(dabest.object,
           not.in.g.summs <- !(group.summaries %in% accepted.summaries)
 
           if (not.in.g.summs) {
-            err1 <- str_interp("${group.summaries} is not a recognized option.")
+            err1 <- stringr::str_interp("${group.summaries} is not a recognized option.")
             err2 <- "Accepted `group.summaries` are 'mean_sd' or 'median_quartiles'."
             stop(paste(err1, err2))
 
@@ -370,28 +388,37 @@ plot.dabest <- function(dabest.object,
             rawdata.plot <-
               rawdata.plot +
               suppressWarnings(
-                geom_linerange(data = for.tufte.lines, size = 1,
-                             position = pos.nudge,
-                             aes(x = !!x_enquo, y = mean,
-                                 ymin = low.sd,
-                                 ymax = upper.sd)) ) +
-              geom_point(data = for.tufte.lines, size = 0.75,
-                         position = pos.nudge,
-                         colour = "white",
-                         aes(x = !!x_enquo, y = mean))
+                ggplot2::geom_linerange(
+                  data = for.tufte.lines,
+                  size = 1,
+                  position = pos.nudge,
+                  ggplot2::aes(x = !!x_enquo, y = mean,
+                               ymin = low.sd,
+                               ymax = upper.sd)) ) +
+              ggplot2::geom_point(
+                data = for.tufte.lines,
+                size = 0.75,
+                position = pos.nudge,
+                colour = "white",
+                aes(x = !!x_enquo, y = mean))
 
           } else if (group.summaries == 'median_quartiles') {
             rawdata.plot <-
               rawdata.plot +
-              geom_linerange(data = for.tufte.lines, size = 1,
-                             position = pos.nudge,
-                             aes(x = !!x_enquo, y = median,
-                                 ymin = low.quartile,
-                                 ymax = upper.quartile)) +
-              geom_point(data = for.tufte.lines, size = 0.75,
-                         position = pos.nudge,
-                         colour = "white",
-                         aes(x = !!x_enquo, y = median))
+              suppressWarnings(
+                ggplot2::geom_linerange(
+                  data = for.tufte.lines,
+                  size = 1,
+                  position = pos.nudge,
+                  ggplot2::aes(x = !!x_enquo, y = median,
+                               ymin = low.quartile,
+                               ymax = upper.quartile)) ) +
+              ggplot2::geom_point(
+                data = for.tufte.lines,
+                size = 0.75,
+                position = pos.nudge,
+                colour = "white",
+                aes(x = !!x_enquo, y = median))
         }
       }
     }
@@ -404,18 +431,22 @@ plot.dabest <- function(dabest.object,
 
     rawdata.plot <- rawdata.plot +
       # Plot the summary lines for the control group...
-      geom_segment(color = "black",
-                   size = horizontal.line.width,
-                   aes(x = 1, xend = 3,
-                       y = func_control,
-                       yend = func_control)) +
+      ggplot2::geom_segment(
+        color = "black",
+        size  = horizontal.line.width,
+        ggplot2::aes(x    = 1,
+                     xend = 3,
+                     y    = func_control,
+                     yend = func_control)) +
 
       # ... and the test group.
-      geom_segment(color = "black",
-                   size = horizontal.line.width,
-                   aes(x = 2, xend = 3,
-                       y = func_test,
-                       yend = func_test))
+      ggplot2::geom_segment(
+        color = "black",
+        size  = horizontal.line.width,
+        ggplot2::aes(x    = 2,
+                     xend = 3,
+                     y    = func_test,
+                     yend = func_test))
 
     # Apply appropriate theme to swarm plot.
     rawdata.plot <- rawdata.plot + floating.theme
@@ -427,7 +458,7 @@ plot.dabest <- function(dabest.object,
 
   #### Munge bootstraps. ####
   # Munge bootstraps into tibble for easy plotting with ggplot.
-  boots.for.plot <- as_tibble(data.frame(boot.result$bootstraps))
+  boots.for.plot <- tibble::as_tibble(data.frame(boot.result$bootstraps))
   colnames(boots.for.plot) <- boot.result$test_group
 
   if (isFALSE(float.contrast)) {
@@ -436,7 +467,7 @@ plot.dabest <- function(dabest.object,
       oldcols <- colnames(boots.for.plot)
       boots.for.plot <-
         boots.for.plot %>%
-        add_column(placeholder = rep(NaN, nrow(boots.for.plot)))
+        tibble::add_column(placeholder = rep(NaN, nrow(boots.for.plot)))
 
       colnames(boots.for.plot) <- c(oldcols, control.column)
     }
@@ -450,7 +481,7 @@ plot.dabest <- function(dabest.object,
     factor(boots.for.plot[[x_quoname]], all.groups, ordered = TRUE)
 
   boots.for.plot <-
-    arrange(boots.for.plot, !!x_enquo)
+    dplyr::arrange(boots.for.plot, !!x_enquo)
 
 
 
@@ -466,37 +497,47 @@ plot.dabest <- function(dabest.object,
   }
 
   delta.plot <-
-    ggplot(boots.for.plot, na.rm = TRUE) +
-    geom_flat_violin(na.rm = TRUE,
-                     width = flat_violin_width,
-                     adjust = flat_violin_adjust,
-                     size = 0,
-                     aes(!!x_enquo, !!y_enquo)) +
+    ggplot2::ggplot(boots.for.plot, na.rm = TRUE) +
+    geom_flat_violin(
+      na.rm  = TRUE,
+      width  = flat_violin_width,
+      adjust = flat_violin_adjust,
+      size   = 0,
+      aes(!!x_enquo, !!y_enquo)) +
     # This is the line representing the null effect size.
-    geom_segment(color =  "black", size = horizontal.line.width,
-                 x = 0, xend = length(all.groups) + es0.trimming,
-                 y = 0, yend = 0)
+    ggplot2::geom_segment(
+      color =  "black",
+      size  = horizontal.line.width,
+      x     = 0,
+      xend  = length(all.groups) + es0.trimming,
+      y     = 0,
+      yend  = 0)
 
 
 
   #### Plot effect sizes and CIs. ####
   if (isTRUE(boot.result$paired[1])) {
-    delta.ylab <- str_interp("Paired ${boot.result$func[1]} difference\n")
+    delta.ylab <- stringr::str_interp("Paired ${boot.result$func[1]} difference\n")
   } else {
-    delta.ylab <- str_interp("Unpaired ${boot.result$func[1]} difference\n")
+    delta.ylab <- stringr::str_interp("Unpaired ${boot.result$func[1]} difference\n")
   }
 
   delta.plot <-
     delta.plot +
-    ylab(delta.ylab) +
-    geom_point(data = boot.result,
-               color = "black", size = esmarker.size,
-               aes(test_group, difference)) +
-    geom_errorbar(data = boot.result,
-                  color = "black", width = 0, size = 0.75,
-                  aes(x = test_group,
-                      ymin = bca_ci_low,
-                      ymax = bca_ci_high))
+    ggplot2::ylab(delta.ylab) +
+    ggplot2::geom_point(
+      data  = boot.result,
+      color = "black",
+      size  = esmarker.size,
+      ggplot2::aes(test_group, difference)) +
+    ggplot2::geom_errorbar(
+      data  = boot.result,
+      color = "black",
+      width = 0,
+      size  = 0.75,
+      ggplot2::aes(x    = test_group,
+                   ymin = bca_ci_low,
+                   ymax = bca_ci_high))
 
 
 
@@ -504,7 +545,7 @@ plot.dabest <- function(dabest.object,
   rawdata.plot <-  rawdata.plot + remove.axes
 
   # Get the ylims.
-  rawdata.plot.build       <- ggplot_build(rawdata.plot)
+  rawdata.plot.build       <- ggplot2::ggplot_build(rawdata.plot)
   rawdata.plot.build.panel <- rawdata.plot.build$layout$panel_params[[1]]
   rawdata.plot.ylim        <- rawdata.plot.build.panel$y.range
   segment.ypos             <- rawdata.plot.ylim[1]
@@ -543,33 +584,35 @@ plot.dabest <- function(dabest.object,
     if (isTRUE(float.contrast)) {
       xstart   <- rawdata.plot.lower.xlim
     } else {
-      xstart <- start.idx - padding
+      xstart   <- start.idx - padding
     }
 
     if (isFALSE(slopegraph)) {
 
       if (isTRUE(float.contrast)) {
-        xend     <- end.idx   + padding * 1.5
+        xend   <- end.idx + padding * 1.5
       } else {
-        xend     <- end.idx   + padding
+        xend   <- end.idx + padding
       }
 
       rawdata.plot <- rawdata.plot +
-        geom_segment(x    = xstart,
-                     xend = xend,
-                     y    = segment.ypos,
-                     yend = segment.ypos,
-                     size = segment.thickness)
+        ggplot2::geom_segment(
+          x    = xstart,
+          xend = xend,
+          y    = segment.ypos,
+          yend = segment.ypos,
+          size = segment.thickness)
 
     } else {
       rawdata.plot <- rawdata.plot +
-        geom_segment(size = segment.thickness,
-                     aes_(x    = xstart,
-                          xend = end.idx + padding,
-                          y    = segment.ypos,
-                          yend = segment.ypos)
-                     )
+        ggplot2::geom_segment(
+          size = segment.thickness,
+          ggplot2::aes_(x    = xstart,
+                        xend = end.idx + padding,
+                        y    = segment.ypos,
+                        yend = segment.ypos))
     }
+
     start.idx  <- start.idx + size
   }
 
@@ -580,7 +623,7 @@ plot.dabest <- function(dabest.object,
     # Draw the lone violinplot as a floating contrast.
     # Get rawdata.plot ylims.
     swarm.ylims <-
-      ggplot_build(rawdata.plot)$layout$panel_scales_y[[1]]$range$range
+      ggplot2::ggplot_build(rawdata.plot)$layout$panel_scales_y[[1]]$range$range
 
     # Shift ylims appropriately.
     if (func_control > 0) {
@@ -589,20 +632,21 @@ plot.dabest <- function(dabest.object,
       swarm.ylims <- swarm.ylims + func_control
     }
 
-    delta.plot <- delta.plot +
-      coord_cartesian(ylim = swarm.ylims) +
-      scale_y_continuous(position = "right") +
+    delta.plot <-
+      delta.plot +
+      ggplot2::coord_cartesian(ylim = swarm.ylims) +
+      ggplot2::scale_y_continuous(position = "right") +
       # This is the delta-side effect size line,
       # that aligns with the central measure of the test group.
-      geom_segment(color = "black",
-                   size = horizontal.line.width,
-                   x = 0, xend = 3,
-                   y = boot.result$difference[1],
-                   yend = boot.result$difference[1]) +
+      ggplot2::geom_segment(color = "black",
+                            size  = horizontal.line.width,
+                            x     = 0,
+                            xend  = 3,
+                            y     = boot.result$difference[1],
+                            yend  = boot.result$difference[1]) +
       # Need to simulate a dummy x-label for plot alignment.
-      scale_x_discrete(
-        labels = c(str_interp("${all.groups[2]}\nminus ${all.groups[1]}"))
-        ) +
+      ggplot2::scale_x_discrete(labels =
+          c(stringr::str_interp("${all.groups[2]}\nminus ${all.groups[1]}")) ) +
       floating.theme
 
   } else {
@@ -610,27 +654,29 @@ plot.dabest <- function(dabest.object,
     # Properly concatenate the delta.plot labels.
     delta.tick.labs  <- vector("list", length(idx))
     i <- 1
+
     for (subplot_groups in idx) {
       control_group <- subplot_groups[1]
       test_groups   <- subplot_groups[2: length(subplot_groups)]
 
       labels <- c(" ",
-                  paste(test_groups, str_interp("minus\n${control_group}"),
+                  paste(test_groups, stringr::str_interp("minus\n${control_group}"),
                         sep = "\n"))
 
       delta.tick.labs[[i]] = labels
       i <- i + 1
     }
     # Equalize the xlims across both plots.
-    both.xlim    <- c(1, length(all.groups) + 0.3)
+    both.xlim <- c(1, length(all.groups) + 0.3)
 
     if (isFALSE(float.contrast)) {
-      rawdata.plot <- rawdata.plot + coord_cartesian(xlim = both.xlim)
+      rawdata.plot <- rawdata.plot + ggplot2::coord_cartesian(xlim = both.xlim)
     }
 
-    delta.plot   <- delta.plot +
-      coord_cartesian(xlim = both.xlim) +
-      scale_x_discrete(labels = delta.tick.labs) +
+    delta.plot <-
+      delta.plot +
+      ggplot2::coord_cartesian(xlim = both.xlim) +
+      ggplot2::scale_x_discrete(labels = delta.tick.labs) +
       non.floating.theme
   }
 
@@ -640,7 +686,7 @@ plot.dabest <- function(dabest.object,
   delta.plot   <-  delta.plot   + remove.axes
 
   # Get the ylims.
-  delta.plot.build         <- ggplot_build(delta.plot)
+  delta.plot.build         <- ggplot2::ggplot_build(delta.plot)
   delta.plot.build.panel   <- delta.plot.build$layout$panel_params[[1]]
   delta.plot.ylim          <- delta.plot.build.panel$y.range
   segment.ypos             <- delta.plot.ylim[1]
@@ -660,21 +706,23 @@ plot.dabest <- function(dabest.object,
       xstart     <- delta.plot.lower.xlim
       xend       <- end.idx   + padding * 3
 
-      delta.plot <- delta.plot +
-        geom_segment(x    = 1 - (padding * 3),
-                     xend = delta.plot.upper.ylim,
-                     y    = segment.ypos,
-                     yend = segment.ypos,
-                     size = segment.thickness)
+      delta.plot <-
+        delta.plot +
+        ggplot2::geom_segment(x    = 1 - (padding * 3),
+                              xend = delta.plot.upper.ylim,
+                              y    = segment.ypos,
+                              yend = segment.ypos,
+                              size = segment.thickness)
     } else {
       xstart     <- start.idx - padding
       xend       <- end.idx   + padding
-      delta.plot <- delta.plot +
-        geom_segment(x    = xstart,
-                     xend = xend,
-                     y    = segment.ypos,
-                     yend = segment.ypos,
-                     size = segment.thickness)
+      delta.plot <-
+        delta.plot +
+        ggplot2::geom_segment(x    = xstart,
+                              xend = xend,
+                              y    = segment.ypos,
+                              yend = segment.ypos,
+                              size = segment.thickness)
 
     }
     start.idx  <- start.idx + size
@@ -683,11 +731,11 @@ plot.dabest <- function(dabest.object,
 
 
   #### Handle color legend. ####
-  if (!quo_is_null(color.col_enquo)) {
+  if (!rlang::quo_is_null(color.col_enquo)) {
     legend <- cowplot::get_legend(rawdata.plot)
   }
   # Remove the legend from the rawplot.
-  rawdata.plot <- rawdata.plot + guides(color = "none")
+  rawdata.plot <- rawdata.plot + ggplot2::guides(color = "none")
 
 
 
@@ -705,10 +753,12 @@ plot.dabest <- function(dabest.object,
 
       suffix.spacing   <- rep(" ", space.diff)
 
-      rawplot.yticks   <- paste(str_interp(suffix.spacing), rawplot.yticks)
+      rawplot.yticks   <- paste(stringr::str_interp(suffix.spacing),
+                                rawplot.yticks)
 
-      rawdata.plot     <- rawdata.plot +
-                          scale_y_continuous(labels = rawplot.yticks)
+      rawdata.plot <-
+        rawdata.plot +
+        ggplot2::scale_y_continuous(labels = rawplot.yticks)
 
 
     } else if (max_rawplot_ticklength > max_deltaplot_ticklength) {
@@ -716,10 +766,10 @@ plot.dabest <- function(dabest.object,
 
       suffix.spacing   <- rep(" ", space.diff)
 
-      deltaplot.yticks <- paste(str_interp(suffix.spacing), deltaplot.yticks)
+      deltaplot.yticks <- paste(stringr::str_interp(suffix.spacing), deltaplot.yticks)
 
-      delta.plot       <- delta.plot +
-                          scale_y_continuous(labels = deltaplot.yticks)
+      delta.plot <- delta.plot +
+        ggplot2::scale_y_continuous(labels = deltaplot.yticks)
     }
   }
 
@@ -730,17 +780,19 @@ plot.dabest <- function(dabest.object,
   if (isTRUE(float.contrast)) {
     # Side-by-side floating plot layout.
     # plot.margin declares the top, right, bottom, left margins in order.
-    rawdata.plot <- rawdata.plot +
-      theme(plot.margin = unit(c(5.5, 0, 5.5, 5.5), "pt"))
+    rawdata.plot <-
+      rawdata.plot +
+      ggplot2::theme(plot.margin = unit(c(5.5, 0, 5.5, 5.5), "pt"))
 
-    delta.plot   <- delta.plot +
-      theme(plot.margin = unit(c(5.5, 5.5, 5.5, 0), "pt"),
-            axis.line.x.bottom = element_blank())
+    delta.plot   <-
+      delta.plot +
+      ggplot2::theme(plot.margin = unit(c(5.5, 5.5, 5.5, 0), "pt"),
+                     axis.line.x.bottom = ggplot2::element_blank())
 
     aligned_spine = 'b'
     nrows <- 1
 
-    if (quo_is_null(color.col_enquo)) {
+    if (rlang::quo_is_null(color.col_enquo)) {
       plist <- list(rawdata.plot, delta.plot)
       ncols <- 2
       widths <- c(0.7, 0.3)
@@ -755,7 +807,7 @@ plot.dabest <- function(dabest.object,
     aligned_spine = 'lr'
     nrows <- 2
 
-    if (quo_is_null(color.col_enquo)) {
+    if (rlang::quo_is_null(color.col_enquo)) {
       plist <- list(rawdata.plot, delta.plot)
       ncols <- 1
       widths <- c(1)
@@ -767,10 +819,11 @@ plot.dabest <- function(dabest.object,
   }
 
   result <- cowplot::plot_grid(
-            plotlist = plist,
-            nrow = nrows, ncol = ncols,
+            plotlist   = plist,
+            nrow       = nrows,
+            ncol       = ncols,
             rel_widths = widths,
-            axis = aligned_spine)
+            axis       = aligned_spine)
 
   return(result)
 }

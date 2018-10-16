@@ -11,7 +11,7 @@
 #'
 get_tick_labels <- function(plot.obj, axes) {
   # This works for ggplot2 v3.0.0; not fully tested with other versions yet.
-  plot.obj.build <- ggplot_build(plot.obj)
+  plot.obj.build <- ggplot2::ggplot_build(plot.obj)
 
   if (axes == "x") {
     ticks <- plot.obj.build$layout$panel_params[[1]]$x.labels
@@ -23,6 +23,9 @@ get_tick_labels <- function(plot.obj, axes) {
 
   return(ticks)
 }
+
+
+
 
 #' Get the longest character string from a list.
 #'
