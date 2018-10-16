@@ -6,7 +6,7 @@
 \usage{
 \method{plot}{dabest}(dabest.object, color.column = NULL,
   palette = "Set1", float.contrast = TRUE, slopegraph = TRUE,
-  group.summaries = "mean_sd", theme = theme_classic(),
+  group.summaries = "mean_sd", theme = ggplot2::theme_classic(),
   tick.fontsize = 11, axes.title.fontsize = 14, swarm.label = NULL,
   es.label = NULL, rawmarker.size = 2, esmarker.size = 4,
   rawplot.type = c("swarmplot", "sinaplot"), swarmplot.params = NULL,
