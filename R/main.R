@@ -7,10 +7,10 @@
 #' of \code{idx} is the control group. The difference between
 #' \code{func(group_n)} and \code{func(control)} is computed, for every
 #' subsequent element of \code{idx}.\cr \cr For each comparison, a bootstrap
-#' confidence interval isconstructed for the difference, and bias correction and
-#' acceleration isapplied to correct for any skew. \code{dabest} uses bootstrap
+#' confidence interval is constructed for the difference, and bias correction and
+#' acceleration is applied to correct for any skew. \code{dabest} uses bootstrap
 #' resampling to compute non-parametric assumption-free confidence intervals,
-#' and visualizesthem using estimation plots with a specialized
+#' and visualizes them using estimation plots with a specialized
 #' \code{\link{plot.dabest}} function.
 #'
 #' Estimation statistics is a statistical framework that focusses on effect
@@ -54,8 +54,7 @@
 #'   group specified in \code{idx}. These will be used by \code{plot()} to
 #'   generate the estimation plot.
 #'
-#'   \code{result} is a list of the class "boot.diff", with the following 15
-#'   elements:
+#'   \code{result} is a \link{tibble} with the following 15 columns:
 #'   \item{control_group, test_group}{ The name of the control group
 #'   and test group respectively. }
 #'   \item{control_size, test_size}{ The number
