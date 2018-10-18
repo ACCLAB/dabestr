@@ -135,6 +135,8 @@ plot.dabest <- function(dabest.object,
                         float.contrast      = TRUE,
                         slopegraph          = TRUE,
                         group.summaries     = "mean_sd",
+                        rawplot.ylabel      = NULL,
+                        effsize.ylabel       = NULL,
                         theme               = ggplot2::theme_classic(),
                         tick.fontsize       = 11,
                         axes.title.fontsize = 14,
@@ -282,6 +284,26 @@ plot.dabest <- function(dabest.object,
   } else {
     rawplot.type <- "slopegraph"
   }
+
+  # y-axes labels.
+  if (is.null(rawplot.ylabel)) {
+    rawplot.ylabel <- stringr::str_interp("${y_quoname}\n")
+  } else {
+    rawplot.ylabel <- stringr::str_interp("${rawplot.ylabel}\n")
+  }
+
+  if (is.null(effsize.ylabel)) {
+    if (isTRUE(is.paired)) {
+      effsize.ylabel <-
+        stringr::str_interp("Paired ${func} difference\n")
+    } else {
+      effsize.ylabel <-
+        stringr::str_interp("Unpaired ${func} difference\n")
+    }
+  } else {
+    effsize.ylabel <- stringr::str_interp("${effsize.ylabel}\n")
+  }
+
 
 
 
