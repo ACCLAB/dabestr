@@ -135,19 +135,23 @@ plot.dabest <- function(dabest.object,
                         float.contrast      = TRUE,
                         slopegraph          = TRUE,
                         group.summaries     = "mean_sd",
+
+                        rawplot.type        = c("swarmplot", "sinaplot"),
+                        rawplot.ylim        = NULL,
                         rawplot.ylabel      = NULL,
+                        rawplot.markersize  = 2,
+
+                        effsize.ylim        = NULL,
                         effsize.ylabel       = NULL,
+                        effsize.markersize  = 4,
+
                         theme               = ggplot2::theme_classic(),
                         tick.fontsize       = 11,
                         axes.title.fontsize = 14,
-                        swarm.label         = NULL,
-                        es.label            = NULL,
-                        rawmarker.size      = 2,
-                        esmarker.size       = 4,
-                        rawplot.type        = c("swarmplot", "sinaplot"),
+
                         swarmplot.params    = NULL,
                         sinaplot.params     = NULL,
-                        slopegraph.params   = NULL) {
+                        slopegraph.params   = NULL ){
 
   #### Extract variables ####
   # Create handles for easy access to the items in `dabest.object`.
@@ -170,7 +174,7 @@ plot.dabest <- function(dabest.object,
   is.paired          <-  boot.result$paired[1]
 
 
-  #### Parse if float.contrast/slopegraph. ####
+  #### Decide if floating or slopegraph. ####
   # float.contrast and slopegraph
   if (isFALSE(is.paired)) slopegraph <- FALSE
 
@@ -185,7 +189,7 @@ plot.dabest <- function(dabest.object,
 
 
 
-  #### Decide if multiplot or not. ####
+  #### Select data for plotting. ####
   if (length(all.groups)     == 2 &&
       plot.groups.sizes[[1]] == 2) {
     # Not multiplot. Add it to an empty list.
@@ -258,7 +262,7 @@ plot.dabest <- function(dabest.object,
     if (rawplot.type == 'swarmplot') {
       if (is.null(swarmplot.params)) {
         if (isTRUE(float.contrast)) {
-          swarmplot.params <- list(size = rawmarker.size,
+          swarmplot.params <- list(size = rawplot.markersize,
                                    dodge.width = swarm.dodge,
                                    alpha = 0.95,
                                    cex = 1)
@@ -272,7 +276,7 @@ plot.dabest <- function(dabest.object,
 
     } else if (rawplot.type == 'sinaplot') {
       if (is.null(sinaplot.params)) {
-        sinaplot.params <- list(size = rawmarker.size,
+        sinaplot.params <- list(size = rawplot.markersize,
                                 maxwidth = swarm.width,
                                 mapping = color.aes)
       } else if (class(sinaplot.params) != "list") {
@@ -346,13 +350,33 @@ plot.dabest <- function(dabest.object,
 
 
 
+  #### Set rawdata plot ylims. ####
+  if (is.null(rawplot.ylim)) {
+    rawplot.ylim <- range(for.plot[[y_quoname]])
+  }
+
+  # Equalize the xlims across both plots.
+  if (isTRUE(float.contrast)) {
+    rawdata.coord_cartesian <-
+      ggplot2::coord_cartesian(ylim = rawplot.ylim)
+
+  } else {
+    both.xlim <- c(1, length(all.groups) + 0.3)
+    rawdata.coord_cartesian <-
+      ggplot2::coord_cartesian(xlim = both.xlim, ylim = rawplot.ylim)
+  }
+
+
+
+
   #### Plot raw data. ####
   # slopegraph.
   if (rawplot.type == "slopegraph") {
 
     rawdata.plot <-
       ggplot2::ggplot() +
-      ggplot2::ylab(stringr::str_interp("${y_quoname}\n")) +
+      rawdata.coord_cartesian +
+      ggplot2::ylab(rawplot.ylabel) +
       ggplot2::scale_x_discrete(labels = Ns$swarmticklabs,
                                 limits = all.groups)
 
@@ -391,15 +415,18 @@ plot.dabest <- function(dabest.object,
     rawdata.plot <- rawdata.plot +
       ggplot2::ylab(stringr::str_interp("${y_quoname}\n"))
 
-  } else {
 
+
+  } else {
     # swarmplot.
     rawdata.plot <-
       ggplot2::ggplot(data = for.plot,
                       ggplot2::aes(!!x_enquo, !!y_enquo)) +
+      rawdata.coord_cartesian +
       ggplot2::scale_color_brewer(palette = palette) +
-      ggplot2::ylab(stringr::str_interp("${y_quoname}\n")) +
-      ggplot2::scale_x_discrete(labels = Ns$swarmticklabs)
+      ggplot2::ylab(rawplot.ylabel) +
+      ggplot2::scale_x_discrete(breaks = all.groups,
+                                labels = Ns$swarmticklabs)
 
       if (rawplot.type == 'swarmplot') {
         if (isTRUE(float.contrast)) {
@@ -544,6 +571,13 @@ plot.dabest <- function(dabest.object,
 
 
 
+  #### Set delta plot ylims. ####
+  if (is.null(effsize.ylim)) {
+    effsize.ylim <- range( na.omit(boots.for.plot[y_quoname]) )
+  }
+
+
+
   #### Plot bootstraps. ####
   if (isTRUE(float.contrast)) {
     es0.trimming       <- 1
@@ -575,19 +609,14 @@ plot.dabest <- function(dabest.object,
 
 
   #### Plot effect sizes and CIs. ####
-  if (isTRUE(boot.result$paired[1])) {
-    delta.ylab <- stringr::str_interp("Paired ${boot.result$func[1]} difference\n")
-  } else {
-    delta.ylab <- stringr::str_interp("Unpaired ${boot.result$func[1]} difference\n")
-  }
 
   delta.plot <-
     delta.plot +
-    ggplot2::ylab(delta.ylab) +
+    ggplot2::ylab(effsize.ylabel) +
     ggplot2::geom_point(
       data  = boot.result,
       color = "black",
-      size  = esmarker.size,
+      size  = effsize.markersize,
       ggplot2::aes(test_group, difference)) +
     ggplot2::geom_errorbar(
       data  = boot.result,
@@ -600,6 +629,62 @@ plot.dabest <- function(dabest.object,
 
 
 
+  #### Float vs nonfloat delta plots. ####
+  if (isTRUE(float.contrast)) {
+
+    # Shift ylims appropriately.
+    if (func_control > 0) {
+      new.delta.ylim <- rawplot.ylim - func_control
+    } else {
+      new.delta.ylim <- rawplot.ylim + func_control
+    }
+
+    delta.plot <-
+      delta.plot +
+      ggplot2::coord_cartesian(ylim = new.delta.ylim) +
+      ggplot2::scale_y_continuous(position = "right") +
+      # This is the delta-side effect size line,
+      # that aligns with the central measure of the test group.
+      ggplot2::geom_segment(color = "black",
+                            size  = horizontal.line.width,
+                            x     = 0,
+                            xend  = 3,
+                            y     = boot.result$difference[1],
+                            yend  = boot.result$difference[1]) +
+      ggplot2::scale_x_discrete(labels =
+          c(stringr::str_interp("${all.groups[2]}\nminus ${all.groups[1]}")) ) +
+      floating.theme
+
+
+  } else {
+    # Plot nonfloating deltas.
+    # Properly concatenate the delta.plot labels.
+    delta.tick.labs  <- vector("list", length(idx))
+    i <- 1
+
+    for (subplot_groups in idx) {
+      control_group <- subplot_groups[1]
+      test_groups   <- subplot_groups[2: length(subplot_groups)]
+
+      labels <- c(" ",
+                  paste(test_groups, stringr::str_interp("minus\n${control_group}"),
+                        sep = "\n"))
+
+      delta.tick.labs[[i]] = labels
+      i <- i + 1
+    }
+
+    # Equalize the xlims across both plots, and set ylims for deltaplot.
+    delta.plot <- delta.plot +
+      ggplot2::coord_cartesian(xlim = both.xlim,
+                               ylim = effsize.ylim) +
+      ggplot2::scale_x_discrete(breaks = all.groups,
+                                labels = delta.tick.labs) +
+      non.floating.theme
+  }
+
+
+
   #### Trim rawdata axes. ####
   rawdata.plot <-  rawdata.plot + remove.axes
 
@@ -607,19 +692,25 @@ plot.dabest <- function(dabest.object,
   rawdata.plot.build       <- ggplot2::ggplot_build(rawdata.plot)
   rawdata.plot.build.panel <- rawdata.plot.build$layout$panel_params[[1]]
   rawdata.plot.ylim        <- rawdata.plot.build.panel$y.range
+
+  # rawdata.plot.build.panel_scales <-
+  #   rawdata.plot.build$layout$panel_scales_y[[1]]
+  # rawdata.plot.scale.ylim         <-
+  #   rawdata.plot.build.panel_scales$range$range
+
   segment.ypos             <- rawdata.plot.ylim[1]
 
   rawdata.plot.xlim        <- rawdata.plot.build.panel$x.range
   rawdata.plot.lower.xlim  <- rawdata.plot.xlim[1]
 
-  if (isTRUE(float.contrast)  && isTRUE(slopegraph)) {
+  if (isTRUE(float.contrast) && isTRUE(slopegraph)) {
     rawdata.plot.smallest.ytick <-
       rawdata.plot.build.panel$y.major_source[1]
 
     rawdata.plot.ytick.interval <-
       abs(abs(rawdata.plot.build.panel$y.major_source[2]) -
             abs(rawdata.plot.smallest.ytick)
-          )
+      )
 
     segment.ypos <- rawdata.plot.smallest.ytick - rawdata.plot.ytick.interval
   }
@@ -677,69 +768,6 @@ plot.dabest <- function(dabest.object,
 
 
 
-  #### Touch up delta plot. ####
-  if (isTRUE(float.contrast)) {
-    # Draw the lone violinplot as a floating contrast.
-    # Get rawdata.plot ylims.
-    swarm.ylims <-
-      ggplot2::ggplot_build(rawdata.plot)$layout$panel_scales_y[[1]]$range$range
-
-    # Shift ylims appropriately.
-    if (func_control > 0) {
-      swarm.ylims <- swarm.ylims - func_control
-    } else {
-      swarm.ylims <- swarm.ylims + func_control
-    }
-
-    delta.plot <-
-      delta.plot +
-      ggplot2::coord_cartesian(ylim = swarm.ylims) +
-      ggplot2::scale_y_continuous(position = "right") +
-      # This is the delta-side effect size line,
-      # that aligns with the central measure of the test group.
-      ggplot2::geom_segment(color = "black",
-                            size  = horizontal.line.width,
-                            x     = 0,
-                            xend  = 3,
-                            y     = boot.result$difference[1],
-                            yend  = boot.result$difference[1]) +
-      # Need to simulate a dummy x-label for plot alignment.
-      ggplot2::scale_x_discrete(labels =
-          c(stringr::str_interp("${all.groups[2]}\nminus ${all.groups[1]}")) ) +
-      floating.theme
-
-  } else {
-    # Plot nonfloating deltas.
-    # Properly concatenate the delta.plot labels.
-    delta.tick.labs  <- vector("list", length(idx))
-    i <- 1
-
-    for (subplot_groups in idx) {
-      control_group <- subplot_groups[1]
-      test_groups   <- subplot_groups[2: length(subplot_groups)]
-
-      labels <- c(" ",
-                  paste(test_groups, stringr::str_interp("minus\n${control_group}"),
-                        sep = "\n"))
-
-      delta.tick.labs[[i]] = labels
-      i <- i + 1
-    }
-    # Equalize the xlims across both plots.
-    both.xlim <- c(1, length(all.groups) + 0.3)
-
-    if (isFALSE(float.contrast)) {
-      rawdata.plot <- rawdata.plot + ggplot2::coord_cartesian(xlim = both.xlim)
-    }
-
-    delta.plot <-
-      delta.plot +
-      ggplot2::coord_cartesian(xlim = both.xlim) +
-      ggplot2::scale_x_discrete(labels = delta.tick.labs) +
-      non.floating.theme
-  }
-
-
 
   #### Trim deltaplot axes. ####
   delta.plot   <-  delta.plot   + remove.axes
@@ -767,8 +795,10 @@ plot.dabest <- function(dabest.object,
 
       delta.plot <-
         delta.plot +
-        ggplot2::geom_segment(x    = 1 - (padding * 3),
-                              xend = delta.plot.upper.ylim,
+        ggplot2::geom_segment(#x    = 1 - (padding * 3),
+                              #xend = delta.plot.upper.ylim,
+                              x    = xstart,
+                              xend = xend,
                               y    = segment.ypos,
                               yend = segment.ypos,
                               size = segment.thickness)
@@ -800,36 +830,41 @@ plot.dabest <- function(dabest.object,
 
   #### Equalize tick label lengths. ####
   if (isFALSE(float.contrast)) {
-    rawplot.yticks           <- get_tick_labels(rawdata.plot, axes="y")
-    max_rawplot_ticklength   <- max_nchar_ticks(rawplot.yticks)
+    rawplot.yticks.labels    <- get_tick_labels(rawdata.plot, axes="y")
+    rawplot.yticks.breaks    <- as.numeric(rawplot.yticks.labels)
+    max_rawplot_ticklength   <- max_nchar_ticks(rawplot.yticks.labels)
 
-    deltaplot.yticks         <- get_tick_labels(delta.plot, axes="y")
-    max_deltaplot_ticklength <- max_nchar_ticks(deltaplot.yticks)
+    deltaplot.yticks.labels  <- get_tick_labels(delta.plot, axes="y")
+    deltaplot.yticks.breaks  <- as.numeric(deltaplot.yticks.labels)
+    max_deltaplot_ticklength <- max_nchar_ticks(deltaplot.yticks.labels)
 
 
     if (max_rawplot_ticklength < max_deltaplot_ticklength) {
       space.diff <- max_deltaplot_ticklength - max_rawplot_ticklength
 
-      suffix.spacing   <- rep(" ", space.diff)
+      suffix.spacing        <- rep(" ", space.diff)
 
-      rawplot.yticks   <- paste(stringr::str_interp(suffix.spacing),
-                                rawplot.yticks)
-
+      rawplot.yticks.labels <- paste(stringr::str_interp(suffix.spacing),
+                                     rawplot.yticks.labels)
       rawdata.plot <-
         rawdata.plot +
-        ggplot2::scale_y_continuous(labels = rawplot.yticks)
+        ggplot2::scale_y_continuous(breaks = rawplot.yticks.breaks,
+                                    labels = rawplot.yticks.labels)
 
 
     } else if (max_rawplot_ticklength > max_deltaplot_ticklength) {
       space.diff = max_rawplot_ticklength - max_deltaplot_ticklength
 
-      suffix.spacing   <- rep(" ", space.diff)
+      suffix.spacing          <- rep(" ", space.diff)
 
-      deltaplot.yticks <- paste(stringr::str_interp(suffix.spacing), deltaplot.yticks)
+      deltaplot.yticks.labels <- paste(stringr::str_interp(suffix.spacing),
+                                       deltaplot.yticks.labels)
 
       delta.plot <- delta.plot +
-        ggplot2::scale_y_continuous(labels = deltaplot.yticks)
+        ggplot2::scale_y_continuous(breaks = deltaplot.yticks.breaks,
+                                    labels = deltaplot.yticks.labels)
     }
+
   }
 
 
@@ -877,18 +912,13 @@ plot.dabest <- function(dabest.object,
     }
   }
 
+
   result <- cowplot::plot_grid(
-            plotlist   = plist,
-            nrow       = nrows,
-            ncol       = ncols,
-            rel_widths = widths,
-            axis       = aligned_spine)
-
+      plotlist   = plist,
+      nrow       = nrows,
+      ncol       = ncols,
+      rel_widths = widths,
+      axis       = aligned_spine)
   return(result)
+
 }
-
-
-
-
-
-
