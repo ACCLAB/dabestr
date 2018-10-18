@@ -411,10 +411,6 @@ plot.dabest <- function(dabest.object,
         }
     }
 
-    # Add x-labels.
-    rawdata.plot <- rawdata.plot +
-      ggplot2::ylab(stringr::str_interp("${y_quoname}\n"))
-
 
 
   } else {
