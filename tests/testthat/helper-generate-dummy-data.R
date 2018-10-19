@@ -20,3 +20,8 @@ generate.two.groups <- function(sampleN = 40, populationN = 10000,
   return(my.data)
 }
 
+
+
+generate.canned.data <- function() {
+  # Add code later.
+}
