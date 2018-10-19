@@ -1,0 +1,216 @@
+---
+title: "An Introduction to dabestr"
+author: "Joses Ho"
+date: "`r Sys.Date()`"
+output:
+  tufte::tufte_html: default
+  rmarkdown::html_vignette: default
+  pdf_document: default
+subtitle: Data Analysis with Bootstrap Estimation
+vignette: >
+  %\VignetteIndexEntry{An Introduction to dabestr} 
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8} 
+---
+
+# Create Data
+
+```{r create.data, message=FALSE}
+library(dplyr)
+
+set.seed(54321)
+
+N = 40
+c1 <- rnorm(N, mean = 100, sd = 25)
+c2 <- rnorm(N, mean = 100, sd = 50)
+g1 <- rnorm(N, mean = 120, sd = 25)
+g2 <- rnorm(N, mean = 80, sd = 50)
+g3 <- rnorm(N, mean = 100, sd = 12)
+g4 <- rnorm(N, mean = 100, sd = 50)
+gender <- c(rep('Male', N/2), rep('Female', N/2))
+id <- 1: N
+
+
+wide.data <- 
+  tibble::tibble(
+    Control1 = c1, Control2 = c2,
+    Group1 = g1, Group2 = g2, Group3 = g3, Group4 = g4,
+    Gender = gender, ID = id)
+
+
+my.data   <- 
+  wide.data %>%
+  tidyr::gather(key = Group, value = Measurement, -ID, -Gender)
+
+head(my.data)
+```
+
+# The Gardner-Altman Two Group Estimation Plot
+
+## Unpaired
+
+The `dabest` function is the main workhorse. To create a two-group estimation plot (_aka_ a Gardner-Altman plot), specify the `x` and `y` columns, whether the comparison is `paired = TRUE` or `paired = FALSE`, and the 2 groups via `idx`. The first group is the control group, and the second group is the test group. The effect size will be computed as `second - first`.
+
+```{r two.group.unpaired, message=FALSE, fig.width = 7, fig.height = 4}
+
+library(dabestr)
+
+two.group.unpaired <- 
+  my.data %>%
+  dabest(Group, Measurement, 
+         idx = c("Control1", "Group1"), 
+         paired = FALSE)
+
+# Calling the object automatically prints out a summary.
+two.group.unpaired 
+
+# Creating an estimation plot.
+plot(two.group.unpaired, color.col = Gender)
+```
+
+## Paired
+
+If the obeservations are paired, one needs to specify an `id.col`, which is a column in the data that indicates the identity of each paired observation. This will produce a slopegraph instead of a swarmplot is produced.
+
+```{r two.group.paired, fig.width = 7, fig.height = 4}
+two.group.paired <- 
+  my.data %>%
+  dabest(Group, Measurement, 
+         idx = c("Control1", "Group1"), 
+         paired = TRUE, id.col = ID)
+
+# The summary indicates this is a paired comparison. 
+two.group.paired 
+
+plot(two.group.paired, color.col = Gender)
+```
+
+# The Cummings estimation plot
+
+## Multi-two group
+
+To create a multi-two group plot, one will need to specify a list, with each element of the list corresponding to the each two-group comparison.
+
+```{r multi.two.group.unpaired, fig.width = 7, fig.height = 4}
+
+multi.two.group.unpaired <- 
+  my.data %>%
+  dabest(Group, Measurement, 
+         idx = list(c("Control1", "Group1"), 
+                    c("Control2", "Group2")),
+         paired = FALSE
+  )
+
+multi.two.group.unpaired 
+
+plot(multi.two.group.unpaired, color.col = Gender)
+```
+
+## Multi-paired
+
+One can also produce a multi-paired plot.
+
+```{r multi.two.group.paired, fig.width = 7, fig.height = 4}
+
+multi.two.group.paired <- 
+  my.data %>%
+  dabest(Group, Measurement, 
+         idx = list(c("Control1", "Group1"), 
+                    c("Control2", "Group2")),
+         paired = TRUE, id.col = ID
+  )
+
+multi.two.group.paired 
+
+plot(multi.two.group.paired, color.col = Gender, slopegraph = FALSE)
+```
+
+## Shared Control
+
+If you supply a character vector to `idx` with more than 2 groups, a *shared control* plot will be produced.
+
+```{r shared.control, fig.width = 7, fig.height = 4}
+
+shared.control <- 
+  my.data %>%
+  dabest(Group, Measurement, 
+         idx = c("Control2", "Group2", "Group4"),
+         paired = FALSE
+  )
+
+shared.control 
+
+plot(shared.control, color.col = Gender, rawplot.type = "swarmplot")
+
+```
+
+## Multi-group plot
+
+```{r multi.group, fig.width = 7, fig.height = 4}
+
+multi.group <- 
+  my.data %>%
+  dabest(Group, Measurement, 
+         idx = list(c("Control1", "Group1", "Group3"), 
+                    c("Control2", "Group2", "Group4")),
+         paired = FALSE
+  )
+
+multi.group 
+
+plot(multi.group, color.col = Gender)
+```
+
+# Controlling Aesthetics
+
+You can control several graphical aspects of the estimation plot. 
+
+Use the `rawplot.ylim` and `effsize.ylim` parametersto supply custom y-limits for the rawplot and the delta plot, respectively.
+
+
+```{r ylim.demo, fig.width = 7, fig.height = 4}
+
+plot(multi.group, color.col = Gender,
+     rawplot.ylim = c(-100, 200),
+     effsize.ylim = c(-60, 60)
+)
+
+```
+
+The `rawplot.ylabel` and `effsize.ylabel` parameters control the y-axis titles for the rawplot and the delta plot, respectively.
+
+```{r ylabel.demo, fig.width = 7, fig.height = 4}
+
+plot(multi.group, color.col = Gender,
+     rawplot.ylabel = "Rawplot Title?",
+     effsize.ylabel = "My delta plot!"
+)
+```
+
+The `axes.title.fontsize` parameter determines the fontsize of both the rawplot and deltaplot y-axes titles.
+
+```{r ylabel.fontsize, fig.width = 7, fig.height = 4}
+
+plot(multi.group, color.col = Gender,
+     axes.title.fontsize = 10 # default is 14.
+)
+
+```
+
+The `palette` parameter accepts any `ggplot2` palettes. The default palette applied is "Set2". 
+
+```{r palette.demo, fig.width = 7, fig.height = 4}
+
+plot(multi.group, color.col = Gender,
+     palette = "Dark2" # The default is "Set2".
+     )
+```
+
+You can use the `theme` parameter to pass along any ggplot2 themes. The default `ggplot2` theme is `theme_classic{}`. 
+
+```{r different.theme, fig.width = 7, fig.height = 4}
+plot(multi.group, color.col = Gender,
+     theme = theme_gray()
+     )
+```
+
