@@ -80,7 +80,7 @@
 #'   used to indicate the effect size.
 #'
 #'
-#' @param theme default \code{theme_classic()} from \link{ggtheme}.
+#' @param theme default \link{theme_classic}.
 #'
 #' @param tick.fontsize default 11. This controls the font size (in points) of
 #'   all tick labels.
@@ -112,8 +112,8 @@
 #'
 #'
 #' @section References:
-#' \href{https://doi.org/10.1101/377978}{Moving beyond P values}: Everyday data
-#' analysis with estimation plots. (2018) Joses Ho, Tayfun Tumkaya, Sameer
+#' \href{https://doi.org/10.1101/377978}{Moving beyond P values: Everyday data
+#' analysis with estimation plots.} (2018) Joses Ho, Tayfun Tumkaya, Sameer
 #' Aryal, Hyungwon Choi, Adam Claridge-Chang
 #'
 #'

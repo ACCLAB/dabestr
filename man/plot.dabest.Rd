@@ -72,7 +72,7 @@ to \code{dabest}.}
 \item{effsize.markersize}{default 4. This is the size (in points) of the dots
 used to indicate the effect size.}
 
-\item{theme}{default \code{theme_classic()} from \link{ggtheme}.}
+\item{theme}{default \link{theme_classic}.}
 
 \item{tick.fontsize}{default 11. This controls the font size (in points) of
 all tick labels.}
@@ -116,8 +116,8 @@ and produces an estimation plot.
 }
 \section{References}{
 
-\href{https://doi.org/10.1101/377978}{Moving beyond P values}: Everyday data
-analysis with estimation plots. (2018) Joses Ho, Tayfun Tumkaya, Sameer
+\href{https://doi.org/10.1101/377978}{Moving beyond P values: Everyday data
+analysis with estimation plots.} (2018) Joses Ho, Tayfun Tumkaya, Sameer
 Aryal, Hyungwon Choi, Adam Claridge-Chang
 }
 
