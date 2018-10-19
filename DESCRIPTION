@@ -38,4 +38,7 @@ Depends: boot,
     tidyr
 RoxygenNote: 6.1.0
 Suggests: testthat,
-    vdiffr
+    vdiffr,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
