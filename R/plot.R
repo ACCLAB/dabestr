@@ -231,8 +231,7 @@ plot.dabest <- function(dabest.object,
                      sd             = sd(!!y_enquo),
                      low.quartile   = stats::quantile(!!y_enquo)[2],
                      upper.quartile = stats::quantile(!!y_enquo)[4]) %>%
-    dplyr::mutate(low.sd = mean - sd,
-           upper.sd = mean + sd)
+    dplyr::mutate(low.sd = mean - sd, upper.sd = mean + sd)
 
 
   #### Parse keywords. ####
