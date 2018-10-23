@@ -231,8 +231,7 @@ plot.dabest <- function(dabest.object,
                      sd             = sd(!!y_enquo),
                      low.quartile   = stats::quantile(!!y_enquo)[2],
                      upper.quartile = stats::quantile(!!y_enquo)[4]) %>%
-    dplyr::mutate(low.sd = mean - sd,
-           upper.sd = mean + sd)
+    dplyr::mutate(low.sd = mean - sd, upper.sd = mean + sd)
 
 
   #### Parse keywords. ####
@@ -575,32 +574,41 @@ plot.dabest <- function(dabest.object,
 
 
   #### Plot bootstraps. ####
+  float.reflines.xstart <- 0.4
+  float.reflines.xend   <- 1.6
+
   if (isTRUE(float.contrast)) {
-    es0.trimming       <- 1
-    flat_violin_width  <- 1
-    flat_violin_adjust <- 5
+    es0.trimming        <- 0
+    flat.violin.width   <- 1
+    flat.violin.adjust  <- 5
+    x.start             <- float.reflines.xstart
+    x.end               <- float.reflines.xend
+
   } else {
-    es0.trimming       <- 0.5
-    flat_violin_width  <- 0.75
-    flat_violin_adjust <- 3
+    es0.trimming        <- 0.5
+    flat.violin.width   <- 0.75
+    flat.violin.adjust  <- 3
+    x.start             <- 0
+    x.end               <- length(all.groups) + es0.trimming
   }
 
   delta.plot <-
     ggplot2::ggplot(boots.for.plot, na.rm = TRUE) +
     geom_flat_violin(
-      na.rm  = TRUE,
-      width  = flat_violin_width,
-      adjust = flat_violin_adjust,
-      size   = 0,
-      aes(!!x_enquo, !!y_enquo)) +
+      aes(!!x_enquo, !!y_enquo),
+      na.rm  =  TRUE,
+      width  =  flat.violin.width,
+      adjust =  flat.violin.adjust,
+      size   =  0 # width of the line.
+      ) +
     # This is the line representing the null effect size.
     ggplot2::geom_segment(
-      color =  "black",
-      size  = horizontal.line.width,
-      x     = 0,
-      xend  = length(all.groups) + es0.trimming,
-      y     = 0,
-      yend  = 0)
+      color  =  "black",
+      size   =  horizontal.line.width,
+      x      =  x.start,
+      xend   =  x.end,
+      y      =  0,
+      yend   =  0)
 
 
 
@@ -643,8 +651,8 @@ plot.dabest <- function(dabest.object,
       # that aligns with the central measure of the test group.
       ggplot2::geom_segment(color = "black",
                             size  = horizontal.line.width,
-                            x     = 0,
-                            xend  = 3,
+                            x     = float.reflines.xstart,
+                            xend  = float.reflines.xend,
                             y     = boot.result$difference[1],
                             yend  = boot.result$difference[1]) +
       ggplot2::scale_x_discrete(labels =
@@ -689,39 +697,15 @@ plot.dabest <- function(dabest.object,
   rawdata.plot.build.panel <- rawdata.plot.build$layout$panel_params[[1]]
   rawdata.plot.ylim        <- rawdata.plot.build.panel$y.range
 
-  # rawdata.plot.build.panel_scales <-
-  #   rawdata.plot.build$layout$panel_scales_y[[1]]
-  # rawdata.plot.scale.ylim         <-
-  #   rawdata.plot.build.panel_scales$range$range
-
   segment.ypos             <- rawdata.plot.ylim[1]
 
   rawdata.plot.xlim        <- rawdata.plot.build.panel$x.range
   rawdata.plot.lower.xlim  <- rawdata.plot.xlim[1]
 
-  if (isTRUE(float.contrast) && isTRUE(slopegraph)) {
-    rawdata.plot.smallest.ytick <-
-      rawdata.plot.build.panel$y.major_source[1]
-
-    rawdata.plot.ytick.interval <-
-      abs(abs(rawdata.plot.build.panel$y.major_source[2]) -
-            abs(rawdata.plot.smallest.ytick)
-      )
-
-    segment.ypos <- rawdata.plot.smallest.ytick - rawdata.plot.ytick.interval
-  }
-
 
   # Set padding to add.
   start.idx          <- 1
   padding            <- 0.25
-
-  if (isTRUE(float.contrast)) {
-    segment.thickness <- 0.5
-  } else {
-    segment.thickness <- 0.75
-  }
-
 
   # Re-draw the trimmed axes.
   for (size in plot.groups.sizes) {
@@ -733,7 +717,17 @@ plot.dabest <- function(dabest.object,
       xstart   <- start.idx - padding
     }
 
-    if (isFALSE(slopegraph)) {
+    if (isTRUE(slopegraph)) {
+
+      rawdata.plot <- rawdata.plot +
+        ggplot2::geom_segment(
+          # size = segment.thickness,
+          ggplot2::aes_(x    = xstart,
+                        xend = end.idx + padding,
+                        y    = segment.ypos,
+                        yend = segment.ypos))
+
+    } else {
 
       if (isTRUE(float.contrast)) {
         xend   <- end.idx + padding * 1.5
@@ -746,17 +740,8 @@ plot.dabest <- function(dabest.object,
           x    = xstart,
           xend = xend,
           y    = segment.ypos,
-          yend = segment.ypos,
-          size = segment.thickness)
+          yend = segment.ypos)
 
-    } else {
-      rawdata.plot <- rawdata.plot +
-        ggplot2::geom_segment(
-          size = segment.thickness,
-          ggplot2::aes_(x    = xstart,
-                        xend = end.idx + padding,
-                        y    = segment.ypos,
-                        yend = segment.ypos))
     }
 
     start.idx  <- start.idx + size
@@ -766,7 +751,7 @@ plot.dabest <- function(dabest.object,
 
 
   #### Trim deltaplot axes. ####
-  delta.plot   <-  delta.plot   + remove.axes
+  delta.plot  <-  delta.plot + remove.axes
 
   # Get the ylims.
   delta.plot.build         <- ggplot2::ggplot_build(delta.plot)
@@ -777,9 +762,10 @@ plot.dabest <- function(dabest.object,
 
   delta.plot.xlim          <- delta.plot.build.panel$x.range
   delta.plot.lower.xlim    <- delta.plot.xlim[1]
+  delta.plot.upper.xlim    <- delta.plot.xlim[2]
 
   # Set padding to add.
-  start.idx          <- 1
+  start.idx      <- 1
 
   # Re-draw the trimmed axes.
   for (size in plot.groups.sizes) {
@@ -787,29 +773,21 @@ plot.dabest <- function(dabest.object,
 
     if (isTRUE(float.contrast)) {
       xstart     <- delta.plot.lower.xlim
-      xend       <- end.idx   + padding * 3
+      xend       <- delta.plot.upper.xlim
 
-      delta.plot <-
-        delta.plot +
-        ggplot2::geom_segment(#x    = 1 - (padding * 3),
-                              #xend = delta.plot.upper.ylim,
-                              x    = xstart,
-                              xend = xend,
-                              y    = segment.ypos,
-                              yend = segment.ypos,
-                              size = segment.thickness)
     } else {
       xstart     <- start.idx - padding
       xend       <- end.idx   + padding
-      delta.plot <-
-        delta.plot +
-        ggplot2::geom_segment(x    = xstart,
-                              xend = xend,
-                              y    = segment.ypos,
-                              yend = segment.ypos,
-                              size = segment.thickness)
-
     }
+
+    delta.plot <-
+      delta.plot +
+      ggplot2::geom_segment(x    = xstart,
+                            xend = xend,
+                            y    = segment.ypos,
+                            yend = segment.ypos
+      )
+
     start.idx  <- start.idx + size
   }
 

@@ -43,4 +43,3 @@ generate.canned.data <- function() {
   my.data <- wide.data %>%
     tidyr::gather(key = Group, value = Measurement, -ID, -Gender)
 }
-
