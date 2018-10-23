@@ -65,7 +65,7 @@ two.group.unpaired <-
 two.group.unpaired 
 
 # Creating an estimation plot.
-plot(two.group.unpaired, color.col = Gender)
+plot(two.group.unpaired, color.col = Gender, rawplot.ylim = c(0, 200))
 ```
 
 ## Paired
@@ -122,7 +122,7 @@ multi.two.group.paired <-
 
 multi.two.group.paired 
 
-plot(multi.two.group.paired, color.col = Gender, slopegraph = FALSE)
+plot(multi.two.group.paired, color.col = Gender, slopegraph = TRUE)
 ```
 
 ## Shared Control
@@ -165,7 +165,7 @@ plot(multi.group, color.col = Gender)
 
 You can control several graphical aspects of the estimation plot. 
 
-Use the `rawplot.ylim` and `effsize.ylim` parametersto supply custom y-limits for the rawplot and the delta plot, respectively.
+Use the `rawplot.ylim` and `effsize.ylim` parameters to supply custom y-limits for the rawplot and the delta plot, respectively.
 
 
 ```{r ylim.demo, fig.width = 7, fig.height = 4}
