@@ -111,7 +111,8 @@ Statistical Science: vol. 11, no. 3, 1996. pp. 189–228.
 \examples{
 # Performing unpaired (two independent groups) analysis.
 unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
-                             "setosa", "versicolor", paired = FALSE)
+                             idx = c("setosa", "versicolor"),
+                             paired = FALSE)
 
 # Display the results in a user-friendly format.
 unpaired_mean_diff

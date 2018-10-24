@@ -102,7 +102,8 @@
 #' @examples
 #' # Performing unpaired (two independent groups) analysis.
 #' unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
-#'                              "setosa", "versicolor", paired = FALSE)
+#'                              idx = c("setosa", "versicolor"),
+#'                              paired = FALSE)
 #'
 #' # Display the results in a user-friendly format.
 #' unpaired_mean_diff
