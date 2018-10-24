@@ -18,25 +18,34 @@
 #' associated dichotomous hypothesis testing.
 #'
 #'
+#'
 #' @param .data A data.frame or tibble.
+#'
 #' @param x,y Columns in \code{.data}.
+#'
 #' @param idx A vector containing factors or strings in the \code{x} columns.
 #'   These must be quoted (ie. surrounded by quotation marks). The first element
 #'   will be the control group, so all differences will be computed for every
 #'   other group and this first group.
+#'
 #' @param paired boolean. If TRUE, the two groups are treated as paired samples.
 #'   The \code{control_group} group is treated as pre-intervention and the
 #'   \code{test_group} group is considered post-intervention.
+#'
 #' @param id.column A column name indicating the identity of the datapoint if
 #' the data is paired. This must be supplied if paired is TRUE.
+#'
 #' @param ci float, default 95. The level of the confidence intervals produced.
 #'   The default \code{ci = 95} produces 95\% CIs.
+#'
 #' @param reps integer, default 5000. The number of bootstrap resamples that
 #'   will be generated.
+#'
 #' @param func function, default mean. This function will be applied to
 #'   \code{control} and \code{test} individually, and the difference will be
 #'   saved as a single bootstrap resample. Any NaNs will be removed
 #'   automatically with \code{na.omit}.
+#'
 #' @param seed integer, default 12345. This specifies the seed used to set the
 #' random number generator. Setting a seed ensures that the bootstrap confidence
 #' intervals for the same data will remain stable over seperate runs/calls of
@@ -55,28 +64,41 @@
 #'   generate the estimation plot.
 #'
 #'   \code{result} is a \link{tibble} with the following 15 columns:
+#'
 #'   \item{control_group, test_group}{ The name of the control group
 #'   and test group respectively. }
+#'
 #'   \item{control_size, test_size}{ The number
 #'   of observations in the control group and test group respectively. }
+#'
 #'   \item{func}{ The \code{func} passed to \code{bootdiff}. }
+#'
 #'   \item{paired}{ Is
 #'   the difference paired (\code{TRUE}) or not (\code{FALSE})? }
+#'
 #'   \item{difference}{ The difference between the two groups; effectively
 #'   \code{func(test_group) - func(control_group)}. }
+#'
 #'   \item{variable}{ The
 #'   variable whose difference is being computed, ie. the column supplied to
 #'   \code{y}. }
+#'
 #'   \item{ci}{ The \code{ci} passed to the \code{bootdiff}. }
+#'
 #'   \item{bca_ci_low, bca_ci_high}{ The lower and upper limits of the Bias
 #'   Corrected and Accelerated bootstrap confidence interval. }
+#'
 #'   \item{pct_ci_low, pct_ci_high}{ The lower and upper limits of the
 #'   percentile bootstrap confidence interval. }
 #'
 #'   \item{bootstraps}{ The array of bootstrap resamples generated. }
 #'
+#'
+#'
 #' @seealso \code{\link{plot.dabest}}, which generates an estimation plot from
 #'   the \code{dabest} object.
+#'
+#'
 #' @examples
 #' # Performing unpaired (two independent groups) analysis.
 #' unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
@@ -90,34 +112,38 @@
 #'
 #'
 #' # Performing paired analysis.
-#' paired_mean_diff <- dabest(
-#'                      iris, Species, Petal.Width,
-#'                      idx = c("setosa", "versicolor", "virginica"),
-#'                      paired = FALSE)
+#' paired_mean_diff          <- dabest(
+#'                               iris, Species, Petal.Width,
+#'                               idx = c("setosa", "versicolor", "virginica"),
+#'                               paired = FALSE
+#'                               )
 #'
 #'
 #' # Computing the median difference.
-#' unpaired_median_diff <- dabest(
-#'                      iris, Species, Petal.Width,
-#'                      idx = c("setosa", "versicolor", "virginica"),
-#'                      paired = FALSE,
-#'                      func = median)
+#' unpaired_median_diff      <- dabest(
+#'                               iris, Species, Petal.Width,
+#'                               idx = c("setosa", "versicolor", "virginica"),
+#'                               paired = FALSE,
+#'                               func = median
+#'                               )
 #'
 #'
 #' # Producing a 90% CI instead of 95%.
-#' unpaired_mean_diff_90_ci <- dabest(
-#'                      iris, Species, Petal.Width,
-#'                      idx = c("setosa", "versicolor", "virginica"),
-#'                      paired = FALSE,
-#'                      ci = 0.90)
+#' unpaired_mean_diff_90_ci  <- dabest(
+#'                               iris, Species, Petal.Width,
+#'                               idx = c("setosa", "versicolor", "virginica"),
+#'                               paired = FALSE,
+#'                               ci = 0.90
+#'                               )
 #'
 #'
 #' # Constructing the confidence intervals on 10000 bootstrap resamples.
 #' unpaired_mean_diff_n10000 <- dabest(
-#'                      iris, Species, Petal.Width,
-#'                      idx = c("setosa", "versicolor", "virginica"),
-#'                      paired = FALSE,
-#'                      reps = 10000)
+#'                                iris, Species, Petal.Width,
+#'                                idx = c("setosa", "versicolor", "virginica"),
+#'                                paired = FALSE,
+#'                                reps = 10000
+#'                                )
 #'
 #' # Using pipes to munge your data and then passing to `dabest`.
 #' # First, we generate some synthetic data.
@@ -134,17 +160,14 @@
 #'                      idx = c("Control", "Test1", "Test2"),
 #'                      paired = FALSE)
 #'
-#' @section References: DiCiccio, Thomas J., and Bradley Efron. Bootstrap
-#'   Confidence Intervals. Statistical Science: vol. 11, no. 3, 1996, pp.
-#'   189–228,
-#'
-#'   \url{http://www.jstor.org/stable/2246110.}
 #'
 #'
-#'   Efron, Bradley, and R. J. Tibshirani. An Introduction to the Bootstrap. CRC
-#'   Press, 1994.
+#' @section References:
+#' \href{http://www.jstor.org/stable/2246110}{Bootstrap Confidence Intervals.}
+#' DiCiccio, Thomas J., and Bradley Efron.
+#' Statistical Science: vol. 11, no. 3, 1996. pp. 189–228.
 #'
-#'   \url{https://www.crcpress.com/An-Introduction-to-the-Bootstrap/Efron-Tibshirani/p/book/9780412042317}
+#'   \href{https://www.crcpress.com/An-Introduction-to-the-Bootstrap/Efron-Tibshirani/p/book/9780412042317}{An Introduction to the Bootstrap.} Efron, Bradley, and R. J. Tibshirani. 1994. CRC Press.
 #'
 #'
 #'
@@ -373,7 +396,7 @@ print.dabest <- function(dabest.object, signif_digits = 3) {
   # Header
   dabest_ver = packageVersion("dabestr")
   header = str_interp(
-    "Data Analysis with Bootstrap Estimation (DABEST) v${dabest_ver}\n")
+    "DABEST (Data Analysis with Bootstrap Estimation) v${dabest_ver}\n")
   cat(header)
 
   cat(rep('=', nchar(header) - 1), sep='')

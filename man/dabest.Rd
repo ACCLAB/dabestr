@@ -52,21 +52,30 @@ A list with 7 elements: \code{data}, \code{x}, \code{y}, \code{idx},
   generate the estimation plot.
 
   \code{result} is a \link{tibble} with the following 15 columns:
+
   \item{control_group, test_group}{ The name of the control group
   and test group respectively. }
+
   \item{control_size, test_size}{ The number
   of observations in the control group and test group respectively. }
+
   \item{func}{ The \code{func} passed to \code{bootdiff}. }
+
   \item{paired}{ Is
   the difference paired (\code{TRUE}) or not (\code{FALSE})? }
+
   \item{difference}{ The difference between the two groups; effectively
   \code{func(test_group) - func(control_group)}. }
+
   \item{variable}{ The
   variable whose difference is being computed, ie. the column supplied to
   \code{y}. }
+
   \item{ci}{ The \code{ci} passed to the \code{bootdiff}. }
+
   \item{bca_ci_low, bca_ci_high}{ The lower and upper limits of the Bias
   Corrected and Accelerated bootstrap confidence interval. }
+
   \item{pct_ci_low, pct_ci_high}{ The lower and upper limits of the
   percentile bootstrap confidence interval. }
 
@@ -91,17 +100,12 @@ sizes and confidence intervals around them, rather than \emph{P} values and
 associated dichotomous hypothesis testing.
 }
 \section{References}{
- DiCiccio, Thomas J., and Bradley Efron. Bootstrap
-  Confidence Intervals. Statistical Science: vol. 11, no. 3, 1996, pp.
-  189–228,
 
-  \url{http://www.jstor.org/stable/2246110.}
+\href{http://www.jstor.org/stable/2246110}{Bootstrap Confidence Intervals.}
+DiCiccio, Thomas J., and Bradley Efron.
+Statistical Science: vol. 11, no. 3, 1996. pp. 189–228.
 
-
-  Efron, Bradley, and R. J. Tibshirani. An Introduction to the Bootstrap. CRC
-  Press, 1994.
-
-  \url{https://www.crcpress.com/An-Introduction-to-the-Bootstrap/Efron-Tibshirani/p/book/9780412042317}
+  \href{https://www.crcpress.com/An-Introduction-to-the-Bootstrap/Efron-Tibshirani/p/book/9780412042317}{An Introduction to the Bootstrap.} Efron, Bradley, and R. J. Tibshirani. 1994. CRC Press.
 }
 
 \examples{
@@ -117,34 +121,38 @@ plot(unpaired_mean_diff)
 
 
 # Performing paired analysis.
-paired_mean_diff <- dabest(
-                     iris, Species, Petal.Width,
-                     idx = c("setosa", "versicolor", "virginica"),
-                     paired = FALSE)
+paired_mean_diff          <- dabest(
+                              iris, Species, Petal.Width,
+                              idx = c("setosa", "versicolor", "virginica"),
+                              paired = FALSE
+                              )
 
 
 # Computing the median difference.
-unpaired_median_diff <- dabest(
-                     iris, Species, Petal.Width,
-                     idx = c("setosa", "versicolor", "virginica"),
-                     paired = FALSE,
-                     func = median)
+unpaired_median_diff      <- dabest(
+                              iris, Species, Petal.Width,
+                              idx = c("setosa", "versicolor", "virginica"),
+                              paired = FALSE,
+                              func = median
+                              )
 
 
 # Producing a 90\% CI instead of 95\%.
-unpaired_mean_diff_90_ci <- dabest(
-                     iris, Species, Petal.Width,
-                     idx = c("setosa", "versicolor", "virginica"),
-                     paired = FALSE,
-                     ci = 0.90)
+unpaired_mean_diff_90_ci  <- dabest(
+                              iris, Species, Petal.Width,
+                              idx = c("setosa", "versicolor", "virginica"),
+                              paired = FALSE,
+                              ci = 0.90
+                              )
 
 
 # Constructing the confidence intervals on 10000 bootstrap resamples.
 unpaired_mean_diff_n10000 <- dabest(
-                     iris, Species, Petal.Width,
-                     idx = c("setosa", "versicolor", "virginica"),
-                     paired = FALSE,
-                     reps = 10000)
+                               iris, Species, Petal.Width,
+                               idx = c("setosa", "versicolor", "virginica"),
+                               paired = FALSE,
+                               reps = 10000
+                               )
 
 # Using pipes to munge your data and then passing to `dabest`.
 # First, we generate some synthetic data.
@@ -160,6 +168,8 @@ meandiff <- long.data \%>\%
               dabest(x = Group, y = Measurement,
                      idx = c("Control", "Test1", "Test2"),
                      paired = FALSE)
+
+
 
 }
 \seealso{
