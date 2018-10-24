@@ -38,7 +38,7 @@ as a \href{http://charliepark.org/slopegraphs/}{Tufte slopegraph}.}
 \item{group.summaries}{"mean_sd", "median_quartiles", or \code{NULL}. Plots
 the summary statistics for each group. If 'mean_sd', then the mean and
 standard deviation of each group is plotted as a gapped line beside each
-group. If 'median_quantiles', then the median and 25th & 75th percentiles
+group. If 'median_quartiles', then the median and 25th & 75th percentiles
 of each group is plotted instead. If \code{group.summaries = NULL}, the
 summaries are not shown.}
 
