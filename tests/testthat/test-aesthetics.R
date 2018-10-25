@@ -144,7 +144,7 @@ test_that("Cumming custom aesthetics", {
   # Test theme.
  cumming.custom.theme <-
     plot(multi.group, color.col = Gender,
-         theme = theme_gray() # The default is `theme_classic()`.
+         theme = ggplot2::theme_gray() # The default is `theme_classic()`.
     )
 
   expect_dpplgngr("Cumming custom theme",

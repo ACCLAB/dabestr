@@ -19,7 +19,7 @@ expect_dpplgngr <- function(title, fig, path = NULL, ...,
                             verbose = FALSE) {
 
   if (!enable_vdiffr) {
-    expect_error(regexp = NA, ggplot_build(fig))
+    expect_error(regexp = NA, ggplot2::ggplot_build(fig))
     return(invisible(NULL))
   }
 
