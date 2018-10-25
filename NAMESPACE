@@ -3,3 +3,8 @@
 S3method(plot,dabest)
 S3method(print,dabest)
 export(dabest)
+importFrom(boot,boot)
+importFrom(magrittr,"%>%")
+importFrom(stats,median)
+importFrom(stats,na.omit)
+importFrom(stats,sd)
