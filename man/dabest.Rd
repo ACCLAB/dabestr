@@ -109,6 +109,7 @@ Statistical Science: vol. 11, no. 3, 1996. pp. 189–228.
 }
 
 \examples{
+
 # Performing unpaired (two independent groups) analysis.
 unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
                              idx = c("setosa", "versicolor"),
@@ -122,10 +123,20 @@ plot(unpaired_mean_diff)
 
 
 # Performing paired analysis.
+# First, we munge the `iris` dataset so we can perform a within-subject
+# comparison of sepal length vs. sepal width.
+
+new.iris     <- iris
+new.iris$ID  <- 1: length(new.iris)
+setosa.only  <-
+  new.iris \%>\%
+  tidyr::gather(key = Metric, value = Value, -ID, -Species) \%>\%
+  dplyr::filter(Species \%in\% c("setosa"))
+
 paired_mean_diff          <- dabest(
-                              iris, Species, Petal.Width,
-                              idx = c("setosa", "versicolor", "virginica"),
-                              paired = FALSE
+                              setosa.only, Metric, Value,
+                              idx = c("Sepal.Length", "Sepal.Width"),
+                              paired = TRUE, id.col = ID
                               )
 
 
@@ -158,12 +169,14 @@ unpaired_mean_diff_n10000 <- dabest(
 # Using pipes to munge your data and then passing to `dabest`.
 # First, we generate some synthetic data.
 set.seed(12345)
-N = 70
-c <- rnorm(N, mean = 50, sd = 20)
-t1 <- rnorm(N, mean = 200, sd = 20)
-t2 <- rnorm(N, mean = 100, sd = 70)
-long.data <- tibble(Control = c, Test1 = t1, Test2 = t2)
+N        <- 70
+c         <- rnorm(N, mean = 50, sd = 20)
+t1        <- rnorm(N, mean = 200, sd = 20)
+t2        <- rnorm(N, mean = 100, sd = 70)
+long.data <- tibble::tibble(Control = c, Test1 = t1, Test2 = t2)
+
 # Munge the data using `gather`, then pass it directly to `dabest`
+
 meandiff <- long.data \%>\%
               tidyr::gather(key = Group, value = Measurement) \%>\%
               dabest(x = Group, y = Measurement,
