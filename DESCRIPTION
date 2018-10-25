@@ -1,6 +1,6 @@
 Package: dabestr
 Type: Package
-Title: Data Analysis using Bootstrap-Coupled Estimation in R.
+Title: Data Analysis using Bootstrap-Coupled Estimation in R
 Version: 0.1.0
 Authors@R: c(
     person("Joses W.", "Ho", 
