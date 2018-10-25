@@ -1,7 +1,7 @@
 # Copyright (c) 2018 Micah Allen, Davide Poggiali, Kirstie Whitaker,
 # Tom Rhys Marshall and Rogier Kievit.
 #
-# The code in this file (referred to as the Software) is licensed under the
+# The R code in this file (referred to as the Software) is licensed under the
 # MIT license.
 #
 # LICENSE:
@@ -22,16 +22,29 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-#
-geom_flat_violin <- function(mapping = NULL, data = NULL, stat = "ydensity",
-                             position = "dodge", trim = TRUE, scale = "area",
-                             show.legend = NA, inherit.aes = TRUE, ...) {
 
-  layer(data = data, mapping = mapping, stat = stat,
-        geom = GeomFlatViolin, position = position, show.legend = show.legend,
-        inherit.aes = inherit.aes,
-        params = list(trim = trim,scale = scale, ...)
+#' @importFrom magrittr %>%
+geom_flat_violin <- function(
+  mapping     = NULL,
+  data        = NULL,
+  stat        = "ydensity",
+  position    = "dodge",
+  trim        = TRUE,
+  scale       = "area",
+  show.legend = NA,
+  inherit.aes = TRUE, ...) {
+
+  ggplot2::layer(
+    data        = data,
+    mapping     = mapping,
+    stat        = stat,
+    geom        = GeomFlatViolin,
+    position    = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params      = list(trim = trim,scale = scale, ...)
   )
+
 }
 
 
@@ -75,8 +88,9 @@ GeomFlatViolin <-
       newdata <- rbind(newdata, newdata[1,])
 
       ggplot2:::ggname("geom_flat_violin",
-                       GeomPolygon$draw_panel(newdata,
-                                              panel_scales, coord))
+                       ggplot2::GeomPolygon$draw_panel(
+                         newdata, panel_scales, coord)
+                       )
     },
 
     draw_key = ggplot2::draw_key_polygon,
