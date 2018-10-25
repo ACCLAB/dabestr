@@ -24,10 +24,15 @@ Description: dabestr is a package for Data Analysis using Bootstrap-Coupled
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
-Depends: boot,
+Depends: 
+    R (>= 2.10),
+    boot,
+    magrittr
+Imports: 
     cowplot,
-    ggplot2 (>= 3.0), 
     dplyr,
+    ggplot2 (>= 3.0),
+    grid,
     forcats,
     ggforce,
     ggbeeswarm,
@@ -37,7 +42,8 @@ Depends: boot,
     tibble,
     tidyr
 RoxygenNote: 6.1.0
-Suggests: testthat,
+Suggests: 
+    testthat,
     vdiffr,
     knitr,
     rmarkdown
