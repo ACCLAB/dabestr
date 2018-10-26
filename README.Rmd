@@ -27,6 +27,7 @@ An estimation plot has two key features.
 2. It presents the **effect size** as a **bootstrap 95% confidence interval** on a **separate but aligned axes**.
 
 ```{r create.dummy.data, warning=FALSE, message=FALSE, echo=FALSE}
+
 library(dplyr)
 library(dabestr)
 
@@ -54,15 +55,16 @@ wide.data <-
 my.data   <- 
   wide.data %>%
   tidyr::gather(key = Group, value = Measurement, -ID, -Gender)
+
 ```
 
 
 
 ```{r gardner.altman.showpieces, warning=FALSE, message=FALSE, echo=FALSE, fig.width = 6, fig.height = 3}
+
 custom.theme <- 
   ggplot2::theme_classic() +
   ggplot2::theme(text=ggplot2::element_text(family = "Work Sans"))
-
 
 
 two.group.unpaired <- 
@@ -80,16 +82,17 @@ two.group.paired <-
          idx = c("Control1", "Group2"), 
          paired = TRUE, id.col = ID)
 
+
 plot(two.group.unpaired, theme = custom.theme, color.column = Gender)
 
 plot(two.group.paired, theme = custom.theme, color.column = Gender)
-
 
 ``` 
 
 
 
 ```{r cumming.showpieces, warning=FALSE, message=FALSE, echo=FALSE, fig.width = 9, fig.height = 5}
+
 multi.two.group.unpaired <- 
   my.data %>%
   dabest(Group, Measurement, 
@@ -98,7 +101,6 @@ multi.two.group.unpaired <-
                     c("Group3", "Group4")),
          paired = FALSE
   )
-
 
 plot(multi.two.group.unpaired, theme = custom.theme,
      color.column = Gender)
@@ -114,9 +116,10 @@ multi.two.group.paired <-
          paired = TRUE, id.col = ID
   )
 
-
 plot(multi.two.group.paired, theme = custom.theme,
      color.column = Gender)
+
+
 
 shared.control <- 
   my.data %>%
@@ -125,10 +128,8 @@ shared.control <-
          paired = FALSE
   )
 
+plot(shared.control, theme = custom.theme,color.column = Gender)
 
-shared.control.row <- plot(shared.control, 
-                           theme = custom.theme,
-                           color.column = Gender)
 ```
 
 

@@ -18,7 +18,7 @@ An estimation plot has two key features.
 
 ![](man/figures/README-gardner.altman.showpieces-1.png)![](man/figures/README-gardner.altman.showpieces-2.png)
 
-![](man/figures/README-cumming.showpieces-1.png)![](man/figures/README-cumming.showpieces-2.png)
+![](man/figures/README-cumming.showpieces-1.png)![](man/figures/README-cumming.showpieces-2.png)![](man/figures/README-cumming.showpieces-3.png)
 
 Installation
 ------------
