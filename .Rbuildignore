@@ -1,7 +1,7 @@
-^.*\.Rproj$          # Automatically added by RStudio.
-^\.Rproj\.user$      # Used for temporary files.
-^\.travis\.yml$      # Used for Travis CI.
-^cran-comments\.md$  # Comments for CRAN submission.
-^NEWS\.md$           # A NEWS file.
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.travis\.yml$
+^cran-comments\.md$
+^NEWS\.md$
 ^README\.Rmd$
 ^README-.*\.png$
