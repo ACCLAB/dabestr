@@ -26,13 +26,118 @@ An estimation plot has two key features.
 
 2. It presents the **effect size** as a **bootstrap 95% confidence interval** on a **separate but aligned axes**.
 
-<insert showpiece here>
+```{r create.dummy.data, warning=FALSE, message=FALSE, echo=FALSE}
+library(dplyr)
+library(dabestr)
+
+
+set.seed(54321)
+
+N = 40
+c1 <- rnorm(N, mean = 100, sd = 25)
+c2 <- rnorm(N, mean = 100, sd = 50)
+g1 <- rnorm(N, mean = 120, sd = 25)
+g2 <- rnorm(N, mean = 80, sd = 50)
+g3 <- rnorm(N, mean = 100, sd = 12)
+g4 <- rnorm(N, mean = 100, sd = 50)
+gender <- c(rep('Male', N/2), rep('Female', N/2))
+id <- 1: N
+
+
+wide.data <- 
+  tibble::tibble(
+    Control1 = c1, Control2 = c2,
+    Group1 = g1, Group2 = g2, Group3 = g3, Group4 = g4,
+    Gender = gender, ID = id)
+
+
+my.data   <- 
+  wide.data %>%
+  tidyr::gather(key = Group, value = Measurement, -ID, -Gender)
+```
+
+
+
+```{r gardner.altman.showpieces, warning=FALSE, message=FALSE, echo=FALSE, fig.width = 6, fig.height = 3}
+custom.theme <- 
+  ggplot2::theme_classic() +
+  ggplot2::theme(text=ggplot2::element_text(family = "Work Sans"))
+
+
+
+two.group.unpaired <- 
+  my.data %>%
+  dabest(Group, Measurement, 
+         # The idx below passes "Control" as the control group, 
+         # and "Group1" as the test group. The mean difference
+         # will be computed as mean(Group1) - mean(Control1).
+         idx = c("Control1", "Group1"), 
+         paired = FALSE)
+
+two.group.paired <- 
+  my.data %>%
+  dabest(Group, Measurement, 
+         idx = c("Control1", "Group2"), 
+         paired = TRUE, id.col = ID)
+
+plot(two.group.unpaired, theme = custom.theme, color.column = Gender)
+
+plot(two.group.paired, theme = custom.theme, color.column = Gender)
+
+
+``` 
+
+
+
+```{r cumming.showpieces, warning=FALSE, message=FALSE, echo=FALSE, fig.width = 9, fig.height = 5}
+multi.two.group.unpaired <- 
+  my.data %>%
+  dabest(Group, Measurement, 
+         idx = list(c("Control1", "Group1"), 
+                    c("Control2", "Group2"),
+                    c("Group3", "Group4")),
+         paired = FALSE
+  )
+
+
+plot(multi.two.group.unpaired, theme = custom.theme,
+     color.column = Gender)
+
+
+
+multi.two.group.paired <- 
+  my.data %>%
+  dabest(Group, Measurement, 
+         idx = list(c("Control1", "Group1"), 
+                    c("Control2", "Group2"),
+                    c("Group3", "Group4")),
+         paired = TRUE, id.col = ID
+  )
+
+
+plot(multi.two.group.paired, theme = custom.theme,
+     color.column = Gender)
+
+shared.control <- 
+  my.data %>%
+  dabest(Group, Measurement, 
+         idx = c("Control1", "Group1", "Group2", "Group3", "Group4"),
+         paired = FALSE
+  )
+
+
+shared.control.row <- plot(shared.control, 
+                           theme = custom.theme,
+                           color.column = Gender)
+```
+
+
 
 ## Installation
 
 Currently, this package is only available on Github. A CRAN version is forthcoming.
 
-```r
+```{r demo.install, eval=FALSE}
 # install.packages("dabestr") ## Does not work; awaiting CRAN acceptance.
 
 devtools::install_github("ACCLAB/dabestr")

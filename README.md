@@ -16,7 +16,9 @@ An estimation plot has two key features.
 
 2.  It presents the **effect size** as a **bootstrap 95% confidence interval** on a **separate but aligned axes**.
 
-<insert showpiece here>
+![](man/figures/README-gardner.altman.showpieces-1.png)![](man/figures/README-gardner.altman.showpieces-2.png)
+
+![](man/figures/README-cumming.showpieces-1.png)![](man/figures/README-cumming.showpieces-2.png)
 
 Installation
 ------------
@@ -34,8 +36,6 @@ Usage
 
 ``` r
 library(dabestr)
-#> Loading required package: boot
-#> Loading required package: magrittr
 
 # Performing unpaired (two independent groups) analysis.
 unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
