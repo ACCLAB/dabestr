@@ -17,7 +17,7 @@ These must be quoted (ie. surrounded by quotation marks). The first element
 will be the control group, so all differences will be computed for every
 other group and this first group.}
 
-\item{paired}{boolean, If TRUE, the two groups are treated as
+\item{paired}{boolean, default FALSE. If TRUE, the two groups are treated as
 paired samples. The \code{control_group} group is treated as
 pre-intervention and the \code{test_group} group is considered
 post-intervention.}
