@@ -268,14 +268,15 @@ plot.dabest <- function(x, ...,
   #### Parse keywords. ####
   # color.column
   color.col_enquo      <-  rlang::enquo(color.column)
+  swarm.dodge        <-  0
 
   if (rlang::quo_is_null(color.col_enquo)) {
     color.aes          <-  ggplot2::aes(col = !!x_enquo)
-    swarm.dodge        <-  0
+    # swarm.dodge        <-  0
   } else {
     color.col_quoname  <-  rlang::quo_name(color.col_enquo)
     color.aes          <-  ggplot2::aes(col = !!color.col_enquo)
-    swarm.dodge        <-  0.1
+    # swarm.dodge        <-  0.1
   }
 
 
