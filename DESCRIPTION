@@ -42,9 +42,11 @@ Imports:
     tibble,
     tidyr
 RoxygenNote: 6.1.0
-Suggests: 
+Suggests:
+    gifski,
+    knitr,
+    rmarkdown,
+    tufte,
     testthat,
     vdiffr,
-    knitr,
-    rmarkdown
 VignetteBuilder: knitr
