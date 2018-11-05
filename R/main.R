@@ -249,9 +249,11 @@ dabest <- function(
 
     # Check the control group (`group[1]`) is in the x-column.
     if (identical(group[1] %in% data_for_diff[[x_quoname]], FALSE)) {
-      err1 <- stringr::str_interp("${group[1]} is not found ")
+
+      err1 <- stringr::str_interp("${group[1]} is not found")
       err2 <- stringr::str_interp("in the ${x_quoname} column.")
-      stop(err1 + err2)
+
+      stop(paste(err1, err2))
     }
 
     ctrl <-
