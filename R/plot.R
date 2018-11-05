@@ -294,7 +294,8 @@ plot.dabest <- function(x, ...,
                                    alpha = 0.95,
                                    cex = 1)
         } else {
-          swarmplot.params <- list(width = swarm.width)
+          swarmplot.params <- list(size = rawplot.markersize,
+                                   width = swarm.width)
         }
       } else if (class(swarmplot.params) != "list") {
         stop("`swarmplot.params` is not a list.")
