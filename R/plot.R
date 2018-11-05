@@ -64,6 +64,8 @@
 #'   See \href{https://en.wikipedia.org/wiki/Point_(typography)}{this article}
 #'   for more info.
 #'
+#' @param rawplot.groupwidth default 0.3. This is the maximum amount of spread
+#'   (in the x-direction) allowed, for each group.
 #'
 #' @param effsize.ylim default \code{NULL}. Enter a custom y-limit for the
 #'   effect size plot. This parameter is ignored if \code{float.contrast =
@@ -156,6 +158,7 @@ plot.dabest <- function(x, ...,
                         rawplot.ylim        = NULL,
                         rawplot.ylabel      = NULL,
                         rawplot.markersize  = 2,
+                        rawplot.groupwidth  = 0.3,
 
                         effsize.ylim        = NULL,
                         effsize.ylabel       = NULL,
@@ -283,26 +286,22 @@ plot.dabest <- function(x, ...,
   }
 
 
-  # *plot.params.
+  #### swarmplot/sinaplot params. ####
   if (isFALSE(slopegraph)) {
-    swarm.width = 0.3
+
     if (rawplot.type == 'swarmplot') {
       if (is.null(swarmplot.params)) {
-        if (isTRUE(float.contrast)) {
-          swarmplot.params <- list(size = rawplot.markersize,
-                                   dodge.width = swarm.dodge,
-                                   alpha = 0.95,
-                                   cex = 1)
-        } else {
-          swarmplot.params <- list(size = rawplot.markersize,
-                                   width = swarm.width)
-        }
+        swarmplot.params <- list(size        = rawplot.markersize,
+                                 width       = rawplot.groupwidth,
+                                 dodge.width = swarm.dodge,
+                                 mapping     = color.aes,
+                                 alpha       = 0.95)
       } else if (class(swarmplot.params) != "list") {
         stop("`swarmplot.params` is not a list.")
-      }
-      swarmplot.params[['mapping']] = color.aes
+      } else swarmplot.params[['mapping']] = color.aes
 
     } else if (rawplot.type == 'sinaplot') {
+      swarm.width = 0.3
       if (is.null(sinaplot.params)) {
         sinaplot.params <- list(size = rawplot.markersize,
                                 maxwidth = swarm.width,
@@ -441,8 +440,7 @@ plot.dabest <- function(x, ...,
 
 
 
-  } else {
-    # swarmplot.
+  } else { # swarmplot.
     rawdata.plot <-
       ggplot2::ggplot(data = for.plot,
                       ggplot2::aes(!!x_enquo, !!y_enquo)) +
@@ -453,18 +451,28 @@ plot.dabest <- function(x, ...,
                                 labels = Ns$swarmticklabs)
 
       if (rawplot.type == 'swarmplot') {
-        if (isTRUE(float.contrast)) {
-          rawdata.plot <-
-            rawdata.plot +
-            do.call(ggbeeswarm::geom_beeswarm, swarmplot.params) +
-            floating.theme
 
+        rawdata.plot <-
+          rawdata.plot +
+          do.call(ggbeeswarm::geom_quasirandom, swarmplot.params)
+
+        if (isTRUE(float.contrast)) {
+          rawdata.plot <- rawdata.plot + floating.theme
         } else {
-          rawdata.plot <-
-            rawdata.plot +
-            do.call(ggbeeswarm::geom_quasirandom, swarmplot.params) +
-            non.floating.theme
+          rawdata.plot <- rawdata.plot + non.floating.theme
         }
+
+        # if (isTRUE(float.contrast)) {
+        #   rawdata.plot <-
+        #     rawdata.plot +
+        #     do.call(ggbeeswarm::geom_beeswarm, swarmplot.params) +
+        #     floating.theme
+        # } else {
+        # rawdata.plot <-
+        #   rawdata.plot +
+        #   do.call(ggbeeswarm::geom_quasirandom, swarmplot.params) +
+        #   non.floating.theme
+        # }
 
 
       } else if (rawplot.type == 'sinaplot') {
@@ -481,7 +489,8 @@ plot.dabest <- function(x, ...,
 
     #### Plot group summaries. ####
     if (isFALSE(float.contrast)) {
-      line.nudge = 0.35
+      line.nudge <- rawplot.groupwidth * 1.25
+      if (line.nudge > 0.8) line.nudge <- 0.8
       pos.nudge = ggplot2::position_nudge(x = line.nudge)
 
       if (!is.null(group.summaries)) {
