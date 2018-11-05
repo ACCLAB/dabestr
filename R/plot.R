@@ -48,7 +48,7 @@
 #'
 #'
 #' @param rawplot.type default "beeswarm". Accepts either "beeswarm" or
-#'   "sinaplot". See \link{geom_beeswarm} and \link{geom_sina} for more
+#'   "sinaplot". See \link{geom_quasirandom} and \link{geom_sina} for more
 #'   information.
 #'
 #' @param rawplot.ylim default \code{NULL}. Enter a custom y-limit for the
@@ -91,9 +91,7 @@
 #'
 #'
 #' @param swarmplot.params default \code{NULL}. Supply list of
-#' \code{keyword = value} pairs to \link{geom_beeswarm}
-#' (if \code{float.contrast = TRUE}) or \link{geom_quasirandom}
-#' (if \code{float.contrast = FALSE}).
+#' \code{keyword = value} pairs to \link{geom_quasirandom}.
 #'
 #' @param sinaplot.params default \code{NULL}. Supply list of
 #' \code{keyword = value} pairs to \code{ggforce::geom_sina()}.

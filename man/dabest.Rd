@@ -4,7 +4,7 @@
 \alias{dabest}
 \title{Differences between Groups with Bootstrap Confidence Intervals}
 \usage{
-dabest(.data, x, y, idx, paired, id.column = NULL, ci = 95,
+dabest(.data, x, y, idx, paired = FALSE, id.column = NULL, ci = 95,
   reps = 5000, func = mean, seed = 12345)
 }
 \arguments{
@@ -17,12 +17,13 @@ These must be quoted (ie. surrounded by quotation marks). The first element
 will be the control group, so all differences will be computed for every
 other group and this first group.}
 
-\item{paired}{boolean. If TRUE, the two groups are treated as paired samples.
-The \code{control_group} group is treated as pre-intervention and the
-\code{test_group} group is considered post-intervention.}
+\item{paired}{boolean, If TRUE, the two groups are treated as
+paired samples. The \code{control_group} group is treated as
+pre-intervention and the \code{test_group} group is considered
+post-intervention.}
 
-\item{id.column}{A column name indicating the identity of the datapoint if
-the data is paired. This must be supplied if paired is TRUE.}
+\item{id.column, }{default NULL. A column name indicating the identity of the
+datapoint if the data is paired. This must be supplied if paired is TRUE.}
 
 \item{ci}{float, default 95. The level of the confidence intervals produced.
 The default \code{ci = 95} produces 95\% CIs.}

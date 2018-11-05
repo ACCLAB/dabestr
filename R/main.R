@@ -28,12 +28,13 @@
 #'   will be the control group, so all differences will be computed for every
 #'   other group and this first group.
 #'
-#' @param paired boolean. If TRUE, the two groups are treated as paired samples.
-#'   The \code{control_group} group is treated as pre-intervention and the
-#'   \code{test_group} group is considered post-intervention.
+#' @param paired boolean, default FALSE. If TRUE, the two groups are treated as
+#'   paired samples. The \code{control_group} group is treated as
+#'   pre-intervention and the \code{test_group} group is considered
+#'   post-intervention.
 #'
-#' @param id.column A column name indicating the identity of the datapoint if
-#' the data is paired. This must be supplied if paired is TRUE.
+#' @param id.column, default NULL. A column name indicating the identity of the
+#'   datapoint if the data is paired. This must be supplied if paired is TRUE.
 #'
 #' @param ci float, default 95. The level of the confidence intervals produced.
 #'   The default \code{ci = 95} produces 95\% CIs.
@@ -190,7 +191,7 @@
 #'
 #' @export
 dabest <- function(
-            .data, x, y, idx, paired, id.column = NULL,
+            .data, x, y, idx, paired = FALSE, id.column = NULL,
             ci = 95, reps = 5000, func = mean, seed = 12345) {
 
   #### Create quosures and quonames. ####
@@ -204,6 +205,7 @@ dabest <- function(
   func_quoname   <-  rlang::quo_name(func_enquo)
 
   id.col_enquo   <-  rlang::enquo(id.column)
+
 
   if (identical(paired, TRUE) & rlang::quo_is_null(id.col_enquo)) {
     stop("`paired` is TRUE but no `id.col` was supplied.")
