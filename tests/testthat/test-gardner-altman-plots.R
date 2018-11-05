@@ -13,7 +13,7 @@ test_that("Gardner-Altman unpaired", {
 
   gardner.altman.unpaired <- plot(unpaired, color.col = Gender)
 
-  expect_dpplgngr("Gardner-Altman unpaired", gardner.altman.unpaired)
+  vdiffr::expect_doppelganger("Gardner-Altman unpaired", gardner.altman.unpaired)
 })
 
 
@@ -29,7 +29,7 @@ test_that("Gardner-Altman paired", {
 
   gardner.altman.paired <- plot(paired, color.col = Gender)
 
-  expect_dpplgngr("Gardner-Altman paired", gardner.altman.paired)
+  vdiffr::expect_doppelganger("Gardner-Altman paired", gardner.altman.paired)
 })
 
 

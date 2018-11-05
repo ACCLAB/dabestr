@@ -14,7 +14,7 @@ test_that("Cumming two-groups unpaired", {
   cumming.two.group.unpaired <-
     plot(unpaired, color.col = Gender, float.contrast = FALSE)
 
-  expect_dpplgngr("Cumming two-groups unpaired",
+  vdiffr::expect_doppelganger("Cumming two-groups unpaired",
                   cumming.two.group.unpaired)
 })
 
@@ -33,7 +33,7 @@ test_that("Cumming two-groups paired", {
   cumming.two.group.paired <-
     plot(paired, color.col = Gender, float.contrast = FALSE)
 
-  expect_dpplgngr("Cumming two-group paired",
+  vdiffr::expect_doppelganger("Cumming two-group paired",
                   cumming.two.group.paired)
 })
 
@@ -53,7 +53,7 @@ test_that("Cumming multi two-groups unpaired", {
   cumming.multi.two.group.unpaired <-
     plot(multi.two.group.unpaired, color.col = Gender)
 
-  expect_dpplgngr("Cumming multi two-groups unpaired",
+  vdiffr::expect_doppelganger("Cumming multi two-groups unpaired",
                   cumming.multi.two.group.unpaired)
 })
 
@@ -73,14 +73,14 @@ test_that("Cumming multi two-groups paired", {
   cumming.multi.two.group.paired.slope <-
     plot(multi.two.group.paired, color.col = Gender, slopegraph = TRUE)
 
-  expect_dpplgngr("Cumming multi two-groups paired slopegraph",
+  vdiffr::expect_doppelganger("Cumming multi two-groups paired slopegraph",
                   cumming.multi.two.group.paired.slope)
 
 
   cumming.multi.two.group.paired.swarm <-
     plot(multi.two.group.paired, color.col = Gender, slopegraph = FALSE)
 
-  expect_dpplgngr("Cumming multi two-groups paired swarm",
+  vdiffr::expect_doppelganger("Cumming multi two-groups paired swarm",
                   cumming.multi.two.group.paired.swarm)
 
 
@@ -102,7 +102,7 @@ test_that("Cumming shared control", {
   shared.control.plot <-
     plot(shared.control, color.col = Gender)
 
-  expect_dpplgngr("Cumming shared control",
+  vdiffr::expect_doppelganger("Cumming shared control",
                   shared.control.plot)
 
 })
@@ -123,7 +123,7 @@ test_that("Cumming multi-group shared control", {
   multi.group.shared.control.plot <-
     plot(multi.group.shared.control, color.col = Gender)
 
-  expect_dpplgngr("Cumming multi-group shared control",
+  vdiffr::expect_doppelganger("Cumming multi-group shared control",
                   multi.group.shared.control.plot)
 
 })
