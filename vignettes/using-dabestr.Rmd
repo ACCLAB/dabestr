@@ -1,0 +1,262 @@
+---
+title: "Using dabestr"
+author: "Joses Ho"
+date: "`r Sys.Date()`"
+output:
+  tufte::tufte_html: default
+subtitle: How to create estimation plots
+vignette: >
+  %\VignetteIndexEntry{Using dabestr} 
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8} 
+---
+
+# Create Data
+
+For this vignette, we will create and use a synthetic dataset.
+
+```{r create.data, message=FALSE}
+library(dplyr)
+
+set.seed(54321)
+
+N = 40
+c1 <- rnorm(N, mean = 100, sd = 25)
+c2 <- rnorm(N, mean = 100, sd = 50)
+g1 <- rnorm(N, mean = 120, sd = 25)
+g2 <- rnorm(N, mean = 80, sd = 50)
+g3 <- rnorm(N, mean = 100, sd = 12)
+g4 <- rnorm(N, mean = 100, sd = 50)
+gender <- c(rep('Male', N/2), rep('Female', N/2))
+id <- 1: N
+
+
+wide.data <- 
+  tibble::tibble(
+    Control1 = c1, Control2 = c2,
+    Group1 = g1, Group2 = g2, Group3 = g3, Group4 = g4,
+    Gender = gender, ID = id)
+
+
+my.data   <- 
+  wide.data %>%
+  tidyr::gather(key = Group, value = Measurement, -ID, -Gender)
+
+head(my.data)
+```
+
+This dataset is a [tidy dataset](https://cran.r-project.org/web/packages/tidyr/vignettes/tidy-data.html), where each observation (datapoint) is a row, and each variable (or associated metadata) is a column. `dabestr` requires that data be in this form, as do [other popular R packages](https://www.tidyverse.org) for data visualization and analysis.
+
+# The Gardner-Altman Two Group Estimation Plot
+
+## Unpaired
+
+The `dabest` function is the main workhorse of the `dabestr` package. To create a two-group estimation plot (_aka_ a [Gardner-Altman plot](https://en.wikipedia.org/wiki/Estimation_statistics#Gardner-Altman_plot)), specify:
+
+* the `x` and `y` columns, 
+* whether the comparison is `paired = TRUE` or `paired = FALSE`, 
+* and the groups to be compared via `idx`. 
+
+```{r two.group.unpaired}
+
+library(dabestr)
+
+two.group.unpaired <- 
+  my.data %>%
+  dabest(Group, Measurement, 
+         # The idx below passes "Control" as the control group, 
+         # and "Group1" as the test group. The mean difference
+         # will be computed as mean(Group1) - mean(Control1).
+         idx = c("Control1", "Group1"), 
+         paired = FALSE)
+
+# Calling the object automatically prints out a summary.
+two.group.unpaired 
+```
+
+To create a two-group estimation plot (_aka_ a [Gardner-Altman plot](https://en.wikipedia.org/wiki/Estimation_statistics#Gardner-Altman_plot)), simply use `plot(dabest.object)`. 
+
+_Advanced R users would be interested to learn that `dabest` produces an object of class `dabest`. There is a generic S3 `plot` method for `dabest` objects that produces the estimation plot._
+
+```{r create.gardner.altman.plot, fig.width = 7, fig.height = 4}
+plot(two.group.unpaired, color.column = Gender)
+```
+
+This is known as a Gardner-Altman estimation plot, after [Martin J. Gardner](https://www.independent.co.uk/news/people/obituary-professor-martin-gardner-1470261.html) and [Douglas Altman](https://www.bmj.com/content/361/bmj.k2588) who were the first to [publish it](https://www.bmj.com/content/bmj/292/6522/746.full.pdf) in 1986.
+
+The key features of the Gardner-Altman estimation plot are:
+
+1. All data points are plotted.
+2. The mean difference (the effect size) and its 95% confidence interval (95% CI) is displayed as a point estimate and vertical bar respectively, on a seperate but aligned axes.
+
+The estimation plot produced by `dabest` differs from the one first introduced by Gardner and Altman in one important aspect. `dabest` derives the 95% CI through nonparametric bootstrap resampling. This enables visualization of the confidence interval as a graded sampling distribution.
+
+The 95% CI presented is bias-corrected and accelerated (ie. a BCa bootstrap). You can read more about bootstrap resampling and BCa correction in this [vignette](bootstrap-confidence-intervals.html). 
+
+## Paired
+
+If you have paired or repeated observations, you must specify the `id.col`, a column in the data that indicates the identity of each paired observation. This will produce a [Tufte slopegraph](http://charliepark.org/slopegraphs/) instead of a swarmplot.
+
+```{r two.group.paired, fig.width = 7, fig.height = 4}
+two.group.paired <- 
+  my.data %>%
+  dabest(Group, Measurement, 
+         idx = c("Control1", "Group1"), 
+         paired = TRUE, id.col = ID)
+
+# The summary indicates this is a paired comparison. 
+two.group.paired 
+
+plot(two.group.paired, color.column = Gender)
+```
+
+# The Cummings estimation plot
+
+## Multi-two group
+
+To create a multi-two group plot, one will need to specify a list, with each element of the list corresponding to the each two-group comparison.
+
+
+```{r multi.two.group.unpaired, fig.width = 7, fig.height = 4}
+
+multi.two.group.unpaired <- 
+  my.data %>%
+  dabest(Group, Measurement, 
+         idx = list(c("Control1", "Group1"), 
+                    c("Control2", "Group2")),
+         paired = FALSE
+         )
+
+multi.two.group.unpaired 
+
+plot(multi.two.group.unpaired, color.column = Gender)
+```
+
+This is a Cumming estimation plot. It is heavily influenced by the plot designs of [Geoff Cumming](https://www.youtube.com/watch?v=nDN-hcKR7j8) in his 2012 text [Understanding the New Statistics](https://www.routledge.com/Understanding-The-New-Statistics-Effect-Sizes-Confidence-Intervals-and/Cumming/p/book/9780415879682). The effect size and 95% CIs are plotted a seperate axes that is now positioned below the raw data. In addition, summary measurements are displayed as gapped lines to the right of each group. These vertical lines are identical to conventional mean ± standard deviation error bars. Here, the mean of each group is indicated as a gap in the line, drawing inspiration from Edward Tufte's low data-ink ratio dictum.
+
+By default, `dabest` plots the mean ± standard deviation of each group as a gapped line beside each group. The  `group.summaries = 'median_quartiles'` parameter will plot the median and 25th & 75th percentiles of each group is plotted instead. If `group.summaries = NULL`, the summaries are not shown.
+
+```{r multi.two.group.unpaired.median.summaries, fig.width = 7, fig.height = 4}
+plot(multi.two.group.unpaired, color.column = Gender, 
+     group.summaries = "median_quartiles")
+```
+
+## Multi-paired
+
+One can also produce a multi-paired plot.
+
+```{r multi.two.group.paired, fig.width = 7, fig.height = 4}
+
+multi.two.group.paired <- 
+  my.data %>%
+  dabest(Group, Measurement, 
+         idx = list(c("Control1", "Group1"), 
+                    c("Control2", "Group2")),
+         paired = TRUE, id.col = ID
+         )
+
+multi.two.group.paired 
+
+plot(multi.two.group.paired, color.column = Gender, slopegraph = TRUE)
+```
+
+## Shared Control
+
+If you supply a character vector to `idx` with more than 2 groups, a *shared control* plot will be produced.
+
+```{r shared.control, fig.width = 7, fig.height = 4}
+
+shared.control <- 
+  my.data %>%
+  dabest(Group, Measurement, 
+         idx = c("Control2", "Group2", "Group4"),
+         paired = FALSE
+         )
+
+shared.control 
+
+plot(shared.control, color.column = Gender, rawplot.type = "swarmplot")
+
+```
+
+## Multi-group plot
+
+```{r multi.group, fig.width = 7, fig.height = 4}
+
+multi.group <- 
+  my.data %>%
+  dabest(Group, Measurement, 
+         idx = list(c("Control1", "Group1", "Group3"), 
+                    c("Control2", "Group2", "Group4")),
+         paired = FALSE
+        )
+
+multi.group 
+
+plot(multi.group, color.column = Gender)
+```
+
+# Controlling Aesthetics
+
+You can control several graphical aspects of the estimation plot. 
+
+Use the `rawplot.ylim` and `effsize.ylim` parameters to supply custom y-limits for the rawplot and the delta plot, respectively.
+
+```{r ylim.demo, fig.width = 7, fig.height = 4}
+
+plot(multi.group, color.column = Gender,
+     rawplot.ylim = c(-100, 200),
+     effsize.ylim = c(-60, 60)
+    )
+
+```
+
+You can control the size of the dots used to create the rawplot data with `rawplot.markersize`. The default size (in points) is 2.
+
+To obtain an aesthetically-pleasing plot, You should use this option in tandem with the `rawplot.groupwidth` option. This sets the maximum amount that each group of datapoints is allowed to spread in the x-direction. The default is 0.3.
+
+```{r markersize.groupwidth.demo, fig.width = 7, fig.height = 4}
+
+plot(multi.group, color.column = Gender,
+     rawplot.markersize = 1,
+     rawplot.groupwidth = 0.4
+    )
+```
+
+The `rawplot.ylabel` and `effsize.ylabel` parameters control the y-axis titles for the rawplot and the delta plot, respectively.
+
+```{r ylabel.demo, fig.width = 7, fig.height = 4}
+
+plot(multi.group, color.column = Gender,
+     rawplot.ylabel = "Rawplot Title?",
+     effsize.ylabel = "My delta plot!"
+    )
+```
+
+The `axes.title.fontsize` parameter determines the fontsize of both the rawplot and deltaplot y-axes titles.
+
+```{r ylabel.fontsize, fig.width = 7, fig.height = 4}
+
+plot(multi.group, color.column = Gender,
+     axes.title.fontsize = 10 # default is 14.
+    )
+
+```
+
+The `palette` parameter accepts any `ggplot2` palettes. The default palette applied is "Set2". 
+
+```{r palette.demo, fig.width = 7, fig.height = 4}
+
+plot(multi.group, color.column = Gender,
+     palette = "Dark2" # The default is "Set2".
+     )
+```
+
+You can use the `theme` parameter to pass along any ggplot2 themes. The default `ggplot2` theme is `theme_classic()`. 
+
+```{r different.theme, fig.width = 7, fig.height = 4}
+plot(multi.group, color.column = Gender,
+     theme = ggplot2::theme_gray()
+     )
+```
+
