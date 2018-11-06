@@ -45,6 +45,8 @@ density.theme <-
   theme_classic() +
   theme(
     text                 =  element_text(family = "Work Sans"),
+    panel.background     =  element_rect(fill = "#fffff8"),
+    plot.background      =  element_rect(fill = "#fffff8"),
     axis.text            =  element_text(size = 13),
     axis.title           =  element_text(size = 15),
     axis.ticks.length    =  unit(7, "points"),
