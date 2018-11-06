@@ -76,6 +76,8 @@ non.floating.theme <-
     text                 =  element_text(family = "Work Sans"),
     axis.text            =  element_text(size = 13),
     axis.title           =  element_text(size = 15),
+    panel.background     =  element_rect(fill = "#fffff8"),
+    plot.background      =  element_rect(fill = "#fffff8"),
     axis.ticks.length    =  unit(7, "points"),
     axis.line.x.bottom   =  element_blank(),
     axis.ticks.x.bottom  =  element_blank(),
@@ -344,7 +346,7 @@ Shown above is a [Gardner-Altman estimation plot](https://en.wikipedia.org/wiki/
 
 An estimation plot obtains and displays the 95% CI through *nonparametric bootstrap resampling*. This enables visualization of the confidence interval as a graded sampling distribution. This is different from the original Gardner-Altman design: the 95% CI was computed through parametric methods, and displayed as a vertical error bar.
 
-You can read more about bootstrap resampling in this [vignette](bootstrap-confidence-intervals.html). 
+<!-- You can read more about bootstrap resampling in this [vignette](bootstrap-confidence-intervals.html).  -->
 
 ## Estimation Statistics
 
