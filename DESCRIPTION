@@ -41,11 +41,11 @@ Imports:
     stringr,
     tibble,
     tidyr
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Suggests:
     knitr,
     rmarkdown,
     tufte,
     testthat,
-    vdiffr,
+    vdiffr
 VignetteBuilder: knitr

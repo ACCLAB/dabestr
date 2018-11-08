@@ -3,6 +3,8 @@
 dabestr
 =======
 
+![Travis CI build status](https://img.shields.io/travis/com/ACCLAB/dabestr/master.svg)
+
 dabestr is a package for **D**ata **A**nalysis using **B**ootstrap-Coupled **EST**imation in R.
 
 About

@@ -233,15 +233,15 @@ plot(multi.group, color.column = Gender,
     )
 ```
 
-The `axes.title.fontsize` parameter determines the fontsize of both the rawplot and deltaplot y-axes titles.
+<!-- The `axes.title.fontsize` parameter determines the fontsize of both the rawplot and deltaplot y-axes titles. -->
 
-```{r ylabel.fontsize, fig.width = 7, fig.height = 4}
+<!-- ```{r ylabel.fontsize, fig.width = 7, fig.height = 4} -->
 
-plot(multi.group, color.column = Gender,
-     axes.title.fontsize = 10 # default is 14.
-    )
+<!-- plot(multi.group, color.column = Gender, -->
+<!--      axes.title.fontsize = 10 # default is 14. -->
+<!--     ) -->
 
-```
+<!-- ``` -->
 
 The `palette` parameter accepts any `ggplot2` palettes. The default palette applied is "Set2". 
 
