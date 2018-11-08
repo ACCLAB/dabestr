@@ -7,3 +7,5 @@ r:
   - devel
 sudo: false
 cache: packages
+before_install:
+  - sudo apt-get install -y libudunits2-dev
