@@ -18,25 +18,35 @@
 #' associated dichotomous hypothesis testing.
 #'
 #'
+#'
 #' @param .data A data.frame or tibble.
+#'
 #' @param x,y Columns in \code{.data}.
+#'
 #' @param idx A vector containing factors or strings in the \code{x} columns.
 #'   These must be quoted (ie. surrounded by quotation marks). The first element
 #'   will be the control group, so all differences will be computed for every
 #'   other group and this first group.
-#' @param paired boolean. If TRUE, the two groups are treated as paired samples.
-#'   The \code{control_group} group is treated as pre-intervention and the
-#'   \code{test_group} group is considered post-intervention.
-#' @param id.column A column name indicating the identity of the datapoint if
-#' the data is paired. This must be supplied if paired is TRUE.
+#'
+#' @param paired boolean, default FALSE. If TRUE, the two groups are treated as
+#'   paired samples. The \code{control_group} group is treated as
+#'   pre-intervention and the \code{test_group} group is considered
+#'   post-intervention.
+#'
+#' @param id.column, default NULL. A column name indicating the identity of the
+#'   datapoint if the data is paired. This must be supplied if paired is TRUE.
+#'
 #' @param ci float, default 95. The level of the confidence intervals produced.
 #'   The default \code{ci = 95} produces 95\% CIs.
+#'
 #' @param reps integer, default 5000. The number of bootstrap resamples that
 #'   will be generated.
+#'
 #' @param func function, default mean. This function will be applied to
 #'   \code{control} and \code{test} individually, and the difference will be
 #'   saved as a single bootstrap resample. Any NaNs will be removed
 #'   automatically with \code{na.omit}.
+#'
 #' @param seed integer, default 12345. This specifies the seed used to set the
 #' random number generator. Setting a seed ensures that the bootstrap confidence
 #' intervals for the same data will remain stable over seperate runs/calls of
@@ -55,32 +65,48 @@
 #'   generate the estimation plot.
 #'
 #'   \code{result} is a \link{tibble} with the following 15 columns:
+#'
 #'   \item{control_group, test_group}{ The name of the control group
 #'   and test group respectively. }
+#'
 #'   \item{control_size, test_size}{ The number
 #'   of observations in the control group and test group respectively. }
+#'
 #'   \item{func}{ The \code{func} passed to \code{bootdiff}. }
+#'
 #'   \item{paired}{ Is
 #'   the difference paired (\code{TRUE}) or not (\code{FALSE})? }
+#'
 #'   \item{difference}{ The difference between the two groups; effectively
 #'   \code{func(test_group) - func(control_group)}. }
+#'
 #'   \item{variable}{ The
 #'   variable whose difference is being computed, ie. the column supplied to
 #'   \code{y}. }
+#'
 #'   \item{ci}{ The \code{ci} passed to the \code{bootdiff}. }
+#'
 #'   \item{bca_ci_low, bca_ci_high}{ The lower and upper limits of the Bias
 #'   Corrected and Accelerated bootstrap confidence interval. }
+#'
 #'   \item{pct_ci_low, pct_ci_high}{ The lower and upper limits of the
 #'   percentile bootstrap confidence interval. }
 #'
 #'   \item{bootstraps}{ The array of bootstrap resamples generated. }
 #'
+#'
+#'
 #' @seealso \code{\link{plot.dabest}}, which generates an estimation plot from
 #'   the \code{dabest} object.
+#'
+#'
+#'
 #' @examples
+#'
 #' # Performing unpaired (two independent groups) analysis.
 #' unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
-#'                              "setosa", "versicolor", paired = FALSE)
+#'                              idx = c("setosa", "versicolor"),
+#'                              paired = FALSE)
 #'
 #' # Display the results in a user-friendly format.
 #' unpaired_mean_diff
@@ -90,68 +116,82 @@
 #'
 #'
 #' # Performing paired analysis.
-#' paired_mean_diff <- dabest(
-#'                      iris, Species, Petal.Width,
-#'                      idx = c("setosa", "versicolor", "virginica"),
-#'                      paired = FALSE)
+#' # First, we munge the `iris` dataset so we can perform a within-subject
+#' # comparison of sepal length vs. sepal width.
+#'
+#' new.iris     <- iris
+#' new.iris$ID  <- 1: length(new.iris)
+#' setosa.only  <-
+#'   new.iris %>%
+#'   tidyr::gather(key = Metric, value = Value, -ID, -Species) %>%
+#'   dplyr::filter(Species %in% c("setosa"))
+#'
+#' paired_mean_diff          <- dabest(
+#'                               setosa.only, Metric, Value,
+#'                               idx = c("Sepal.Length", "Sepal.Width"),
+#'                               paired = TRUE, id.col = ID
+#'                               )
 #'
 #'
 #' # Computing the median difference.
-#' unpaired_median_diff <- dabest(
-#'                      iris, Species, Petal.Width,
-#'                      idx = c("setosa", "versicolor", "virginica"),
-#'                      paired = FALSE,
-#'                      func = median)
+#' unpaired_median_diff      <- dabest(
+#'                               iris, Species, Petal.Width,
+#'                               idx = c("setosa", "versicolor", "virginica"),
+#'                               paired = FALSE,
+#'                               func = median
+#'                               )
 #'
 #'
 #' # Producing a 90% CI instead of 95%.
-#' unpaired_mean_diff_90_ci <- dabest(
-#'                      iris, Species, Petal.Width,
-#'                      idx = c("setosa", "versicolor", "virginica"),
-#'                      paired = FALSE,
-#'                      ci = 0.90)
+#' unpaired_mean_diff_90_ci  <- dabest(
+#'                               iris, Species, Petal.Width,
+#'                               idx = c("setosa", "versicolor", "virginica"),
+#'                               paired = FALSE,
+#'                               ci = 0.90
+#'                               )
 #'
 #'
 #' # Constructing the confidence intervals on 10000 bootstrap resamples.
 #' unpaired_mean_diff_n10000 <- dabest(
-#'                      iris, Species, Petal.Width,
-#'                      idx = c("setosa", "versicolor", "virginica"),
-#'                      paired = FALSE,
-#'                      reps = 10000)
+#'                                iris, Species, Petal.Width,
+#'                                idx = c("setosa", "versicolor", "virginica"),
+#'                                paired = FALSE,
+#'                                reps = 10000
+#'                                )
 #'
 #' # Using pipes to munge your data and then passing to `dabest`.
 #' # First, we generate some synthetic data.
 #' set.seed(12345)
-#' N = 70
-#' c <- rnorm(N, mean = 50, sd = 20)
-#' t1 <- rnorm(N, mean = 200, sd = 20)
-#' t2 <- rnorm(N, mean = 100, sd = 70)
-#' long.data <- tibble(Control = c, Test1 = t1, Test2 = t2)
+#' N        <- 70
+#' c         <- rnorm(N, mean = 50, sd = 20)
+#' t1        <- rnorm(N, mean = 200, sd = 20)
+#' t2        <- rnorm(N, mean = 100, sd = 70)
+#' long.data <- tibble::tibble(Control = c, Test1 = t1, Test2 = t2)
+#'
 #' # Munge the data using `gather`, then pass it directly to `dabest`
+#'
 #' meandiff <- long.data %>%
 #'               tidyr::gather(key = Group, value = Measurement) %>%
 #'               dabest(x = Group, y = Measurement,
 #'                      idx = c("Control", "Test1", "Test2"),
 #'                      paired = FALSE)
 #'
-#' @section References: DiCiccio, Thomas J., and Bradley Efron. Bootstrap
-#'   Confidence Intervals. Statistical Science: vol. 11, no. 3, 1996, pp.
-#'   189–228,
-#'
-#'   \url{http://www.jstor.org/stable/2246110.}
 #'
 #'
-#'   Efron, Bradley, and R. J. Tibshirani. An Introduction to the Bootstrap. CRC
-#'   Press, 1994.
+#' @section References:
+#' \href{http://www.jstor.org/stable/2246110}{Bootstrap Confidence Intervals.}
+#' DiCiccio, Thomas J., and Bradley Efron.
+#' Statistical Science: vol. 11, no. 3, 1996. pp. 189–228.
 #'
-#'   \url{https://www.crcpress.com/An-Introduction-to-the-Bootstrap/Efron-Tibshirani/p/book/9780412042317}
+#'   \href{https://www.crcpress.com/An-Introduction-to-the-Bootstrap/Efron-Tibshirani/p/book/9780412042317}{An Introduction to the Bootstrap.} Efron, Bradley, and R. J. Tibshirani. 1994. CRC Press.
 #'
 #'
-#'
+#' @importFrom magrittr %>%
+#' @importFrom boot boot
 #'
 #' @export
 dabest <- function(
-            .data, x, y, idx, paired, id.column = NULL,
+            .data, x, y, idx, paired = FALSE, id.column = NULL,
             ci = 95, reps = 5000, func = mean, seed = 12345) {
 
   #### Create quosures and quonames. ####
@@ -165,6 +205,7 @@ dabest <- function(
   func_quoname   <-  rlang::quo_name(func_enquo)
 
   id.col_enquo   <-  rlang::enquo(id.column)
+
 
   if (identical(paired, TRUE) & rlang::quo_is_null(id.col_enquo)) {
     stop("`paired` is TRUE but no `id.col` was supplied.")
@@ -210,11 +251,19 @@ dabest <- function(
 
     # Check the control group (`group[1]`) is in the x-column.
     if (identical(group[1] %in% data_for_diff[[x_quoname]], FALSE)) {
-      stop(str_interp("${group[1]} is not found in the ${x_quoname} column."))
+
+      err1 <- stringr::str_interp("${group[1]} is not found")
+      err2 <- stringr::str_interp("in the ${x_quoname} column.")
+
+      stop(paste(err1, err2))
     }
-    ctrl <- data_for_diff %>%
-      filter(!!x_enquo == group[1])
+
+    ctrl <-
+      data_for_diff %>%
+      dplyr::filter(!!x_enquo == group[1])
+
     ctrl <- ctrl[[y_quoname]]
+
     c <- na.omit(ctrl)
 
     # If ctrl is length 0, stop!
@@ -279,9 +328,10 @@ dabest <- function(
       #### Compute confidence interval. ####
       # check CI.
       if (ci < 0 | ci > 100) {
-        err_string <-
-          stringr::str_interp("`ci` must be between 0 and 100, not ${ci}")
-        stop(errstring)
+        err_string <- stringr::str_interp(
+          "`ci` must be between 0 and 100, not ${ci}"
+          )
+        stop(err_string)
       }
 
       bootci <- boot::boot.ci(boot, conf = ci/100, type = c("perc", "bca"))
@@ -361,35 +411,64 @@ dabest <- function(
 }
 
 
-
 #' Print a `dabest` object
-#' @param signif_digit integer, default 3. All numerical values in the printout
+#'
+#' @param x A \code{dabest} object, generated by the function of the same name.
+#'
+#' @param signif_digits integer, default 3. All numerical values in the printout
 #' will be rounded to this many significant digits.
+#'
+#' @param ... Signature for S3 generic function.
+#'
+#' @return A summary of all the relevant effect sizes computed.
+#'
+#' @examples
+#' # Performing unpaired (two independent groups) analysis.
+#' unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
+#'                              idx = c("setosa", "versicolor"),
+#'                              paired = FALSE)
+#'
+#' # Display the results in a user-friendly format.
+#' print(unpaired_mean_diff)
+#'
 #' @export
-print.dabest <- function(dabest.object, signif_digits = 3) {
+print.dabest <- function(x, ..., signif_digits = 3) {
 
+  #### Check object class ####
+  if (class(x)[1] != "dabest") {
+    stop(paste(
+      "The object you are plotting is not a `dabest` class object. ",
+      "Please check again! ")
+    )
+  } else {
+    dabest.object <- x
+  }
+
+  #### Get results table and y var. ####
   tbl <- dabest.object$result
   var <- rlang::quo_name(dabest.object$y)
-  # Header
-  dabest_ver = packageVersion("dabestr")
-  header = str_interp(
-    "Data Analysis with Bootstrap Estimation (DABEST) v${dabest_ver}\n")
+
+  #### Create header. ####
+  dabest_ver <- utils::packageVersion("dabestr")
+  header     <- stringr::str_interp(
+    "DABEST (Data Analysis with Bootstrap Estimation) v${dabest_ver}\n")
   cat(header)
 
   cat(rep('=', nchar(header) - 1), sep='')
   cat("\n\n")
 
-  cat(str_interp("Variable: ${var} \n\n"))
+  cat(stringr::str_interp("Variable: ${var} \n\n"))
 
-  # Print each row.
+  #### Print each row. ####
   cat(apply(tbl, 1, printrow_dabest, sigdig = signif_digits),
       sep = "\n")
 
-  # Endnotes.
-  cat(str_interp("${tbl$nboots[1]} bootstrap resamples.\n"))
+  #### Endnote about BCa. ####
+  cat(stringr::str_interp("${tbl$nboots[1]} bootstrap resamples.\n"))
   cat("All confidence intervals are bias-corrected and accelerated.\n\n")
 
 }
+
 
 
 

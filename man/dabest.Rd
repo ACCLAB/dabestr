@@ -4,7 +4,7 @@
 \alias{dabest}
 \title{Differences between Groups with Bootstrap Confidence Intervals}
 \usage{
-dabest(.data, x, y, idx, paired, id.column = NULL, ci = 95,
+dabest(.data, x, y, idx, paired = FALSE, id.column = NULL, ci = 95,
   reps = 5000, func = mean, seed = 12345)
 }
 \arguments{
@@ -17,12 +17,13 @@ These must be quoted (ie. surrounded by quotation marks). The first element
 will be the control group, so all differences will be computed for every
 other group and this first group.}
 
-\item{paired}{boolean. If TRUE, the two groups are treated as paired samples.
-The \code{control_group} group is treated as pre-intervention and the
-\code{test_group} group is considered post-intervention.}
+\item{paired}{boolean, default FALSE. If TRUE, the two groups are treated as
+paired samples. The \code{control_group} group is treated as
+pre-intervention and the \code{test_group} group is considered
+post-intervention.}
 
-\item{id.column}{A column name indicating the identity of the datapoint if
-the data is paired. This must be supplied if paired is TRUE.}
+\item{id.column, }{default NULL. A column name indicating the identity of the
+datapoint if the data is paired. This must be supplied if paired is TRUE.}
 
 \item{ci}{float, default 95. The level of the confidence intervals produced.
 The default \code{ci = 95} produces 95\% CIs.}
@@ -52,21 +53,30 @@ A list with 7 elements: \code{data}, \code{x}, \code{y}, \code{idx},
   generate the estimation plot.
 
   \code{result} is a \link{tibble} with the following 15 columns:
+
   \item{control_group, test_group}{ The name of the control group
   and test group respectively. }
+
   \item{control_size, test_size}{ The number
   of observations in the control group and test group respectively. }
+
   \item{func}{ The \code{func} passed to \code{bootdiff}. }
+
   \item{paired}{ Is
   the difference paired (\code{TRUE}) or not (\code{FALSE})? }
+
   \item{difference}{ The difference between the two groups; effectively
   \code{func(test_group) - func(control_group)}. }
+
   \item{variable}{ The
   variable whose difference is being computed, ie. the column supplied to
   \code{y}. }
+
   \item{ci}{ The \code{ci} passed to the \code{bootdiff}. }
+
   \item{bca_ci_low, bca_ci_high}{ The lower and upper limits of the Bias
   Corrected and Accelerated bootstrap confidence interval. }
+
   \item{pct_ci_low, pct_ci_high}{ The lower and upper limits of the
   percentile bootstrap confidence interval. }
 
@@ -91,23 +101,20 @@ sizes and confidence intervals around them, rather than \emph{P} values and
 associated dichotomous hypothesis testing.
 }
 \section{References}{
- DiCiccio, Thomas J., and Bradley Efron. Bootstrap
-  Confidence Intervals. Statistical Science: vol. 11, no. 3, 1996, pp.
-  189–228,
 
-  \url{http://www.jstor.org/stable/2246110.}
+\href{http://www.jstor.org/stable/2246110}{Bootstrap Confidence Intervals.}
+DiCiccio, Thomas J., and Bradley Efron.
+Statistical Science: vol. 11, no. 3, 1996. pp. 189–228.
 
-
-  Efron, Bradley, and R. J. Tibshirani. An Introduction to the Bootstrap. CRC
-  Press, 1994.
-
-  \url{https://www.crcpress.com/An-Introduction-to-the-Bootstrap/Efron-Tibshirani/p/book/9780412042317}
+  \href{https://www.crcpress.com/An-Introduction-to-the-Bootstrap/Efron-Tibshirani/p/book/9780412042317}{An Introduction to the Bootstrap.} Efron, Bradley, and R. J. Tibshirani. 1994. CRC Press.
 }
 
 \examples{
+
 # Performing unpaired (two independent groups) analysis.
 unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
-                             "setosa", "versicolor", paired = FALSE)
+                             idx = c("setosa", "versicolor"),
+                             paired = FALSE)
 
 # Display the results in a user-friendly format.
 unpaired_mean_diff
@@ -117,49 +124,67 @@ plot(unpaired_mean_diff)
 
 
 # Performing paired analysis.
-paired_mean_diff <- dabest(
-                     iris, Species, Petal.Width,
-                     idx = c("setosa", "versicolor", "virginica"),
-                     paired = FALSE)
+# First, we munge the `iris` dataset so we can perform a within-subject
+# comparison of sepal length vs. sepal width.
+
+new.iris     <- iris
+new.iris$ID  <- 1: length(new.iris)
+setosa.only  <-
+  new.iris \%>\%
+  tidyr::gather(key = Metric, value = Value, -ID, -Species) \%>\%
+  dplyr::filter(Species \%in\% c("setosa"))
+
+paired_mean_diff          <- dabest(
+                              setosa.only, Metric, Value,
+                              idx = c("Sepal.Length", "Sepal.Width"),
+                              paired = TRUE, id.col = ID
+                              )
 
 
 # Computing the median difference.
-unpaired_median_diff <- dabest(
-                     iris, Species, Petal.Width,
-                     idx = c("setosa", "versicolor", "virginica"),
-                     paired = FALSE,
-                     func = median)
+unpaired_median_diff      <- dabest(
+                              iris, Species, Petal.Width,
+                              idx = c("setosa", "versicolor", "virginica"),
+                              paired = FALSE,
+                              func = median
+                              )
 
 
 # Producing a 90\% CI instead of 95\%.
-unpaired_mean_diff_90_ci <- dabest(
-                     iris, Species, Petal.Width,
-                     idx = c("setosa", "versicolor", "virginica"),
-                     paired = FALSE,
-                     ci = 0.90)
+unpaired_mean_diff_90_ci  <- dabest(
+                              iris, Species, Petal.Width,
+                              idx = c("setosa", "versicolor", "virginica"),
+                              paired = FALSE,
+                              ci = 0.90
+                              )
 
 
 # Constructing the confidence intervals on 10000 bootstrap resamples.
 unpaired_mean_diff_n10000 <- dabest(
-                     iris, Species, Petal.Width,
-                     idx = c("setosa", "versicolor", "virginica"),
-                     paired = FALSE,
-                     reps = 10000)
+                               iris, Species, Petal.Width,
+                               idx = c("setosa", "versicolor", "virginica"),
+                               paired = FALSE,
+                               reps = 10000
+                               )
 
 # Using pipes to munge your data and then passing to `dabest`.
 # First, we generate some synthetic data.
 set.seed(12345)
-N = 70
-c <- rnorm(N, mean = 50, sd = 20)
-t1 <- rnorm(N, mean = 200, sd = 20)
-t2 <- rnorm(N, mean = 100, sd = 70)
-long.data <- tibble(Control = c, Test1 = t1, Test2 = t2)
+N        <- 70
+c         <- rnorm(N, mean = 50, sd = 20)
+t1        <- rnorm(N, mean = 200, sd = 20)
+t2        <- rnorm(N, mean = 100, sd = 70)
+long.data <- tibble::tibble(Control = c, Test1 = t1, Test2 = t2)
+
 # Munge the data using `gather`, then pass it directly to `dabest`
+
 meandiff <- long.data \%>\%
               tidyr::gather(key = Group, value = Measurement) \%>\%
               dabest(x = Group, y = Measurement,
                      idx = c("Control", "Test1", "Test2"),
                      paired = FALSE)
+
+
 
 }
 \seealso{

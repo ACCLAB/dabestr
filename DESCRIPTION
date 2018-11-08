@@ -1,7 +1,7 @@
 Package: dabestr
 Type: Package
-Title: Data Analysis using Bootstrap-Coupled Estimation in R.
-Version: 0.0.9999
+Title: Data Analysis using Bootstrap-Coupled Estimation in R
+Version: 0.1.0
 Authors@R: c(
     person("Joses W.", "Ho", 
           email = "joseshowh@gmail.com", role = c("cre", "aut")),
@@ -21,13 +21,18 @@ Description: dabestr is a package for Data Analysis using Bootstrap-Coupled
     display the underlying distribution.
     2. It presents the effect size as a bootstrap 95% confidence interval on a 
     separate but aligned axes.
-License: BSD 3-Clause Clear
+License: file LICENSE
 Encoding: UTF-8
 LazyData: true
-Depends: boot,
+Depends: 
+    R (>= 3.5.0),
+    boot,
+    magrittr
+Imports: 
     cowplot,
-    ggplot2 (>= 3.0), 
     dplyr,
+    ggplot2 (>= 3.0),
+    grid,
     forcats,
     ggforce,
     ggbeeswarm,
@@ -37,4 +42,10 @@ Depends: boot,
     tibble,
     tidyr
 RoxygenNote: 6.1.0
-Suggests: testthat
+Suggests:
+    knitr,
+    rmarkdown,
+    tufte,
+    testthat,
+    vdiffr,
+VignetteBuilder: knitr

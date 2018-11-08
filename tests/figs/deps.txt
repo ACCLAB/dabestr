@@ -1,0 +1,2 @@
+ggplot2: 3.1.0
+vdiffr-svg-engine: 0.9000
