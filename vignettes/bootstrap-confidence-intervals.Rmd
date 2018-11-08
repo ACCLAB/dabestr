@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 
 ```{r create.population}
 library(dplyr)
-set.seed(12345)
+set.seed(34567)
 
 control_pop <- rnorm(10000, mean = 2,   sd = 0.5)
 test_pop    <- rnorm(10000, mean = 2.5, sd = 0.5)
@@ -44,7 +44,7 @@ library(ggplot2)
 density.theme <-
   theme_classic() +
   theme(
-    text                 =  element_text(family = "Work Sans"),
+    #text                 =  element_text(family = "Work Sans Medium"),
     panel.background     =  element_rect(fill = "#fffff8"),
     plot.background      =  element_rect(fill = "#fffff8"),
     axis.text            =  element_text(size = 13),
@@ -85,13 +85,13 @@ pop.density.plot <-
   guides(fill = FALSE) + xlab("") +
   
   annotate("text", x = 2, size = annotate.text.size, 
-           hjust = 0, color = 'turquoise', family = "Work Sans",
+           hjust = 0, color = 'turquoise', family = "Work Sans Medium",
            y = annotate.text.ypos, label = "µControl") +
   annotate("text", x = 2.5, size = annotate.text.size, 
-           hjust = 0, color = 'salmon', family = "Work Sans",
+           hjust = 0, color = 'salmon', family = "Work Sans Medium",
            y = annotate.text.ypos, label = "µTest") +
   annotate("text", x = 0.5, size = annotate.text.size, 
-           hjust = 0, color = 'black', family = "Work Sans",
+           hjust = 0, color = 'black', family = "Work Sans Medium",
            y = annotate.text.ypos - 0.25, 
            label = "µTest - µControl = ??") +
   
@@ -170,7 +170,7 @@ plot_grid(pop.density.plot ,
 ```
 
 
-We can easily compute the mean difference in our observed samples. This is our *estimate* of the effect size that we are interested in.
+We can easily compute the mean difference in our observed samples. This is our *estimate* of the *population* effect size that we are interested in.
 
 **But how do we obtain a measure of precision and confidence about our estimate? Can we get a sense of how it relates to the population mean difference?**
 
@@ -190,7 +190,7 @@ The bootstrap[^2] is a simple but powerful technique. It was [first described](h
 
 It creates multiple *resamples* (with replacement) from a single set of observations, and computes the effect size of interest on each of these resamples. The bootstrap resamples of the effect size can then be used to determine the 95% CI.
 
-With computers, we can perform 5000 resamples very easily. Shown below are the first 500 resamples from our set of observations.
+With computers, we can perform 5000 resamples very easily. 
 
 ```{r create.bootstrap.demo}
 # For some reason, I need to create a legend outside of the GIF-generating function.
@@ -217,7 +217,8 @@ get.temp.legend <- function() {
     scale_fill_brewer(palette = "Dark2") +
     scale_colour_brewer(palette = "Dark2") +
     theme(
-      legend.title         =  element_blank())
+      legend.text  = element_text(family = "Work Sans Medium"),
+      legend.title =  element_blank())
     
   
   return(get_legend(resamples.plot))
@@ -225,23 +226,23 @@ get.temp.legend <- function() {
 
 
 
-
-bootstrap.demo <- function(sample1, sample2, 
-                       resamples = 1000, 
-                       effsize.func = mean,
-                       effsize.label = 'mean',
-                       create.gif = TRUE) {
+bootstrap.demo <- function(
+  sample1, sample2, show.resamples = 3,
+  resamples = 1500, effsize.func = mean, 
+  rawplot.ylims = c(0, 3), rawplot.xlims = c(0.5, 4),
+  effsize.label = 'mean', nbins = 750) {
   
+  effsize.control <- effsize.func(sample1)
+  effsize.test    <- effsize.func(sample2)
   
-      
   fixed.samples.plot <-
     samples.plot +
-    geom_segment(x    = effsize.func(sample1),
-                 xend = effsize.func(sample1),
+    geom_segment(x    = effsize.control,
+                 xend = effsize.control,
                  y = 1.5, yend = 2.5,
                  color = "blue") +
-    geom_segment(x    = effsize.func(sample2),
-                 xend = effsize.func(sample2),
+    geom_segment(x    = effsize.test,
+                 xend = effsize.test,
                  y = 0.5, yend = 1.5,
                  color = "red") +
     
@@ -255,17 +256,14 @@ bootstrap.demo <- function(sample1, sample2,
       axis.ticks.x.bottom  = element_blank(),
       # margin units are top, right, bottom, left.
       plot.margin          = unit(c(0, 5, 0, 5), "pt"))
-
-
-  control_effsize   <- effsize.func(sample1)
-  true.effsize.diff <- effsize.func(sample2) - control_effsize
+  
+  true.effsize.diff <- effsize.test - effsize.control
   
   
-  resample.effsizes <- vector("list", resamples)
+  # resample.effsizes <- vector("list", resamples)
+  resample.plots <- vector("list", show.resamples)
   
-  ci.legend <- get.temp.legend()
-  
-  for (i in 1: resamples) {
+  for (i in 1: (show.resamples * 2)) {
     
     resample1 <- sample(sample1, length(sample1), replace = TRUE)
     resample2 <- sample(sample2, length(sample2), replace = TRUE)
@@ -304,10 +302,11 @@ bootstrap.demo <- function(sample1, sample2,
                    y = 0.5, yend = 1.5,
                    color = "salmon") +
       
-      geom_vline(xintercept = effsize.func(sample1),
+      geom_vline(xintercept = effsize.control,
                  color = "blue") +
-      geom_vline(xintercept = effsize.func(sample2),
+      geom_vline(xintercept = effsize.test,
                  color = "red") +
+      
       annotate("text", x = 0.4, y = 2.75,
                family = "Rubik Medium",
                hjust = 0,
@@ -318,93 +317,128 @@ bootstrap.demo <- function(sample1, sample2,
       # margin units are top, right, bottom, left.
       plot.margin          = unit(c(0, 5, 0, 5), "pt"))
     
-    
-    resample.effsizes[i] <- effsize.func(resample2) - effsize.func(resample1)
-    
-    
-    # Shift ylims appropriately.
-    
-    if (control_effsize > 0) {
-      resamp.means.xlim <- rawplot.xlims - control_effsize
-    } else {
-      resamp.means.xlim <- rawplot.xlims + control_effsize
+    if (i < show.resamples) {
+      resamp.plot <- resamp.plot + 
+        theme(axis.line.x  = element_blank(),
+              axis.text.x  = element_blank(),
+              axis.ticks.x = element_blank())
     }
     
-    ordered.resamples      <- sort(na.omit(unlist(resample.effsizes)))
-
-    idx.pct.low <- floor(0.025 * i)
-    if (idx.pct.low == 0) idx.pct.low <- 1
-    idx.pct.high <- floor(0.925 * i)
-    if (idx.pct.high == 0) idx.pct.high <- 1
+    # resample.plots[[i]] <- plot_to_gtable(resamp.plot)
     
-    ci.low  <- ordered.resamples[idx.pct.low]
-    ci.high <- ordered.resamples[idx.pct.high]
-    
-    resample.plot.frame <- 
-      data_frame(effsize_diff = unlist(resample.effsizes)) %>%
-      mutate(ci = case_when(
-              effsize_diff < ci.low  | effsize_diff > ci.high  ~ "Not inside 95% CI",
-              effsize_diff >= ci.low | effsize_diff <= ci.high ~ "Inside 95% CI"
-              )
-             )
-    
-    resamples.plot <- 
-      ggplot(resample.plot.frame, 
-             aes(x = effsize_diff, fill = ci, colour = ci)) + 
-      density.theme +
-      coord_cartesian(xlim = resamp.means.xlim, 
-                      ylim = c(0, 4)
-                      ) +
-      geom_dotplot(method = "histodot",
-                   binwidth = 0.02) +
-      scale_fill_brewer(palette = "Dark2") +
-      scale_colour_brewer(palette = "Dark2") +
-      geom_vline(xintercept = 0, 
-                 color = "blue") +
-      geom_vline(xintercept = true.effsize.diff,
-                 color = "red") +
-      xlab("") +
-      theme(
-        legend.title         =  element_blank(),
-        # margin units are top, right, bottom, left.
-        plot.margin          = unit(c(0, 5, 0, 5), "pt")) +
-      annotate("text", x = -1.4, y = 2.5,
-                 family = "Rubik Medium",
-                 hjust = 0,
-                 label = stringr::str_interp(
-                   "Resampling Distribution\nof difference in ${effsize.label}")
-      ) + guides(color = "none", fill = "none")
-    
-    plotobj <- 
-      plot_grid(
-        fixed.samples.plot, NULL,
-        NULL, NULL,
-        resamp.plot, NULL,
-        resamples.plot, ci.legend,
-        rel_widths = c(1, 0.2),
-        rel_heights = c(1, -0.3, 1, 2),
-        nrow = 4, ncol = 2
-        )
-
-    if (isTRUE(create.gif)) {
-      print(plotobj)
-    }
+    current.idx <- i + (i - 1)
+    resample.plots[[current.idx]] <- plot_to_gtable(resamp.plot)
+    resample.plots[[current.idx + 1]] <- NULL
   }
   
-  if (isFALSE(create.gif)) {
-   print(plotobj)
+
+  
+  all.resample.plots <-
+    plot_grid(
+      plotlist = resample.plots,
+      rel_heights = rep(c(1, -0.1), 
+                        show.resamples * 2),
+      ncol = 1,
+      nrow = show.resamples * 2
+      )
+  
+  sample.and.resample.plot <-
+    plot_grid(
+      plotlist = list(fixed.samples.plot, NULL,
+                      all.resample.plots),
+      rel_heights = rep(c(1, -0.1, 4)),
+      ncol = 1,
+      nrow = 3
+      )
+  
+  ### Use the line below to debug. ###
+  # return(sample.and.resample.plot)
+  
+  boot.res          <- simpleboot::two.boot(sample2, sample1,
+                                            effsize.func, resamples)
+  boot.ci.result    <- boot::boot.ci(boot.res, type = "perc")
+
+  pct.ci.low  <- boot.ci.result$percent[4]
+  pct.ci.high <- boot.ci.result$percent[5]
+
+  resample.effsizes <- as.vector(unlist(boot.res$t))
+
+  # Shift ylims appropriately.
+  if (effsize.control > 0) {
+    resamp.means.xlim <- rawplot.xlims - effsize.control
+  } else {
+    resamp.means.xlim <- rawplot.xlims + effsize.control
   }
+
+  ordered.resamples      <- sort(na.omit(unlist(resample.effsizes)))
+
+  resample.plot.frame <-
+    data_frame(effsize_diff = unlist(resample.effsizes)) %>%
+    mutate(
+      ci = case_when(
+        effsize_diff < pct.ci.low  | effsize_diff > pct.ci.high  ~ "Not inside 95% CI",
+        effsize_diff >= pct.ci.low | effsize_diff <= pct.ci.high ~ "Inside 95% CI"
+        )
+      )
+
+  resamples.plot <-
+    ggplot(resample.plot.frame,
+           aes(x = effsize_diff, fill = ci, colour = ci)) +
+    density.theme +
+    coord_cartesian(xlim = resamp.means.xlim) +
+    geom_histogram(bins = nbins) +
+    # geom_dotplot(method = "histodot",
+    #              binwidth = 0.02) +
+    scale_fill_brewer(palette = "Dark2") +
+    scale_colour_brewer(palette = "Dark2") +
+    geom_vline(xintercept = 0,
+               color = "blue") +
+    geom_vline(xintercept = true.effsize.diff,
+               color = "red") +
+    xlab("") +
+    theme(
+      legend.title         =  element_blank(),
+      plot.title           =  element_text(hjust = 0, family = "Rubik Medium"),
+      # margin units are top, right, bottom, left.
+      plot.margin          = unit(c(0, 5, 0, 5), "pt")) +
+    ggtitle(stringr::str_interp(
+      "Resampling Distribution\nof difference in ${effsize.label}\n(${resamples} resamples)")) +
+    # annotate("text", x = -1.4, y = 15,
+    #            family = "Rubik Medium",
+    #            hjust = 0,
+    #            label = stringr::str_interp(
+    #              "Resampling Distribution\nof difference in ${effsize.label}")) +
+    guides(color = "none", fill = "none")
+  
+  ci.legend <- get.temp.legend()
+  
+  ### Use the line below to debug. ###
+  # return(resamples.plot)
+  
+  plotobj <-
+    plot_grid(
+      sample.and.resample.plot, NULL,
+      # NULL, NULL,
+      resamples.plot, ci.legend,
+      rel_widths = c(1, 0.2),
+      rel_heights = c(2, 1),
+      nrow = 2, ncol = 2
+    )
+  
+  return(plotobj)
   
 }
 ```
 
 
-```{r bootstrap.mean_diff.gif, animation.hook='gifski', interval = 0.05, fig.height=6}
-# You will need to install the packages `gifski`, 
+```{r bootstrap.mean_diff.gif, animation.hook='gifski', interval = 0.05, fig.height=9}
+
+
+bootstrap.demo(sample1, sample2, show.resamples = 3, resamples = 5000, 
+               nbins = 100)
+
+# To create the GIF, You will need to install the packages `gifski`, 
 # and your version of `knitr` >= v1.20.14 .
-
-bootstrap.demo(sample1, sample2, resamples = 500, create.gif = TRUE)
-
 # fig.width.pix  <- 8 * 72
 # fig.height.pix <- 6 * 72
 # 
@@ -416,25 +450,22 @@ bootstrap.demo(sample1, sample2, resamples = 500, create.gif = TRUE)
 #   delay = 0.02, loop = TRUE
 #   )
 
+
 ```
 
 
-<!-- ![](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif) -->
 
-
-As more resamples are performed, watch how the resampling distribution of the difference in means approaches a normal distribution[^3].
-
-[^3]: This is due to the [Central Limit Theorem](https://en.wikipedia.org/wiki/Central_limit_theorem): a large number of independent random samples will approach a normal distribution even if the underlying population is not normally distributed.
+The resampling distribution of the difference in means approaches a normal distribution. This is due to the [Central Limit Theorem](https://en.wikipedia.org/wiki/Central_limit_theorem): a large number of independent random samples will approach a normal distribution even if the underlying population is not normally distributed.
 
 Bootstrap resampling gives us two important benefits:
 
-1. *Non-parametric statistical analysis.* There is no need to assume that our observations, or the underlying populations, are normally distributed. 
-2. *Easy construction of the 95% CI from the resampling distribution.* For 1000 bootstrap resamples of the mean difference, one can use the 25th value and the 975th value of the ranked differences as boundaries of the confidence interval. Such an interval construction is known as a *percentile interval*.
+1. *Non-parametric statistical analysis.* There is no need to assume that our observations, or the underlying populations, are normally distributed. Thanks to the Central Limit Theorem, the resampling distribution of the effect size will approach a normality.
+2. *Easy construction of the 95% CI from the resampling distribution.* For 1000 bootstrap resamples of the mean difference, one can use the 25th value and the 975th value of the ranked differences as boundaries of the 95% confidence interval. (This captures the central 95% of the distribution.) Such an interval construction is known as a *percentile interval*.
 
 
 # Adjusting for asymmetrical resampling distributions
 
-While resampling distributions of the difference in means (and medians) often have a normal distribution, it is not uncommon to encounter a skewed distibution. Thus, Efron developed the [bias-corrected and accelerated bootstrap](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)#History) (BCa bootstrap) to account for the skew, and still obtain the central 95% of the distribution. [dabestr](using-dabestr.html) applies the BCa correction to the resampling bootstrap distributions of the effect size. 
+While resampling distributions of the difference in means often have a normal distribution, it is not uncommon to encounter a skewed distibution. Thus, Efron developed the [bias-corrected and accelerated bootstrap](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)#History) (BCa bootstrap) to account for the skew, and still obtain the central 95% of the distribution. [dabestr](using-dabestr.html) applies the BCa correction to the resampling bootstrap distributions of the effect size. 
 
 ```{r, create.skew.pop, fig.height=3}
 
@@ -460,7 +491,8 @@ histo.plot.frame <-
 ggplot(histo.plot.frame, 
      aes(x = boots)) + 
   density.theme +
-  theme(axis.line.x  = element_blank(),
+  theme(plot.title   = element_text(family = "Work Sans Medium"),
+        axis.line.x  = element_blank(),
         axis.text.x  = element_blank(),
         axis.ticks.x = element_blank()) +
   coord_cartesian(ylim = c(-0.04, 0.17)) +
@@ -483,6 +515,7 @@ ggplot(histo.plot.frame,
                y    = -0.02, yend = 0.21,
                color = 'darkgrey') +
   annotate("text", x = 11, y = -0.01,
+           family = "Work Sans Medium",
            color = "darkgrey",
            hjust = 1, vjust = 0,
            label = "Percentile bootstrap") +
@@ -495,15 +528,17 @@ ggplot(histo.plot.frame,
   geom_vline(xintercept = skew.boot.ci$bca[4]) +
   geom_vline(xintercept = skew.boot.ci$bca[5]) +
   annotate("text", x = 11, y = -0.04,
-         hjust = 1, vjust = 0,
-         label = "BCa bootstrap") +
+           family = "Work Sans Medium",
+           hjust = 1, vjust = 0,
+           label = "BCa bootstrap") +
 
  # Mean line
   geom_vline(xintercept = mean(skew.sample),
             color = "magenta1") +
   annotate("text", x = mean(skew.sample), y = 0.175,
-          color = "magenta2",
-          hjust = 0, label = "  Mean of observations") +
+           color = "magenta2",
+           family = "Work Sans Medium",
+           hjust = 0, label = "  Mean of observations") +
   
   ggtitle("Constructing 95% confidence intervals\nfor a skewed sampling distribution\n")
 
@@ -549,7 +584,7 @@ my.data   <-
 # Create plot.
 custom.theme <- 
   theme_classic() +
-  theme(text = element_text(family = "Work Sans"))
+  theme(text = element_text(family = "Work Sans Medium"))
 
 my.data %>%
   dabest(Group, Measurement, 

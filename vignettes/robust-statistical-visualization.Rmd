@@ -70,18 +70,26 @@ Let's say we have performed an experiment with `r sampleN` control subjects, and
 library(ggplot2)
 
 
-non.floating.theme <-
+estimation.plot.theme <-
   theme_classic() +
   theme(
-    text                 =  element_text(family = "Work Sans"),
-    axis.text            =  element_text(size = 13),
-    axis.title           =  element_text(size = 15),
-    panel.background     =  element_rect(fill = "#fffff8"),
-    plot.background      =  element_rect(fill = "#fffff8"),
-    axis.ticks.length    =  unit(7, "points"),
-    axis.line.x.bottom   =  element_blank(),
-    axis.ticks.x.bottom  =  element_blank(),
-    axis.title.x.bottom  =  element_blank()
+    text                  =  element_text(family = "Work Sans"),
+    axis.text             =  element_text(size = 13),
+    axis.title            =  element_text(size = 15),
+    
+    axis.ticks.length     =  unit(7, "points"),
+    axis.line.x.bottom    =  element_blank(),
+    axis.ticks.x.bottom   =  element_blank(),
+    axis.title.x.bottom   =  element_blank()
+    )
+
+non.floating.theme <-
+  estimation.plot.theme +
+  theme(
+    panel.background      =  element_rect(fill = "#fffff8"),
+    plot.background       =  element_rect(fill = "#fffff8"),
+    legend.background     =  element_rect(fill = "#fffff8"),
+    legend.box.background =  element_rect(fill = "#fffff8")
     )
 
 floating.theme <-
@@ -106,11 +114,11 @@ annotate.text.size <- 5
 
 ggplot(plot.frame, aes(x = Group, y = mean)) +
   
-  non.floating.theme +
+  estimation.plot.theme +
   
   geom_col(aes(fill = Group), width = 0.5) +
   
-  custom.fill +
+  scale_fill_brewer(palette="Dark2") +
   
   geom_errorbar(width = 0.,
                 aes(ymin = mean - std, 
@@ -166,11 +174,11 @@ Alternatively, we can use a boxplot to visualize the data.
 ```{r boxplot, message=FALSE, echo=FALSE, fig.width = 7, fig.height = 4}
 ggplot(my.data, aes(x = Group, y = Value)) +
   
-  non.floating.theme +
+  estimation.plot.theme +
   
   geom_boxplot(aes(fill = Group)) +
   
-  custom.fill +
+  scale_fill_brewer(palette="Dark2") +
   
   geom_segment(x    = 1, xend = 1,
                y    = plot.frame$max[1] + 0.15, 
@@ -230,11 +238,11 @@ pval.round <- signif(t.test.result$p.value, 2)
 
 ggplot(my.data, aes(x = Group, y = Value)) +
   
-  non.floating.theme +
+  estimation.plot.theme +
   
   geom_jitter(aes(colour = Group), width = 0.25) +
   
-  custom.colour +
+  scale_color_brewer(palette="Dark2") +
   
   geom_segment(x    = 1, xend = 1,
                y    = plot.frame$max[1] + 0.15, 
@@ -296,15 +304,17 @@ gardner.altman <-
          idx = c("Control", "Test"),
          paired = FALSE) %>%
   plot(palette = "Dark2",
-       theme = non.floating.theme,
+       theme = estimation.plot.theme,
        rawplot.type = 'swarmplot',
-       rawplot.markersize = 8, 
-       swarmplot.params = list(priority = "random"))
+       width = 0.1
+       # rawplot.markersize = 6,
+       # effsize.markersize = 8
+       )
 
 
 annotation <- 
   ggplot() +
-  non.floating.theme +
+  estimation.plot.theme +
   theme(axis.text  = element_blank(),
         axis.line  = element_blank(),
         axis.ticks = element_blank()) +
@@ -362,11 +372,7 @@ For each of the most routine significance tests, **there is an estimation replac
 
 *Unpaired Student’s t-test → Two-group estimation plot*
 
-```{r gardner.altman.unpaired, warning=FALSE, message=FALSE, echo=FALSE, fig.width = 6, fig.height = 3}
-
-custom.theme <- 
-  ggplot2::theme_classic() +
-  ggplot2::theme(text=ggplot2::element_text(family = "Work Sans"))
+```{r gardner.altman.unpaired, warning=FALSE, message=FALSE, echo=FALSE, fig.width = 6, fig.height = 4}
 
 
 two.group.unpaired <- 
@@ -378,7 +384,7 @@ two.group.unpaired <-
          idx = c("Control", "Test"), 
          paired = FALSE)
 
-plot(two.group.unpaired, theme = custom.theme, color.column = Gender)
+plot(two.group.unpaired, theme = estimation.plot.theme, color.column = Gender)
 
 ``` 
 
@@ -386,14 +392,14 @@ plot(two.group.unpaired, theme = custom.theme, color.column = Gender)
 
 The Gardner-Altman estimation plot can also display effect sizes for repeated measures (*aka* a paired experimental design) using a [Tufte slopegraph](http://charliepark.org/slopegraphs/) instead of a swarmplot.
 
-```{r gardner.altman.paired, warning=FALSE, message=FALSE, echo=FALSE, fig.width = 6, fig.height = 3}
+```{r gardner.altman.paired, warning=FALSE, message=FALSE, echo=FALSE, fig.width = 6, fig.height = 4}
 two.group.paired <- 
   my.data %>%
   dabest(Group, Value, 
          idx = c("Control", "Test"), 
          paired = TRUE, id.col = ID)
 
-plot(two.group.paired, theme = custom.theme, color.column = Gender)
+plot(two.group.paired, theme = estimation.plot.theme, color.column = Gender)
 ``` 
 
 
@@ -452,7 +458,7 @@ multi.two.group.unpaired <-
          paired = FALSE
   )
 
-plot(multi.two.group.unpaired, theme = custom.theme,
+plot(multi.two.group.unpaired, theme = estimation.plot.theme,
      tick.fontsize = 13, axes.title.fontsize = 15,
      color.column = Gender)
 ```
@@ -472,7 +478,7 @@ multi.two.group.paired <-
          paired = TRUE, id.col = ID
   )
 
-plot(multi.two.group.paired, theme = custom.theme,
+plot(multi.two.group.paired, theme = estimation.plot.theme,
      tick.fontsize = 13, axes.title.fontsize = 15,
      color.column = Gender)
 ```
@@ -488,7 +494,7 @@ shared.control <-
          paired = FALSE
   )
 
-plot(shared.control, theme = custom.theme, 
+plot(shared.control, theme = estimation.plot.theme, 
      tick.fontsize = 13, axes.title.fontsize = 15,
      color.column = Gender)
 
