@@ -3,7 +3,7 @@
 dabestr
 =======
 
-![Travis CI build status](https://img.shields.io/travis/com/ACCLAB/dabestr/master.svg)
+[![Travis CI build status](https://img.shields.io/travis/com/ACCLAB/dabestr/master.svg)](https://travis-ci.com/ACCLAB/dabestr/)
 
 dabestr is a package for **D**ata **A**nalysis using **B**ootstrap-Coupled **EST**imation in R.
 
@@ -26,6 +26,8 @@ Installation
 ------------
 
 Currently, this package is only available on Github. A CRAN version is forthcoming.
+
+Your version of R must be 3.5.0 or higher.
 
 ``` r
 # install.packages("dabestr") ## Does not work; awaiting CRAN acceptance.
