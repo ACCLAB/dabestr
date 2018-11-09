@@ -27,6 +27,8 @@ Installation
 
 Currently, this package is only available on Github. A CRAN version is forthcoming.
 
+Your version of R must be 3.5.0 or higher.
+
 ``` r
 # install.packages("dabestr") ## Does not work; awaiting CRAN acceptance.
 
