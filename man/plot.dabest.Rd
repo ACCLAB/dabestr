@@ -107,7 +107,7 @@ An estimation plot has two key features.
   \item{It presents the effect size as a bootstrap 95 percent confidence
         interval on a separate but aligned axes.}
 }
-Estimation plots emerge from estimation statistics, an inutitive framework
+Estimation plots emerge from estimation statistics, an intuitive framework
 that avoids the pitfalls of significance testing. It uses familiar
 statistical concepts: means, mean differences, and error bars.
 More importantly, it focuses on the effect size of one's
