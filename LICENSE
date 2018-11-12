@@ -33,9 +33,9 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 
-This package contains the file `flat_violin.R`, copyright (c) 2018 Micah Allen,
-Davide Poggiali, Kirstie Whitaker, Tom Rhys Marshall and Rogier Kievit. It is
-licensed under the MIT License.
+This package contains the file `flat_violin.R`, copyright (c) 2018 David
+Robinson, Micah Allen, Davide Poggiali, Kirstie Whitaker, Tom Rhys Marshall and
+Rogier Kievit. It is licensed under the MIT License.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of `flat_violin.R` (the "Software"), to deal in the Software without restriction,
