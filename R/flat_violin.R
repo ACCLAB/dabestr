@@ -1,5 +1,5 @@
-# Copyright (c) 2018 Micah Allen, Davide Poggiali, Kirstie Whitaker,
-# Tom Rhys Marshall and Rogier Kievit.
+# Copyright (c) 2018 David Robinson, Micah Allen, Davide Poggiali, Kirstie
+# Whitaker, Tom Rhys Marshall and Rogier Kievit.
 #
 # The R code in this file (referred to as the Software) is licensed under the
 # MIT license.
