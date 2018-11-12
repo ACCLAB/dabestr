@@ -102,7 +102,7 @@ An estimation plot has two key features.
 \enumerate{
   \item{It presents all datapoints as a
   \href{https://github.com/eclarke/ggbeeswarm#introduction}{swarmplot} or
-  \href{https://cran.r-project.org/web/packages/sinaplot/vignettes/SinaPlot.html}{sinaplot},
+  \href{https://CRAN.R-project.org/package=sinaplot}{sinaplot},
   which orders each point to display the underlying distribution.}
   \item{It presents the effect size as a bootstrap 95 percent confidence
         interval on a separate but aligned axes.}
