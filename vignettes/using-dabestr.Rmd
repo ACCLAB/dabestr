@@ -45,7 +45,7 @@ my.data   <-
 head(my.data)
 ```
 
-This dataset is a [tidy dataset](https://cran.r-project.org/web/packages/tidyr/vignettes/tidy-data.html), where each observation (datapoint) is a row, and each variable (or associated metadata) is a column. `dabestr` requires that data be in this form, as do [other popular R packages](https://www.tidyverse.org) for data visualization and analysis.
+This dataset is a [tidy dataset](https://vita.had.co.nz/papers/tidy-data.html), where each observation (datapoint) is a row, and each variable (or associated metadata) is a column. `dabestr` requires that data be in this form, as do [other popular R packages](https://www.tidyverse.org) for data visualization and analysis.
 
 # The Gardner-Altman Two Group Estimation Plot
 
