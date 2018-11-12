@@ -13,7 +13,7 @@
 #' and visualizes them using estimation plots with a specialized
 #' \code{\link{plot.dabest}} function.
 #'
-#' Estimation statistics is a statistical framework that focusses on effect
+#' Estimation statistics is a statistical framework that focuses on effect
 #' sizes and confidence intervals around them, rather than \emph{P} values and
 #' associated dichotomous hypothesis testing.
 #'
