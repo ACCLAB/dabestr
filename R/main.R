@@ -179,7 +179,7 @@
 #'
 #'
 #' @section References:
-#' \href{http://www.jstor.org/stable/2246110}{Bootstrap Confidence Intervals.}
+#' \href{https://www.jstor.org/stable/2246110}{Bootstrap Confidence Intervals.}
 #' DiCiccio, Thomas J., and Bradley Efron.
 #' Statistical Science: vol. 11, no. 3, 1996. pp. 189–228.
 #'
