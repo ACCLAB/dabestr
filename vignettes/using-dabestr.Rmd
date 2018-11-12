@@ -252,11 +252,11 @@ plot(multi.group, color.column = Gender,
      )
 ```
 
-You can use the `theme` parameter to pass along any ggplot2 themes. The default `ggplot2` theme is `theme_classic()`. 
+<!-- You can use the `theme` parameter to pass along any ggplot2 themes. The default `ggplot2` theme is `theme_classic()`.  -->
 
-```{r different.theme, fig.width = 7, fig.height = 4}
-plot(multi.group, color.column = Gender,
-     theme = ggplot2::theme_gray()
-     )
-```
+<!-- ```{r different.theme, fig.width = 7, fig.height = 4} -->
+<!-- plot(multi.group, color.column = Gender, -->
+<!--      theme = ggplot2::theme_gray() -->
+<!--      ) -->
+<!-- ``` -->
 
