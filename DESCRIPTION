@@ -20,7 +20,7 @@ Description: Data Analysis using Bootstrap-Coupled ESTimation in R.
     display the underlying distribution.
     2. It presents the effect size as a bootstrap 95% confidence interval on a 
     separate but aligned axes.
-License: file LICENSE
+License: BSD 3-Clause Clear License + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Depends: 
