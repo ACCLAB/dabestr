@@ -1,11 +1,10 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
 dabestr
 =======
 
 [![Travis CI build status](https://img.shields.io/travis/com/ACCLAB/dabestr/master.svg)](https://travis-ci.com/ACCLAB/dabestr/)
 
-dabestr is a package for **D**ata **A**nalysis using **B**ootstrap-Coupled **EST**imation in R.
+dabestr is a package for **D**ata **A**nalysis using **B**ootstrap-Coupled **EST**imation.
 
 About
 -----

@@ -2,7 +2,6 @@
 output: github_document
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(
@@ -17,7 +16,7 @@ knitr::opts_chunk$set(
 [![Travis CI build status](https://img.shields.io/travis/com/ACCLAB/dabestr/master.svg)](https://travis-ci.com/ACCLAB/dabestr/)
 
 
-dabestr is a package for **D**ata **A**nalysis using **B**ootstrap-Coupled **EST**imation in R.
+dabestr is a package for **D**ata **A**nalysis using **B**ootstrap-Coupled **EST**imation.
 
 ## About
 
