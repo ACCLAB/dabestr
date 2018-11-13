@@ -1,3 +1,18 @@
+## Resubmission
+This is a resubmission. In this version I have:
+
+* Cleaned up the LICENSE file. The software is licensed under the 
+BSD 3-Clause Clear License, which is a variant of the BSD 3-Clause License that 
+explicitly does not grant any patent rights. <https://choosealicense.com/licenses/bsd-3-clause-clear/> 
+
+
+* Fixed the DOI markup.
+
+* Removed the redundant "in R" from the title.
+
+* Added reference about the plots and methods in the Description field of 
+DESCRIPTION.
+  
 ## Test environments
 * local OS X install, R 3.5.0
 * ubuntu 14.04.5 (on travis-ci, devel and release)

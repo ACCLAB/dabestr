@@ -20,7 +20,8 @@ Description: Data Analysis using Bootstrap-Coupled ESTimation.
     display the underlying distribution.
     2. It presents the effect size as a bootstrap 95% confidence interval on a 
     separate but aligned axes.
-License: file LICENSE
+    Estimation plots are introduced in Ho et al (2018) <doi:10.1101/377978>.
+License: BSD_3_Clause_Clear | file LICENSE
 Encoding: UTF-8
 LazyData: true
 Depends: 
