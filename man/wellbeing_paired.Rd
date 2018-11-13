@@ -7,8 +7,8 @@
 \format{A list with two elements: \code{before} and \code{after}.}
 \source{
 Cumming, G. Understanding the New Statistics: Effect Sizes,
-Confidence Intervals, and Meta-Analysis. Routledge, 2012,
-https://books.google.com.sg/books?id=AVBDYgEACAAJ.
+Confidence Intervals, and Meta-Analysis. Routledge 2012.
+https://books.google.com/books?id=AVBDYgEACAAJ
 }
 \usage{
 wellbeing_paired

@@ -463,7 +463,7 @@ plot(multi.two.group.unpaired, theme = estimation.plot.theme,
      color.column = Gender)
 ```
 
-The effect size and 95% CIs are still plotted a seperate axes, but unlike the Gardner-Altman plot, this axes is positioned beneath the raw data. Such a design frees up visual space in the upper panel, allowing the display of  summary measurements (mean ± standard deviation) for each group. These are shown as gapped lines to the right of each group. The mean of each group is indicated as a gap in the line, adhering to Edward Tufte's dictum to [keep the data-ink ratio low](https://medium.com/@plotlygraphs/maximizing-the-data-ink-ratio-in-dashboards-and-slide-deck-7887f7c1fab).
+The effect size and 95% CIs are still plotted a separate axes, but unlike the Gardner-Altman plot, this axes is positioned beneath the raw data. Such a design frees up visual space in the upper panel, allowing the display of  summary measurements (mean ± standard deviation) for each group. These are shown as gapped lines to the right of each group. The mean of each group is indicated as a gap in the line, adhering to Edward Tufte's dictum to [keep the data-ink ratio low](https://medium.com/@plotlygraphs/maximizing-the-data-ink-ratio-in-dashboards-and-slide-deck-7887f7c1fab).
 
 *Repeated measures ANOVA → Multi paired estimation plot*
 
