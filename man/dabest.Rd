@@ -38,7 +38,7 @@ automatically with \code{na.omit}.}
 
 \item{seed}{integer, default 12345. This specifies the seed used to set the
 random number generator. Setting a seed ensures that the bootstrap confidence
-intervals for the same data will remain stable over seperate runs/calls of
+intervals for the same data will remain stable over separate runs/calls of
 this function. See \link{set.seed} for more details.}
 }
 \value{

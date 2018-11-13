@@ -465,7 +465,7 @@ Bootstrap resampling gives us two important benefits:
 
 # Adjusting for asymmetrical resampling distributions
 
-While resampling distributions of the difference in means often have a normal distribution, it is not uncommon to encounter a skewed distibution. Thus, Efron developed the [bias-corrected and accelerated bootstrap](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)#History) (BCa bootstrap) to account for the skew, and still obtain the central 95% of the distribution. [dabestr](using-dabestr.html) applies the BCa correction to the resampling bootstrap distributions of the effect size. 
+While resampling distributions of the difference in means often have a normal distribution, it is not uncommon to encounter a skewed distribution. Thus, Efron developed the [bias-corrected and accelerated bootstrap](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)#History) (BCa bootstrap) to account for the skew, and still obtain the central 95% of the distribution. [dabestr](using-dabestr.html) applies the BCa correction to the resampling bootstrap distributions of the effect size. 
 
 ```{r, create.skew.pop, fig.height=3}
 
