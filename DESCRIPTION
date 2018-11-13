@@ -9,8 +9,7 @@ Authors@R: c(
           role = c("aut"))
           )
 Maintainer: Joses W. Ho <joseshowh@gmail.com>
-Description: dabestr is a package for Data Analysis using Bootstrap-Coupled 
-    ESTimation in R.
+Description: Data Analysis using Bootstrap-Coupled ESTimation in R.
     Estimation statistics is a simple framework that avoids the pitfalls of 
     significance testing. It uses familiar statistical concepts: means, 
     mean differences, and error bars. More importantly, it focuses on the 

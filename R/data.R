@@ -25,7 +25,7 @@
 #'
 #' This dataset is taken from Mueller and Oppenheimer (2014), comparing the
 #' percentage of notes that was verbatim transcribed during a lecture by two
-#' indpendent groups of students: one using pen and paper, and one using
+#' independent groups of students: one using pen and paper, and one using
 #' laptops.
 #'
 #' It is also found in Chapter 7 "The Independent Groups Design"
@@ -56,8 +56,8 @@
 #' @format A list with two elements: \code{control} and \code{test}.
 #'
 #' @source Cumming, G. Understanding the New Statistics: Effect Sizes,
-#' Confidence Intervals, and Meta-Analysis. Routledge, 2012,
-#' https://books.google.com.sg/books?id=AVBDYgEACAAJ.
+#' Confidence Intervals, and Meta-Analysis. Routledge 2012.
+#' https://books.google.com/books?id=AVBDYgEACAAJ
 "wellbeing_ind"
 
 
@@ -75,6 +75,6 @@
 #' @format A list with two elements: \code{before} and \code{after}.
 #'
 #' @source Cumming, G. Understanding the New Statistics: Effect Sizes,
-#' Confidence Intervals, and Meta-Analysis. Routledge, 2012,
-#' https://books.google.com.sg/books?id=AVBDYgEACAAJ.
+#' Confidence Intervals, and Meta-Analysis. Routledge 2012.
+#' https://books.google.com/books?id=AVBDYgEACAAJ
 "wellbeing_paired"

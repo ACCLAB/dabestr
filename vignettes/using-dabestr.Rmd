@@ -87,7 +87,7 @@ This is known as a Gardner-Altman estimation plot, after [Martin J. Gardner](htt
 The key features of the Gardner-Altman estimation plot are:
 
 1. All data points are plotted.
-2. The mean difference (the effect size) and its 95% confidence interval (95% CI) is displayed as a point estimate and vertical bar respectively, on a seperate but aligned axes.
+2. The mean difference (the effect size) and its 95% confidence interval (95% CI) is displayed as a point estimate and vertical bar respectively, on a separate but aligned axes.
 
 The estimation plot produced by `dabest` differs from the one first introduced by Gardner and Altman in one important aspect. `dabest` derives the 95% CI through nonparametric bootstrap resampling. This enables visualization of the confidence interval as a graded sampling distribution.
 
@@ -132,7 +132,7 @@ multi.two.group.unpaired
 plot(multi.two.group.unpaired, color.column = Gender)
 ```
 
-This is a Cumming estimation plot. It is heavily influenced by the plot designs of [Geoff Cumming](https://www.youtube.com/watch?v=nDN-hcKR7j8) in his 2012 text [Understanding the New Statistics](https://www.routledge.com/Understanding-The-New-Statistics-Effect-Sizes-Confidence-Intervals-and/Cumming/p/book/9780415879682). The effect size and 95% CIs are plotted a seperate axes that is now positioned below the raw data. In addition, summary measurements are displayed as gapped lines to the right of each group. These vertical lines are identical to conventional mean ± standard deviation error bars. Here, the mean of each group is indicated as a gap in the line, drawing inspiration from Edward Tufte's low data-ink ratio dictum.
+This is a Cumming estimation plot. It is heavily influenced by the plot designs of [Geoff Cumming](https://www.youtube.com/watch?v=nDN-hcKR7j8) in his 2012 text [Understanding the New Statistics](https://www.routledge.com/Understanding-The-New-Statistics-Effect-Sizes-Confidence-Intervals-and/Cumming/p/book/9780415879682). The effect size and 95% CIs are plotted a separate axes that is now positioned below the raw data. In addition, summary measurements are displayed as gapped lines to the right of each group. These vertical lines are identical to conventional mean ± standard deviation error bars. Here, the mean of each group is indicated as a gap in the line, drawing inspiration from Edward Tufte's low data-ink ratio dictum.
 
 By default, `dabest` plots the mean ± standard deviation of each group as a gapped line beside each group. The  `group.summaries = 'median_quartiles'` parameter will plot the median and 25th & 75th percentiles of each group is plotted instead. If `group.summaries = NULL`, the summaries are not shown.
 
