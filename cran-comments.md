@@ -7,24 +7,39 @@
 ## R CMD check results
 There were no ERRORs or WARNINGs.
 
-There were 3 NOTEs:
+There were 2 NOTEs:
+* checking installed package size ... NOTE
+  installed size is  6.2Mb
+  sub-directories of 1Mb or more:
+    doc   5.6Mb
+    
+  COMMENTS:
+  The size of the installed package is over 5 MB the vignettes produce a large 
+  number of plots. Future versions will gradually reduce the vignettes' sizes. 
 
-* The installed package size is over 5 MB because the vignettes have a large number of plots. Future releases will progressively reduce the filesize of the vignettes.
-
-* Non-FOSS package license (file LICENSE)
-  The LICENSE does not match a FOSS template license because it contains the original copyright license for "flat_violin.R".
-
-* Found the following (possibly) invalid URLs:
-    URL: https://www.jstor.org/stable/2246110
-      From: man/dabest.Rd
-      Status: 403
-      Message: Forbidden
-      
+* checking CRAN incoming feasibility ... NOTE
+  Maintainer: 'Joses W. Ho <joseshowh@gmail.com>'
+  
+  New submission
+  
+  Non-FOSS package license (file LICENSE)
+  
+  Possibly mis-spelled words in DESCRIPTION:
+    ESTimation (12:52)
+    swarmplot (19:40)
+  
+  Found the following (possibly) invalid DOIs:
     DOI: https://doi.org/10.1101/377978
       From: inst/CITATION
       Message: Invalid DOI
-      
-  Both the DOI and URL are valid, and can be accessed by modern browsers.
+
+  COMMENTS: 
+  The LICENSE does not match a FOSS template license because it contains the 
+  original copyright license for "flat_violin.R".
+  
+  The words are not misspelled, and are valid.
+  
+  The DOI is valid, and can be accessed by modern browsers.
 
 
 ## Downstream dependencies
