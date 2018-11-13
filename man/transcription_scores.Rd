@@ -17,7 +17,7 @@ transcription_scores
 \description{
 This dataset is taken from Mueller and Oppenheimer (2014), comparing the
 percentage of notes that was verbatim transcribed during a lecture by two
-indpendent groups of students: one using pen and paper, and one using
+independent groups of students: one using pen and paper, and one using
 laptops.
 }
 \details{
