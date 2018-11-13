@@ -1,60 +1,30 @@
 ## Resubmission
 This is a resubmission. In this version I have:
 
-* Cleaned up the LICENSE file. The software is licensed under the 
-BSD 3-Clause Clear License, which is a variant of the BSD 3-Clause License that 
-explicitly does not grant any patent rights. <https://choosealicense.com/licenses/bsd-3-clause-clear/> 
-
+* Cleaned the LICENSE file. Note that the package is licensed under 
+the BSD 3-Clause Clear License, which is a variant of the BSD 3-Clause 
+License that explicitly does not grant any patent rights
+<https://choosealicense.com/licenses/bsd-3-clause-clear/>. 
+It does not seem to be listed in the license templates on CRAN
+<https://cran.r-project.org/web/licenses/>.
 
 * Fixed the DOI markup.
 
 * Removed the redundant "in R" from the title.
 
-* Added reference about the plots and methods in the Description field of 
-DESCRIPTION.
-  
+* Added reference about the plots and methods in the Description field 
+of DESCRIPTION.
+
+
 ## Test environments
 * local OS X install, R 3.5.0
+* local debian install, R 3.5.1
 * ubuntu 14.04.5 (on travis-ci, devel and release)
 * win-builder (devel and release)
 
 
 ## R CMD check results
-There were no ERRORs or WARNINGs.
-
-There were 2 NOTEs:
-* checking installed package size ... NOTE
-  installed size is  6.2Mb
-  sub-directories of 1Mb or more:
-    doc   5.6Mb
-    
-  COMMENTS:
-  The size of the installed package is over 5 MB the vignettes produce a large 
-  number of plots. Future versions will gradually reduce the vignettes' sizes. 
-
-* checking CRAN incoming feasibility ... NOTE
-  Maintainer: 'Joses W. Ho <joseshowh@gmail.com>'
-  
-  New submission
-  
-  Non-FOSS package license (file LICENSE)
-  
-  Possibly mis-spelled words in DESCRIPTION:
-    ESTimation (12:52)
-    swarmplot (19:40)
-  
-  Found the following (possibly) invalid DOIs:
-    DOI: https://doi.org/10.1101/377978
-      From: inst/CITATION
-      Message: Invalid DOI
-
-  COMMENTS: 
-  The LICENSE does not match a FOSS template license because it contains the 
-  original copyright license for "flat_violin.R".
-  
-  The words are not misspelled, and are valid.
-  
-  The DOI is valid, and can be accessed by modern browsers.
+There were no ERRORs, WARNINGs, or NOTEs.
 
 
 ## Downstream dependencies
