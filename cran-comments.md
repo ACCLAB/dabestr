@@ -5,6 +5,7 @@ This is a resubmission. In this version I have:
 BSD 3-Clause Clear License, which is a variant of the BSD 3-Clause License that 
 explicitly does not grant any patent rights. <https://choosealicense.com/licenses/bsd-3-clause-clear/> 
 
+
 * Fixed the DOI markup.
 
 * Removed the redundant "in R" from the title.
