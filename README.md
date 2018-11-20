@@ -2,11 +2,7 @@
 dabestr
 =======
 
-[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version-last-release/dabestr?color=orange)](https://cran.r-project.org/package=dabestr)
-
-[![Travis CI build status](https://img.shields.io/travis/com/ACCLAB/dabestr/master.svg)](https://travis-ci.com/ACCLAB/dabestr/)
-
-[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version-last-release/dabestr?color=orange)](https://cran.r-project.org/package=dabestr) [![Travis CI build status](https://img.shields.io/travis/com/ACCLAB/dabestr/master.svg)](https://travis-ci.com/ACCLAB/dabestr/) [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 dabestr is a package for **D**ata **A**nalysis using **B**ootstrap-Coupled **EST**imation.
 
