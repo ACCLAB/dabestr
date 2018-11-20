@@ -29,8 +29,10 @@ Currently, this package is only available on Github. A CRAN version is forthcomi
 Your version of R must be 3.5.0 or higher.
 
 ``` r
-# install.packages("dabestr") ## Does not work; awaiting CRAN acceptance.
+install.packages("dabestr")
 
+# To install the latest development version on Github,
+# use the line below.
 devtools::install_github("ACCLAB/dabestr")
 ```
 
