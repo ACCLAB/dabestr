@@ -233,11 +233,11 @@ plot.dabest <- function(x, ...,
     }
 
     for.plot <- dplyr::bind_rows(for.plot)
-
-    for.plot[[x_quoname]] <-
-      for.plot[[x_quoname]] %>%
-      factor(all.groups, ordered = TRUE)
   }
+
+  for.plot[[x_quoname]] <-
+    for.plot[[x_quoname]] %>%
+    factor(all.groups, ordered = TRUE)
 
 
   #### Compute the Ns. ####

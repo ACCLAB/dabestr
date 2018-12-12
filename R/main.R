@@ -376,6 +376,13 @@ dabest <- function(
 
   colnames(summaries) <- c(x_quoname, func_quoname)
 
+  # Order the summaries by the idx.
+  summaries[[x_quoname]] <-
+    summaries[[x_quoname]] %>%
+    factor(all_groups, ordered = TRUE)
+
+  summaries <- summaries %>% dplyr::arrange(!!x_enquo)
+
 
 
   #### Assemble only the data used to create the plot. ####

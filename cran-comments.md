@@ -1,19 +1,6 @@
-## Resubmission
-This is a resubmission. In this version I have:
 
-* Cleaned the LICENSE file. Note that the package is licensed under 
-the BSD 3-Clause Clear License, which is a variant of the BSD 3-Clause 
-License that explicitly does not grant any patent rights
-<https://choosealicense.com/licenses/bsd-3-clause-clear/>. 
-It does not seem to be listed in the license templates on CRAN
-<https://cran.r-project.org/web/licenses/>.
-
-* Fixed the DOI markup.
-
-* Removed the redundant "in R" from the title.
-
-* Added reference about the plots and methods in the Description field 
-of DESCRIPTION.
+## v0.2.0
+This is a update to the package, fixing a bug in the previous release.
 
 
 ## Test environments
@@ -24,8 +11,17 @@ of DESCRIPTION.
 
 
 ## R CMD check results
-There were no ERRORs, WARNINGs, or NOTEs.
+There were no ERRORs or WARNINGs.
 
+There was 1 NOTE.
+  installed size is  5.3Mb
+    sub-directories of 1Mb or more:
+      doc   4.5Mb
+  
+  The vignettes contain several graphics to demonstrate both the package and the
+  underlying design principles. Future versions will aim to reduce the size
+  of the vignettes.
+  
 
 ## Downstream dependencies
 There are currently no downstream dependencies for this package.
