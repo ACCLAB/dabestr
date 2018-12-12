@@ -433,24 +433,8 @@ bootstrap.demo <- function(
 
 ```{r bootstrap.mean_diff.gif, fig.height=9}
 
-
 bootstrap.demo(sample1, sample2, show.resamples = 3, resamples = 5000, 
                nbins = 100)
-
-# To create the GIF, You will need to install the packages `gifski`, 
-# and your version of `knitr` >= v1.20.14 .
-# add the following chunk options.: animation.hook='gifski', interval = 0.05
-# fig.width.pix  <- 8 * 72
-# fig.height.pix <- 6 * 72
-# 
-# gifski::save_gif(
-#   bootstrap.demo(sample1, sample2, resamples = 1000, create.gif = TRUE), 
-#   gif_file = "bootstrap.gif", 
-#   width = fig.width.pix, 
-#   height = fig.height.pix,
-#   delay = 0.02, loop = TRUE
-#   )
-
 
 ```
 
