@@ -159,13 +159,6 @@ unpaired_mean_diff_90_ci  <- dabest(
                               )
 
 
-# Constructing the confidence intervals on 10000 bootstrap resamples.
-unpaired_mean_diff_n10000 <- dabest(
-                               iris, Species, Petal.Width,
-                               idx = c("setosa", "versicolor", "virginica"),
-                               paired = FALSE,
-                               reps = 10000
-                               )
 
 # Using pipes to munge your data and then passing to `dabest`.
 # First, we generate some synthetic data.
