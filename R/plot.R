@@ -115,14 +115,11 @@
 #' # Create a Gardner-Altman estimation plot.
 #' plot(unpaired_mean_diff)
 #'
-#' # Create a Cumming estimation plot instead.
-#' plot(unpaired_mean_diff, float.contrast = FALSE)
 #'
 #'
 #' # Comparing versicolor and virginica petal width to setosa petal width.
 #' shared_control_data <- dabest(iris, Species, Petal.Width,
-#'                               idx = c("setosa", "versicolor", "virginica"),
-#'                               paired = FALSE
+#'                               idx = c("setosa", "versicolor", "virginica")
 #'                               )
 #'
 #' # Create a Cumming estimation plot.
