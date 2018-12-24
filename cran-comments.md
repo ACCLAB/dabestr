@@ -4,8 +4,8 @@ This is a update to the package, fixing a bug in the previous release.
 
 
 ## Test environments
-* local OS X install, R 3.5.0
-* local debian install, R 3.5.1
+* local OS X install, R 3.5.2
+* local debian install, R 3.5.2
 * ubuntu 14.04.5 (on travis-ci, devel and release)
 * win-builder (devel and release)
 
