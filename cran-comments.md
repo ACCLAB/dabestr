@@ -11,16 +11,7 @@ This is a update to the package, fixing a bug in the previous release.
 
 
 ## R CMD check results
-There were no ERRORs or WARNINGs.
-
-There was 1 NOTE.
-  installed size is  5.3Mb
-    sub-directories of 1Mb or more:
-      doc   4.5Mb
-  
-  The vignettes contain several graphics to demonstrate both the package and the
-  underlying design principles. Future versions will aim to reduce the size
-  of the vignettes.
+There were no ERRORs, WARNINGs, or NOTEs.
   
 
 ## Downstream dependencies
