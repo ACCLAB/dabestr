@@ -58,7 +58,7 @@ density.theme <-
 
 
 title.theme <-
-  theme(plot.title = element_text(family = "Rubik Medium", 
+  theme(plot.title = element_text(#family = "Rubik Medium", 
                                   size   =  17))
 
 ```
@@ -250,7 +250,7 @@ bootstrap.demo <- function(
                  color = "red") +
     
     annotate("text", x = 0.4, y = 2.75,
-             family = "Rubik Medium",
+             # family = "Rubik Medium",
              hjust = 0,
              label = "Original Observations") +
     theme(
@@ -311,7 +311,7 @@ bootstrap.demo <- function(
                  color = "red") +
       
       annotate("text", x = 0.4, y = 2.75,
-               family = "Rubik Medium",
+               # family = "Rubik Medium",
                hjust = 0,
                label = stringr::str_interp("Resample #${i}")) +
       
@@ -401,7 +401,9 @@ bootstrap.demo <- function(
     xlab("") +
     theme(
       legend.title         =  element_blank(),
-      plot.title           =  element_text(hjust = 0, family = "Rubik Medium"),
+      plot.title           =  element_text(hjust = 0
+                                           # family = "Rubik Medium"
+                                           ),
       # margin units are top, right, bottom, left.
       plot.margin          = unit(c(0, 5, 0, 5), "pt")) +
     ggtitle(stringr::str_interp(
