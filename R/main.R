@@ -172,11 +172,11 @@
 #'
 #'
 #' @section References:
-#' \href{https://www.jstor.org/stable/2246110}{Bootstrap Confidence Intervals.}
+#' \href{https://projecteuclid.org/euclid.ss/1032280214}{Bootstrap Confidence Intervals.}
 #' DiCiccio, Thomas J., and Bradley Efron.
 #' Statistical Science: vol. 11, no. 3, 1996. pp. 189–228.
 #'
-#'   \href{https://www.crcpress.com/An-Introduction-to-the-Bootstrap/Efron-Tibshirani/p/book/9780412042317}{An Introduction to the Bootstrap.} Efron, Bradley, and R. J. Tibshirani. 1994. CRC Press.
+#' \href{https://www.crcpress.com/An-Introduction-to-the-Bootstrap/Efron-Tibshirani/p/book/9780412042317/}{An Introduction to the Bootstrap.} Efron, Bradley, and R. J. Tibshirani. 1994. CRC Press.
 #'
 #'
 #' @importFrom magrittr %>%

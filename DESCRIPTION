@@ -32,7 +32,6 @@ Imports:
     cowplot,
     dplyr,
     ggplot2 (>= 3.0),
-    grid,
     forcats,
     ggforce,
     ggbeeswarm,
