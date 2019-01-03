@@ -1,7 +1,7 @@
 Package: dabestr
 Type: Package
 Title: Data Analysis using Bootstrap-Coupled Estimation
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: c(
     person("Joses W.", "Ho", 
           email = "joseshowh@gmail.com", role = c("cre", "aut")),
@@ -32,7 +32,6 @@ Imports:
     cowplot,
     dplyr,
     ggplot2 (>= 3.0),
-    grid,
     forcats,
     ggforce,
     ggbeeswarm,

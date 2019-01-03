@@ -151,13 +151,6 @@
 #'                               )
 #'
 #'
-#' # Constructing the confidence intervals on 10000 bootstrap resamples.
-#' unpaired_mean_diff_n10000 <- dabest(
-#'                                iris, Species, Petal.Width,
-#'                                idx = c("setosa", "versicolor", "virginica"),
-#'                                paired = FALSE,
-#'                                reps = 10000
-#'                                )
 #'
 #' # Using pipes to munge your data and then passing to `dabest`.
 #' # First, we generate some synthetic data.
@@ -179,11 +172,11 @@
 #'
 #'
 #' @section References:
-#' \href{https://www.jstor.org/stable/2246110}{Bootstrap Confidence Intervals.}
+#' \href{https://projecteuclid.org/euclid.ss/1032280214}{Bootstrap Confidence Intervals.}
 #' DiCiccio, Thomas J., and Bradley Efron.
 #' Statistical Science: vol. 11, no. 3, 1996. pp. 189–228.
 #'
-#'   \href{https://www.crcpress.com/An-Introduction-to-the-Bootstrap/Efron-Tibshirani/p/book/9780412042317}{An Introduction to the Bootstrap.} Efron, Bradley, and R. J. Tibshirani. 1994. CRC Press.
+#' \href{https://www.crcpress.com/An-Introduction-to-the-Bootstrap/Efron-Tibshirani/p/book/9780412042317/}{An Introduction to the Bootstrap.} Efron, Bradley, and R. J. Tibshirani. 1994. CRC Press.
 #'
 #'
 #' @importFrom magrittr %>%
@@ -375,6 +368,13 @@ dabest <- function(
     dplyr::summarize(func_quoname = func(!!y_enquo))
 
   colnames(summaries) <- c(x_quoname, func_quoname)
+
+  # Order the summaries by the idx.
+  summaries[[x_quoname]] <-
+    summaries[[x_quoname]] %>%
+    factor(all_groups, ordered = TRUE)
+
+  summaries <- summaries %>% dplyr::arrange(!!x_enquo)
 
 
 

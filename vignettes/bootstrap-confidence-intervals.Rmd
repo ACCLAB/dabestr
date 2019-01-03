@@ -44,7 +44,7 @@ library(ggplot2)
 density.theme <-
   theme_classic() +
   theme(
-    text                 =  element_text(family = "Work Sans Medium"),
+    # text                 =  element_text(family = "Work Sans Medium"),
     # panel.background     =  element_rect(fill = "#fffff8"),
     # plot.background      =  element_rect(fill = "#fffff8"),
     axis.text            =  element_text(size = 13),
@@ -58,7 +58,7 @@ density.theme <-
 
 
 title.theme <-
-  theme(plot.title = element_text(family = "Rubik Medium", 
+  theme(plot.title = element_text(#family = "Rubik Medium", 
                                   size   =  17))
 
 ```
@@ -85,13 +85,16 @@ pop.density.plot <-
   guides(fill = FALSE) + xlab("") +
   
   annotate("text", x = 2, size = annotate.text.size, 
-           hjust = 0, color = 'turquoise', family = "Work Sans Medium",
+           hjust = 0, color = 'turquoise', 
+           # family = "Work Sans Medium",
            y = annotate.text.ypos, label = "µControl") +
   annotate("text", x = 2.5, size = annotate.text.size, 
-           hjust = 0, color = 'salmon', family = "Work Sans Medium",
+           hjust = 0, color = 'salmon', 
+           # family = "Work Sans Medium",
            y = annotate.text.ypos, label = "µTest") +
   annotate("text", x = 0.5, size = annotate.text.size, 
-           hjust = 0, color = 'black', family = "Work Sans Medium",
+           hjust = 0, color = 'black', 
+           # family = "Work Sans Medium",
            y = annotate.text.ypos - 0.25, 
            label = "µTest - µControl = ??") +
   
@@ -217,7 +220,7 @@ get.temp.legend <- function() {
     scale_fill_brewer(palette = "Dark2") +
     scale_colour_brewer(palette = "Dark2") +
     theme(
-      legend.text  = element_text(family = "Work Sans Medium"),
+      # legend.text  = element_text(family = "Work Sans Medium"),
       legend.title =  element_blank())
     
   
@@ -247,7 +250,7 @@ bootstrap.demo <- function(
                  color = "red") +
     
     annotate("text", x = 0.4, y = 2.75,
-             family = "Rubik Medium",
+             # family = "Rubik Medium",
              hjust = 0,
              label = "Original Observations") +
     theme(
@@ -308,7 +311,7 @@ bootstrap.demo <- function(
                  color = "red") +
       
       annotate("text", x = 0.4, y = 2.75,
-               family = "Rubik Medium",
+               # family = "Rubik Medium",
                hjust = 0,
                label = stringr::str_interp("Resample #${i}")) +
       
@@ -398,7 +401,9 @@ bootstrap.demo <- function(
     xlab("") +
     theme(
       legend.title         =  element_blank(),
-      plot.title           =  element_text(hjust = 0, family = "Rubik Medium"),
+      plot.title           =  element_text(hjust = 0
+                                           # family = "Rubik Medium"
+                                           ),
       # margin units are top, right, bottom, left.
       plot.margin          = unit(c(0, 5, 0, 5), "pt")) +
     ggtitle(stringr::str_interp(
@@ -431,25 +436,10 @@ bootstrap.demo <- function(
 ```
 
 
-```{r bootstrap.mean_diff.gif, animation.hook='gifski', interval = 0.05, fig.height=9}
-
+```{r bootstrap.mean_diff.gif, fig.height=9}
 
 bootstrap.demo(sample1, sample2, show.resamples = 3, resamples = 5000, 
                nbins = 100)
-
-# To create the GIF, You will need to install the packages `gifski`, 
-# and your version of `knitr` >= v1.20.14 .
-# fig.width.pix  <- 8 * 72
-# fig.height.pix <- 6 * 72
-# 
-# gifski::save_gif(
-#   bootstrap.demo(sample1, sample2, resamples = 1000, create.gif = TRUE), 
-#   gif_file = "bootstrap.gif", 
-#   width = fig.width.pix, 
-#   height = fig.height.pix,
-#   delay = 0.02, loop = TRUE
-#   )
-
 
 ```
 
@@ -491,7 +481,7 @@ histo.plot.frame <-
 ggplot(histo.plot.frame, 
      aes(x = boots)) + 
   density.theme +
-  theme(plot.title   = element_text(family = "Work Sans Medium"),
+  theme(# plot.title   = element_text(family = "Work Sans Medium"),
         axis.line.x  = element_blank(),
         axis.text.x  = element_blank(),
         axis.ticks.x = element_blank()) +
@@ -515,7 +505,7 @@ ggplot(histo.plot.frame,
                y    = -0.02, yend = 0.21,
                color = 'darkgrey') +
   annotate("text", x = 11, y = -0.01,
-           family = "Work Sans Medium",
+           # family = "Work Sans Medium",
            color = "darkgrey",
            hjust = 1, vjust = 0,
            label = "Percentile bootstrap") +
@@ -528,7 +518,7 @@ ggplot(histo.plot.frame,
   geom_vline(xintercept = skew.boot.ci$bca[4]) +
   geom_vline(xintercept = skew.boot.ci$bca[5]) +
   annotate("text", x = 11, y = -0.04,
-           family = "Work Sans Medium",
+           # family = "Work Sans Medium",
            hjust = 1, vjust = 0,
            label = "BCa bootstrap") +
 
@@ -537,7 +527,7 @@ ggplot(histo.plot.frame,
             color = "magenta1") +
   annotate("text", x = mean(skew.sample), y = 0.175,
            color = "magenta2",
-           family = "Work Sans Medium",
+           # family = "Work Sans Medium",
            hjust = 0, label = "  Mean of observations") +
   
   ggtitle("Constructing 95% confidence intervals\nfor a skewed sampling distribution\n")
@@ -583,8 +573,8 @@ my.data   <-
 
 # Create plot.
 custom.theme <- 
-  theme_classic() +
-  theme(text = element_text(family = "Work Sans Medium"))
+  theme_classic() # +
+  # theme(text = element_text(family = "Work Sans Medium"))
 
 my.data %>%
   dabest(Group, Measurement, 
