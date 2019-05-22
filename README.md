@@ -21,10 +21,14 @@ An estimation plot has two key features.
 
 ![](man/figures/README-cumming.showpieces-1.png)![](man/figures/README-cumming.showpieces-2.png)![](man/figures/README-cumming.showpieces-3.png)
 
-Installation
+Requirements
 ------------
 
 Your version of R must be 3.5.0 or higher.
+
+
+Installation
+------------
 
 ``` r
 install.packages("dabestr")
@@ -75,10 +79,6 @@ How to Cite
 
 Joses Ho, Tayfun Tumkaya, Sameer Aryal, Hyungwon Choi, Adam Claridge-Chang
 
-dabest In Other Languages
--------------------------
-
-dabestr is also available in [Python](https://github.com/ACCLAB/DABEST-python "DABEST-Python on Github") and [Matlab](https://github.com/ACCLAB/DABEST-Matlab "DABEST-Matlab on Github").
 
 Bugs
 ----
@@ -88,4 +88,12 @@ Please open a [new issue](https://github.com/ACCLAB/dabestr/issues/new). Include
 Contributing
 ------------
 
-All contributions are welcome. Please fork this Github repo and open a pull request.
+All contributions are welcome; please read the [Guidelines for contributing](https://github.com/ACCLAB/dabestr/blob/master/CONTRIBUTING.md) first.
+
+We also have a [Code of Conduct](https://github.com/ACCLAB/dabestr/blob/master/CODE_OF_CONDUCT.md) to foster an inclusive and productive space.
+
+
+dabestr in other languages
+-------------------------
+
+dabestr is also available in [Python](https://github.com/ACCLAB/DABEST-python "DABEST-Python on Github") and [Matlab](https://github.com/ACCLAB/DABEST-Matlab "DABEST-Matlab on Github").
