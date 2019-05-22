@@ -72,12 +72,16 @@ plot(unpaired_mean_diff)
 
 ![](man/figures/README-usage-1.png)
 
+You will find more useful code snippets in this [vignette](https://cran.r-project.org/web/packages/dabestr/vignettes/using-dabestr.html).
+
 How to Cite
 -----------
 
 [**Moving beyond P values: Everyday data analysis with estimation plots**](https://doi.org/10.1101/377978 "Our BioRxiv preprint")
 
-Joses Ho, Tayfun Tumkaya, Sameer Aryal, Hyungwon Choi, Adam Claridge-Chang
+*Joses Ho, Tayfun Tumkaya, Sameer Aryal, Hyungwon Choi, Adam Claridge-Chang*
+
+https://doi.org/10.1101/377978
 
 
 Bugs
