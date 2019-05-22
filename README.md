@@ -74,7 +74,7 @@ plot(unpaired_mean_diff)
 
 You will find more useful code snippets in this [vignette](https://cran.r-project.org/web/packages/dabestr/vignettes/using-dabestr.html).
 
-How to Cite
+How to cite
 -----------
 
 [**Moving beyond P values: Everyday data analysis with estimation plots**](https://doi.org/10.1101/377978 "Our BioRxiv preprint")
