@@ -1,3 +1,5 @@
+Meta
+doc
 .Rproj.user
 .Rhistory
 .RData
@@ -6,3 +8,5 @@
 .DS_Store
 *.DS_Store
 inst/doc
+# revdevcheck temp folder
+revdep

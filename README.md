@@ -2,7 +2,7 @@
 dabestr
 =======
 
-[![minimal R version](https://img.shields.io/badge/R%3E%3D-3.5.0-6666ff.svg)](https://cran.r-project.org/) [![CRAN Status Badge](https://www.r-pkg.org/badges/version-last-release/dabestr?color=orange)](https://cran.r-project.org/package=dabestr) [![Travis CI build status](https://img.shields.io/travis/com/ACCLAB/dabestr/master.svg)](https://travis-ci.com/ACCLAB/dabestr/) [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![minimal R version](https://img.shields.io/badge/R%3E%3D-3.5.0-6666ff.svg)](https://cran.r-project.org/) [![CRAN Status Badge](https://www.r-pkg.org/badges/version-last-release/dabestr?color=orange)](https://cran.r-project.org/package=dabestr) [![Travis CI build status](https://img.shields.io/travis/com/ACCLAB/dabestr/master.svg)](https://travis-ci.com/ACCLAB/dabestr/) [![License](https://img.shields.io/badge/License-BSD%203--Clause--Clear-blue.svg)](https://spdx.org/licenses/BSD-3-Clause-Clear.html)
 
 dabestr is a package for **D**ata **A**nalysis using **B**ootstrap-Coupled **EST**imation.
 
@@ -21,10 +21,14 @@ An estimation plot has two key features.
 
 ![](man/figures/README-cumming.showpieces-1.png)![](man/figures/README-cumming.showpieces-2.png)![](man/figures/README-cumming.showpieces-3.png)
 
-Installation
+Requirements
 ------------
 
 Your version of R must be 3.5.0 or higher.
+
+
+Installation
+------------
 
 ``` r
 install.packages("dabestr")
@@ -68,17 +72,17 @@ plot(unpaired_mean_diff)
 
 ![](man/figures/README-usage-1.png)
 
-How to Cite
+You will find more useful code snippets in this [vignette](https://cran.r-project.org/web/packages/dabestr/vignettes/using-dabestr.html).
+
+How to cite
 -----------
 
 [**Moving beyond P values: Everyday data analysis with estimation plots**](https://doi.org/10.1101/377978 "Our BioRxiv preprint")
 
-Joses Ho, Tayfun Tumkaya, Sameer Aryal, Hyungwon Choi, Adam Claridge-Chang
+*Joses Ho, Tayfun Tumkaya, Sameer Aryal, Hyungwon Choi, Adam Claridge-Chang*
 
-dabest In Other Languages
--------------------------
+https://doi.org/10.1101/377978
 
-dabestr is also available in [Python](https://github.com/ACCLAB/DABEST-python "DABEST-Python on Github") and [Matlab](https://github.com/ACCLAB/DABEST-Matlab "DABEST-Matlab on Github").
 
 Bugs
 ----
@@ -88,4 +92,12 @@ Please open a [new issue](https://github.com/ACCLAB/dabestr/issues/new). Include
 Contributing
 ------------
 
-All contributions are welcome. Please fork this Github repo and open a pull request.
+All contributions are welcome; please read the [Guidelines for contributing](https://github.com/ACCLAB/dabestr/blob/master/CONTRIBUTING.md) first.
+
+We also have a [Code of Conduct](https://github.com/ACCLAB/dabestr/blob/master/CODE_OF_CONDUCT.md) to foster an inclusive and productive space.
+
+
+dabestr in other languages
+-------------------------
+
+dabestr is also available in [Python](https://github.com/ACCLAB/DABEST-python "DABEST-Python on Github") and [Matlab](https://github.com/ACCLAB/DABEST-Matlab "DABEST-Matlab on Github").
