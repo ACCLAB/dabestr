@@ -3,8 +3,8 @@ dabestr
 =======
 
 [![Travis CI build status](https://img.shields.io/travis/com/ACCLAB/dabestr/master.svg)](https://travis-ci.com/ACCLAB/dabestr/)
-[![CRAN Status Badge](https://www.r-pkg.org/badges/version-last-release/dabestr?color=green)](https://cran.r-project.org/package=dabestr)
 [![minimal R version](https://img.shields.io/badge/R%3E%3D-3.5.0-6666ff.svg)](https://cran.r-project.org/)  
+[![CRAN Status Badge](https://www.r-pkg.org/badges/version-last-release/dabestr?color=green)](https://cran.r-project.org/package=dabestr)
 [![Free-to-view citation](https://zenodo.org/badge/DOI/10.1038/s41592-019-0470-3.svg)](https://rdcu.be/bHhJ4)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause--Clear-orange.svg)](https://spdx.org/licenses/BSD-3-Clause-Clear.html)
 
