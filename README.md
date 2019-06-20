@@ -5,7 +5,7 @@ dabestr
 [![Travis CI build status](https://img.shields.io/travis/com/ACCLAB/dabestr/master.svg)](https://travis-ci.com/ACCLAB/dabestr/)
 [![CRAN Status Badge](https://www.r-pkg.org/badges/version-last-release/dabestr?color=green)](https://cran.r-project.org/package=dabestr)
 [![minimal R version](https://img.shields.io/badge/R%3E%3D-3.5.0-6666ff.svg)](https://cran.r-project.org/)  
-[![Free-to-view citation](https://zenodo.org/badge/DOI/10.1038/s41592-019-0470-3.svg)](https://zenodo.org/badge/DOI/10.1038/s41592-019-0470-3.svg)
+[![Free-to-view citation](https://zenodo.org/badge/DOI/10.1038/s41592-019-0470-3.svg)](https://rdcu.be/bHhJ4)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause--Clear-orange.svg)](https://spdx.org/licenses/BSD-3-Clause-Clear.html)
 
 dabestr is a package for **D**ata **A**nalysis using **B**ootstrap-Coupled **EST**imation.
@@ -81,11 +81,13 @@ You will find more useful code snippets in this [vignette](https://cran.r-projec
 How to cite
 -----------
 
-[**Moving beyond P values: Everyday data analysis with estimation plots**](https://doi.org/10.1101/377978 "Our BioRxiv preprint")
+**Moving beyond P values: Everyday data analysis with estimation plots**
 
 *Joses Ho, Tayfun Tumkaya, Sameer Aryal, Hyungwon Choi, Adam Claridge-Chang*
 
-https://doi.org/10.1101/377978
+Nature Methods 2019, 1548-7105
+
+[Paywalled publisher site](https://www.nature.com/articles/s41592-019-0470-3); [Free-to-view PDF](https://rdcu.be/bHhJ4)
 
 
 Bugs
