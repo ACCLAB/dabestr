@@ -233,6 +233,8 @@ plot.dabest <- function(x, ...,
     for.plot <- dplyr::bind_rows(for.plot)
   }
 
+  # # The next three lines prevent plots with repeated groups
+  # # from being produced.
   for.plot[[x_quoname]] <-
     for.plot[[x_quoname]] %>%
     factor(all.groups, ordered = TRUE)
