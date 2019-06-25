@@ -24,6 +24,8 @@ Description: Data Analysis using Bootstrap-Coupled ESTimation.
     <doi:10.1038/s41592-019-0470-3>. 
     The free-to-view PDF is located at <https://rdcu.be/bHhJ4>.
 License: file LICENSE
+URL: https://github.com/ACCLAB/dabestr
+BugReports: https://github.com/ACCLAB/dabestr/issues
 Encoding: UTF-8
 LazyData: true
 Depends: 
