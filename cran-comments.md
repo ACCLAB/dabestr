@@ -5,7 +5,7 @@ This is a update to the package, fixing a bug in the previous release.
 
 ## Test environments
 * local OS X install (macOS High Sierra; release)
-* ubuntu 14.04.5 (on travis-ci; devel and release)
+* ubuntu 16.04 (on travis-ci; devel and release)
 * win-builder (oldrelese, release, and devel)
 
 
