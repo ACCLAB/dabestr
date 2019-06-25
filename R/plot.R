@@ -134,9 +134,10 @@
 #'
 #'
 #' @section References:
-#' \href{https://doi.org/10.1101/377978}{Moving beyond P values: Everyday data
-#' analysis with estimation plots.} (2018) Joses Ho, Tayfun Tumkaya, Sameer
-#' Aryal, Hyungwon Choi, Adam Claridge-Chang
+#' \href{https://rdcu.be/bHhJ4}{Moving beyond P values: Data
+#' analysis with estimation graphics.} Nature Methods 2019, 1548-7105.
+#' Joses Ho, Tayfun Tumkaya, Sameer Aryal, Hyungwon Choi, Adam Claridge-Chang
+#'
 #'
 #' @importFrom magrittr %>%
 #' @importFrom stats median na.omit sd
@@ -232,6 +233,8 @@ plot.dabest <- function(x, ...,
     for.plot <- dplyr::bind_rows(for.plot)
   }
 
+  # # The next three lines prevent plots with repeated groups
+  # # from being produced.
   for.plot[[x_quoname]] <-
     for.plot[[x_quoname]] %>%
     factor(all.groups, ordered = TRUE)
