@@ -1,6 +1,8 @@
 
 ## v0.2.1
 This is a update to the package, fixing a bug in the previous release.
+I fixed an earlier submission on 25 June 2019, which had a non-canonical
+CRAN URL.
 
 
 ## Test environments

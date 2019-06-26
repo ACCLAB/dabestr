@@ -76,7 +76,7 @@ plot(unpaired_mean_diff)
 
 ![](man/figures/README-usage-1.png)
 
-You will find more useful code snippets in this [vignette](https://cran.r-project.org/web/packages/dabestr/vignettes/using-dabestr.html).
+You will find more useful code snippets in this [vignette](http://bit.ly/using-dabestr).
 
 How to cite
 -----------
