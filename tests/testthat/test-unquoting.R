@@ -44,8 +44,8 @@ test_that("Using `grp` as x column is kosher", {
   # Check results.
   df_analysed.result <- df_analysed$result
 
-  expect_equal(df_analysed.result$control_group, "A")
-  expect_equal(df_analysed.result$test_group, "B")
+  expect_match(df_analysed.result$control_group, "A")
+  expect_match(df_analysed.result$test_group, "B")
 
   expect_equal(df_analysed.result$control_size, 54)
   expect_equal(df_analysed.result$test_size, 46)
