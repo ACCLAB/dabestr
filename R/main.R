@@ -381,8 +381,10 @@ dabest <- function(
   #### Assemble only the data used to create the plot. ####
   data.out <- .data
 
-  data.out[[x_quoname]] <- forcats::as_factor(data.out[[x_quoname]],
-                                              all_groups)
+  # New in v0.2.1 patch.
+  # Basically, the `ellipsis` package has been updated,
+  # and now forcats::as_factor() should only take the object to coerce.
+  data.out[[x_quoname]] <- forcats::as_factor(data.out[[x_quoname]])
 
   data.out <- dplyr::filter(data.out, !!x_enquo %in% all_groups)
 

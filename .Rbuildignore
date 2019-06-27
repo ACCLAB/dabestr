@@ -5,6 +5,7 @@
 ^\.Rproj\.user$
 ^\.travis\.yml$
 ^cran-comments\.md$
-^NEWS\.md$
 ^README\.Rmd$
 ^README-.*\.png$
+^CODE_OF_CONDUCT.md$
+^CONTRIBUTING.MD$
