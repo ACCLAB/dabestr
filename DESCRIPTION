@@ -35,6 +35,7 @@ Depends:
 Imports: 
     cowplot,
     dplyr,
+    ellipsis,
     ggplot2 (>= 3.0),
     forcats,
     ggforce,
