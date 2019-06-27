@@ -100,7 +100,6 @@
 #' \code{keyword = value} pairs to \code{ggplot2::geom_line()}. This
 #' controls the appearance of the lines plotted for a paired slopegraph.
 #'
-#' @param ... Signature for S3 generic function.
 #'
 #'
 #' @return A \code{ggplot} object.
@@ -143,7 +142,7 @@
 #' @importFrom stats median na.omit sd
 #'
 #' @export
-plot.dabest <- function(x, ...,
+plot.dabest <- function(x,
                         color.column        = NULL,
                         palette             = "Set1",
                         float.contrast      = TRUE,
