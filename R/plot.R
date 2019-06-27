@@ -547,7 +547,7 @@ plot.dabest <- function(x,
     func_test    <- summary[[func]][2]
 
     rawdata.plot <- rawdata.plot +
-      # Plot the summary lines for the control group...
+      # Plot the summary lines for the control group.
       ggplot2::geom_segment(
         color = "black",
         size  = horizontal.line.width,
@@ -556,7 +556,7 @@ plot.dabest <- function(x,
                      y    = func_control,
                      yend = func_control)) +
 
-      # ... and the test group.
+      # Plot the summary lines for the test group.
       ggplot2::geom_segment(
         color = "black",
         size  = horizontal.line.width,
