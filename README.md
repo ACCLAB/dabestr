@@ -55,7 +55,7 @@ unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
 
 # Display the results in a user-friendly format.
 unpaired_mean_diff
-#> DABEST (Data Analysis with Bootstrap Estimation) v0.2.1
+#> DABEST (Data Analysis with Bootstrap Estimation) v0.2.2
 #> =======================================================
 #> 
 #> Variable: Petal.Width 
