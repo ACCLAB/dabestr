@@ -306,7 +306,7 @@ gardner.altman <-
   plot(palette = "Dark2",
        theme = estimation.plot.theme,
        rawplot.type = 'swarmplot',
-       width = 0.1
+       rawplot.groupwidth = 0.1
        # rawplot.markersize = 6,
        # effsize.markersize = 8
        )
