@@ -54,4 +54,8 @@ test_that("Using `grp` as x column is kosher", {
   expect_equal(round(df_analysed.result$bca_ci_low, digits=4), -0.1253)
   expect_equal(df_analysed.result$bca_ci_high, 0.07162217)
 
+  gardner.altman.renamed <- plot(df_analysed)
+
+  vdiffr::expect_doppelganger("Gardner Altman Renamed", gardner.altman.renamed)
+
 })
