@@ -5,9 +5,10 @@ doc
 .RData
 .Ruserdata
 .Rprofile
-
 .DS_Store
 *.DS_Store
 inst/doc
 # revdevcheck temp folder
 revdep
+# test figures
+tests/testthat/Rplots.pdf
