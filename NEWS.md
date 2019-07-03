@@ -1,3 +1,6 @@
+# dabestr v0.2.2
+* This patch fixes an issue where local variables were duplicated in column names, requiring proper unquoting.
+
 # dabestr v0.2.1
 * This release fixes a bug due to the new version of `ellipsis`. (# 37).
 

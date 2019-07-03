@@ -242,6 +242,7 @@ dabest <- function(
 
   for (group in group_list) {
 
+
     # Check the control group (`group[1]`) is in the x-column.
     if (identical(group[1] %in% data_for_diff[[x_quoname]], FALSE)) {
 
@@ -251,9 +252,9 @@ dabest <- function(
       stop(paste(err1, err2))
     }
 
-    ctrl <-
-      data_for_diff %>%
-      dplyr::filter(!!x_enquo == group[1])
+    # Patch in v0.2.2.
+    # Note how we have to unquote both the x_enquo, and the group name!
+    ctrl <- data_for_diff %>% dplyr::filter(!!x_enquo == !!group[1])
 
     ctrl <- ctrl[[y_quoname]]
 
@@ -284,7 +285,9 @@ dabest <- function(
           )
       }
 
-      test <- data_for_diff %>% dplyr::filter(!!x_enquo == grp)
+      # Patch in v0.2.2.
+      # Note how we have to unquote both x_enquo, and grp!
+      test <- data_for_diff %>% dplyr::filter(!!x_enquo == !!grp)
       test <- test[[y_quoname]]
       t <- na.omit(test)
 
