@@ -1,13 +1,23 @@
 
-dabestr
-=======
+# dabestr
 
 [![Travis CI build status](https://img.shields.io/travis/com/ACCLAB/dabestr/master.svg)](https://travis-ci.com/ACCLAB/dabestr/) [![minimal R version](https://img.shields.io/badge/R%3E%3D-3.5.0-6666ff.svg)](https://cran.r-project.org/)   [![CRAN Status Badge](https://www.r-pkg.org/badges/version-last-release/dabestr?color=green)](https://cran.r-project.org/package=dabestr) [![CRAN Download Count](https://cranlogs.r-pkg.org/badges/grand-total/dabestr?color=brightgreen)](https://cran.r-project.org/package=dabestr) [![Free-to-view citation](https://zenodo.org/badge/DOI/10.1038/s41592-019-0470-3.svg)](https://rdcu.be/bHhJ4) [![License](https://img.shields.io/badge/License-BSD%203--Clause--Clear-orange.svg)](https://spdx.org/licenses/BSD-3-Clause-Clear.html)
 
+## Contents
+
+- [About](#about)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+- [How to cite](#how-to-cite)
+- [Bugs](#bugs)
+- [Contributing](#contributing)
+- [dabestr in other languages](#dabestr-in-other-languages)
+
+## About
+
 dabestr is a package for **D**ata **A**nalysis using **B**ootstrap-Coupled **EST**imation.
 
-About
------
 
 [Estimation statistics](https://en.wikipedia.org/wiki/Estimation_statistics "Estimation Stats on Wikipedia") is a [simple framework](https://thenewstatistics.com/itns/ "Introduction to the New Statistics") that avoids the [pitfalls](https://www.nature.com/articles/nmeth.3288 "The fickle P value generates irreproducible results, Halsey et al 2015") of significance testing. It uses familiar statistical concepts: means, mean differences, and error bars. More importantly, it focuses on the effect size of one's experiment/intervention, as opposed to a false dichotomy engendered by *P* values.
 
@@ -21,14 +31,12 @@ An estimation plot has two key features.
 
 ![](man/figures/README-cumming.showpieces-1.png)![](man/figures/README-cumming.showpieces-2.png)![](man/figures/README-cumming.showpieces-3.png)
 
-Requirements
-------------
+## Requirements
 
 Your version of R must be 3.5.0 or higher.
 
 
-Installation
-------------
+## Installation
 
 ``` r
 install.packages("dabestr")
@@ -38,8 +46,7 @@ install.packages("dabestr")
 devtools::install_github("ACCLAB/dabestr")
 ```
 
-Usage
------
+## Usage
 
 ``` r
 library(dabestr)
@@ -74,8 +81,7 @@ plot(unpaired_mean_diff)
 
 You will find more useful code snippets in this [vignette](http://bit.ly/using-dabestr).
 
-How to cite
------------
+## How to cite
 
 **Moving beyond P values: Everyday data analysis with estimation plots**
 
@@ -86,20 +92,18 @@ Nature Methods 2019, 1548-7105. [10.1038/s41592-019-0470-3](http://dx.doi.org/10
 [Paywalled publisher site](https://www.nature.com/articles/s41592-019-0470-3); [Free-to-view PDF](https://rdcu.be/bHhJ4)
 
 
-Bugs
-----
+## Bugs
 
 Please open a [new issue](https://github.com/ACCLAB/dabestr/issues/new). Include a reproducible example (aka [reprex](https://www.tidyverse.org/help/)) so anyone can copy-paste your code and move quickly towards helping you out!
 
-Contributing
-------------
+
+## Contributing
 
 All contributions are welcome; please read the [Guidelines for contributing](https://github.com/ACCLAB/dabestr/blob/master/CONTRIBUTING.md) first.
 
 We also have a [Code of Conduct](https://github.com/ACCLAB/dabestr/blob/master/CODE_OF_CONDUCT.md) to foster an inclusive and productive space.
 
 
-dabestr in other languages
--------------------------
+## dabestr in other languages
 
 dabestr is also available in [Python](https://github.com/ACCLAB/DABEST-python "DABEST-Python on Github") and [Matlab](https://github.com/ACCLAB/DABEST-Matlab "DABEST-Matlab on Github").
