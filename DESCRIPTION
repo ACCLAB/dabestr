@@ -36,7 +36,7 @@ Imports:
     cowplot,
     dplyr,
     ellipsis,
-    ggplot2 (>= 3.0),
+    ggplot2 (>= 3.2),
     forcats,
     ggforce,
     ggbeeswarm,
