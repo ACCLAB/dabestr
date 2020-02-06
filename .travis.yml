@@ -21,12 +21,6 @@ jobs:
     dist: xenial
     r: devel
 
-  - os: osx
-    r: release
-
-  - os: osx
-    r: devel
-
 sudo: false
 
 cache:

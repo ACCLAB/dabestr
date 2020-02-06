@@ -6,10 +6,9 @@ release of ggplot2 (v3.3.0).
 
 ## Test environments
 * macOS 10.15 Catalina (local install; release)
-* macOS 10.13 High Sierra (on travis-ci; release and devel)
 * ubuntu 18.04 (on travis-ci; release and devel)
 * ubuntu 16.04 (on travis-ci; release and devel)
-* win-builder (oldrelease, release, and devel)
+* win-builder (release and devel)
 
 
 ## R CMD check results
