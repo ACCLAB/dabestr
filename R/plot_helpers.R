@@ -4,7 +4,7 @@ get_tick_labels <- function(plot.obj, axes) {
   panel.params <- plot.obj.build$layout$panel_params[[1]]
 
   #### Modified in v0.2.3, update for ggplot2>=v3.3.0.
-  if (packageVersion("ggplot2") <= "3.2.1") {
+  if (utils::packageVersion("ggplot2") <= "3.2.1") {
     xticks <- panel.params$x.labels
     yticks <- panel.params$y.labels
   } else {

@@ -4,8 +4,18 @@
 \alias{dabest}
 \title{Differences between Groups with Bootstrap Confidence Intervals}
 \usage{
-dabest(.data, x, y, idx, paired = FALSE, id.column = NULL, ci = 95,
-  reps = 5000, func = mean, seed = 12345)
+dabest(
+  .data,
+  x,
+  y,
+  idx,
+  paired = FALSE,
+  id.column = NULL,
+  ci = 95,
+  reps = 5000,
+  func = mean,
+  seed = 12345
+)
 }
 \arguments{
 \item{.data}{A data.frame or tibble.}
