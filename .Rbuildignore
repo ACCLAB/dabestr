@@ -9,3 +9,5 @@
 ^README-.*\.png$
 ^CODE_OF_CONDUCT.md$
 ^CONTRIBUTING.MD$
+^packrat/
+^\.Rprofile$

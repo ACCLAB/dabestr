@@ -1,14 +1,14 @@
 
-## v0.2.1
-This is a update to the package, fixing a bug in the previous release.
-I fixed an earlier submission on 25 June 2019, which had a non-canonical
-CRAN URL.
+## v0.2.3
+This is a patch update, in response to an automated CRAN check for the upcoming 
+release of ggplot2 (v3.3.0).
 
 
 ## Test environments
-* local OS X install (macOS High Sierra; release)
-* ubuntu 16.04 (on travis-ci; devel and release)
-* win-builder (oldrelese, release, and devel)
+* macOS 10.15 Catalina (local install; release)
+* ubuntu 18.04 (on travis-ci; release and devel)
+* ubuntu 16.04 (on travis-ci; release and devel)
+* win-builder (release and devel)
 
 
 ## R CMD check results
@@ -23,4 +23,5 @@ to reduce the image size.
   
 
 ## Downstream dependencies
-There are currently no downstream dependencies for this package.
+There is one downstream package: permubiome. 
+There were no errors or issues when `devtools::revdep()` was run.
