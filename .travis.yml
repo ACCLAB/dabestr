@@ -1,6 +1,10 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
 language: r
+r:
+  - oldrel
+  - release
+  - devel
 jobs:
   include:
   - os: linux
@@ -9,13 +13,13 @@ jobs:
     dist: xenial
   - os: osx
 sudo: false
-install:
-  - R -e "0" --args --bootstrap-packrat
-  - R -e "packrat::restore(restart = FALSE)"
+#install:
+#  - R -e "0" --args --bootstrap-packrat
+#  - R -e "packrat::restore(restart = FALSE)"
 cache:
-  directories:
-    - $TRAVIS_BUILD_DIR/packrat/src
-    - $TRAVIS_BUILD_DIR/packrat/lib
+#  directories:
+#    - $TRAVIS_BUILD_DIR/packrat/src
+#    - $TRAVIS_BUILD_DIR/packrat/lib
   packages: true
 before_install:
-  - sudo apt-get install -y libudunits2-dev
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install -y libudunits2-dev; fi
