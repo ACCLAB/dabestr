@@ -4,9 +4,11 @@ This is a patch update, in response to an automated CRAN check for the upcoming 
 
 
 ## Test environments
-* local OS X install (macOS Catalina; release)
-* ubuntu 16.04 (on travis-ci; devel and release)
-* win-builder (oldrelese, release, and devel)
+* macOS 10.15 Catalina (local install; release)
+* macOS 10.13 High Sierra (on travis-ci; oldrelease, devel and release)
+* ubuntu 18.04 (on travis-ci; oldrelease, devel and release)
+* ubuntu 16.04 (on travis-ci; oldrelease, devel and release)
+* win-builder (oldrelease, release, and devel)
 
 
 ## R CMD check results
