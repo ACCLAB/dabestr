@@ -312,6 +312,12 @@ Version: 1.4.1
 Hash: cc16de93eaabd3c6d0785cb8e6d059ab
 Requires: R6, curl, jsonlite, mime, openssl
 
+Package: hunspell
+Source: CRAN
+Version: 3.0
+Hash: ca33dffdc7b9f80157fd9bc8b697634b
+Requires: Rcpp, digest
+
 Package: ini
 Source: CRAN
 Version: 0.3.1
@@ -568,6 +574,12 @@ Package: sourcetools
 Source: CRAN
 Version: 0.1.7
 Hash: d093478ac90064e670cd4bf1a99b47b6
+
+Package: spelling
+Source: CRAN
+Version: 2.1
+Hash: b7476981ed910b8dd0fce24ebfd7c6af
+Requires: commonmark, hunspell, knitr, xml2
 
 Package: stringi
 Source: CRAN
