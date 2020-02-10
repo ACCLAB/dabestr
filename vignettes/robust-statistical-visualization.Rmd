@@ -350,13 +350,9 @@ cowplot::plot_grid(gardner.altman, annotation, nrow = 2)
 
 Shown above is a [Gardner-Altman estimation plot](https://en.wikipedia.org/wiki/Estimation_statistics#Gardner-Altman_plot)[^2]. This plot has two key features. Firstly, it presents all datapoints as a swarmplot, which orders each point to display the underlying distribution. Secondly, an estimation plot presents the effect size as a _bootstrap 95% confidence interval_ (95% CI) on a _separate but aligned axes_. where the effect size is displayed to the right of the war data, and the mean of the test group is aligned with the effect size. *Thus, estimation plots are robust, beautiful, and convey important statistical information elegantly and efficiently*.
 
-
 [^2]: The plot draws its name from [Martin J. Gardner](https://www.independent.co.uk/news/people/obituary-professor-martin-gardner-1470261.html) and [Douglas Altman](https://www.bmj.com/content/361/bmj.k2588), who are credited with [creating the design](https://www.bmj.com/content/bmj/292/6522/746.full.pdf) in 1986.
 
-
 An estimation plot obtains and displays the 95% CI through *nonparametric bootstrap resampling*. This enables visualization of the confidence interval as a graded sampling distribution. This is different from the original Gardner-Altman design: the 95% CI was computed through parametric methods, and displayed as a vertical error bar.
-
-<!-- You can read more about bootstrap resampling in this [vignette](bootstrap-confidence-intervals.html).  -->
 
 ## Estimation Statistics
 

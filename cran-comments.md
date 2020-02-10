@@ -1,5 +1,8 @@
 
 ## v0.2.3
+
+This is a resbumission. I have reduced the tarball size by removing a vignette.
+
 This is a patch update, in response to an automated CRAN check for the upcoming 
 release of ggplot2 (v3.3.0).
 

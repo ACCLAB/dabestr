@@ -91,7 +91,7 @@ The key features of the Gardner-Altman estimation plot are:
 
 The estimation plot produced by `dabest` differs from the one first introduced by Gardner and Altman in one important aspect. `dabest` derives the 95% CI through nonparametric bootstrap resampling. This enables visualization of the confidence interval as a graded sampling distribution.
 
-The 95% CI presented is bias-corrected and accelerated (ie. a BCa bootstrap). You can read more about bootstrap resampling and BCa correction in this [vignette](bootstrap-confidence-intervals.html). 
+The 95% CI presented is bias-corrected and accelerated (ie. a BCa bootstrap). You can read more about bootstrap resampling and BCa correction [here](https://acclab.github.io/bootstrap-confidence-intervals.html). 
 
 ## Paired
 
