@@ -8,8 +8,8 @@ citEntry(entry       = "Misc",
                         as.person("Hyungwon Choi"),
                         as.person("Adam Claridge-Chang")
                         ),
-         year        = "2018",
-         doi         = "10.1101/377978",
-         url         = "https://www.biorxiv.org/content/early/2018/07/26/377978.full.pdf",
-         textVersion = "Moving beyond P values: Everyday data analysis with estimation plots. (2018) Joses Ho, Tayfun Tumkaya, Sameer Aryal, Hyungwon Choi, Adam Claridge-Chang. bioRxiv doi: https://doi.org/10.1101/377978"
+         year        = "2019",
+         doi         = "10.1038/s41592-019-0470-3",
+         url         = "https://rdcu.be/bHhJ4",
+         textVersion = "Moving beyond P values: Everyday data analysis with estimation plots. (2019) Joses Ho, Tayfun Tumkaya, Sameer Aryal, Hyungwon Choi, Adam Claridge-Chang. Nature Methods 2019, 1548-710. doi: https://doi.org/10.1038/s41592-019-0470-3"
          )
