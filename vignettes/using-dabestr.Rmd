@@ -262,5 +262,5 @@ plot(multi.group, color.column = Gender,
 
 # Further Reading
 
-Read more about how the estimation plot combines [statistical rigour and visual design](https://acclab.github.io/robust-statistical-visualization.html). You might also be interested finding out more about [bootstrap confidence intervals](https://acclab.github.io/bootstrap-confidence-intervals.html).
+Read more about how the estimation plot combines [statistical rigour and visual design](https://acclab.github.io/robust-statistical-visualization.html). You might also be interested in finding out more about [bootstrap confidence intervals](https://acclab.github.io/bootstrap-confidence-intervals.html).
 
