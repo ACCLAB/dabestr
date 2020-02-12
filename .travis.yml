@@ -1,10 +1,30 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
 language: r
-r:
-  - release
-  - devel
+
+jobs:
+  include:
+
+  - os: linux
+    dist: bionic
+    r: release
+
+  - os: linux
+    dist: bionic
+    r: devel
+
+  - os: linux
+    dist: xenial
+    r: release
+
+  - os: linux
+    dist: xenial
+    r: devel
+
 sudo: false
-cache: packages
+
+cache:
+  packages: true
+
 before_install:
-  - sudo apt-get install -y libudunits2-dev
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install -y libudunits2-dev; fi

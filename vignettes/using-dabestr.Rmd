@@ -91,7 +91,7 @@ The key features of the Gardner-Altman estimation plot are:
 
 The estimation plot produced by `dabest` differs from the one first introduced by Gardner and Altman in one important aspect. `dabest` derives the 95% CI through nonparametric bootstrap resampling. This enables visualization of the confidence interval as a graded sampling distribution.
 
-The 95% CI presented is bias-corrected and accelerated (ie. a BCa bootstrap). You can read more about bootstrap resampling and BCa correction in this [vignette](bootstrap-confidence-intervals.html). 
+The 95% CI presented is bias-corrected and accelerated (ie. a BCa bootstrap). You can read more about bootstrap resampling and BCa correction [here](https://acclab.github.io/bootstrap-confidence-intervals.html). 
 
 ## Paired
 
@@ -233,15 +233,14 @@ plot(multi.group, color.column = Gender,
     )
 ```
 
-<!-- The `axes.title.fontsize` parameter determines the fontsize of both the rawplot and deltaplot y-axes titles. -->
+The `axes.title.fontsize` parameter determines the fontsize of both the rawplot and deltaplot y-axes titles.
 
-<!-- ```{r ylabel.fontsize, fig.width = 7, fig.height = 4} -->
+```{r ylabel.fontsize, fig.width = 7, fig.height = 4}
 
-<!-- plot(multi.group, color.column = Gender, -->
-<!--      axes.title.fontsize = 10 # default is 14. -->
-<!--     ) -->
-
-<!-- ``` -->
+plot(multi.group, color.column = Gender,
+     axes.title.fontsize = 10 # default is 14.
+    )
+```
 
 The `palette` parameter accepts any `ggplot2` palettes. The default palette applied is "Set2". 
 
@@ -252,11 +251,16 @@ plot(multi.group, color.column = Gender,
      )
 ```
 
-<!-- You can use the `theme` parameter to pass along any ggplot2 themes. The default `ggplot2` theme is `theme_classic()`.  -->
+You can use the `theme` parameter to pass along any ggplot2 themes. The default `ggplot2` theme is `theme_classic()`.
 
-<!-- ```{r different.theme, fig.width = 7, fig.height = 4} -->
-<!-- plot(multi.group, color.column = Gender, -->
-<!--      theme = ggplot2::theme_gray() -->
-<!--      ) -->
-<!-- ``` -->
+```{r different.theme, fig.width = 7, fig.height = 4}
+plot(multi.group, color.column = Gender,
+     theme = ggplot2::theme_gray()
+     )
+```
+
+
+# Further Reading
+
+Read more about how the estimation plot combines [statistical rigour and visual design](https://acclab.github.io/robust-statistical-visualization.html). You might also be interested in finding out more about [bootstrap confidence intervals](https://acclab.github.io/bootstrap-confidence-intervals.html).
 
