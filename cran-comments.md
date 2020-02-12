@@ -1,7 +1,8 @@
 
 ## v0.2.3
 
-This is a resbumission. I have reduced the tarball size by removing a vignette.
+This is a resbumission. I have reduced the tarball size by removing two vignettes,
+and reduced the runtime of the examples.
 
 This is a patch update, in response to an automated CRAN check for the upcoming 
 release of ggplot2 (v3.3.0).
@@ -15,15 +16,8 @@ release of ggplot2 (v3.3.0).
 
 
 ## R CMD check results
-There was 1 NOTE:
-installed size is  6.5Mb
-  sub-directories of 1Mb or more:
-    doc   5.7Mb
+There are no ERRORs, WARNINGs, or NOTEs.
 
-This is a graphical plotting package; hence the use of images in the docs
-is greater than a conventional R package. Future releases will endeavor
-to reduce the image size.
-  
 
 ## Downstream dependencies
 There is one downstream package: permubiome. 

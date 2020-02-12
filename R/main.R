@@ -99,7 +99,8 @@
 #' @seealso \code{\link{plot.dabest}}, which generates an estimation plot from
 #'   the \code{dabest} object.
 #'
-#'
+#' Run \code{vignette("Using dabestr", package = "dabestr")} in the console to
+#' read more about using parameters to control the plot features.
 #'
 #' @examples
 #'
@@ -141,14 +142,6 @@
 #'                               func = median
 #'                               )
 #'
-#'
-#' # Producing a 90% CI instead of 95%.
-#' unpaired_mean_diff_90_ci  <- dabest(
-#'                               iris, Species, Petal.Width,
-#'                               idx = c("setosa", "versicolor", "virginica"),
-#'                               paired = FALSE,
-#'                               ci = 0.90
-#'                               )
 #'
 #'
 #'
