@@ -12,3 +12,5 @@ inst/doc
 revdep
 # test figures
 tests/testthat/Rplots.pdf
+packrat/lib*/
+packrat/src/

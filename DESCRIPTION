@@ -1,7 +1,7 @@
 Package: dabestr
 Type: Package
 Title: Data Analysis using Bootstrap-Coupled Estimation
-Version: 0.2.1.9000
+Version: 0.2.3
 Authors@R: c(
     person("Joses W.", "Ho", 
           email = "joseshowh@gmail.com", role = c("cre", "aut")),
@@ -36,7 +36,7 @@ Imports:
     cowplot,
     dplyr,
     ellipsis,
-    ggplot2 (>= 3.0),
+    ggplot2 (>= 3.2),
     forcats,
     ggforce,
     ggbeeswarm,
@@ -45,7 +45,7 @@ Imports:
     stringr,
     tibble,
     tidyr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 Suggests:
     knitr,
     rmarkdown,

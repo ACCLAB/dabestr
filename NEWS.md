@@ -1,3 +1,6 @@
+# dabestr v0.2.3
+* This patch fixes an issue that prevented Cumming plot generation, due to a ggplot2 new release (v3.3.0).
+
 # dabestr v0.2.2
 * This patch fixes an issue where local variables were duplicated in column names, requiring proper unquoting.
 

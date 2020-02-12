@@ -3,7 +3,6 @@
 \docType{package}
 \name{dabestr}
 \alias{dabestr}
-\alias{dabestr-package}
 \title{dabestr: A package for producing estimation plots.}
 \description{
 The dabestr package provides a function to construct bootstrap confidence
