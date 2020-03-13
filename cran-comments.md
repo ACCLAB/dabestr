@@ -1,11 +1,9 @@
 
 ## v0.2.3
 
-This is a resbumission. I have reduced the tarball size by removing two vignettes,
-and reduced the runtime of the examples.
-
-This is a patch update, in response to an automated CRAN check for the upcoming 
-release of ggplot2 (v3.3.0).
+This is a resbumission, in response to an automated CRAN check for
+flavor r-patched-solaris-x86. 
+See <https://cran.r-project.org/web/checks/check_results_dabestr.html>
 
 
 ## Test environments
