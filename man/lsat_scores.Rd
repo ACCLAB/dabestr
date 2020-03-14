@@ -4,7 +4,9 @@
 \name{lsat_scores}
 \alias{lsat_scores}
 \title{LSAT Scores.}
-\format{A list with two elements: \code{pretrain} and \code{posttrain}.}
+\format{
+A list with two elements: \code{pretrain} and \code{posttrain}.
+}
 \source{
 Thomason, N. R., Adajian, T., Barnett, A. E., Boucher, S.,
 van der Brugge, E., Campbell, J., Knorpp, W., Lempert, R.,

@@ -4,7 +4,9 @@
 \name{wellbeing_paired}
 \alias{wellbeing_paired}
 \title{Wellbeing Scores (Before and after design).}
-\format{A list with two elements: \code{before} and \code{after}.}
+\format{
+A list with two elements: \code{before} and \code{after}.
+}
 \source{
 Cumming, G. Understanding the New Statistics: Effect Sizes,
 Confidence Intervals, and Meta-Analysis. Routledge 2012.
