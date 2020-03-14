@@ -4,7 +4,9 @@
 \name{transcription_scores}
 \alias{transcription_scores}
 \title{Transcription Scores.}
-\format{A list with two elements: \code{pen} and \code{laptop}.}
+\format{
+A list with two elements: \code{pen} and \code{laptop}.
+}
 \source{
 Mueller, Pam A., and Daniel M. Oppenheimer. “The Pen Is Mightier
 than the Keyboard: Advantages of Longhand over Laptop Note Taking.”

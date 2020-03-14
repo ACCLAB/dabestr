@@ -4,7 +4,9 @@
 \name{wellbeing_ind}
 \alias{wellbeing_ind}
 \title{Wellbeing Scores (2 independent groups).}
-\format{A list with two elements: \code{control} and \code{test}.}
+\format{
+A list with two elements: \code{control} and \code{test}.
+}
 \source{
 Cumming, G. Understanding the New Statistics: Effect Sizes,
 Confidence Intervals, and Meta-Analysis. Routledge 2012.
