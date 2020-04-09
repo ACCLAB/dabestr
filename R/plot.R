@@ -398,6 +398,53 @@ plot.dabest <- function(x, ...,
   }
 
 
+  #### Create color palette. ####
+  group.count <- length(all.groups)
+
+  #### Check if palette is supported by ggplot2. ####
+  if (length(palette) == 1) {
+    # Assume it is an intended ggplot2 palette.
+
+    #### Check if in desired ggplot2 palette.
+    if (palette %in% rownames(RColorBrewer::brewer.pal.info)) {
+      palette.max.colors <- RColorBrewer::brewer.pal.info[palette, "maxcolors"]
+
+      if (group.count <= palette.max.colors) {
+        custom.pal <- setNames(brewer.pal(group.count, palette), all.groups)
+
+      } else {
+        #### Create palette with correct number of groups. ####
+        cat(paste(stringr::str_interp("${palette} has colors (${palette.max.colors}) ",
+                                      "but ${x_quoname} has ${group.count} unique groups. ",
+                                      "The palette has thus been extended automatically."),
+        )
+        )
+
+        color.ramp.func <- grDevices::colorRampPalette(brewer.pal(group.count, palette))
+
+        custom.pal <- setNames(color.ramp.func(group.count), all.groups)
+      }
+
+    } else {
+      stop(paste(stringr::str_interp("'${palette}' is not a valid ggplot2 palette.\n"),
+                 "Please see https://ggplot2.tidyverse.org/reference/scale_brewer.html#palettes\n",
+                 "for all acceptable palettes.")
+      )
+    }
+
+  } else {
+    # Assume this is a vector of colors.
+
+    if (length(palette) >= group.count) {
+      custom.pal <- palette
+    } else {
+      stop(paste(stringr::str_interp("${length(palette)} colors were supplied,\n"),
+                 stringr::str_interp("but ${group.count} colors are needed.")
+      )
+      )
+    }
+  }
+
 
 
   #### Plot raw data. ####
@@ -444,12 +491,14 @@ plot.dabest <- function(x, ...,
 
 
 
-  } else { # swarmplot.
+  } else {
+    # swarmplot.
     rawdata.plot <-
       ggplot2::ggplot(data = for.plot,
                       ggplot2::aes(!!x_enquo, !!y_enquo)) +
       rawdata.coord_cartesian +
-      ggplot2::scale_color_brewer(palette = palette) +
+      # ggplot2::scale_color_brewer(palette = palette) +
+      ggplot2::scale_colour_manual(values = custom.pal) # manually setting the palette.
       ggplot2::ylab(rawplot.ylabel) +
       ggplot2::scale_x_discrete(breaks = all.groups,
                                 labels = Ns$swarmticklabs)
