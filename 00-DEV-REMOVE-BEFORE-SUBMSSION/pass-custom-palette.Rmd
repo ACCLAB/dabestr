@@ -1,0 +1,128 @@
+---
+title: "Test out custom palette"
+author: "Joses"
+date: "4/7/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+```{r}
+mpg.dabest <- dabest(mpg, class, displ, idx = c("compact","pickup", "suv"))
+
+plot(mpg.dabest)
+
+```
+
+```{r}
+library(dplyr)
+library(tibble)
+library(ggplot2)
+library(RColorBrewer)
+```
+
+```{r make.func}
+testfunc <- function(palette) {
+  
+  groups <- unique(mpg$class)
+  group.count <- length(groups)
+  
+  #### Check if palette is supported by ggplot2. ####
+  if (length(palette) == 1) {
+    # Assume it is an intended ggplot2 palette.
+    
+    #### Check if in desired ggplot2 palette.
+    if (palette %in% rownames(RColorBrewer::brewer.pal.info)) {
+      palette.max.colors <- RColorBrewer::brewer.pal.info[palette, "maxcolors"]
+    
+      if (group.count <= palette.max.colors) {
+        custom.pal <- setNames(brewer.pal(group.count, palette), groups)
+        
+      } else {
+        #### Create palette with correct number of groups. ####
+        cat(paste(stringr::str_interp("${palette} has colors (${palette.max.colors}) ",
+                                      "but ${groups} has ${group.count} unique groups. ",
+                                      "The palette has thus been extended automatically."),
+                 )
+           )
+        
+        color.ramp.func <- grDevices::colorRampPalette(brewer.pal(group.count, palette))
+        
+        custom.pal <- setNames(color.ramp.func(group.count), groups)
+      }
+    
+    } else {
+      stop(paste(stringr::str_interp("'${palette}' is not a valid ggplot2 palette.\n"),
+                "Please see https://ggplot2.tidyverse.org/reference/scale_brewer.html#palettes\n",
+                "for all acceptable palettes.")
+           )
+    }
+    
+  } else {
+    #### If palette not recognized, it is a list or vector of colors? ####
+    #### Or assume this is a vector of colors? ####
+    ## TODO WORKING ON THIS NOW ##
+    # Check that the length of the palette is sufficient.
+    
+    if (length(palette) >= group.count) {
+      custom.pal <- palette
+    } else {
+      stop(paste(stringr::str_interp("${length(palette)} colors were supplied,\n"),
+                 stringr::str_interp("but ${group.count} colors are needed.")
+                 )
+           )
+    }
+  }
+
+  
+  
+  ggplot(mpg, aes(displ, hwy, colour = class)) + 
+    geom_point() +
+    scale_colour_manual(values = custom.pal) # manually setting the palette.
+
+}
+```
+
+
+
+```{r test.suite}
+
+# ggplot2 palette.
+testfunc("Dark2")
+testfunc("Pastel1")
+
+# Not a ggplot2 palette.
+testfunc("Dark3")
+
+# Custom palette.
+testfunc(c("red", "pink", "purple", #"green", 
+           "orange", "yellow", "darkgreen"))
+```
+
+
+
+
+```{r}
+check.palette <- function(palette) {
+  tryCatch(palette[[2]],
+        error = function(palette) {
+          stop(paste(stringr::str_interp("${palette} is not a ggplot2 palette.\n"),
+           "Please refer to https://ggplot2.tidyverse.org/reference/scale_brewer.html#palettes\n",
+           "for a full list of named ggplot2 palettes.")
+        )
+      }
+  )
+}
+```
+
+
+
