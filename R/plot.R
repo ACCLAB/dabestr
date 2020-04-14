@@ -402,6 +402,7 @@ plot.dabest <- function(x, ...,
   group.count <- length(all.groups)
 
   #### Check if palette is supported by ggplot2. ####
+  # This section was added in v0.2.5, allowing a custom palette to be passed easily.
   if (length(palette) == 1) {
     # Assume it is an intended ggplot2 palette.
 
