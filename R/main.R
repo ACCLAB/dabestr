@@ -477,9 +477,9 @@ printrow_dabest <- function(my.row, sigdig = 3) {
     c(
       "${p} ${ffunc} difference of ",
       "${my.row$test_group} ",
-      "(n=${my.row$control_size}) ",
+      "(n = ${my.row$test_size}) ",
       "minus ${my.row$control_group} ",
-      "(n=${my.row$test_size})\n"
+      "(n = ${my.row$control_size})\n"
     )
   )
 
