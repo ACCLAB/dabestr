@@ -172,7 +172,7 @@
 #' \href{https://www.crcpress.com/An-Introduction-to-the-Bootstrap/Efron-Tibshirani/p/book/9780412042317/}{An Introduction to the Bootstrap.} Efron, Bradley, and R. J. Tibshirani. 1994. CRC Press.
 #'
 #'
-#' @importFrom magrittr %>%
+#' @importFrom magrittr %>% %<>%
 #' @importFrom boot boot
 #'
 #' @export
@@ -350,6 +350,9 @@ dabest <- function(
 
     }
   }
+
+  result$control_group %<>% as.factor
+  result$test_group    %<>% as.factor
 
   # Reset seed.
   set.seed(NULL)
