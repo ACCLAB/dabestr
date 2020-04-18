@@ -278,7 +278,7 @@ plot.dabest <- function(x, ...,
     color.col_quoname  <- x_quoname
     groups.for.palette <- all.groups
   } else {
-    color.aes          <- ggplot2::aes(col = !!color.col_enquo)
+    color.aes          <- ggplot2::aes(col = factor(!!color.col_enquo))
     color.col_quoname  <- rlang::quo_name(color.col_enquo)
     groups.for.palette <- unique(for.plot[[color.col_quoname]])
   }
@@ -491,7 +491,7 @@ plot.dabest <- function(x, ...,
                                alpha = 0.75,
                                ggplot2::aes(!!x_enquo, !!y_enquo,
                                             group = !!id.col,
-                                            colour = !!color.col_enquo)
+                                            colour = factor(!!color.col_enquo))
                                )
         }
       rawdata.plot <-
