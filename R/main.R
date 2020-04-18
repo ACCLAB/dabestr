@@ -217,12 +217,12 @@ dabest <- function(
 
 
   #### Decide if multiplot or not. ####
-  if (class(idx) == "character") {
+  if (is.atomic(idx)) {
     # Not multiplot. Add it to an empty list.
     group_list  <-  list(idx)
     all_groups  <-  idx
 
-  } else if (class(idx) == "list") {
+  } else {
     # This is a multiplot. Give it a new name.
     group_list  <-  idx
     all_groups  <-  unique(unlist(group_list)) # Flatten `group_list`.
@@ -496,4 +496,3 @@ printrow_dabest <- function(my.row, sigdig = 3) {
 
   cat(line1, line2)
 }
-
