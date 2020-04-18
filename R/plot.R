@@ -274,13 +274,17 @@ plot.dabest <- function(x, ...,
   swarm.dodge        <-  0
 
   if (rlang::quo_is_null(color.col_enquo)) {
-    color.aes          <- ggplot2::aes(col = !!x_enquo)
     color.col_quoname  <- x_quoname
     groups.for.palette <- all.groups
+
+    color.aes          <- ggplot2::aes(col = !!x_enquo)
+
   } else {
-    color.aes          <- ggplot2::aes(col = factor(!!color.col_enquo))
     color.col_quoname  <- rlang::quo_name(color.col_enquo)
     groups.for.palette <- unique(for.plot[[color.col_quoname]])
+    for.plot[[color.col_quoname]] %<>% as.factor # turn the color column into a factor.
+
+    color.aes          <- ggplot2::aes(col = !!color.col_enquo)
   }
 
 
@@ -491,7 +495,8 @@ plot.dabest <- function(x, ...,
                                alpha = 0.75,
                                ggplot2::aes(!!x_enquo, !!y_enquo,
                                             group = !!id.col,
-                                            colour = factor(!!color.col_enquo))
+                                            colour = !!color.col_enquo)
+                                            # colour = factor(!!color.col_enquo))
                                )
         }
       rawdata.plot <-
