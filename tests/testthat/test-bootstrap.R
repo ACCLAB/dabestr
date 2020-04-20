@@ -15,13 +15,13 @@ test_that("Two-group unpaired mean diff reports accurately", {
 
   report      <- boot.result$result
 
-  expect_match(report$control_group, "Control")
+  expect_match(as.character(report$control_group), "Control")
   expect_equal(report$control_size, sample.size)
 
-  expect_match(report$test_group, "Test")
+  expect_match(as.character(report$test_group), "Test")
   expect_equal(report$test_size, sample.size)
 
-  expect_match(report$variable, "Value")
+  expect_match(as.character(report$variable), "Value")
 
   expect_false(report$paired)
 })

@@ -23,10 +23,12 @@
 #'
 #' @param x,y Columns in \code{.data}.
 #'
-#' @param idx A vector containing factors or strings in the \code{x} columns.
-#'   These must be quoted (ie. surrounded by quotation marks). The first element
-#'   will be the control group, so all differences will be computed for every
-#'   other group and this first group.
+#' @param idx Accepts a vector containing factors or strings in the \code{x}
+#'   column, or a list containing vectors as noted above.
+#'   If a vector is supplied, the first element will be the control group,
+#'   so all differences will be computed for every other group and this first group.
+#'   If a list of vectors is supplied, a multi-plot will be generated,
+#'   with the first element of each vector being the control group.
 #'
 #' @param paired boolean, default FALSE. If TRUE, the two groups are treated as
 #'   paired samples. The \code{control_group} group is treated as
@@ -172,7 +174,7 @@
 #' \href{https://www.crcpress.com/An-Introduction-to-the-Bootstrap/Efron-Tibshirani/p/book/9780412042317/}{An Introduction to the Bootstrap.} Efron, Bradley, and R. J. Tibshirani. 1994. CRC Press.
 #'
 #'
-#' @importFrom magrittr %>%
+#' @importFrom magrittr %>% %<>%
 #' @importFrom boot boot
 #'
 #' @export
@@ -217,12 +219,12 @@ dabest <- function(
 
 
   #### Decide if multiplot or not. ####
-  if (class(idx) == "character") {
+  if (is.atomic(idx)) {
     # Not multiplot. Add it to an empty list.
     group_list  <-  list(idx)
     all_groups  <-  idx
 
-  } else if (class(idx) == "list") {
+  } else {
     # This is a multiplot. Give it a new name.
     group_list  <-  idx
     all_groups  <-  unique(unlist(group_list)) # Flatten `group_list`.
@@ -351,6 +353,9 @@ dabest <- function(
     }
   }
 
+  result$control_group %<>% as.factor
+  result$test_group    %<>% as.factor
+
   # Reset seed.
   set.seed(NULL)
 
@@ -477,9 +482,9 @@ printrow_dabest <- function(my.row, sigdig = 3) {
     c(
       "${p} ${ffunc} difference of ",
       "${my.row$test_group} ",
-      "(n=${my.row$control_size}) ",
+      "(n = ${my.row$test_size}) ",
       "minus ${my.row$control_group} ",
-      "(n=${my.row$test_size})\n"
+      "(n = ${my.row$control_size})\n"
     )
   )
 
@@ -493,4 +498,3 @@ printrow_dabest <- function(my.row, sigdig = 3) {
 
   cat(line1, line2)
 }
-

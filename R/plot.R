@@ -28,8 +28,11 @@
 #'   passed to the \code{dabest} function. This column will be treated as a
 #'   \link{factor} and used to color the datapoints in the rawdata swarmplot.
 #'
-#' @param palette default "Set1". Accepts any one of the ggplot2 palettes.
-#' See the "Palettes" section in \link{scale_color_brewer}.
+#' @param palette default "Set1". Accepts any one of the RColorBrewer palettes,
+#'   or a vector of colors. Colors can be specified as RGB hexcode or as a
+#'   named color. See the "Palettes" section in \link{scale_color_brewer}
+#'   for more on palettes. To obtain all 657 named colors in R, enter \code{colors()}
+#'   at the console.
 #'
 #' @param float.contrast default \code{TRUE}.  If \code{idx} in the
 #'   \code{dabest} object contains only 2 groups, \code{float.contrast = TRUE}
@@ -141,7 +144,7 @@
 #'
 #'
 #' @importFrom magrittr %>%
-#' @importFrom stats median na.omit sd
+#' @importFrom stats median na.omit sd setNames
 #'
 #' @export
 plot.dabest <- function(x, ...,
@@ -270,16 +273,21 @@ plot.dabest <- function(x, ...,
 
   #### Parse keywords. ####
   # color.column
-  color.col_enquo      <-  rlang::enquo(color.column)
+  color.col_enquo    <-  rlang::enquo(color.column)
   swarm.dodge        <-  0
 
   if (rlang::quo_is_null(color.col_enquo)) {
-    color.aes          <-  ggplot2::aes(col = !!x_enquo)
-    # swarm.dodge        <-  0
+    color.col_quoname  <- x_quoname
+    groups.for.palette <- all.groups
+
+    color.aes          <- ggplot2::aes(col = !!x_enquo)
+
   } else {
-    color.col_quoname  <-  rlang::quo_name(color.col_enquo)
-    color.aes          <-  ggplot2::aes(col = !!color.col_enquo)
-    # swarm.dodge        <-  0.1
+    color.col_quoname  <- rlang::quo_name(color.col_enquo)
+    groups.for.palette <- unique(for.plot[[color.col_quoname]])
+    for.plot[[color.col_quoname]] %<>% as.factor # turn the color column into a factor.
+
+    color.aes          <- ggplot2::aes(col = !!color.col_enquo)
   }
 
 
@@ -398,6 +406,59 @@ plot.dabest <- function(x, ...,
   }
 
 
+  #### Create color palette. ####
+  group.count <- length(groups.for.palette)
+
+  #### Check if palette is supported by ggplot2. ####
+  if (length(palette) == 1) {
+    # Assume it is an intended ggplot2 palette.
+
+    #### Check if in desired ggplot2 palette.
+    if (palette %in% rownames(RColorBrewer::brewer.pal.info)) {
+      palette.max.colors <- RColorBrewer::brewer.pal.info[palette, "maxcolors"]
+
+      if (group.count <= palette.max.colors) {
+        if (group.count < 3) {
+          pal <- RColorBrewer::brewer.pal(3, palette)
+        } else{
+          pal <- RColorBrewer::brewer.pal(group.count, palette)
+        }
+
+        custom.pal <- setNames(pal[1:group.count], groups.for.palette)
+
+      } else {
+        #### Create palette with correct number of groups. ####
+        cat(paste(
+          stringr::str_interp(
+            "${palette} has colors (${palette.max.colors}) ",
+            "but ${color.col_quoname} has ${group.count} unique groups. ",
+            "The palette has thus been extended automatically."),
+            )
+        )
+
+        color.ramp.func <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(group.count, palette))
+
+        custom.pal <- setNames(color.ramp.func(group.count), groups.for.palette)
+      }
+
+    } else {
+      stop(paste(stringr::str_interp("'${palette}' is not a valid ggplot2 palette.\n"),
+                 "Please see https://ggplot2.tidyverse.org/reference/scale_brewer.html#palettes\n",
+                 "for all acceptable palettes.")
+      )
+    }
+
+  } else {
+    # Assume this is a vector of colors.
+    if (length(palette) >= group.count) {
+      custom.pal <- setNames(palette, groups.for.palette)
+    } else {
+      stop(paste(stringr::str_interp("${length(palette)} colors were supplied,\n"),
+                 stringr::str_interp("but ${group.count} colors are needed.")
+      )
+      )
+    }
+  }
 
 
   #### Plot raw data. ####
@@ -414,7 +475,7 @@ plot.dabest <- function(x, ...,
     slope.line.width  <- 0.5
 
     for (subplot_groups in idx) {
-      subplot  <- dplyr::filter(raw.data, !!x_enquo %in% subplot_groups)
+      subplot <- dplyr::filter(raw.data, !!x_enquo %in% subplot_groups)
 
       subplot[[x_quoname]] <-
         subplot[[x_quoname]] %>%
@@ -438,8 +499,12 @@ plot.dabest <- function(x, ...,
                                ggplot2::aes(!!x_enquo, !!y_enquo,
                                             group = !!id.col,
                                             colour = !!color.col_enquo)
+                                            # colour = factor(!!color.col_enquo))
                                )
         }
+      rawdata.plot <-
+        rawdata.plot + ggplot2::scale_colour_manual(values = custom.pal)
+
     }
 
 
@@ -449,7 +514,8 @@ plot.dabest <- function(x, ...,
       ggplot2::ggplot(data = for.plot,
                       ggplot2::aes(!!x_enquo, !!y_enquo)) +
       rawdata.coord_cartesian +
-      ggplot2::scale_color_brewer(palette = palette) +
+      # ggplot2::scale_color_brewer(palette = palette) +
+      ggplot2::scale_colour_manual(values = custom.pal) +
       ggplot2::ylab(rawplot.ylabel) +
       ggplot2::scale_x_discrete(breaks = all.groups,
                                 labels = Ns$swarmticklabs)

@@ -37,15 +37,15 @@ test_that("Using `grp` as x column is kosher", {
   # Run code here.
   set.seed(12345)
   df <- cbind(data.frame(value=sample(1:9, 100, replace = TRUE)/10),
-              data.frame(grp=sample(c("A","B"), 100, replace = T))
+              data.frame(grp=sample(c("A", "B"), 100, replace = T))
               )
   df_analysed <- dabest(df, x = grp, y = value, idx = c("A", "B"))
 
   # Check results.
   df_analysed.result <- df_analysed$result
 
-  expect_match(df_analysed.result$control_group, "A")
-  expect_match(df_analysed.result$test_group, "B")
+  expect_match(as.character(df_analysed.result$control_group), "A")
+  expect_match(as.character(df_analysed.result$test_group), "B")
 
   expect_equal(df_analysed.result$control_size, 54)
   expect_equal(df_analysed.result$test_size, 46)

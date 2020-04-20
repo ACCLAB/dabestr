@@ -39,14 +39,23 @@ test_that("Gardner-Altman custom aesthetics", {
                   gardner.altman.unpaired.custom.ylabels)
 
 
-  # Test palette.
-  gardner.altman.unpaired.custom.palette <-
+  # Test palette, RColorBrwer.
+  gardner.altman.unpaired.RColorBrewer.palette <-
     plot(unpaired, color.column = Gender,
          palette = "Dark2" # The default is "Set2".
   )
 
-  vdiffr::expect_doppelganger("Gardner-Altman unpaired custom palette",
-                  gardner.altman.unpaired.custom.palette)
+  vdiffr::expect_doppelganger("Gardner-Altman unpaired RColorBrewer palette",
+                              gardner.altman.unpaired.RColorBrewer.palette)
+
+  # Test palette, manual
+  gardner.altman.unpaired.manual.palette <-
+    plot(unpaired, color.column = Gender,
+         palette = c("moccasin", "honeydew2")
+    )
+
+  vdiffr::expect_doppelganger("Gardner-Altman unpaired manaul palette",
+                              gardner.altman.unpaired.manual.palette)
 
 
   # Test rawplot marker size.
@@ -102,14 +111,24 @@ test_that("Gardner-Altman custom aesthetics", {
                   gardner.altman.paired.custom.ylabels)
 
 
-  # Test palette.
-  gardner.altman.paired.custom.palette <-
+  # Test palette, RcolorBrewer.
+  gardner.altman.paired.RcolorBrewer.palette <-
     plot(paired, color.column = Gender,
-         palette = "Dark2" # The default is "Set2".
+         palette = "Set1" # The default is "Set2".
     )
 
-  vdiffr::expect_doppelganger("Gardner-Altman paired custom palette",
-                  gardner.altman.paired.custom.palette)
+  vdiffr::expect_doppelganger("Gardner-Altman paired RcolorBrewer palette",
+                              gardner.altman.paired.RcolorBrewer.palette)
+
+
+  # Test palette, manual
+  gardner.altman.paired.manual.palette <-
+    plot(paired, color.column = Gender,
+         palette = c("gold", "black")
+    )
+
+  vdiffr::expect_doppelganger("Gardner-Altman paired manual palette",
+                              gardner.altman.paired.manual.palette)
 
 
 })
@@ -191,18 +210,31 @@ test_that("Cumming custom aesthetics", {
                   cumming.custom.ylabels)
 
 
-  # Test palette.
-  cumming.custom.palette <-
+  # Test RColorBrewer palette Cumming.
+  cumming.RColorBrewer.palette <-
     plot(multi.group, color.column = Gender,
          palette = "Dark2" # The default is "Set2".
     )
 
-  vdiffr::expect_doppelganger("Cumming custom palette",
-                  cumming.custom.palette)
+  vdiffr::expect_doppelganger("Cumming RColorBrewer palette",
+                              cumming.RColorBrewer.palette)
+
+
+  # Test manually supplied palette.
+  cumming.manual.palette <-
+    plot(multi.group, color.column = Gender,
+       # A custom palette consisting of a vector of colors,
+       # specified as RGB hexcode, or as a R named color.
+       # See all 657 named R colors with `colors()`.
+       palette = c("#FFA500", "sienna4")
+  )
+
+  vdiffr::expect_doppelganger("Cumming manual palette",
+                               cumming.manual.palette)
 
 
   # Test theme.
- cumming.custom.theme <-
+  cumming.custom.theme <-
     plot(multi.group, color.column = Gender,
          theme = ggplot2::theme_gray() # The default is `theme_classic()`.
     )
