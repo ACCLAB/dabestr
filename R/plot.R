@@ -144,7 +144,7 @@
 #'
 #'
 #' @importFrom magrittr %>%
-#' @importFrom stats median na.omit sd
+#' @importFrom stats median na.omit sd setNames
 #'
 #' @export
 plot.dabest <- function(x, ...,
