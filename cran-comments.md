@@ -1,9 +1,7 @@
 
-## v0.2.3
+## v0.2.5
 
-This is a resbumission, in response to an automated CRAN check for
-flavor r-patched-solaris-x86. 
-See <https://cran.r-project.org/web/checks/check_results_dabestr.html>
+This is a new version with a bugfix and new features.
 
 
 ## Test environments
