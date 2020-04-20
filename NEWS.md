@@ -1,3 +1,9 @@
+# dabestr v0.2.5
+* This release implements the ability to supply a custom vector of colors to `palette` during plotting. There is also a bugfix that misreported the Ns for the test and control group.
+
+# dabestr v0.2.4
+* This version represents a resbumission, in response to an automated CRAN check for flavor r-patched-solaris-x86. See https://cran.r-project.org/web/checks/check_results_dabestr.html
+
 # dabestr v0.2.3
 * This patch fixes an issue that prevented Cumming plot generation, due to a ggplot2 new release (v3.3.0).
 
