@@ -114,7 +114,7 @@ test_that("Gardner-Altman custom aesthetics", {
   # Test palette, RcolorBrewer.
   gardner.altman.paired.RcolorBrewer.palette <-
     plot(paired, color.column = Gender,
-         palette = "Dark2" # The default is "Set2".
+         palette = "Set1" # The default is "Set2".
     )
 
   vdiffr::expect_doppelganger("Gardner-Altman paired RcolorBrewer palette",
