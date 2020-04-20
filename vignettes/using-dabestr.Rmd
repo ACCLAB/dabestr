@@ -244,12 +244,24 @@ plot(multi.group, color.column = Gender,
     )
 ```
 
-The `palette` parameter accepts any `ggplot2` palettes. The default palette applied is "Set2". 
+The `palette` parameter accepts either one of the following: 
 
-```{r palette.demo, fig.width = 7, fig.height = 4}
+1. Any `RColorBrewer` palettes. The default palette applied is "Set2". 
+2. A vector of colors. 
 
+```{r palette.demo1, fig.width = 7, fig.height = 4}
 plot(multi.group, color.column = Gender,
      palette = "Dark2" # The default is "Set2".
+     )
+```
+
+
+```{r palette.demo2, fig.width = 7, fig.height = 4}
+plot(multi.group, color.column = Gender,
+     # A custom palette consisting of a vector of colors,
+     # specified as RGB hexcode, or as a R named color.
+     # See all 657 named R colors with `colors()`.
+     palette = c("#FFA500", "sienna4")
      )
 ```
 
