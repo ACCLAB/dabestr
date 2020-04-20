@@ -247,7 +247,7 @@ plot(multi.group, color.column = Gender,
 The `palette` parameter accepts either one of the following: 
 
 1. Any `RColorBrewer` palettes. The default palette applied is "Set2". 
-2. A vector of colors. 
+2. A vector of colors. (_Introduced in v0.2.5_) 
 
 ```{r palette.demo1, fig.width = 7, fig.height = 4}
 plot(multi.group, color.column = Gender,
