@@ -24,7 +24,7 @@
 #' @param x,y Columns in \code{.data}.
 #'
 #' @param idx Accepts a vector containing factors or strings in the \code{x}
-#'   columns, or a list containing vectors as noted above.
+#'   column, or a list containing vectors as noted above.
 #'   If a vector is supplied, the first element will be the control group,
 #'   so all differences will be computed for every other group and this first group.
 #'   If a list of vectors is supplied, a multi-plot will be generated,
