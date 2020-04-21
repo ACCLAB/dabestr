@@ -1,38 +1,38 @@
 Package: dabestr
 Type: Package
 Title: Data Analysis using Bootstrap-Coupled Estimation
-Version: 0.2.4
+Version: 0.2.5
 Authors@R: c(
-    person("Joses W.", "Ho", 
+    person("Joses W.", "Ho",
           email = "joseshowh@gmail.com", role = c("cre", "aut")),
     person("Tayfun", "Tumkaya",
           role = c("aut"))
           )
 Maintainer: Joses W. Ho <joseshowh@gmail.com>
 Description: Data Analysis using Bootstrap-Coupled ESTimation.
-    Estimation statistics is a simple framework that avoids the pitfalls of 
-    significance testing. It uses familiar statistical concepts: means, 
-    mean differences, and error bars. More importantly, it focuses on the 
-    effect size of one's experiment/intervention, as opposed to a false 
+    Estimation statistics is a simple framework that avoids the pitfalls of
+    significance testing. It uses familiar statistical concepts: means,
+    mean differences, and error bars. More importantly, it focuses on the
+    effect size of one's experiment/intervention, as opposed to a false
     dichotomy engendered by P values.
     An estimation plot has two key features:
-    1. It presents all datapoints as a swarmplot, which orders each point to 
+    1. It presents all datapoints as a swarmplot, which orders each point to
     display the underlying distribution.
-    2. It presents the effect size as a bootstrap 95% confidence interval on a 
+    2. It presents the effect size as a bootstrap 95% confidence interval on a
     separate but aligned axes.
-    Estimation plots are introduced in Ho et al., Nature Methods 2019, 1548-7105. 
-    <doi:10.1038/s41592-019-0470-3>. 
+    Estimation plots are introduced in Ho et al., Nature Methods 2019, 1548-7105.
+    <doi:10.1038/s41592-019-0470-3>.
     The free-to-view PDF is located at <https://rdcu.be/bHhJ4>.
 License: file LICENSE
 URL: https://github.com/ACCLAB/dabestr
 BugReports: https://github.com/ACCLAB/dabestr/issues
 Encoding: UTF-8
 LazyData: true
-Depends: 
+Depends:
     R (>= 3.5.0),
     boot,
     magrittr
-Imports: 
+Imports:
     cowplot,
     dplyr,
     ellipsis,
@@ -41,6 +41,7 @@ Imports:
     ggforce,
     ggbeeswarm,
     plyr,
+    RColorBrewer,
     rlang,
     simpleboot,
     stringr,

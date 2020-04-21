@@ -37,8 +37,11 @@
 passed to the \code{dabest} function. This column will be treated as a
 \link{factor} and used to color the datapoints in the rawdata swarmplot.}
 
-\item{palette}{default "Set1". Accepts any one of the ggplot2 palettes.
-See the "Palettes" section in \link{scale_color_brewer}.}
+\item{palette}{default "Set1". Accepts any one of the RColorBrewer palettes,
+or a vector of colors. Colors can be specified as RGB hexcode or as a
+named color. See the "Palettes" section in \link{scale_color_brewer}
+for more on palettes. To obtain all 657 named colors in R, enter \code{colors()}
+at the console.}
 
 \item{float.contrast}{default \code{TRUE}.  If \code{idx} in the
 \code{dabest} object contains only 2 groups, \code{float.contrast = TRUE}
