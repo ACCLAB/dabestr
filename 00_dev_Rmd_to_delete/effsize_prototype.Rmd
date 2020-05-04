@@ -1,0 +1,225 @@
+---
+title: "effsize prototype"
+author: "Joses Ho"
+date: "2/7/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load libraries
+
+```{r load.libraries}
+Packages <- c("dplyr", "effsize"#, "boot", "dabestr"
+              )
+
+lapply(Packages, library, character.only = TRUE)
+```
+
+## Create Dummy Data
+
+```{r create.dummy.data}
+set.seed(54321)
+
+N = 40
+c1 <- rnorm(N, mean = 100, sd = 25)
+c2 <- rnorm(N, mean = 100, sd = 50)
+g1 <- rnorm(N, mean = 120, sd = 25)
+g2 <- rnorm(N, mean = 80, sd = 50)
+g3 <- rnorm(N, mean = 100, sd = 12)
+g4 <- rnorm(N, mean = 100, sd = 50)
+gender <- c(rep('Male', N/2), rep('Female', N/2))
+id <- 1: N
+
+
+wide.data <- 
+  tibble::tibble(
+    Control1 = c1, Control2 = c2,
+    Group1 = g1, Group2 = g2, Group3 = g3, Group4 = g4,
+    Gender = gender, ID = id)
+
+
+tidy.data   <- 
+  wide.data %>%
+  tidyr::gather(key = Group, value = Measurement, -ID, -Gender)
+
+```
+
+
+
+```{r sketch}
+
+
+dbp <- dabestr::dabest_proto(tidy.data, Group, Measurement,
+                    idx = list(c("Control1", "Group1"), c("Control2", "Group2", "Group3")),
+                    paired = FALSE)
+
+db <- dabest(tidy.data, Group, Measurement, func = mean,
+              idx = list(c("Control1", "Group1"), c("Control2", "Group2", "Group3")),
+              paired = FALSE)
+
+# unpaired_mean_diff <- dabest_proto(iris, Species, Petal.Width,
+#                              idx = c("setosa", "versicolor"),
+#                              paired = FALSE)
+# 
+# dbp %>% effect_size(ci = 95, reps = 5000)
+
+aa <- mean_diff(dbp)
+```
+
+
+## Limit effsize selection.
+
+```{r}
+baz <- function(x) UseMethod("baz", x)
+baz.A <- function(x) "A!"
+baz.B <- function(x) "B..."
+
+ab <- structure(1, class = c("A", "B"))
+ba <- structure(1, class = c("B", "A"))
+baz(ab)
+baz(ba)
+```
+
+
+
+## Custom effsize functions
+
+```{r custom.effsize.funcs}
+# hedges.correction <- function(g1, g2) {
+#   # Returns the exact Hedges' correction factor for Cohen's d.
+# 
+#   deg.freedom = length(g1) + length(g2) - 2
+# 
+#   exact.f = gamma(deg.freedom/2) /
+#     (sqrt(deg.freedom/2) * gamma((deg.freedom - 1)/2))
+# 
+#   return(exact.f)
+# }
+# 
+# 
+# 
+# cohens.d <- function(control, treatment, paired) {
+#   return(effsize::cohen.d(treatment, control, paired=paired)$estimate)
+# }
+# 
+# 
+# 
+# hedges.g <- function(control, treatment, paired) {
+#   cd <- cohens.d(treatment, control, paired=paired)
+#   corr.factor <- hedges.correction(treatment, control)
+#   return(cd * corr.factor)
+# }
+# 
+# 
+# 
+# cliffs.delta <- function(control, treatment, paired = NA) {
+#   return(effsize::cliff.delta(treatment, control)$estimate)
+# }
+# 
+# 
+# 
+# mean.diff <- function(control, treatment, paired) {
+#   if (identical(paired, FALSE)) return(mean(treatment) - mean(control))
+#   else return(mean(treatment - control))
+# }
+# 
+# 
+# 
+# median.diff <- function(control, treatment, paired) {
+#   if (identical(paired, FALSE)) return(median(treatment) - median(control))
+#   else return(median(treatment - control))
+# }
+# 
+# 
+# 
+# es.boot <- function(effsize, data, paired, indices) {
+#   control <- data$control[indices]
+#   test <- data$test[indices]
+#   
+#   cd <- effsize(control, test, paired)
+#   
+#   return(cd)
+# }
+```
+
+## Check effsize
+
+```{r check.es}
+cohens.d(c1, g2, paired = TRUE)
+
+hedges.g(c1, g2, paired = TRUE)
+
+cliffs.delta(c1, g2)
+
+mean.diff(c1, g2)
+```
+
+## Try bootstrap!
+
+```{r try.bootstrap}
+# library(dqrng)
+# dqRNGkind("pcg64")
+
+#### Main API ####
+dabest(tidy.data, Group, Measurement, 
+       idx = c("Control1", "Group2"), 
+       # paired = TRUE, id.column = ID,
+       func = mean)
+
+
+#### Current Guts ####
+set.seed(12345)
+unpaired_result1 <- simpleboot::two.boot(g2, c1, FUN = mean, R = 5000)
+boot::boot.ci(unpaired_result1, type=c("percent", "bca"))
+set.seed(NULL)
+
+
+#### Prototype Guts ####
+input_list <- data.frame(control=c1, test=g2)
+set.seed(12345)
+
+
+ppp <- boot::boot(statistic = es.boot, R = 5000, 
+                  effsize = cliffs.delta, 
+                  data = input_list,
+                  paired = FALSE)
+
+boot::boot.ci(ppp, type=c("percent", "bca"))
+set.seed(NULL)
+
+
+
+
+
+set.seed(12345)
+paired_result <- simpleboot::pairs_boot(c1, g2, median.diff, R = 5000, paired=TRUE)
+boot::boot.ci(paired_result, type=c("percent", "bca"))
+set.seed(NULL)
+
+```
+
+```{r create my own boot object}
+# # too damn complicated...
+
+# my.boot.object <- list()
+# 
+# my.boot.object$t0 <- unpaired_result$t0
+# my.boot.object$t <- unpaired_result$t
+# my.boot.object$R <- unpaired_result$R
+# my.boot.object$sim <- "ordinary"
+# my.boot.object$stype <- "i"
+# my.boot.object$statistic <- es.boot
+# 
+# 
+# 
+# class(my.boot.object) <- c("boot", "dabest.boot", "list")
+# 
+# 
+# boot::boot.ci(my.boot.object, type=c("percent", "bca"))
+
+```
+
+
