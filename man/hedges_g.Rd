@@ -7,6 +7,8 @@
 hedges_g(x, ..., ci = 95, reps = 5000, seed = 12345)
 }
 \arguments{
+\item{x}{A dabest_proto object}
+
 \item{ci}{float, default 95. The level of the confidence intervals produced.
 The default \code{ci = 95} produces 95\% CIs.}
 
@@ -17,8 +19,6 @@ will be generated.}
 random number generator. Setting a seed ensures that the bootstrap confidence
 intervals for the same data will remain stable over separate runs/calls of
 this function. See \link{set.seed} for more details.}
-
-\item{.data}{A dabest_proto object}
 }
 \value{
 Difference of means for treatment vs. control.

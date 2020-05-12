@@ -1,6 +1,6 @@
 #' Compute the Mean Difference
 #'
-#' @param .data A dabest_proto object
+#' @param x A dabest_proto object
 #'
 #' @param ci float, default 95. The level of the confidence intervals produced.
 #'   The default \code{ci = 95} produces 95\% CIs.
@@ -26,7 +26,7 @@ mean_diff.dabest_proto <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) 
 
 #' Compute the Median Difference
 #'
-#' @param .data A dabest_proto object
+#' @param x A dabest_proto object
 #'
 #' @param ci float, default 95. The level of the confidence intervals produced.
 #'   The default \code{ci = 95} produces 95\% CIs.
@@ -52,7 +52,7 @@ median_diff.dabest_proto <- function(x, ..., ci = 95, reps = 5000 , seed = 12345
 
 #' Compute Cohen's d
 #'
-#' @param .data A dabest_proto object
+#' @param x A dabest_proto object
 #'
 #' @param ci float, default 95. The level of the confidence intervals produced.
 #'   The default \code{ci = 95} produces 95\% CIs.
@@ -75,9 +75,10 @@ cohens_d.dabest_proto <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) {
 }
 
 
+
 #' Compute Hedges' g
 #'
-#' @param .data A dabest_proto object
+#' @param x A dabest_proto object
 #'
 #' @param ci float, default 95. The level of the confidence intervals produced.
 #'   The default \code{ci = 95} produces 95\% CIs.
@@ -100,9 +101,10 @@ hedges_g.dabest_proto <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) {
 }
 
 
+
 #' Compute Cliff's delta
 #'
-#' @param .data A dabest_proto object
+#' @param x A dabest_proto object
 #'
 #' @param ci float, default 95. The level of the confidence intervals produced.
 #'   The default \code{ci = 95} produces 95\% CIs.
@@ -125,7 +127,7 @@ cliffs_delta.dabest_proto <- function(x, ..., ci = 95, reps = 5000 , seed = 1234
 }
 
 
-
+#### Helper functions that actually compute the effect sizes. ####
 mean_diff_ <- function(control, treatment, paired) {
   if (identical(paired, FALSE)) return(mean(treatment) - mean(control))
   else return(mean(treatment - control))
@@ -159,17 +161,77 @@ cliffs_delta_ <- function(control, treatment, paired=NA) {
 }
 
 
+#' Returns the exact Hedges' correction factor for Cohen's d.
+#' @param x1 A vector of values.
+#'
+#' @param x2 Another vector of values.
+#'
+#' @return Hedges' correction for the g of x1 and x2.
+#'
+hedges_correction <- function(x1, x2) {
 
-hedges_correction <- function(g1, g2) {
-  # Returns the exact Hedges' correction factor for Cohen's d.
+  n1 <- length(x1)
+  n2 <- length(x2)
 
-  deg.freedom = length(g1) + length(g2) - 2
+  deg.freedom <- n1 + n2 - 2
+  numer       <- gamma(deg.freedom/2)
+  denom0      <- gamma((df - 1) / 2)
+  denom       <- sqrt((df / 2)) * denom0
 
-  exact.f = gamma(deg.freedom/2) /
-    (sqrt(deg.freedom/2) * gamma((deg.freedom - 1)/2))
+  if (is.infinite(numer) | is.infinite(denom)) {
+    # Occurs when df is too large.
+    # Applies Hedges and Olkin's approximation.
+    df.sum <- n1 + n2
+    denom <- (4 * df.sum) - 9
+    out <- 1 - (3 / denom)
+  } else out <- numer / denom
 
-  return(exact.f)
+  return(out)
 }
+
+
+
+#' Compute the standardizers for Cohen's d
+#' @param x1 A vector of values.
+#'
+#' @param x2 Another vector of values.
+#'
+#' @return Named list for pooled and average standardizers.
+#' Use the pooled one for unpaired Cohens' d, and the average one
+#' for paired Cohens'd d.
+#'
+cohen_d_standardizers <- function(x1, x2) {
+  control_n    <- length(x1)
+  test_n       <- length(x2)
+
+  control_mean <- mean(x1)
+  test_mean    <- mean(x2)
+
+  control_var  <- var(x1) # by default, use N-1 to compute the variance.
+  test_var     <- var(x2)
+
+  control_std  <- sd(x1)
+  test_std     <- sd(x2)
+
+  # For unpaired 2-groups standardized mean difference.
+  pooled <- sqrt(
+    ((control_n - 1) * control_var + (test_n - 1) * test_var) /
+      (control_n + test_n - 2)
+  )
+
+  # For paired standardized mean difference.
+  average <- sqrt((control_var + test_var) / 2)
+
+  # out <- c(pooled, average)
+  # names(out) <- c("pooled", "average")
+
+  return(list(pooled = pooled, average = average))
+
+}
+
+
+
+
 
 
 
@@ -200,6 +262,8 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
   idx                 <-  .data$idx
   all.groups          <-  .data$.all.groups
   paired              <-  .data$is.paired
+  data.name           <-  .data$.data.name
+  is.paired           <-  .data$is.paired
 
   plot.groups.sizes   <-  unlist(lapply(idx, length))
 
@@ -219,24 +283,24 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
   # Parse the effect.size.
   if (effect.size == "mean_diff") {
     es = mean_diff_
-    es_summ = mean
-    es_name = "mean"
+    summ_func = mean
+    summ_name = "mean"
   } else if (effect.size == "median_diff") {
     es = median_diff_
-    es_summ = median
-    es_name = "median"
+    summ_func = median
+    summ_name = "median"
   } else if (effect.size == "cohens_d") {
     es = cohens_d_
-    es_summ = mean
-    es_name = "mean"
+    summ_func = mean
+    summ_name = "mean"
   } else if (effect.size == "hedges_g") {
     es = hedges_g_
-    es_summ = mean
-    es_name = "mean"
+    summ_func = mean
+    summ_name = "mean"
   } else if (effect.size == "cliffs_delta") {
     es = cliffs_delta_
-    es_summ = median
-    es_name = "median"
+    summ_func = median
+    summ_name = "median"
   }
 
 
@@ -378,9 +442,9 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
     raw.data %>%
     dplyr::filter(!!x_enquo %in% all.groups) %>%
     dplyr::group_by(!!x_enquo) %>%
-    dplyr::summarize(func_quoname = es_summ(!!y_enquo))
+    dplyr::summarize(func_quoname = summ_func(!!y_enquo))
 
-  colnames(summaries) <- c(x_quoname, es_name)
+  colnames(summaries) <- c(x_quoname, summ_name)
 
   # Order the summaries by the idx.
   summaries[[x_quoname]] <-
@@ -408,10 +472,13 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
     data = data.out,
     x = x_enquo,
     y = y_enquo,
-    idx = all.groups,
+    idx = idx,
     id.column = id.col_enquo,
+    is.paired = is.paired,
+    effect.size = effect.size,
     result = result,
-    summary = summaries
+    summary = summaries,
+    .data.name = data.name
   )
 
 
@@ -463,16 +530,25 @@ print.dabest_effsize_proto <- function(x, ..., signif_digits = 3) {
   tbl <- dabest.effsize$result
   var <- rlang::quo_name(dabest.effsize$y)
 
-  #### Create header. ####
-  dabest_ver <- utils::packageVersion("dabestr")
-  header     <- stringr::str_interp(
-    "DABEST (Data Analysis with Bootstrap Estimation) v${dabest_ver}\n")
-  cat(header)
+  #### Print greeting header. ####
+  print_greeting_header()
+  # dabest_ver <- utils::packageVersion("dabestr")
+  # header     <- stringr::str_interp(
+  #   "DABEST (Data Analysis with Bootstrap Estimation) v${dabest_ver}\n")
+  # cat(header)
+  #
+  # cat(rep('=', nchar(header) - 1), sep='')
+  # cat("\n\n")
 
-  cat(rep('=', nchar(header) - 1), sep='')
-  cat("\n\n")
+  # cat(stringr::str_interp("Variable: ${var} \n\n"))
 
-  cat(stringr::str_interp("Variable: ${var} \n\n"))
+  #### Print dataset name, xvar, and yvar. ####
+  xvar = rlang::quo_name(dabest.effsize$x)
+  yvar = rlang::quo_name(dabest.effsize$y)
+
+  cat(stringr::str_interp("Dataset    :  ${dabest.effsize$.data.name}\n"))
+  cat(stringr::str_interp("X Variable :  ${xvar}\n"))
+  cat(stringr::str_interp("Y Variable :  ${yvar}\n\n"))
 
   #### Print each row. ####
   cat(apply(tbl, 1, printrow_, sigdig = signif_digits),

@@ -49,7 +49,31 @@ tidy.data   <-
 
 
 
-```{r sketch}
+```{r sketch1}
+
+dbp1 <- dabestr::dabest_proto(tidy.data, Group, Measurement,
+                    idx = c("Control1", "Group1"),
+                    paired = FALSE)
+
+db <- dabest(tidy.data, Group, Measurement, func = median,
+              idx = c("Control1", "Group1"),
+              paired = FALSE)
+
+# unpaired_mean_diff <- dabest_proto(iris, Species, Petal.Width,
+#                              idx = c("setosa", "versicolor"),
+#                              paired = FALSE)
+# 
+# dbp %>% effect_size(ci = 95, reps = 5000)
+
+aa <- cohens_d(dbp1)
+
+plot(aa)
+
+```
+
+
+
+```{r sketch2}
 
 
 dbp <- dabestr::dabest_proto(tidy.data, Group, Measurement,
@@ -66,84 +90,27 @@ db <- dabest(tidy.data, Group, Measurement, func = mean,
 # 
 # dbp %>% effect_size(ci = 95, reps = 5000)
 
-aa <- mean_diff(dbp)
+aa <- hedges_g(dbp)
+
+plot(aa)
 ```
 
 
-## Limit effsize selection.
+## Scale Gardner-Altman contrast axes
 
 ```{r}
-baz <- function(x) UseMethod("baz", x)
-baz.A <- function(x) "A!"
-baz.B <- function(x) "B..."
+cohens_std <- function() {
+  
+}
 
-ab <- structure(1, class = c("A", "B"))
-ba <- structure(1, class = c("B", "A"))
-baz(ab)
-baz(ba)
+hedges_correction_factor <- function() {
+  
+}
+
 ```
 
 
 
-## Custom effsize functions
-
-```{r custom.effsize.funcs}
-# hedges.correction <- function(g1, g2) {
-#   # Returns the exact Hedges' correction factor for Cohen's d.
-# 
-#   deg.freedom = length(g1) + length(g2) - 2
-# 
-#   exact.f = gamma(deg.freedom/2) /
-#     (sqrt(deg.freedom/2) * gamma((deg.freedom - 1)/2))
-# 
-#   return(exact.f)
-# }
-# 
-# 
-# 
-# cohens.d <- function(control, treatment, paired) {
-#   return(effsize::cohen.d(treatment, control, paired=paired)$estimate)
-# }
-# 
-# 
-# 
-# hedges.g <- function(control, treatment, paired) {
-#   cd <- cohens.d(treatment, control, paired=paired)
-#   corr.factor <- hedges.correction(treatment, control)
-#   return(cd * corr.factor)
-# }
-# 
-# 
-# 
-# cliffs.delta <- function(control, treatment, paired = NA) {
-#   return(effsize::cliff.delta(treatment, control)$estimate)
-# }
-# 
-# 
-# 
-# mean.diff <- function(control, treatment, paired) {
-#   if (identical(paired, FALSE)) return(mean(treatment) - mean(control))
-#   else return(mean(treatment - control))
-# }
-# 
-# 
-# 
-# median.diff <- function(control, treatment, paired) {
-#   if (identical(paired, FALSE)) return(median(treatment) - median(control))
-#   else return(median(treatment - control))
-# }
-# 
-# 
-# 
-# es.boot <- function(effsize, data, paired, indices) {
-#   control <- data$control[indices]
-#   test <- data$test[indices]
-#   
-#   cd <- effsize(control, test, paired)
-#   
-#   return(cd)
-# }
-```
 
 ## Check effsize
 
