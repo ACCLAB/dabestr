@@ -12,10 +12,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Load libraries
 
 ```{r load.libraries}
-Packages <- c("dplyr", "effsize"#, "boot", "dabestr"
-              )
-
-lapply(Packages, library, character.only = TRUE)
+library(dplyr)
+library(dabestr)
+# Packages <- c("dplyr", "effsize"#, "boot", "dabestr"
+#               )
+# 
+# lapply(Packages, library, character.only = TRUE)
 ```
 
 ## Create Dummy Data
@@ -41,23 +43,33 @@ wide.data <-
     Gender = gender, ID = id)
 
 
-tidy.data   <- 
-  wide.data %>%
-  tidyr::gather(key = Group, value = Measurement, -ID, -Gender)
+tidy.data   <- wide.data %>% tidyr::gather(key = Group, value = Measurement, -ID, -Gender)
 
 ```
 
 
 
+```{r test.out.named.ylabel.list}
+
+effect.size.ylabeller <- list("mean difference", "median difference", "Cohen's d", "Hedges' g", "Cliff's delta")
+
+names(effect.size.ylabeller) <- c("mean_diff", "median_diff", "cohens_d", "hedges_g", "cliffs_delta")
+```
+
+
 ```{r sketch1}
 
-dbp1 <- dabestr::dabest_proto(tidy.data, Group, Measurement,
-                    idx = c("Control1", "Group1"),
-                    paired = FALSE)
 
-db <- dabest(tidy.data, Group, Measurement, func = median,
-              idx = c("Control1", "Group1"),
-              paired = FALSE)
+# 
+# db <- dabest(tidy.data, Group, Measurement, func = mean,
+#               # idx = c("Control1", "Group1"),
+#              
+#               idx = list(c("Control1", "Group1"),
+#                          c("Control2", "Group2")),
+#               id.col =  ID,
+#               paired = TRUE)
+# 
+# plot(db, color.column = Gender)
 
 # unpaired_mean_diff <- dabest_proto(iris, Species, Petal.Width,
 #                              idx = c("setosa", "versicolor"),
@@ -65,9 +77,22 @@ db <- dabest(tidy.data, Group, Measurement, func = median,
 # 
 # dbp %>% effect_size(ci = 95, reps = 5000)
 
-aa <- cohens_d(dbp1)
+unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
+                            idx = c("setosa", "versicolor"),
+                            paired = FALSE)
 
-plot(aa)
+dbp1 <- dabestr::dabest(tidy.data, Group, Measurement,
+                    idx = list(c("Control1", "Group1"),
+                               c("Control2", "Group2")),
+                    # idx = c("Group1", "Control1"),
+                    # id.col =  ID,
+                    paired = FALSE)
+res <- mean_diff(dbp1)
+
+
+cohens_d(dbp1) %>% plot(color.column = Gender)
+
+hedges_g(dbp1) %>% plot(color.column = Gender)
 
 ```
 

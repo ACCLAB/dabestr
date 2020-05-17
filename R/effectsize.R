@@ -1,6 +1,15 @@
-#' Compute the Mean Difference
+#' Compute Effect Size(s)
 #'
-#' @param x A dabest_proto object
+#' For each pair of observations in a \code{dabest} object, a desired effect
+#' size can be computed. Currently there are five effect sizes available:
+#' \itemize{ \item The \strong{mean difference}, given by \code{mean_diff()}.
+#' \item The \strong{median difference}, given by \code{median_diff()}. \item
+#' \strong{Cohen's \emph{d}}, given by \code{cohens_d()}. \item \strong{Hedges'
+#' \emph{g}}, given by \code{hedges_g()}. \item \strong{Cliff's delta}, given by
+#' \code{cliffs_delta()}. }
+#'
+#'
+#' @param x A \code{dabest} object.
 #'
 #' @param ci float, default 95. The level of the confidence intervals produced.
 #'   The default \code{ci = 95} produces 95\% CIs.
@@ -9,120 +18,159 @@
 #'   will be generated.
 #'
 #' @param seed integer, default 12345. This specifies the seed used to set the
-#' random number generator. Setting a seed ensures that the bootstrap confidence
-#' intervals for the same data will remain stable over separate runs/calls of
-#' this function. See \link{set.seed} for more details.
+#'   random number generator. Setting a seed ensures that the bootstrap
+#'   confidence intervals for the same data will remain stable over separate
+#'   runs/calls of this function. See \link{set.seed} for more details.
 #'
-#' @return Difference of means for treatment vs. control.
+#'
+#'
+#' @return A \code{dabest_effsize} object with 10 elements.
+#'
+#'   \describe{
+#'
+#'   \item{\code{data}}{ The dataset passed to \code{\link{dabest}}, as a
+#'   \code{\link[tibble]{tibble}}. }
+#'
+#'   \item{\code{x} and \code{y}}{ The columns in \code{data} used to plot the x
+#'   and y axes, respectively, as supplied to \code{\link{dabest}}. These are
+#'   \href{https://adv-r.hadley.nz/quasiquotation.html}{quoted variables} for
+#'   \href{https://tidyeval.tidyverse.org/}{tidy evaluation} during the
+#'   computation of effect sizes. }
+#'
+#'   \item{\code{idx}}{ The vector of control-test groupings as initially passed
+#'   to the \code{\link{dabest}} function. }
+#'
+#'   \item{\code{is.paired}}{ Whether or not the experiment consists of paired
+#'   (aka repeated) observations. Originally supplied to \code{\link{dabest}.} }
+#'
+#'   \item{\code{id.column}}{ If \code{is.paired} is \code{TRUE}, the column in
+#'   \code{data} that indicates the pairing of observations. As passed to
+#'   \code{\link{dabest}.} }
+#'
+#'   \item{\code{effect.size}}{ The effect size being computed. One of the
+#'   following: \code{c("mean_diff", "median_diff", "cohens_d", "hedges_g",
+#'   "cliffs_delta")}. }
+#'
+#'   \item{\code{.data.name}}{ The variable name of the dataset passed to
+#'   \code{\link{dabest}}. }
+#'
+#'   \item{\code{summary}}{ A \link{tibble} with a row for the mean or median of
+#'   each group in the \code{x} column of \code{data}, as indicated in
+#'   \code{idx}. }
+#'
+#'   \item{\code{result}}{
+#'
+#'   A \link{tibble} with the following 15 columns:
+#'
+#'   \describe{ \item{control_group, test_group}{ The name of the control group
+#'   and test group respectively.}
+#'
+#'   \item{control_size, test_size}{ The number of observations in the control
+#'   group and test group respectively. }
+#'
+#'   \item{effect_size}{ The effect size used. }
+#'
+#'   \item{paired}{ Is the difference paired (\code{TRUE}) or not
+#'   (\code{FALSE})? }
+#'
+#'   \item{difference}{ The effect size of the difference between the two
+#'   groups. }
+#'
+#'   \item{variable}{ The variable whose difference is being computed, ie. the
+#'   column supplied to \code{y}. }
+#'
+#'   \item{ci}{ The \code{ci} passed to this function. }
+#'
+#'   \item{bca_ci_low, bca_ci_high}{ The lower and upper limits of the Bias
+#'   Corrected and Accelerated bootstrap confidence interval. }
+#'
+#'   \item{pct_ci_low, pct_ci_high}{ The lower and upper limits of the
+#'   percentile bootstrap confidence interval. }
+#'
+#'   \item{bootstraps}{ The vector of bootstrap resamples generated. } } }
+#'
+#'   }
+#'
+#'
+#' @seealso \itemize{
+#'
+#'   \item \link[=dabest]{Loading data} for effect size computation.
+#'
+#'   \item \link[=plot.dabest_effsize]{Generating estimation plots} after effect size computation.
+#'
+#'   \item The \code{ \link[effsize:effsize-package]{effsize} } package, which
+#'   is used under the hood to compute Cohen's \emph{d}, Hedges' \emph{g}, and
+#'   Cliff's delta.
+#'
+#'   \item The \code{ \link[boot]{boot} } and \code{ \link[boot]{boot.ci} }
+#'   functions from the \code{boot} package, which generate the (nonparametric)
+#'   bootstrapped resamples used to compute the confidence intervals.
+#'
+#'   }
+#'
+#'
+#' @examples
+#' # Loading data for unpaired (two independent groups) analysis.
+#' unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
+#'                              idx = c("setosa", "versicolor"),
+#'                              paired = FALSE)
+#'
+#' # Display the results in a user-friendly format.
+#' unpaired_mean_diff
+#'
+#' # Compute the mean difference.
+#' mean_diff(unpaired_mean_diff)
+#'
+#' # Plotting the mean differences.
+#' mean_diff(unpaired_mean_diff) %>% plot()
 #'
 #' @export
 mean_diff    <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) UseMethod("mean_diff", x)
 
 #' @export
-mean_diff.dabest_proto <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) {
+mean_diff.dabest <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) {
   effect_size(x, ci = ci, reps = reps, seed = seed, effect.size = "mean_diff")
 }
 
 
-#' Compute the Median Difference
-#'
-#' @param x A dabest_proto object
-#'
-#' @param ci float, default 95. The level of the confidence intervals produced.
-#'   The default \code{ci = 95} produces 95\% CIs.
-#'
-#' @param reps integer, default 5000. The number of bootstrap resamples that
-#'   will be generated.
-#'
-#' @param seed integer, default 12345. This specifies the seed used to set the
-#' random number generator. Setting a seed ensures that the bootstrap confidence
-#' intervals for the same data will remain stable over separate runs/calls of
-#' this function. See \link{set.seed} for more details.
-#'
-#' @return Difference of medians for treatment vs. control.
-#'
+#' @rdname mean_diff
 #' @export
 median_diff  <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) UseMethod("median_diff", x)
 
 #' @export
-median_diff.dabest_proto <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) {
+median_diff.dabest <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) {
   effect_size(x, ci = ci, reps = reps, seed = seed, effect.size = "median_diff")
 }
 
 
-#' Compute Cohen's d
-#'
-#' @param x A dabest_proto object
-#'
-#' @param ci float, default 95. The level of the confidence intervals produced.
-#'   The default \code{ci = 95} produces 95\% CIs.
-#'
-#' @param reps integer, default 5000. The number of bootstrap resamples that
-#'   will be generated.
-#'
-#' @param seed integer, default 12345. This specifies the seed used to set the
-#' random number generator. Setting a seed ensures that the bootstrap confidence
-#' intervals for the same data will remain stable over separate runs/calls of
-#' this function. See \link{set.seed} for more details.
-#'
-#' @return Cohen's d.
+#' @rdname mean_diff
 #' @export
 cohens_d     <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) UseMethod("cohens_d", x)
 
 #' @export
-cohens_d.dabest_proto <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) {
+cohens_d.dabest <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) {
   effect_size(x, ci = ci, reps = reps, seed = seed, effect.size = "cohens_d")
 }
 
 
 
-#' Compute Hedges' g
-#'
-#' @param x A dabest_proto object
-#'
-#' @param ci float, default 95. The level of the confidence intervals produced.
-#'   The default \code{ci = 95} produces 95\% CIs.
-#'
-#' @param reps integer, default 5000. The number of bootstrap resamples that
-#'   will be generated.
-#'
-#' @param seed integer, default 12345. This specifies the seed used to set the
-#' random number generator. Setting a seed ensures that the bootstrap confidence
-#' intervals for the same data will remain stable over separate runs/calls of
-#' this function. See \link{set.seed} for more details.
-#'
-#' @return Difference of means for treatment vs. control.
+#' @rdname mean_diff
 #' @export
 hedges_g     <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) UseMethod("hedges_g", x)
 
 #' @export
-hedges_g.dabest_proto <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) {
+hedges_g.dabest <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) {
   effect_size(x, ci = ci, reps = reps, seed = seed, effect.size = "hedges_g")
 }
 
 
 
-#' Compute Cliff's delta
-#'
-#' @param x A dabest_proto object
-#'
-#' @param ci float, default 95. The level of the confidence intervals produced.
-#'   The default \code{ci = 95} produces 95\% CIs.
-#'
-#' @param reps integer, default 5000. The number of bootstrap resamples that
-#'   will be generated.
-#'
-#' @param seed integer, default 12345. This specifies the seed used to set the
-#' random number generator. Setting a seed ensures that the bootstrap confidence
-#' intervals for the same data will remain stable over separate runs/calls of
-#' this function. See \link{set.seed} for more details.
-#'
-#' @return Difference of means for treatment vs. control.
+#' @rdname mean_diff
 #' @export
 cliffs_delta <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) UseMethod("cliffs_delta", x)
 
 #' @export
-cliffs_delta.dabest_proto <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) {
+cliffs_delta.dabest <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) {
   effect_size(x, ci = ci, reps = reps, seed = seed, effect.size = "cliffs_delta")
 }
 
@@ -150,7 +198,8 @@ cohens_d_ <- function(control, treatment, paired) {
 
 hedges_g_ <- function(control, treatment, paired) {
   cd <- cohens_d_(treatment, control, paired=paired)
-  corr.factor <- hedges_correction(treatment, control)
+  # not sure why I have to negate this....
+  corr.factor <- -hedges_correction(treatment, control)
   return(cd * corr.factor)
 }
 
@@ -175,8 +224,8 @@ hedges_correction <- function(x1, x2) {
 
   deg.freedom <- n1 + n2 - 2
   numer       <- gamma(deg.freedom/2)
-  denom0      <- gamma((df - 1) / 2)
-  denom       <- sqrt((df / 2)) * denom0
+  denom0      <- gamma((deg.freedom - 1) / 2)
+  denom       <- sqrt((deg.freedom / 2)) * denom0
 
   if (is.infinite(numer) | is.infinite(denom)) {
     # Occurs when df is too large.
@@ -250,9 +299,9 @@ effsize_boot <- function(effsize, data, paired, indices) {
 effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
 
   #### Check object class ####
-  if (class(.data)[1] != "dabest_proto") {
+  if (class(.data)[1] != "dabest") {
     stop(paste(
-      "The object you are plotting is not a `dabest_proto` class object. ",
+      "The object you are plotting is not a `dabest` class object. ",
       "Please check again! ")
     )
   }
@@ -416,7 +465,7 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
         test_group = grp,
         control_size = length(c),
         test_size = length(t),
-        func = effect.size,
+        effect_size = effect.size,
         paired = paired,
         variable = y_quoname,
         difference = boot_result$t0,
@@ -476,15 +525,15 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
     id.column = id.col_enquo,
     is.paired = is.paired,
     effect.size = effect.size,
+    .data.name = data.name,
     result = result,
-    summary = summaries,
-    .data.name = data.name
+    summary = summaries
   )
 
 
 
-  #### Append the custom class `dabest_effsize_proto`. ####
-  class(out) <- c("dabest_effsize_proto", "list")
+  #### Append the custom class `dabest_effsize`. ####
+  class(out) <- c("dabest_effsize", "list")
 
 
 
@@ -494,32 +543,34 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
 
 
 
-#' Print a `dabest_effsize_proto` object
+#' Print a `dabest_effsize` object
 #'
-#' @param dabest.effsize A \code{dabest_effsize_proto} object, generated by \code{compute.effect.size}.
+#' @param x A \code{dabest_effsize} object, generated by one of the
+#'   \link[=mean_diff]{effect size computation} functions.
 #'
-#' @param ... Signature for S3 generic function.
+#' @param signif_digits Integer, default 3. All numeric figures in the printed
+#'   output will be rounded off to this number of significant digits.
 #'
 #'
-#' @return A summary of the experimental designs.
+#' @return A summary of the effect sizes and respective confidence intervals.
 #'
 #' @examples
 #' # Performing unpaired (two independent groups) analysis.
 #' unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
 #'                              idx = c("setosa", "versicolor"),
 #'                              paired = FALSE) %>%
-#'                      compute.effect.siz
+#'                       mean_diff()
 #'
 #' # Display the results in a user-friendly format.
 #' print(unpaired_mean_diff)
 #'
 #' @export
-print.dabest_effsize_proto <- function(x, ..., signif_digits = 3) {
+print.dabest_effsize <- function(x, ..., signif_digits = 3) {
 
   #### Check object class ####
-  if (class(x)[1] != "dabest_effsize_proto") {
+  if (class(x)[1] != "dabest_effsize") {
     stop(paste(
-      "The object you are plotting is not a `dabest_effsize_proto` class object. ",
+      "The object you are plotting is not a `dabest_effsize` class object. ",
       "Please check again! ")
     )
   } else {
