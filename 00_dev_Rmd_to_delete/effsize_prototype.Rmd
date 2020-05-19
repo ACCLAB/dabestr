@@ -49,13 +49,6 @@ tidy.data   <- wide.data %>% tidyr::gather(key = Group, value = Measurement, -ID
 
 
 
-```{r test.out.named.ylabel.list}
-
-effect.size.ylabeller <- list("mean difference", "median difference", "Cohen's d", "Hedges' g", "Cliff's delta")
-
-names(effect.size.ylabeller) <- c("mean_diff", "median_diff", "cohens_d", "hedges_g", "cliffs_delta")
-```
-
 
 ```{r sketch1}
 
@@ -77,22 +70,23 @@ names(effect.size.ylabeller) <- c("mean_diff", "median_diff", "cohens_d", "hedge
 # 
 # dbp %>% effect_size(ci = 95, reps = 5000)
 
-unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
-                            idx = c("setosa", "versicolor"),
-                            paired = FALSE)
+# unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
+#                             idx = c("setosa", "versicolor"),
+#                             paired = FALSE)
 
-dbp1 <- dabestr::dabest(tidy.data, Group, Measurement,
+dbp1 <- dabest(tidy.data, Group, Measurement,
                     idx = list(c("Control1", "Group1"),
                                c("Control2", "Group2")),
                     # idx = c("Group1", "Control1"),
                     # id.col =  ID,
                     paired = FALSE)
+
 res <- mean_diff(dbp1)
 
 
-cohens_d(dbp1) %>% plot(color.column = Gender)
+cohens_d(dbp1) %>% plot(color.column = Gender, show.legend = FALSE)
 
-hedges_g(dbp1) %>% plot(color.column = Gender)
+my_plot <- hedges_g(dbp1) %>% plot(color.column = Gender)
 
 ```
 
@@ -193,25 +187,5 @@ set.seed(NULL)
 
 ```
 
-```{r create my own boot object}
-# # too damn complicated...
-
-# my.boot.object <- list()
-# 
-# my.boot.object$t0 <- unpaired_result$t0
-# my.boot.object$t <- unpaired_result$t
-# my.boot.object$R <- unpaired_result$R
-# my.boot.object$sim <- "ordinary"
-# my.boot.object$stype <- "i"
-# my.boot.object$statistic <- es.boot
-# 
-# 
-# 
-# class(my.boot.object) <- c("boot", "dabest.boot", "list")
-# 
-# 
-# boot::boot.ci(my.boot.object, type=c("percent", "bca"))
-
-```
 
 

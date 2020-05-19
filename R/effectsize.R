@@ -96,7 +96,12 @@
 #'
 #'   \item \link[=dabest]{Loading data} for effect size computation.
 #'
-#'   \item \link[=plot.dabest_effsize]{Generating estimation plots} after effect size computation.
+#'   \item \link[=plot.dabest_effsize]{Generating estimation plots} after effect
+#'   size computation.
+#'
+#'   \item The
+#'   \href{http://www.estimationstats.com/#/about-effect-sizes}{mathematical
+#'   definitions} and equations used to compute each effect size.
 #'
 #'   \item The \code{ \link[effsize:effsize-package]{effsize} } package, which
 #'   is used under the hood to compute Cohen's \emph{d}, Hedges' \emph{g}, and
