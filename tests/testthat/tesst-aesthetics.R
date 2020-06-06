@@ -11,13 +11,15 @@ test_that("Gardner-Altman custom aesthetics", {
     test.data %>%
     dabest(Group, Measurement,
            idx = c("Control1", "Group1"),
-           paired = FALSE)
+           paired = FALSE) %>% mean_diff()
+
 
   paired <-
     test.data %>%
     dabest(Group, Measurement,
            idx = c("Control1", "Group1"),
-           paired = TRUE, id.col = ID)
+           paired = TRUE, id.col = ID) %>% mean_diff()
+
 
   #### Unpaired Gardner-Altman plot. ####
   # Test custom ylims.
@@ -145,8 +147,7 @@ test_that("Cumming custom aesthetics", {
     dabest(Group, Measurement,
            idx = list(c("Control1", "Group1", "Group3"),
                       c("Control2", "Group2", "Group4")),
-           paired = FALSE
-    )
+           paired = FALSE) %>% mean_diff()
 
 
   #### Multi-group Cumming plot. ####

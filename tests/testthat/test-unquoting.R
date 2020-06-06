@@ -6,15 +6,16 @@ context("Test Unquoting")
 test_that("Renaming `Species` in iris to `Groups` is kosher", {
   # Motivated by https://github.com/ACCLAB/dabestr/issues/35
 
-  # Run code here.
   canonical <- iris %>%
     dabest(Species, Sepal.Length,
-           c("virginica","setosa"))
+           c("virginica","setosa")) %>%
+    mean_diff()
 
   renamed   <- iris %>%
     rename(group=Species) %>%
     dabest(group, Sepal.Length,
-           c("virginica","setosa"))
+           c("virginica","setosa")) %>%
+    mean_diff()
 
   # Check results.
   canonical.result <- canonical$result
@@ -37,9 +38,11 @@ test_that("Using `grp` as x column is kosher", {
   # Run code here.
   set.seed(12345)
   df <- cbind(data.frame(value=sample(1:9, 100, replace = TRUE)/10),
-              data.frame(grp=sample(c("A", "B"), 100, replace = T))
+              data.frame(grp=sample(c("A", "B"), 100, replace = TRUE))
               )
-  df_analysed <- dabest(df, x = grp, y = value, idx = c("A", "B"))
+  df_analysed <- dabest(df, x = grp, y = value,
+                        idx = c("A", "B")) %>%
+                 mean_diff()
 
   # Check results.
   df_analysed.result <- df_analysed$result

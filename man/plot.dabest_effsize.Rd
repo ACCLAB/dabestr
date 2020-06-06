@@ -113,11 +113,11 @@ legend will not be displayed, even if \code{color.column} is supplied.}
 value} pairs to \link{geom_quasirandom}.}
 
 \item{sinaplot.params}{default \code{NULL}. Supply list of \code{keyword =
-value} pairs to \code{ggforce::geom_sina()}.}
+value} pairs to \code{\link[ggforce:geom_sina]{ggforce::geom_sina()}}.}
 
 \item{slopegraph.params}{default \code{NULL}. Supply list of \code{keyword =
-value} pairs to \code{ggplot2::geom_line()}. This controls the appearance
-of the lines plotted for a paired slopegraph.}
+value} pairs to \code{\link[ggplot2:geom_line]{ggplot2::geom_line()}}.
+This controls the appearance of the lines plotted for a paired slopegraph.}
 }
 \value{
 A \code{\link[ggplot2]{ggproto}} object. This object is actually

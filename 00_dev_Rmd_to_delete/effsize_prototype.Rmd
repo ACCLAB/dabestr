@@ -45,34 +45,54 @@ wide.data <-
 
 tidy.data   <- wide.data %>% tidyr::gather(key = Group, value = Measurement, -ID, -Gender)
 
+tidy.data$Group <- as.factor(tidy.data$Group)
+
 ```
 
+
+```{r get.data}
+# library(coin)
+library(PairedData)
+data(anscombe2)
+
+dat <- tidy.data %>% dplyr::filter(Group == "Control1" | Group == "Group1")
+
+tidy.anscombe2 <- anscombe2 %>% tidyr::gather(key = Group, value = Measurement, -Subject)
+
+group1.tidy.anscombe2 <- tidy.anscombe2 %>% dplyr::filter(Group == "X1" | Group == "Y1")
+```
+
+
+
+```{r t.test.comparison}
+#### anscombe2 ####
+# R's built-in t-tests
+t.test(anscombe2$X1, anscombe2$Y1, paired = TRUE)
+wilcox.test(anscombe2$X1, anscombe2$Y1, paired = TRUE, alternative = 'two.sided')
+
+
+# Using `coin`
+coin::wilcoxsign_test(Y1 ~ X1, 
+                      data = anscombe2,
+                      distribution = "exact",
+                      alternative = "two.sided")
+
+
+#### custom data ####
+
+coin::independence_test(data = dat,
+                        Measurement ~ Group,
+                        distribution = "asymptotic")
+
+coin::independence_test(data = dat,
+                        Measurement ~ Group,
+                        distribution = "approximate")
+```
 
 
 
 ```{r sketch1}
 
-
-# 
-# db <- dabest(tidy.data, Group, Measurement, func = mean,
-#               # idx = c("Control1", "Group1"),
-#              
-#               idx = list(c("Control1", "Group1"),
-#                          c("Control2", "Group2")),
-#               id.col =  ID,
-#               paired = TRUE)
-# 
-# plot(db, color.column = Gender)
-
-# unpaired_mean_diff <- dabest_proto(iris, Species, Petal.Width,
-#                              idx = c("setosa", "versicolor"),
-#                              paired = FALSE)
-# 
-# dbp %>% effect_size(ci = 95, reps = 5000)
-
-# unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
-#                             idx = c("setosa", "versicolor"),
-#                             paired = FALSE)
 
 dbp1 <- dabest(tidy.data, Group, Measurement,
                     idx = list(c("Control1", "Group1"),
@@ -113,79 +133,5 @@ aa <- hedges_g(dbp)
 
 plot(aa)
 ```
-
-
-## Scale Gardner-Altman contrast axes
-
-```{r}
-cohens_std <- function() {
-  
-}
-
-hedges_correction_factor <- function() {
-  
-}
-
-```
-
-
-
-
-## Check effsize
-
-```{r check.es}
-cohens.d(c1, g2, paired = TRUE)
-
-hedges.g(c1, g2, paired = TRUE)
-
-cliffs.delta(c1, g2)
-
-mean.diff(c1, g2)
-```
-
-## Try bootstrap!
-
-```{r try.bootstrap}
-# library(dqrng)
-# dqRNGkind("pcg64")
-
-#### Main API ####
-dabest(tidy.data, Group, Measurement, 
-       idx = c("Control1", "Group2"), 
-       # paired = TRUE, id.column = ID,
-       func = mean)
-
-
-#### Current Guts ####
-set.seed(12345)
-unpaired_result1 <- simpleboot::two.boot(g2, c1, FUN = mean, R = 5000)
-boot::boot.ci(unpaired_result1, type=c("percent", "bca"))
-set.seed(NULL)
-
-
-#### Prototype Guts ####
-input_list <- data.frame(control=c1, test=g2)
-set.seed(12345)
-
-
-ppp <- boot::boot(statistic = es.boot, R = 5000, 
-                  effsize = cliffs.delta, 
-                  data = input_list,
-                  paired = FALSE)
-
-boot::boot.ci(ppp, type=c("percent", "bca"))
-set.seed(NULL)
-
-
-
-
-
-set.seed(12345)
-paired_result <- simpleboot::pairs_boot(c1, g2, median.diff, R = 5000, paired=TRUE)
-boot::boot.ci(paired_result, type=c("percent", "bca"))
-set.seed(NULL)
-
-```
-
 
 

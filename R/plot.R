@@ -98,11 +98,11 @@
 #'   value} pairs to \link{geom_quasirandom}.
 #'
 #' @param sinaplot.params default \code{NULL}. Supply list of \code{keyword =
-#'   value} pairs to \code{ggforce::geom_sina()}.
+#'   value} pairs to \code{\link[ggforce:geom_sina]{ggforce::geom_sina()}}.
 #'
 #' @param slopegraph.params default \code{NULL}. Supply list of \code{keyword =
-#'   value} pairs to \code{ggplot2::geom_line()}. This controls the appearance
-#'   of the lines plotted for a paired slopegraph.
+#'   value} pairs to \code{\link[ggplot2:geom_line]{ggplot2::geom_line()}}.
+#'   This controls the appearance of the lines plotted for a paired slopegraph.
 #'
 #'
 #'
@@ -1036,7 +1036,7 @@ plot.dabest_effsize <- function(x, ...,
     aligned_spine = 'b'
     nrows <- 1
 
-    if (rlang::quo_is_null(color.col_enquo)) {
+    if (rlang::quo_is_null(color.col_enquo) | isFALSE(show.legend)) {
       plist <- list(rawdata.plot, delta.plot)
       ncols <- 2
       widths <- c(0.7, 0.3)

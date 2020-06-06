@@ -130,7 +130,7 @@ meandiff <- long.data \%>\%
 \seealso{
 \itemize{
 
- \item \link[=dabest_effsize]{Effect size computation} from the loaded data.
+ \item \link[=mean_diff]{Effect size computation} from the loaded data.
 
  \item \link[=plot.dabest_effsize]{Generating estimation plots} after effect size computation.
 
