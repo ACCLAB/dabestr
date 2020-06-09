@@ -1,0 +1,102 @@
+---
+title: "fix-broken-tests"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dabestr)
+library(dplyr)
+```
+
+
+```{r}
+canonical <- iris %>%
+  dabest(Species, Sepal.Length,
+         c("virginica","setosa")) %>%
+  mean_diff()
+
+
+
+renamed   <- iris %>%
+  rename(group=Species) %>%
+  dabest(group, Sepal.Length,
+         c("virginica","setosa")) %>%
+  hedges_g()
+```
+
+
+```{r}
+set.seed(12345)
+
+df <- cbind(data.frame(value=sample(1:9, 100, replace = TRUE)/10),
+              data.frame(grp=sample(c("A", "B"), 100, replace = TRUE))
+              )
+
+df_analysed <- dabest(df, x = grp, y = value,
+                      idx = c("A", "B")) %>%
+               mean_diff()
+
+# Check results.
+df_analysed.result <- df_analysed$result
+```
+
+
+```{r}
+ctrl <- iris %>% dplyr::filter(Species == 'virginica')
+ctrl <- ctrl$Sepal.Length
+      
+test <- iris %>% dplyr::filter(Species == 'setosa')
+test <- test$Sepal.Length
+
+input_list1 <- list(control=ctrl, test=test)
+input_list2 <- data.frame(control=ctrl, test=test)
+
+set.seed(12345)
+boot_result1 <- boot::boot(statistic = dabestr:::effsize_boot,
+                          R = 5000,
+                          effsize = dabestr:::mean_diff_,
+                          
+                          data = input_list1,
+                          
+                          paired = FALSE)
+set.seed(NULL)
+```
+
+
+
+```{r}
+ctrl <- iris %>% dplyr::filter(Species == 'virginica')
+ctrl <- ctrl$Sepal.Length
+      
+test <- iris %>% dplyr::filter(Species == 'setosa')
+test <- test$Sepal.Length
+
+input_list1 <- list(control=ctrl, test=test)
+input_list2 <- data.frame(control=ctrl, test=test)
+
+set.seed(12345)
+boot_result1 <- boot::boot(statistic = dabestr:::effsize_boot,
+                          R = 5000,
+                          effsize = dabestr:::mean_diff_,
+                          
+                          data = input_list1,
+                          
+                          paired = FALSE)
+set.seed(NULL)
+
+set.seed(12345)
+boot_result2 <- boot::boot(statistic = dabestr:::effsize_boot,
+                          R = 5000,
+                          effsize = dabestr:::mean_diff_,
+                          
+                          data = input_list2,
+                          
+                          paired = FALSE)
+
+mean(test) - mean(ctrl)
+```
+
