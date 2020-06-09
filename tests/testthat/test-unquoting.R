@@ -20,13 +20,13 @@ test_that("Renaming `Species` in iris to `Groups` is kosher", {
   # Check results.
   canonical.result <- canonical$result
   expect_equal(canonical.result$difference, -1.582)
-  expect_equal(canonical.result$bca_ci_low, -1.778)
-  expect_equal(canonical.result$bca_ci_high, -1.378)
+  expect_equal(canonical.result$bca_ci_low, -1.775353, tolerance=0.0001)
+  expect_equal(canonical.result$bca_ci_high, -1.398)
 
   renamed.result <- renamed$result
   expect_equal(renamed.result$difference, -1.582)
-  expect_equal(renamed.result$bca_ci_low, -1.778)
-  expect_equal(renamed.result$bca_ci_high, -1.378)
+  expect_equal(renamed.result$bca_ci_low, -1.775353, tolerance=0.0001)
+  expect_equal(renamed.result$bca_ci_high, -1.398)
 
 })
 
@@ -38,7 +38,7 @@ test_that("Using `grp` as x column is kosher", {
   # Run code here.
   set.seed(12345)
   df <- cbind(data.frame(value=sample(1:9, 100, replace = TRUE)/10),
-              data.frame(grp=sample(c("A", "B"), 100, replace = TRUE))
+              data.frame(grp=sample(c("A", "B",), 100, replace = TRUE))
               )
   df_analysed <- dabest(df, x = grp, y = value,
                         idx = c("A", "B")) %>%
