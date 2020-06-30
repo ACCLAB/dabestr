@@ -30,11 +30,14 @@ Encoding: UTF-8
 LazyData: true
 Depends:
     R (>= 3.5.0),
-    boot,
-    magrittr
+    magrittr,
+    stats,
+    utils
 Imports:
+    boot,
     cowplot,
     dplyr,
+    effsize,
     ellipsis,
     ggplot2 (>= 3.2),
     forcats,
@@ -46,7 +49,7 @@ Imports:
     simpleboot,
     stringr,
     tibble,
-    tidyr
+    tidyr,
 RoxygenNote: 7.1.0
 Suggests:
     knitr,

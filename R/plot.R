@@ -153,9 +153,12 @@
 #' @section References: \href{https://rdcu.be/bHhJ4}{Moving beyond P values:
 #'   Data analysis with estimation graphics.} Nature Methods 2019, 1548-7105.
 #'   Joses Ho, Tayfun Tumkaya, Sameer Aryal, Hyungwon Choi, Adam Claridge-Chang
-#' @importFrom magrittr %>%
-#' @importFrom stats median na.omit sd setNames
-#'
+#' @importFrom magrittr %>% %<>%
+#' @importFrom ggplot2 aes
+#' @importFrom rlang quo_name enquo quo_is_null
+#' @importFrom stats median na.omit sd setNames var
+#' @importFrom stringr str_interp
+#' @importFrom utils head
 #' @export
 plot.dabest_effsize <- function(x, ...,
                                 color.column        = NULL,
@@ -215,8 +218,8 @@ plot.dabest_effsize <- function(x, ...,
   # The variables below should are quosures!
   x_enquo            <-  dabest_effsize.object$x
   y_enquo            <-  dabest_effsize.object$y
-  x_quoname          <-  rlang::quo_name(x_enquo)
-  y_quoname          <-  rlang::quo_name(y_enquo)
+  x_quoname          <-  quo_name(x_enquo)
+  y_quoname          <-  quo_name(y_enquo)
 
   #### Decide if floating or slopegraph. ####
   # float.contrast and slopegraph
@@ -284,21 +287,21 @@ plot.dabest_effsize <- function(x, ...,
 
   #### Parse keywords. ####
   # color.column
-  color.col_enquo    <-  rlang::enquo(color.column)
+  color.col_enquo    <-  enquo(color.column)
   swarm.dodge        <-  0
 
-  if (rlang::quo_is_null(color.col_enquo)) {
+  if (quo_is_null(color.col_enquo)) {
     color.col_quoname  <- x_quoname
     groups.for.palette <- all.groups
 
-    color.aes          <- ggplot2::aes(col = !!x_enquo)
+    color.aes          <- aes(col = !!x_enquo)
 
   } else {
-    color.col_quoname  <- rlang::quo_name(color.col_enquo)
+    color.col_quoname  <- quo_name(color.col_enquo)
     groups.for.palette <- unique(for.plot[[color.col_quoname]])
     for.plot[[color.col_quoname]] %<>% as.factor # turn the color column into a factor.
 
-    color.aes          <- ggplot2::aes(col = !!color.col_enquo)
+    color.aes          <- aes(col = !!color.col_enquo)
   }
 
 
@@ -341,9 +344,9 @@ plot.dabest_effsize <- function(x, ...,
 
   # y-axes labels.
   if (is.null(rawplot.ylabel)) {
-    rawplot.ylabel <- stringr::str_interp("${y_quoname}\n")
+    rawplot.ylabel <- str_interp("${y_quoname}\n")
   } else {
-    rawplot.ylabel <- stringr::str_interp("${rawplot.ylabel}\n")
+    rawplot.ylabel <- str_interp("${rawplot.ylabel}\n")
   }
 
   # For labelling the y-axis.
@@ -355,20 +358,20 @@ plot.dabest_effsize <- function(x, ...,
   if (is.null(effsize.ylabel)) {
     if (isTRUE(is.paired)) {
       effsize.ylabel <-
-        stringr::str_interp("Paired\n${effect.size.ylabeller[[effect.size]]}")
+        str_interp("Paired\n${effect.size.ylabeller[[effect.size]]}")
     } else {
       effsize.ylabel <-
-        stringr::str_interp("Unpaired\n${effect.size.ylabeller[[effect.size]]}")
+        str_interp("Unpaired\n${effect.size.ylabeller[[effect.size]]}")
     }
   } else {
-    effsize.ylabel <- stringr::str_interp("${effsize.ylabel}\n")
+    effsize.ylabel <- str_interp("${effsize.ylabel}\n")
   }
 
 
 
 
   #### Create themes. ####
-  horizontal.line.width = 0.4
+  horizontal.line.width = 0.2
 
   non.floating.theme <-
     theme +
@@ -446,13 +449,12 @@ plot.dabest_effsize <- function(x, ...,
 
       } else {
         #### Create palette with correct number of groups. ####
-        cat(paste(stringr::str_interp(
-                  "${palette} has colors (${palette.max.colors}) ",
-                  "but ${color.col_quoname} has ${group.count} unique groups. ",
-                  "The palette has thus been extended automatically.",
-                                      )
+        cat(paste(str_interp("${palette} has colors (${palette.max.colors}) "),
+                  str_interp("but ${color.col_quoname} has ${group.count} unique groups. "),
+                  "The palette has thus been extended automatically."
                   )
-        )
+            )
+
 
         color.ramp.func <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(group.count, palette))
 
@@ -460,11 +462,9 @@ plot.dabest_effsize <- function(x, ...,
       }
 
     } else {
-      stop(paste(stringr::str_interp(
-                 "'${palette}' is not a valid ggplot2 palette.\n",
+      stop(paste(str_interp("'${palette}' is not a valid ggplot2 palette.\n"),
                  "Please see https://ggplot2.tidyverse.org/reference/scale_brewer.html#palettes\n",
                  "for all acceptable palettes."
-                                    )
                 )
           )
     }
@@ -474,8 +474,8 @@ plot.dabest_effsize <- function(x, ...,
     if (length(palette) >= group.count) {
       custom.pal <- setNames(palette, groups.for.palette)
     } else {
-      stop(paste(stringr::str_interp("${length(palette)} colors were supplied,\n"),
-                 stringr::str_interp("but ${group.count} colors are needed.")
+      stop(paste(str_interp("${length(palette)} colors were supplied,\n"),
+                 str_interp("but ${group.count} colors are needed.")
       )
       )
     }
@@ -489,6 +489,7 @@ plot.dabest_effsize <- function(x, ...,
     rawdata.plot <-
       ggplot2::ggplot() +
       rawdata.coord_cartesian +
+      ggplot2::scale_colour_manual(values = custom.pal) +
       ggplot2::ylab(rawplot.ylabel) +
       ggplot2::scale_x_discrete(labels = Ns$swarmticklabs,
                                 limits = all.groups)
@@ -502,24 +503,24 @@ plot.dabest_effsize <- function(x, ...,
         subplot[[x_quoname]] %>%
         factor(subplot_groups, ordered = TRUE)
 
-      if (rlang::quo_is_null(color.col_enquo)) {
+      if (quo_is_null(color.col_enquo)) {
         rawdata.plot <-
           rawdata.plot +
           ggplot2::geom_line(data = subplot,
                              size = slope.line.width,
                              alpha = 0.8,
-                             ggplot2::aes(!!x_enquo, !!y_enquo,
-                                          group = !!id.col)
-          )
+                             aes(!!x_enquo, !!y_enquo,
+                                          group = !!id.col))
       } else {
         rawdata.plot <-
           rawdata.plot +
           ggplot2::geom_line(data = subplot,
                              size = slope.line.width,
                              alpha = 0.75,
-                             ggplot2::aes(!!x_enquo, !!y_enquo,
-                                          group = !!id.col)) +
-          ggplot2::scale_colour_manual(values = custom.pal)
+                             aes(!!x_enquo, !!y_enquo,
+                                          group = !!id.col,
+                                          colour = !!color.col_enquo))# +
+          # ggplot2::scale_colour_manual(values = custom.pal)
 
       }
       # rawdata.plot <-
@@ -532,7 +533,7 @@ plot.dabest_effsize <- function(x, ...,
   } else { # swarmplot.
     rawdata.plot <-
       ggplot2::ggplot(data = for.plot,
-                      ggplot2::aes(!!x_enquo, !!y_enquo)) +
+                      aes(!!x_enquo, !!y_enquo)) +
       rawdata.coord_cartesian +
       # ggplot2::scale_color_brewer(palette = palette) +
       ggplot2::scale_colour_manual(values = custom.pal) +
@@ -589,7 +590,7 @@ plot.dabest_effsize <- function(x, ...,
         not.in.g.summs <- !(group.summaries %in% accepted.summaries)
 
         if (not.in.g.summs) {
-          err1 <- stringr::str_interp("${group.summaries} is not a recognized option.")
+          err1 <- str_interp("${group.summaries} is not a recognized option.")
           err2 <- "Accepted `group.summaries` are 'mean_sd' or 'median_quartiles'."
           stop(paste(err1, err2))
 
@@ -601,7 +602,7 @@ plot.dabest_effsize <- function(x, ...,
                 data     = for.tufte.lines,
                 size     = 1,
                 position = pos.nudge,
-                ggplot2::aes(x = !!x_enquo, y = mean,
+                aes(x = !!x_enquo, y = mean,
                              ymin = low.sd,
                              ymax = upper.sd)) ) +
             ggplot2::geom_point(
@@ -609,7 +610,7 @@ plot.dabest_effsize <- function(x, ...,
               size     = 0.75,
               position = pos.nudge,
               colour   = "white",
-              ggplot2::aes(x = !!x_enquo, y = mean))
+              aes(x = !!x_enquo, y = mean))
 
         } else if (group.summaries == 'median_quartiles') {
           rawdata.plot <-
@@ -619,7 +620,7 @@ plot.dabest_effsize <- function(x, ...,
                 data     = for.tufte.lines,
                 size     = 1,
                 position = pos.nudge,
-                ggplot2::aes(x = !!x_enquo, y = median,
+                aes(x = !!x_enquo, y = median,
                              ymin = low.quartile,
                              ymax = upper.quartile)) ) +
             ggplot2::geom_point(
@@ -627,7 +628,7 @@ plot.dabest_effsize <- function(x, ...,
               size     = 0.75,
               position = pos.nudge,
               colour   = "white",
-              ggplot2::aes(x = !!x_enquo, y = median))
+              aes(x = !!x_enquo, y = median))
         }
       }
     }
@@ -647,7 +648,7 @@ plot.dabest_effsize <- function(x, ...,
       ggplot2::geom_segment(
         color = "black",
         size  = horizontal.line.width,
-        ggplot2::aes(x    = 1,
+        aes(x    = 1,
                      xend = 3,
                      y    = summary_control,
                      yend = summary_control)) +
@@ -656,7 +657,7 @@ plot.dabest_effsize <- function(x, ...,
       ggplot2::geom_segment(
         color = "black",
         size  = horizontal.line.width,
-        ggplot2::aes(x    = 2,
+        aes(x    = 2,
                      xend = 3,
                      y    = summary_test,
                      yend = summary_test))
@@ -727,7 +728,7 @@ plot.dabest_effsize <- function(x, ...,
   delta.plot <-
     ggplot2::ggplot(boots.for.plot, na.rm = TRUE) +
     geom_flat_violin(
-      ggplot2::aes(!!x_enquo, !!y_enquo),
+      aes(!!x_enquo, !!y_enquo),
       na.rm  =  TRUE,
       width  =  flat.violin.width,
       adjust =  flat.violin.adjust,
@@ -753,13 +754,13 @@ plot.dabest_effsize <- function(x, ...,
       data  = boot.result,
       color = "black",
       size  = effsize.markersize,
-      ggplot2::aes(test_group, difference)) +
+      aes(test_group, difference)) +
     ggplot2::geom_errorbar(
       data  = boot.result,
       color = "black",
       width = 0,
       size  = 0.75,
-      ggplot2::aes(x    = test_group,
+      aes(x    = test_group,
                    ymin = bca_ci_low,
                    ymax = bca_ci_high))
 
@@ -778,7 +779,6 @@ plot.dabest_effsize <- function(x, ...,
 
 
     } else if (effect.size %in% c("cohens_d", "hedges_g")) {
-      # TODO
       # Added in v0.3.0.
       IDX  <- idx[[1]] # Assume there is only 1 idx group.
       ctrl <- raw.data %>% dplyr::filter(!!x_enquo == IDX[1])
@@ -828,7 +828,7 @@ plot.dabest_effsize <- function(x, ...,
                             y     = boot.result$difference[1],
                             yend  = boot.result$difference[1]) +
       ggplot2::scale_x_discrete(labels =
-                                  c(stringr::str_interp("${all.groups[2]}\nminus ${all.groups[1]}")) ) +
+                                  c(str_interp("${all.groups[2]}\nminus ${all.groups[1]}")) ) +
       floating.theme
 
 
@@ -843,7 +843,7 @@ plot.dabest_effsize <- function(x, ...,
       test_groups   <- subplot_groups[2: length(subplot_groups)]
 
       labels <- c(" ",
-                  paste(test_groups, stringr::str_interp("minus\n${control_group}"),
+                  paste(test_groups, str_interp("minus\n${control_group}"),
                         sep = "\n"))
 
       delta.tick.labs[[i]] = labels
@@ -966,7 +966,7 @@ plot.dabest_effsize <- function(x, ...,
 
 
   #### Handle color legend. ####
-  if (!rlang::quo_is_null(color.col_enquo)) {
+  if (!quo_is_null(color.col_enquo)) {
     legend <- cowplot::get_legend(rawdata.plot)
   }
   # Remove the legend from the rawplot.
@@ -990,7 +990,7 @@ plot.dabest_effsize <- function(x, ...,
 
       suffix.spacing        <- rep(" ", space.diff)
 
-      rawplot.yticks.labels <- paste(stringr::str_interp(suffix.spacing),
+      rawplot.yticks.labels <- paste(str_interp(suffix.spacing),
                                      rawplot.yticks.labels)
       rawdata.plot <-
         rawdata.plot +
@@ -1003,7 +1003,7 @@ plot.dabest_effsize <- function(x, ...,
 
       suffix.spacing          <- rep(" ", space.diff)
 
-      deltaplot.yticks.labels <- paste(stringr::str_interp(suffix.spacing),
+      deltaplot.yticks.labels <- paste(str_interp(suffix.spacing),
                                        deltaplot.yticks.labels)
 
       delta.plot <- delta.plot +
@@ -1036,7 +1036,7 @@ plot.dabest_effsize <- function(x, ...,
     aligned_spine = 'b'
     nrows <- 1
 
-    if (rlang::quo_is_null(color.col_enquo) | isFALSE(show.legend)) {
+    if (quo_is_null(color.col_enquo) | isFALSE(show.legend)) {
       plist <- list(rawdata.plot, delta.plot)
       ncols <- 2
       widths <- c(0.7, 0.3)
@@ -1052,7 +1052,7 @@ plot.dabest_effsize <- function(x, ...,
     nrows <- 2
 
     # Added in v0.3.0: option to not display the color legend.
-    if (rlang::quo_is_null(color.col_enquo) | isFALSE(show.legend)) {
+    if (quo_is_null(color.col_enquo) | isFALSE(show.legend)) {
       plist <- list(rawdata.plot, delta.plot)
       ncols <- 1
       widths <- c(1)

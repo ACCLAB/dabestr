@@ -1,5 +1,5 @@
 
-## v0.2.5
+## v0.3.0
 
 This is a new version with a bugfix and new features.
 

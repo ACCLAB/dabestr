@@ -117,44 +117,42 @@
 #'
 #' @examples
 #' # Loading data for unpaired (two independent groups) analysis.
-#' unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
-#'                              idx = c("setosa", "versicolor"),
-#'                              paired = FALSE)
+#' petal_widths <- dabest(iris, Species, Petal.Width,
+#'                        idx = c("setosa", "versicolor"),
+#'                        paired = FALSE)
 #'
-#' # Display the results in a user-friendly format.
-#' unpaired_mean_diff
 #'
 #' # Compute the mean difference.
-#' mean_diff(unpaired_mean_diff)
+#' mean_diff(petal_widths)
 #'
 #' # Plotting the mean differences.
-#' mean_diff(unpaired_mean_diff) %>% plot()
+#' mean_diff(petal_widths) %>% plot()
 #'
 #' @export
-mean_diff    <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) UseMethod("mean_diff", x)
+mean_diff    <- function(x, ci = 95, reps = 5000 , seed = 12345) UseMethod("mean_diff", x)
 
 #' @export
-mean_diff.dabest <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) {
+mean_diff.dabest <- function(x, ci = 95, reps = 5000 , seed = 12345) {
   effect_size(x, ci = ci, reps = reps, seed = seed, effect.size = "mean_diff")
 }
 
 
 #' @rdname mean_diff
 #' @export
-median_diff  <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) UseMethod("median_diff", x)
+median_diff  <- function(x, ci = 95, reps = 5000 , seed = 12345) UseMethod("median_diff", x)
 
 #' @export
-median_diff.dabest <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) {
+median_diff.dabest <- function(x, ci = 95, reps = 5000 , seed = 12345) {
   effect_size(x, ci = ci, reps = reps, seed = seed, effect.size = "median_diff")
 }
 
 
 #' @rdname mean_diff
 #' @export
-cohens_d     <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) UseMethod("cohens_d", x)
+cohens_d     <- function(x, ci = 95, reps = 5000 , seed = 12345) UseMethod("cohens_d", x)
 
 #' @export
-cohens_d.dabest <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) {
+cohens_d.dabest <- function(x, ci = 95, reps = 5000 , seed = 12345) {
   effect_size(x, ci = ci, reps = reps, seed = seed, effect.size = "cohens_d")
 }
 
@@ -162,10 +160,10 @@ cohens_d.dabest <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) {
 
 #' @rdname mean_diff
 #' @export
-hedges_g     <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) UseMethod("hedges_g", x)
+hedges_g     <- function(x, ci = 95, reps = 5000 , seed = 12345) UseMethod("hedges_g", x)
 
 #' @export
-hedges_g.dabest <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) {
+hedges_g.dabest <- function(x, ci = 95, reps = 5000 , seed = 12345) {
   effect_size(x, ci = ci, reps = reps, seed = seed, effect.size = "hedges_g")
 }
 
@@ -173,10 +171,10 @@ hedges_g.dabest <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) {
 
 #' @rdname mean_diff
 #' @export
-cliffs_delta <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) UseMethod("cliffs_delta", x)
+cliffs_delta <- function(x, ci = 95, reps = 5000 , seed = 12345) UseMethod("cliffs_delta", x)
 
 #' @export
-cliffs_delta.dabest <- function(x, ..., ci = 95, reps = 5000 , seed = 12345) {
+cliffs_delta.dabest <- function(x, ci = 95, reps = 5000 , seed = 12345) {
   effect_size(x, ci = ci, reps = reps, seed = seed, effect.size = "cliffs_delta")
 }
 
@@ -287,21 +285,51 @@ cohen_d_standardizers <- function(x1, x2) {
 
 
 
+effsize_boot <- function(data, effsize_func, R = 5000, paired = FALSE) {
+
+  func <- match.fun(effsize_func)
+
+  # Create stata for resampling.
+  s <- c(rep(1, length(data$control)),
+         rep(2, length(data$test)))
 
 
+  bootboot <- function(d, indicies, paired) {
+    c <- d[indicies[s == 1]]
+    t <- d[indicies[s == 2]]
 
-effsize_boot <- function(effsize, data, paired, indices) {
-  control <- data$control[indices]
-  test <- data$test[indices]
+    return(func(c, t, paired))
+  }
 
-  cd <- effsize(control, test, paired)
+  b <- boot(
+    c(data$control, data$test),
+    statistic = bootboot,
+    R = R,
+    strata = s,
+    paired = paired)
 
-  return(cd)
+  return(b)
+
 }
 
 
+# effsize_boot <- function(effsize, data, paired, indices) {
+#   control <- data$control[indices]
+#   test <- data$test[indices]
+#
+#   cd <- effsize(control, test, paired)
+#
+#   return(cd)
+# }
 
+
+
+#' @importFrom boot boot boot.ci
+#' @importFrom dplyr arrange bind_rows filter group_by summarize
 #' @importFrom magrittr %>%
+#' @importFrom rlang quo_name
+#' @importFrom stringr str_interp
+#' @importFrom tibble tibble
 effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
 
   #### Check object class ####
@@ -325,10 +353,10 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
   # The variables below should are quosures!
   x_enquo             <-  .data$x
   y_enquo             <-  .data$y
-  effect.size_enquo   <-  rlang::quo_name(effect.size)
+  effect.size_enquo   <-  quo_name(effect.size)
 
-  x_quoname           <-  rlang::quo_name(x_enquo)
-  y_quoname           <-  rlang::quo_name(y_enquo)
+  x_quoname           <-  quo_name(x_enquo)
+  y_quoname           <-  quo_name(y_enquo)
 
   # effect.size_enquo   <-  rlang::enquo(effect.size)
   # effect.size_quoname <-  rlang::quo_name(effect.size_enquo)
@@ -361,22 +389,22 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
 
 
   #### Loop through each comparison group. ####
-  result <- tibble::tibble() # To capture output.
+  result <- tibble() # To capture output.
 
   for (group in idx) {
 
     # Check the control group (`group[1]`) is in the x-column.
     if (identical(group[1] %in% raw.data[[x_quoname]], FALSE)) {
 
-      err1 <- stringr::str_interp("${group[1]} is not found")
-      err2 <- stringr::str_interp("in the ${x_quoname} column.")
+      err1 <- str_interp("${group[1]} is not found")
+      err2 <- str_interp("in the ${x_quoname} column.")
 
       stop(paste(err1, err2))
     }
 
     # Patch in v0.2.2.
     # Note how we have to unquote both the x_enquo, and the group name!
-    ctrl <- raw.data %>% dplyr::filter(!!x_enquo == !!group[1])
+    ctrl <- raw.data %>% filter(!!x_enquo == !!group[1])
 
     ctrl <- ctrl[[y_quoname]]
 
@@ -385,7 +413,7 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
     # If ctrl is length 0, stop!
     if (length(c) == 0) {
       stop(
-        stringr::str_interp(
+        str_interp(
           c("There are zero numeric observations in the group ${group[1]}.")
         )
       )
@@ -401,7 +429,7 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
       # Check if the current group is in the x-column.
       if (identical(grp %in% raw.data[[x_quoname]], FALSE)) {
         stop(
-          stringr::str_interp(
+          str_interp(
             "${grp} is not found in the ${x_quoname} column."
           )
         )
@@ -409,14 +437,14 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
 
       # Patch in v0.2.2.
       # Note how we have to unquote both x_enquo, and grp!
-      test <- raw.data %>% dplyr::filter(!!x_enquo == !!grp)
+      test <- raw.data %>% filter(!!x_enquo == !!grp)
       test <- test[[y_quoname]]
       t <- na.omit(test)
 
       # If current test group is length 0, stop!
       if (length(t) == 0) {
         stop(
-          stringr::str_interp(
+          str_interp(
             c("There are zero numeric observations in the group ${grp}.")
           )
         )
@@ -425,15 +453,12 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
 
 
       #### Compute bootstrap. ####
-      input_list <- data.frame(control=ctrl, test=test)
+      datalist <- list(control = ctrl, test = test)
 
       set.seed(seed)
+      boot_result <- effsize_boot(datalist, effsize_func = es,
+                                  R = reps, paired = paired)
 
-      boot_result <- boot::boot(statistic = effsize_boot,
-                               R = reps,
-                               effsize = es,
-                               data = input_list,
-                               paired = paired)
       set.seed(NULL)
 
       # if (identical(paired, FALSE)) {
@@ -455,17 +480,17 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
       #### Compute confidence interval. ####
       # check CI.
       if (ci < 0 | ci > 100) {
-        err_string <- stringr::str_interp(
+        err_string <- str_interp(
           "`ci` must be between 0 and 100, not ${ci}"
         )
         stop(err_string)
       }
 
-      bootci <- boot::boot.ci(boot_result, conf = ci/100, type = c("perc", "bca"))
+      bootci <- boot.ci(boot_result, conf = ci/100, type = c("perc", "bca"))
 
 
       #### Save pairwise result. ####
-      row <- tibble::tibble(
+      row <- tibble(
         # Convert the name of `func` to a string.
         control_group = group[1],
         test_group = grp,
@@ -483,7 +508,7 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
         bootstraps = list(as.vector(boot_result$t)),
         nboots = length(boot_result$t)
       )
-      result <- dplyr::bind_rows(result, row)
+      result <- bind_rows(result, row)
     }
   }
 
@@ -495,9 +520,9 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
   #### Compute summaries. ####
   summaries <-
     raw.data %>%
-    dplyr::filter(!!x_enquo %in% all.groups) %>%
-    dplyr::group_by(!!x_enquo) %>%
-    dplyr::summarize(func_quoname = summ_func(!!y_enquo))
+    filter(!!x_enquo %in% all.groups) %>%
+    group_by(!!x_enquo) %>%
+    summarize(func_quoname = summ_func(!!y_enquo))
 
   colnames(summaries) <- c(x_quoname, summ_name)
 
@@ -506,7 +531,7 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
     summaries[[x_quoname]] %>%
     factor(all.groups, ordered = TRUE)
 
-  summaries <- summaries %>% dplyr::arrange(!!x_enquo)
+  summaries <- summaries %>% arrange(!!x_enquo)
 
 
 
@@ -518,7 +543,7 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
   # and now forcats::as_factor() should only take the object to coerce.
   data.out[[x_quoname]] <- forcats::as_factor(data.out[[x_quoname]])
 
-  data.out <- dplyr::filter(data.out, !!x_enquo %in% all.groups)
+  data.out <- filter(data.out, !!x_enquo %in% all.groups)
 
 
 
@@ -554,6 +579,8 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
 #' @param x A \code{dabest_effsize} object, generated by one of the
 #'   \link[=mean_diff]{effect size computation} functions.
 #'
+#' @param ... S3 signature for generic plot function.
+#'
 #' @param signif_digits Integer, default 3. All numeric figures in the printed
 #'   output will be rounded off to this number of significant digits.
 #'
@@ -571,21 +598,22 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
 #' print(unpaired_mean_diff)
 #'
 #' @export
+#' @importFrom rlang quo_name
+#' @importFrom stringr str_interp
 print.dabest_effsize <- function(x, ..., signif_digits = 3) {
 
   #### Check object class ####
   if (class(x)[1] != "dabest_effsize") {
     stop(paste(
       "The object you are plotting is not a `dabest_effsize` class object. ",
-      "Please check again! ")
-    )
+      "Please check again! "))
   } else {
     dabest.effsize <- x
   }
 
   #### Get results table and y var. ####
   tbl <- dabest.effsize$result
-  var <- rlang::quo_name(dabest.effsize$y)
+  var <- quo_name(dabest.effsize$y)
 
   #### Print greeting header. ####
   print_greeting_header()
@@ -600,30 +628,30 @@ print.dabest_effsize <- function(x, ..., signif_digits = 3) {
   # cat(stringr::str_interp("Variable: ${var} \n\n"))
 
   #### Print dataset name, xvar, and yvar. ####
-  xvar = rlang::quo_name(dabest.effsize$x)
-  yvar = rlang::quo_name(dabest.effsize$y)
+  xvar = quo_name(dabest.effsize$x)
+  yvar = quo_name(dabest.effsize$y)
 
-  cat(stringr::str_interp("Dataset    :  ${dabest.effsize$.data.name}\n"))
-  cat(stringr::str_interp("X Variable :  ${xvar}\n"))
-  cat(stringr::str_interp("Y Variable :  ${yvar}\n\n"))
+  cat(str_interp("Dataset    :  ${dabest.effsize$.data.name}\n"))
+  cat(str_interp("X Variable :  ${xvar}\n"))
+  cat(str_interp("Y Variable :  ${yvar}\n\n"))
 
   #### Print each row. ####
   cat(apply(tbl, 1, printrow_, sigdig = signif_digits),
       sep = "\n")
 
   #### Endnote about BCa. ####
-  cat(stringr::str_interp("${tbl$nboots[1]} bootstrap resamples.\n"))
+  cat(str_interp("${tbl$nboots[1]} bootstrap resamples.\n"))
   cat("All confidence intervals are bias-corrected and accelerated.\n\n")
 
 }
 
 
 
-
+#' @importFrom stringr str_interp
 printrow_ <- function(my.row, sigdig = 3) {
   if (identical(my.row$paired, TRUE)) p <- "Paired" else p <- "Unpaired"
   ffunc <- my.row$func
-  line1 <- stringr::str_interp(
+  line1 <- str_interp(
     c(
       "${p} ${ffunc} difference of ",
       "${my.row$test_group} ",
@@ -634,7 +662,7 @@ printrow_ <- function(my.row, sigdig = 3) {
   )
 
 
-  line2 <- stringr::str_interp(
+  line2 <- str_interp(
     c("${signif(my.row$difference, sigdig)} ",
       "[${signif(my.row$ci, sigdig)}CI  ",
       "${signif(my.row$bca_ci_low, sigdig)}; ",
