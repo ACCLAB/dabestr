@@ -117,7 +117,7 @@ value} pairs to \code{\link[ggforce:geom_sina]{ggforce::geom_sina()}}.}
 
 \item{slopegraph.params}{default \code{NULL}. Supply list of \code{keyword =
 value} pairs to \code{ggplot2}'s
-\code{\link[ggplot2:geom_line]{geom_line}}.
+\code{\link[ggplot2:geom_path]{geom_line()}}.
 This controls the appearance of the lines plotted for a paired slopegraph.}
 }
 \value{
