@@ -4,6 +4,8 @@ context("Cumming plots")
 
 
 test_that("Cumming two-groups", {
+
+  skip_if(getRversion() == 4.1) # Skip for now...
   test.data <- generate.canned.data()
 
   unpaired <-
@@ -16,7 +18,6 @@ test_that("Cumming two-groups", {
 
   meandiff <- unpaired %>% mean_diff() %>% plot(color.column = Gender,
                                               float.contrast = FALSE)
-
   vdiffr::expect_doppelganger("Cumming two-groups unpaired mean diff",
                               meandiff)
 
