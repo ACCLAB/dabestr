@@ -128,15 +128,15 @@
 #' plot(unpaired_mean_diff)
 #'
 #'
-#'
-#' # Comparing versicolor and virginica petal width to setosa petal width.
-#' # Here we comupute the Hedges' g effect size.
+#' \dontrun{
+#' # Comparing versicolor and virginica petal widths to setosa petal width.
 #' shared_control_data <- dabest(iris, Species, Petal.Width,
 #'                               idx = c("setosa", "versicolor", "virginica")) %>%
-#'                        hedges_g()
+#'                        mean_diff()
 #'
 #' # Create a Cumming estimation plot.
 #' plot(shared_control_data)
+#' }
 #'
 #' @seealso \itemize{
 #'
