@@ -101,7 +101,8 @@
 #'   value} pairs to \code{\link[ggforce:geom_sina]{ggforce::geom_sina()}}.
 #'
 #' @param slopegraph.params default \code{NULL}. Supply list of \code{keyword =
-#'   value} pairs to \code{\link[ggplot2:geom_line]{ggplot2::geom_line()}}.
+#'   value} pairs to \code{ggplot2}'s
+#'   \code{\link[ggplot2:geom_line]{geom_line}}.
 #'   This controls the appearance of the lines plotted for a paired slopegraph.
 #'
 #'
