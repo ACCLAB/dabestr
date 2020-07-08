@@ -341,6 +341,12 @@ plot.dabest_effsize <- function(x, ...,
                       "Accepted plot types: 'swarmplot' and 'sinaplot'."))
   } else {
     rawplot.type <- "slopegraph"
+    if (is.null(slopegraph.params)) {
+      # Default slopegraph params.
+      swarmplot.params <- list(size = 0.5, alpha = 0.75)
+    } else if (class(slopegraph.params) != "list") {
+      stop("`swarmplot.params` is not a list.")
+    } else slopegraph.params[['mapping']] = color.aes
   }
 
   # y-axes labels.
@@ -487,16 +493,6 @@ plot.dabest_effsize <- function(x, ...,
   # slopegraph.
   if (rawplot.type == "slopegraph") {
 
-    rawdata.plot <-
-      ggplot2::ggplot() +
-      rawdata.coord_cartesian +
-      ggplot2::scale_colour_manual(values = custom.pal) +
-      ggplot2::ylab(rawplot.ylabel) +
-      ggplot2::scale_x_discrete(labels = Ns$swarmticklabs,
-                                limits = all.groups)
-
-    slope.line.width  <- 0.5
-
     for (subplot_groups in idx) {
       subplot <- dplyr::filter(raw.data, !!x_enquo %in% subplot_groups)
 
@@ -506,26 +502,23 @@ plot.dabest_effsize <- function(x, ...,
 
       if (quo_is_null(color.col_enquo)) {
         rawdata.plot <-
-          rawdata.plot +
-          ggplot2::geom_line(data = subplot,
-                             size = slope.line.width,
-                             alpha = 0.8,
-                             aes(!!x_enquo, !!y_enquo,
-                                          group = !!id.col))
+          ggplot2::ggplot(data = subplot,
+                          aes(!!x_enquo, !!y_enquo, group = !!id.col))
       } else {
         rawdata.plot <-
-          rawdata.plot +
-          ggplot2::geom_line(data = subplot,
-                             size = slope.line.width,
-                             alpha = 0.75,
-                             aes(!!x_enquo, !!y_enquo,
-                                          group = !!id.col,
-                                          colour = !!color.col_enquo))# +
-          # ggplot2::scale_colour_manual(values = custom.pal)
-
+          ggplot2::ggplot(data = subplot,
+                          aes(!!x_enquo, !!y_enquo, group = !!id.col,
+                              colour = !!color.col_enquo))
       }
-      # rawdata.plot <-
-      #   rawdata.plot + ggplot2::scale_colour_manual(values = custom.pal)
+
+      rawdata.plot <-
+        rawdata.plot +
+        rawdata.coord_cartesian +
+        ggplot2::scale_colour_manual(values = custom.pal) +
+        ggplot2::ylab(rawplot.ylabel) +
+        ggplot2::scale_x_discrete(labels = Ns$swarmticklabs,
+                                  limits = all.groups) +
+        do.call(ggplot2::geom_line, slopegraph.params)
 
     }
 
@@ -536,7 +529,6 @@ plot.dabest_effsize <- function(x, ...,
       ggplot2::ggplot(data = for.plot,
                       aes(!!x_enquo, !!y_enquo)) +
       rawdata.coord_cartesian +
-      # ggplot2::scale_color_brewer(palette = palette) +
       ggplot2::scale_colour_manual(values = custom.pal) +
       ggplot2::ylab(rawplot.ylabel) +
       ggplot2::scale_x_discrete(breaks = all.groups,
@@ -553,18 +545,6 @@ plot.dabest_effsize <- function(x, ...,
       } else {
         rawdata.plot <- rawdata.plot + non.floating.theme
       }
-
-      # if (isTRUE(float.contrast)) {
-      #   rawdata.plot <-
-      #     rawdata.plot +
-      #     do.call(ggbeeswarm::geom_beeswarm, swarmplot.params) +
-      #     floating.theme
-      # } else {
-      # rawdata.plot <-
-      #   rawdata.plot +
-      #   do.call(ggbeeswarm::geom_quasirandom, swarmplot.params) +
-      #   non.floating.theme
-      # }
 
 
     } else if (rawplot.type == 'sinaplot') {
