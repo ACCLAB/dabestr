@@ -650,10 +650,16 @@ print.dabest_effsize <- function(x, ..., signif_digits = 3) {
 #' @importFrom stringr str_interp
 printrow_ <- function(my.row, sigdig = 3) {
   if (identical(my.row$paired, TRUE)) p <- "Paired" else p <- "Unpaired"
-  ffunc <- my.row$func
+
+  # For labelling the y-axis.
+  effsizer <- list("mean difference", "median difference",
+                   "Cohen's d", "Hedges' g", "Cliff's delta")
+  names(effsizer) <- c("mean_diff", "median_diff",
+                       "cohens_d", "hedges_g", "cliffs_delta")
+
   line1 <- str_interp(
     c(
-      "${p} ${ffunc} difference of ",
+      "${p} ${effsizer[[my.row$effect_size]]} of ",
       "${my.row$test_group} ",
       "(n = ${my.row$test_size}) ",
       "minus ${my.row$control_group} ",
