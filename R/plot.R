@@ -130,7 +130,7 @@
 #'
 #' \dontrun{
 #' # Comparing versicolor and virginica petal widths to setosa petal width.
-#' shared_control_data <- dabest(iris, Species, Petal.Width,
+#' shared_control_data <- dabeıst(iris, Species, Petal.Width,
 #'                               idx = c("setosa", "versicolor", "virginica")) %>%
 #'                        mean_diff()
 #'
@@ -343,10 +343,11 @@ plot.dabest_effsize <- function(x, ...,
     rawplot.type <- "slopegraph"
     if (is.null(slopegraph.params)) {
       # Default slopegraph params.
-      swarmplot.params <- list(size = 0.5, alpha = 0.75)
+      slopegraph.params <- list(size = 0.5, alpha = 0.75)
+
     } else if (class(slopegraph.params) != "list") {
       stop("`swarmplot.params` is not a list.")
-    } else slopegraph.params[['mapping']] = color.aes
+      }
   }
 
   # y-axes labels.
@@ -493,36 +494,63 @@ plot.dabest_effsize <- function(x, ...,
   # slopegraph.
   if (rawplot.type == "slopegraph") {
 
+    rawdata.plot <-
+      ggplot2::ggplot() +
+      rawdata.coord_cartesian +
+      ggplot2::scale_colour_manual(values = custom.pal) +
+      ggplot2::ylab(rawplot.ylabel) +
+      ggplot2::scale_x_discrete(labels = Ns$swarmticklabs,
+                                limits = all.groups)
+
     for (subplot_groups in idx) {
+      # Assign subplot.
       subplot <- dplyr::filter(raw.data, !!x_enquo %in% subplot_groups)
 
       subplot[[x_quoname]] <-
         subplot[[x_quoname]] %>%
         factor(subplot_groups, ordered = TRUE)
 
-      if (quo_is_null(color.col_enquo)) {
-        rawdata.plot <-
-          ggplot2::ggplot(data = subplot,
-                          aes(!!x_enquo, !!y_enquo, group = !!id.col))
+      slopegraph.params[["data"]] <- subplot
+
+      # Assign aesthetic mappings.
+      if (rlang::quo_is_null(color.col_enquo)) {
+        slopegraph.aes <- aes(!!x_enquo, !!y_enquo,
+                              group = !!id.col)
       } else {
-        rawdata.plot <-
-          ggplot2::ggplot(data = subplot,
-                          aes(!!x_enquo, !!y_enquo, group = !!id.col,
-                              colour = !!color.col_enquo))
+        slopegraph.aes <- ggplot2::aes(!!x_enquo, !!y_enquo,
+                              group = !!id.col,
+                              col = !!color.col_enquo)
       }
 
+      slopegraph.params[["mapping"]] <- slopegraph.aes
+
+      # Create slopegraph
       rawdata.plot <-
         rawdata.plot +
-        rawdata.coord_cartesian +
-        ggplot2::scale_colour_manual(values = custom.pal) +
-        ggplot2::ylab(rawplot.ylabel) +
-        ggplot2::scale_x_discrete(labels = Ns$swarmticklabs,
-                                  limits = all.groups) +
         do.call(ggplot2::geom_line, slopegraph.params)
 
+      # if (rlang::quo_is_null(color.col_enquo)) {
+      #   rawdata.plot <-
+      #     rawdata.plot +
+      #     ggplot2::geom_line(data = subplot,
+      #                        size = slope.line.width,
+      #                        alpha = 0.8,
+      #                        ggplot2::aes(!!x_enquo, !!y_enquo,
+      #                                     group = !!id.col)
+      #     )
+      # } else {
+      #   rawdata.plot <-
+      #     rawdata.plot +
+      #     ggplot2::geom_line(data = subplot,
+      #                        size = slope.line.width,
+      #                        alpha = 0.75,
+      #                        ggplot2::aes(!!x_enquo, !!y_enquo,
+      #                                     group = !!id.col,
+      #                                     colour = !!color.col_enquo)
+      #                        # colour = factor(!!color.col_enquo))
+      #     )
+      # }
     }
-
-
 
   } else { # swarmplot.
     rawdata.plot <-
@@ -584,8 +612,8 @@ plot.dabest_effsize <- function(x, ...,
                 size     = 1,
                 position = pos.nudge,
                 aes(x = !!x_enquo, y = mean,
-                             ymin = low.sd,
-                             ymax = upper.sd)) ) +
+                    ymin = low.sd,
+                    ymax = upper.sd)) ) +
             ggplot2::geom_point(
               data     = for.tufte.lines,
               size     = 0.75,
@@ -602,8 +630,8 @@ plot.dabest_effsize <- function(x, ...,
                 size     = 1,
                 position = pos.nudge,
                 aes(x = !!x_enquo, y = median,
-                             ymin = low.quartile,
-                             ymax = upper.quartile)) ) +
+                    ymin = low.quartile,
+                    ymax = upper.quartile)) ) +
             ggplot2::geom_point(
               data     = for.tufte.lines,
               size     = 0.75,
@@ -874,6 +902,7 @@ plot.dabest_effsize <- function(x, ...,
 
       rawdata.plot <- rawdata.plot +
         ggplot2::geom_segment(
+          color = 'black',
           # size = segment.thickness,
           ggplot2::aes_(x    = xstart,
                         xend = end.idx + padding,
@@ -890,6 +919,7 @@ plot.dabest_effsize <- function(x, ...,
 
       rawdata.plot <- rawdata.plot +
         ggplot2::geom_segment(
+          color = 'black',
           x    = xstart,
           xend = xend,
           y    = segment.ypos,
