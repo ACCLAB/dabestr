@@ -156,7 +156,7 @@
 #'   Joses Ho, Tayfun Tumkaya, Sameer Aryal, Hyungwon Choi, Adam Claridge-Chang
 #' @importFrom magrittr %>% %<>%
 #' @importFrom ggplot2 aes
-#' @importFrom rlang quo_name enquo quo_is_null
+#' @importFrom rlang as_name enquo quo_is_null
 #' @importFrom stats median na.omit sd setNames var
 #' @importFrom stringr str_interp
 #' @importFrom utils head
@@ -219,8 +219,8 @@ plot.dabest_effsize <- function(x, ...,
   # The variables below should are quosures!
   x_enquo            <-  dabest_effsize.object$x
   y_enquo            <-  dabest_effsize.object$y
-  x_quoname          <-  quo_name(x_enquo)
-  y_quoname          <-  quo_name(y_enquo)
+  x_quoname          <-  as_name(x_enquo)
+  y_quoname          <-  as_name(y_enquo)
 
   #### Decide if floating or slopegraph. ####
   # float.contrast and slopegraph
@@ -298,7 +298,7 @@ plot.dabest_effsize <- function(x, ...,
     color.aes          <- aes(col = !!x_enquo)
 
   } else {
-    color.col_quoname  <- quo_name(color.col_enquo)
+    color.col_quoname  <- as_name(color.col_enquo)
     groups.for.palette <- unique(for.plot[[color.col_quoname]])
     for.plot[[color.col_quoname]] %<>% as.factor # turn the color column into a factor.
 

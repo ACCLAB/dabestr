@@ -133,7 +133,7 @@
 #'
 #'@importFrom magrittr %>%
 #'@importFrom stringr str_interp
-#'@importFrom rlang quo_name enquo quo_is_null
+#'@importFrom rlang as_name enquo quo_is_null
 #'@importFrom tibble as_tibble
 #'@importFrom dplyr select arrange filter
 #'@export
@@ -142,13 +142,13 @@ dabest <- function(
 
   #### Create quosures and quonames. ####
   data_enquo     <- enquo(.data)
-  data_quoname   <- quo_name(data_enquo)
+  data_quoname   <- as_name(data_enquo)
 
   x_enquo        <-  enquo(x)
-  x_quoname      <-  quo_name(x_enquo)
+  x_quoname      <-  as_name(x_enquo)
 
   y_enquo        <-  enquo(y)
-  y_quoname      <-  quo_name(y_enquo)
+  y_quoname      <-  as_name(y_enquo)
 
   id.col_enquo   <-  enquo(id.column)
 
@@ -168,7 +168,7 @@ dabest <- function(
 
   #### Handled if paired. ####
   if (isTRUE(paired)) {
-    id.col_quoname <-  quo_name(id.col_enquo)
+    id.col_quoname <-  as_name(id.col_enquo)
     # sort the data by id.col so we can be sure all the observations match up.
     data_for_diff  <-
       data_for_diff %>% arrange(!!x_enquo, !!id.col_enquo)
@@ -265,8 +265,8 @@ print.dabest <- function(x, ...) {
   cat("\n")
 
   #### Print xvar and yvar. ####
-  xvar = quo_name(dabest.object$x)
-  yvar = quo_name(dabest.object$y)
+  xvar = as_name(dabest.object$x)
+  yvar = as_name(dabest.object$y)
 
   cat(str_interp("X Variable :  ${xvar}\n"))
   cat(str_interp("Y Variable :  ${yvar}\n\n"))
