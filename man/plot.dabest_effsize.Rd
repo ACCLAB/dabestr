@@ -164,7 +164,7 @@ plot(unpaired_mean_diff)
 
 \dontrun{
 # Comparing versicolor and virginica petal widths to setosa petal width.
-shared_control_data <- dabest(iris, Species, Petal.Width,
+shared_control_data <- dabeıst(iris, Species, Petal.Width,
                               idx = c("setosa", "versicolor", "virginica")) \%>\%
                        mean_diff()
 
