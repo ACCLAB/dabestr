@@ -2,127 +2,78 @@
 % Please edit documentation in R/main.R
 \name{dabest}
 \alias{dabest}
-\title{Differences between Groups with Bootstrap Confidence Intervals}
+\title{Prepare Data for Analysis with dabestr}
 \usage{
-dabest(
-  .data,
-  x,
-  y,
-  idx,
-  paired = FALSE,
-  id.column = NULL,
-  ci = 95,
-  reps = 5000,
-  func = mean,
-  seed = 12345
-)
+dabest(.data, x, y, idx, paired = FALSE, id.column = NULL)
 }
 \arguments{
 \item{.data}{A data.frame or tibble.}
 
 \item{x, y}{Columns in \code{.data}.}
 
-\item{idx}{Accepts a vector containing factors or strings in the \code{x}
-column, or a list containing vectors as noted above.
-If a vector is supplied, the first element will be the control group,
-so all differences will be computed for every other group and this first group.
-If a list of vectors is supplied, a multi-plot will be generated,
-with the first element of each vector being the control group.}
+\item{idx}{A vector containing factors or strings in the \code{x} columns.
+These must be quoted (ie. surrounded by quotation marks). The first element
+will be the control group, so all differences will be computed for every
+other group and this first group.}
 
-\item{paired}{boolean, default FALSE. If TRUE, the two groups are treated as
-paired samples. The \code{control_group} group is treated as
-pre-intervention and the \code{test_group} group is considered
-post-intervention.}
+\item{paired}{Boolean, default FALSE. If TRUE, the two groups are treated as
+paired samples. The first group is treated as pre-intervention and the
+second group is considered post-intervention.}
 
-\item{id.column, }{default NULL. A column name indicating the identity of the
-datapoint if the data is paired. This must be supplied if paired is TRUE.}
-
-\item{ci}{float, default 95. The level of the confidence intervals produced.
-The default \code{ci = 95} produces 95\% CIs.}
-
-\item{reps}{integer, default 5000. The number of bootstrap resamples that
-will be generated.}
-
-\item{func}{function, default mean. This function will be applied to
-\code{control} and \code{test} individually, and the difference will be
-saved as a single bootstrap resample. Any NaNs will be removed
-automatically with \code{na.omit}.}
-
-\item{seed}{integer, default 12345. This specifies the seed used to set the
-random number generator. Setting a seed ensures that the bootstrap confidence
-intervals for the same data will remain stable over separate runs/calls of
-this function. See \link{set.seed} for more details.}
+\item{id.column}{Default NULL. A column name indicating the identity of the
+datapoint if the data is paired. \emph{This must be supplied if paired is
+\code{TRUE}.}}
 }
 \value{
-A list with 7 elements: \code{data}, \code{x}, \code{y}, \code{idx},
- \code{id.column}, \code{result}, and \code{summary}.
+A \code{dabest} object with 8 elements.
 
-  \code{data}, \code{x}, \code{y}, \code{id.column}, and \code{idx} are the
-  same keywords supplied to \code{dabest} as noted above. \cr \cr \code{x}
-  and \code{y} are quoted variables for tidy evaluation by \code{plot}. \cr
-  \cr \code{summary} is a \link{tibble} with \code{func} applied to every
-  group specified in \code{idx}. These will be used by \code{plot()} to
-  generate the estimation plot.
+ \describe{
 
-  \code{result} is a \link{tibble} with the following 15 columns:
+ \item{\code{data}}{ The dataset passed to \code{\link{dabest}}, stored here
+ as a \code{\link[tibble]{tibble}}. }
 
-  \item{control_group, test_group}{ The name of the control group
-  and test group respectively. }
+ \item{\code{x} and \code{y}}{ The columns in \code{data} used to plot the x
+ and y axes, respectively, as supplied to \code{\link{dabest}}. These are
+ \href{https://adv-r.hadley.nz/quasiquotation.html}{quoted variables} for
+ \href{https://tidyeval.tidyverse.org/}{tidy evaluation} during the
+ computation of effect sizes. }
 
-  \item{control_size, test_size}{ The number
-  of observations in the control group and test group respectively. }
+ \item{\code{idx}}{ The vector of control-test groupings. For each pair in
+ \code{idx}, an effect size will be computed by downstream \code{dabestr}
+ functions used to compute \link[=mean_diff]{effect sizes} (such as
+ \code{mean_diff()}.  }
 
-  \item{func}{ The \code{func} passed to \code{bootdiff}. }
+ \item{\code{is.paired}}{ Whether or not the experiment consists of paired
+ (aka repeated) observations. }
 
-  \item{paired}{ Is
-  the difference paired (\code{TRUE}) or not (\code{FALSE})? }
+ \item{\code{id.column}}{ If \code{is.paired} is \code{TRUE}, the column in
+ \code{data} that indicates the pairing of observations. }
 
-  \item{difference}{ The difference between the two groups; effectively
-  \code{func(test_group) - func(control_group)}. }
+ \item{\code{.data.name}}{ The variable name of the dataset passed to
+ \code{\link{dabest}}. }
 
-  \item{variable}{ The
-  variable whose difference is being computed, ie. the column supplied to
-  \code{y}. }
+ \item{\code{.all.groups}}{ All groups as indicated in the \code{idx}
+ argument. }
 
-  \item{ci}{ The \code{ci} passed to the \code{bootdiff}. }
-
-  \item{bca_ci_low, bca_ci_high}{ The lower and upper limits of the Bias
-  Corrected and Accelerated bootstrap confidence interval. }
-
-  \item{pct_ci_low, pct_ci_high}{ The lower and upper limits of the
-  percentile bootstrap confidence interval. }
-
-  \item{bootstraps}{ The array of bootstrap resamples generated. }
+ }
 }
 \description{
-\code{dabest} applies a summary function (\code{func}, default
-\code{\link{mean}}) to the groups listed in \code{idx}, which
-are factors/strings in the \code{x} column of \code{.data}. The first element
-of \code{idx} is the control group. The difference between
-\code{func(group_n)} and \code{func(control)} is computed, for every
-subsequent element of \code{idx}.\cr \cr For each comparison, a bootstrap
-confidence interval is constructed for the difference, and bias correction and
-acceleration is applied to correct for any skew. \code{dabest} uses bootstrap
-resampling to compute non-parametric assumption-free confidence intervals,
-and visualizes them using estimation plots with a specialized
-\code{\link{plot.dabest}} function.
+\code{dabest} prepares a
+\href{https://vita.had.co.nz/papers/tidy-data.pdf}{tidy dataset} for analysis
+using estimation statistics.
 }
 \details{
-Estimation statistics is a statistical framework that focuses on effect
-sizes and confidence intervals around them, rather than \emph{P} values and
+Estimation statistics is a statistical framework that focuses on effect sizes
+and confidence intervals around them, rather than \emph{P} values and
 associated dichotomous hypothesis testing.
+
+\code{dabest}() collates the data in preparation for the computation of
+\link[=mean_diff]{effect sizes}. Bootstrap resampling is used to compute
+non-parametric assumption-free confidence intervals. Visualization of the
+effect sizes and their confidence intervals using estimation plots is then
+performed with a specialized \link[=plot.dabest_effsize]{plotting} function.
 }
-\section{References}{
-
-\href{https://projecteuclid.org/euclid.ss/1032280214}{Bootstrap Confidence Intervals.}
-DiCiccio, Thomas J., and Bradley Efron.
-Statistical Science: vol. 11, no. 3, 1996. pp. 189–228.
-
-\href{https://www.crcpress.com/An-Introduction-to-the-Bootstrap/Efron-Tibshirani/p/book/9780412042317/}{An Introduction to the Bootstrap.} Efron, Bradley, and R. J. Tibshirani. 1994. CRC Press.
-}
-
 \examples{
-
 # Performing unpaired (two independent groups) analysis.
 unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
                              idx = c("setosa", "versicolor"),
@@ -131,9 +82,11 @@ unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
 # Display the results in a user-friendly format.
 unpaired_mean_diff
 
-# Produce an estimation plot.
-plot(unpaired_mean_diff)
+# Compute the mean difference.
+mean_diff(unpaired_mean_diff)
 
+# Plotting the mean differences.
+mean_diff(unpaired_mean_diff) \%>\% plot()
 
 # Performing paired analysis.
 # First, we munge the `iris` dataset so we can perform a within-subject
@@ -146,21 +99,10 @@ setosa.only  <-
   tidyr::gather(key = Metric, value = Value, -ID, -Species) \%>\%
   dplyr::filter(Species \%in\% c("setosa"))
 
-paired_mean_diff          <- dabest(
-                              setosa.only, Metric, Value,
-                              idx = c("Sepal.Length", "Sepal.Width"),
-                              paired = TRUE, id.col = ID
-                              )
-
-
-# Computing the median difference.
-unpaired_median_diff      <- dabest(
-                              iris, Species, Petal.Width,
-                              idx = c("setosa", "versicolor", "virginica"),
-                              paired = FALSE,
-                              func = median
-                              )
-
+paired_mean_diff <- dabest(setosa.only, Metric, Value,
+                           idx = c("Sepal.Length", "Sepal.Width"),
+                           paired = TRUE, id.col = ID) \%>\%
+                    mean_diff()
 
 
 
@@ -179,15 +121,18 @@ meandiff <- long.data \%>\%
               tidyr::gather(key = Group, value = Measurement) \%>\%
               dabest(x = Group, y = Measurement,
                      idx = c("Control", "Test1", "Test2"),
-                     paired = FALSE)
+                     paired = FALSE) \%>\%
+              mean_diff()
 
 
 
 }
 \seealso{
-\code{\link{plot.dabest}}, which generates an estimation plot from
-  the \code{dabest} object.
+\itemize{
 
-Run \code{vignette("Using dabestr", package = "dabestr")} in the console to
-read more about using parameters to control the plot features.
+ \item \link[=mean_diff]{Effect size computation} from the loaded data.
+
+ \item \link[=plot.dabest_effsize]{Generating estimation plots} after effect size computation.
+
+ }
 }

@@ -5,7 +5,8 @@
 \alias{dabestr}
 \title{dabestr: A package for producing estimation plots.}
 \description{
-The dabestr package provides a function to construct bootstrap confidence
-intervals for differences between groups \link{dabest} and a function to
-generate estimation plots \link{plot.dabest}.
+The dabestr package provides functiond to construct bootstrap confidence
+intervals for differences between groups for a range of
+\link[=mean_diff]{effect sizes} and a function to
+generate \link[=plot.dabest_effsize]{estimation plots}.
 }

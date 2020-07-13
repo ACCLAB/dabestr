@@ -1,3 +1,6 @@
+# dabestr v0.3.0
+* This is a breaking release that includes standardised effect sizes, and a bunch of bugfixes.
+
 # dabestr v0.2.5
 * This release implements the ability to supply a custom vector of colors to `palette` during plotting. There is also a bugfix that misreported the Ns for the test and control group.
 

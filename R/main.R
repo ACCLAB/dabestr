@@ -1,111 +1,84 @@
 
-#' Differences between Groups with Bootstrap Confidence Intervals
+#'Prepare Data for Analysis with dabestr
 #'
-#' \code{dabest} applies a summary function (\code{func}, default
-#' \code{\link{mean}}) to the groups listed in \code{idx}, which
-#' are factors/strings in the \code{x} column of \code{.data}. The first element
-#' of \code{idx} is the control group. The difference between
-#' \code{func(group_n)} and \code{func(control)} is computed, for every
-#' subsequent element of \code{idx}.\cr \cr For each comparison, a bootstrap
-#' confidence interval is constructed for the difference, and bias correction and
-#' acceleration is applied to correct for any skew. \code{dabest} uses bootstrap
-#' resampling to compute non-parametric assumption-free confidence intervals,
-#' and visualizes them using estimation plots with a specialized
-#' \code{\link{plot.dabest}} function.
+#'\code{dabest} prepares a
+#'\href{https://vita.had.co.nz/papers/tidy-data.pdf}{tidy dataset} for analysis
+#'using estimation statistics.
 #'
-#' Estimation statistics is a statistical framework that focuses on effect
-#' sizes and confidence intervals around them, rather than \emph{P} values and
-#' associated dichotomous hypothesis testing.
+#'Estimation statistics is a statistical framework that focuses on effect sizes
+#'and confidence intervals around them, rather than \emph{P} values and
+#'associated dichotomous hypothesis testing.
+#'
+#'\code{dabest}() collates the data in preparation for the computation of
+#'\link[=mean_diff]{effect sizes}. Bootstrap resampling is used to compute
+#'non-parametric assumption-free confidence intervals. Visualization of the
+#'effect sizes and their confidence intervals using estimation plots is then
+#'performed with a specialized \link[=plot.dabest_effsize]{plotting} function.
 #'
 #'
+#'@param .data A data.frame or tibble.
 #'
-#' @param .data A data.frame or tibble.
+#'@param x,y Columns in \code{.data}.
 #'
-#' @param x,y Columns in \code{.data}.
+#'@param idx A vector containing factors or strings in the \code{x} columns.
+#'  These must be quoted (ie. surrounded by quotation marks). The first element
+#'  will be the control group, so all differences will be computed for every
+#'  other group and this first group.
 #'
-#' @param idx Accepts a vector containing factors or strings in the \code{x}
-#'   column, or a list containing vectors as noted above.
-#'   If a vector is supplied, the first element will be the control group,
-#'   so all differences will be computed for every other group and this first group.
-#'   If a list of vectors is supplied, a multi-plot will be generated,
-#'   with the first element of each vector being the control group.
+#'@param paired Boolean, default FALSE. If TRUE, the two groups are treated as
+#'  paired samples. The first group is treated as pre-intervention and the
+#'  second group is considered post-intervention.
 #'
-#' @param paired boolean, default FALSE. If TRUE, the two groups are treated as
-#'   paired samples. The \code{control_group} group is treated as
-#'   pre-intervention and the \code{test_group} group is considered
-#'   post-intervention.
-#'
-#' @param id.column, default NULL. A column name indicating the identity of the
-#'   datapoint if the data is paired. This must be supplied if paired is TRUE.
-#'
-#' @param ci float, default 95. The level of the confidence intervals produced.
-#'   The default \code{ci = 95} produces 95\% CIs.
-#'
-#' @param reps integer, default 5000. The number of bootstrap resamples that
-#'   will be generated.
-#'
-#' @param func function, default mean. This function will be applied to
-#'   \code{control} and \code{test} individually, and the difference will be
-#'   saved as a single bootstrap resample. Any NaNs will be removed
-#'   automatically with \code{na.omit}.
-#'
-#' @param seed integer, default 12345. This specifies the seed used to set the
-#' random number generator. Setting a seed ensures that the bootstrap confidence
-#' intervals for the same data will remain stable over separate runs/calls of
-#' this function. See \link{set.seed} for more details.
+#'@param id.column Default NULL. A column name indicating the identity of the
+#'  datapoint if the data is paired. \emph{This must be supplied if paired is
+#'  \code{TRUE}.}
 #'
 #'
+#'@return A \code{dabest} object with 8 elements.
 #'
-#' @return A list with 7 elements: \code{data}, \code{x}, \code{y}, \code{idx},
-#'  \code{id.column}, \code{result}, and \code{summary}.
+#'  \describe{
 #'
-#'   \code{data}, \code{x}, \code{y}, \code{id.column}, and \code{idx} are the
-#'   same keywords supplied to \code{dabest} as noted above. \cr \cr \code{x}
-#'   and \code{y} are quoted variables for tidy evaluation by \code{plot}. \cr
-#'   \cr \code{summary} is a \link{tibble} with \code{func} applied to every
-#'   group specified in \code{idx}. These will be used by \code{plot()} to
-#'   generate the estimation plot.
+#'  \item{\code{data}}{ The dataset passed to \code{\link{dabest}}, stored here
+#'  as a \code{\link[tibble]{tibble}}. }
 #'
-#'   \code{result} is a \link{tibble} with the following 15 columns:
+#'  \item{\code{x} and \code{y}}{ The columns in \code{data} used to plot the x
+#'  and y axes, respectively, as supplied to \code{\link{dabest}}. These are
+#'  \href{https://adv-r.hadley.nz/quasiquotation.html}{quoted variables} for
+#'  \href{https://tidyeval.tidyverse.org/}{tidy evaluation} during the
+#'  computation of effect sizes. }
 #'
-#'   \item{control_group, test_group}{ The name of the control group
-#'   and test group respectively. }
+#'  \item{\code{idx}}{ The vector of control-test groupings. For each pair in
+#'  \code{idx}, an effect size will be computed by downstream \code{dabestr}
+#'  functions used to compute \link[=mean_diff]{effect sizes} (such as
+#'  \code{mean_diff()}.  }
 #'
-#'   \item{control_size, test_size}{ The number
-#'   of observations in the control group and test group respectively. }
+#'  \item{\code{is.paired}}{ Whether or not the experiment consists of paired
+#'  (aka repeated) observations. }
 #'
-#'   \item{func}{ The \code{func} passed to \code{bootdiff}. }
+#'  \item{\code{id.column}}{ If \code{is.paired} is \code{TRUE}, the column in
+#'  \code{data} that indicates the pairing of observations. }
 #'
-#'   \item{paired}{ Is
-#'   the difference paired (\code{TRUE}) or not (\code{FALSE})? }
+#'  \item{\code{.data.name}}{ The variable name of the dataset passed to
+#'  \code{\link{dabest}}. }
 #'
-#'   \item{difference}{ The difference between the two groups; effectively
-#'   \code{func(test_group) - func(control_group)}. }
+#'  \item{\code{.all.groups}}{ All groups as indicated in the \code{idx}
+#'  argument. }
 #'
-#'   \item{variable}{ The
-#'   variable whose difference is being computed, ie. the column supplied to
-#'   \code{y}. }
-#'
-#'   \item{ci}{ The \code{ci} passed to the \code{bootdiff}. }
-#'
-#'   \item{bca_ci_low, bca_ci_high}{ The lower and upper limits of the Bias
-#'   Corrected and Accelerated bootstrap confidence interval. }
-#'
-#'   \item{pct_ci_low, pct_ci_high}{ The lower and upper limits of the
-#'   percentile bootstrap confidence interval. }
-#'
-#'   \item{bootstraps}{ The array of bootstrap resamples generated. }
+#'  }
 #'
 #'
 #'
-#' @seealso \code{\link{plot.dabest}}, which generates an estimation plot from
-#'   the \code{dabest} object.
+#' @seealso \itemize{
 #'
-#' Run \code{vignette("Using dabestr", package = "dabestr")} in the console to
-#' read more about using parameters to control the plot features.
+#'  \item \link[=mean_diff]{Effect size computation} from the loaded data.
+#'
+#'  \item \link[=plot.dabest_effsize]{Generating estimation plots} after effect size computation.
+#'
+#'  }
+#'
+#'
 #'
 #' @examples
-#'
 #' # Performing unpaired (two independent groups) analysis.
 #' unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
 #'                              idx = c("setosa", "versicolor"),
@@ -114,9 +87,11 @@
 #' # Display the results in a user-friendly format.
 #' unpaired_mean_diff
 #'
-#' # Produce an estimation plot.
-#' plot(unpaired_mean_diff)
+#' # Compute the mean difference.
+#' mean_diff(unpaired_mean_diff)
 #'
+#' # Plotting the mean differences.
+#' mean_diff(unpaired_mean_diff) %>% plot()
 #'
 #' # Performing paired analysis.
 #' # First, we munge the `iris` dataset so we can perform a within-subject
@@ -129,21 +104,10 @@
 #'   tidyr::gather(key = Metric, value = Value, -ID, -Species) %>%
 #'   dplyr::filter(Species %in% c("setosa"))
 #'
-#' paired_mean_diff          <- dabest(
-#'                               setosa.only, Metric, Value,
-#'                               idx = c("Sepal.Length", "Sepal.Width"),
-#'                               paired = TRUE, id.col = ID
-#'                               )
-#'
-#'
-#' # Computing the median difference.
-#' unpaired_median_diff      <- dabest(
-#'                               iris, Species, Petal.Width,
-#'                               idx = c("setosa", "versicolor", "virginica"),
-#'                               paired = FALSE,
-#'                               func = median
-#'                               )
-#'
+#' paired_mean_diff <- dabest(setosa.only, Metric, Value,
+#'                            idx = c("Sepal.Length", "Sepal.Width"),
+#'                            paired = TRUE, id.col = ID) %>%
+#'                     mean_diff()
 #'
 #'
 #'
@@ -162,40 +126,34 @@
 #'               tidyr::gather(key = Group, value = Measurement) %>%
 #'               dabest(x = Group, y = Measurement,
 #'                      idx = c("Control", "Test1", "Test2"),
-#'                      paired = FALSE)
+#'                      paired = FALSE) %>%
+#'               mean_diff()
 #'
 #'
 #'
-#' @section References:
-#' \href{https://projecteuclid.org/euclid.ss/1032280214}{Bootstrap Confidence Intervals.}
-#' DiCiccio, Thomas J., and Bradley Efron.
-#' Statistical Science: vol. 11, no. 3, 1996. pp. 189–228.
-#'
-#' \href{https://www.crcpress.com/An-Introduction-to-the-Bootstrap/Efron-Tibshirani/p/book/9780412042317/}{An Introduction to the Bootstrap.} Efron, Bradley, and R. J. Tibshirani. 1994. CRC Press.
-#'
-#'
-#' @importFrom magrittr %>% %<>%
-#' @importFrom boot boot
-#'
-#' @export
+#'@importFrom magrittr %>%
+#'@importFrom stringr str_interp
+#'@importFrom rlang as_name enquo quo_is_null
+#'@importFrom tibble as_tibble
+#'@importFrom dplyr select arrange filter
+#'@export
 dabest <- function(
-            .data, x, y, idx, paired = FALSE, id.column = NULL,
-            ci = 95, reps = 5000, func = mean, seed = 12345) {
+  .data, x, y, idx, paired = FALSE, id.column = NULL) {
 
   #### Create quosures and quonames. ####
-  x_enquo        <-  rlang::enquo(x)
-  x_quoname      <-  rlang::quo_name(x_enquo)
+  data_enquo     <- enquo(.data)
+  data_quoname   <- as_name(data_enquo)
 
-  y_enquo        <-  rlang::enquo(y)
-  y_quoname      <-  rlang::quo_name(y_enquo)
+  x_enquo        <-  enquo(x)
+  x_quoname      <-  as_name(x_enquo)
 
-  func_enquo     <-  rlang::enquo(func)
-  func_quoname   <-  rlang::quo_name(func_enquo)
+  y_enquo        <-  enquo(y)
+  y_quoname      <-  as_name(y_enquo)
 
-  id.col_enquo   <-  rlang::enquo(id.column)
+  id.col_enquo   <-  enquo(id.column)
 
 
-  if (identical(paired, TRUE) & rlang::quo_is_null(id.col_enquo)) {
+  if (identical(paired, TRUE) & quo_is_null(id.col_enquo)) {
     stop("`paired` is TRUE but no `id.col` was supplied.")
   }
 
@@ -203,180 +161,32 @@ dabest <- function(
 
   #### Get only the columns we need. ####
   data_for_diff <-
-    tibble::as_tibble(.data) %>%
-    dplyr::select(!!x_enquo, !!y_enquo, !!id.col_enquo)
+    as_tibble(.data) %>%
+    select(!!x_enquo, !!y_enquo, !!id.col_enquo)
 
 
 
   #### Handled if paired. ####
   if (isTRUE(paired)) {
-    id.col_quoname <-  rlang::quo_name(id.col_enquo)
+    id.col_quoname <-  as_name(id.col_enquo)
     # sort the data by id.col so we can be sure all the observations match up.
     data_for_diff  <-
-      data_for_diff %>% dplyr::arrange(!!x_enquo, !!id.col_enquo)
+      data_for_diff %>% arrange(!!x_enquo, !!id.col_enquo)
   }
 
 
 
   #### Decide if multiplot or not. ####
-  if (is.atomic(idx)) {
+  if (class(idx) == "character") {
     # Not multiplot. Add it to an empty list.
     group_list  <-  list(idx)
-    all_groups  <-  idx
+    all.groups  <-  idx
 
-  } else {
+  } else if (class(idx) == "list") {
     # This is a multiplot. Give it a new name.
     group_list  <-  idx
-    all_groups  <-  unique(unlist(group_list)) # Flatten `group_list`.
+    all.groups  <-  unique(unlist(group_list)) # Flatten `group_list`.
   }
-
-
-
-  #### Loop through each comparison group. ####
-  result <- tibble::tibble() # To capture output.
-
-  for (group in group_list) {
-
-
-    # Check the control group (`group[1]`) is in the x-column.
-    if (identical(group[1] %in% data_for_diff[[x_quoname]], FALSE)) {
-
-      err1 <- stringr::str_interp("${group[1]} is not found")
-      err2 <- stringr::str_interp("in the ${x_quoname} column.")
-
-      stop(paste(err1, err2))
-    }
-
-    # Patch in v0.2.2.
-    # Note how we have to unquote both the x_enquo, and the group name!
-    ctrl <- data_for_diff %>% dplyr::filter(!!x_enquo == !!group[1])
-
-    ctrl <- ctrl[[y_quoname]]
-
-    c <- na.omit(ctrl)
-
-    # If ctrl is length 0, stop!
-    if (length(c) == 0) {
-      stop(
-        stringr::str_interp(
-          c("There are zero numeric observations in the group ${group[1]}.")
-          )
-        )
-    }
-
-    # Get test groups (everything else in group), loop through them and compute
-    # the difference between group[1] and each group.
-    # Test groups are the 2nd element of group onwards.
-    test_groups <- group[2: length(group)]
-
-    for (grp in test_groups) {
-
-      # Check if the current group is in the x-column.
-      if (identical(grp %in% data_for_diff[[x_quoname]], FALSE)) {
-        stop(
-          stringr::str_interp(
-            "${grp} is not found in the ${x_quoname} column."
-            )
-          )
-      }
-
-      # Patch in v0.2.2.
-      # Note how we have to unquote both x_enquo, and grp!
-      test <- data_for_diff %>% dplyr::filter(!!x_enquo == !!grp)
-      test <- test[[y_quoname]]
-      t <- na.omit(test)
-
-      # If current test group is length 0, stop!
-      if (length(t) == 0) {
-        stop(
-          stringr::str_interp(
-            c("There are zero numeric observations in the group ${grp}.")
-            )
-          )
-      }
-
-
-
-      #### Compute bootstrap. ####
-      set.seed(seed)
-
-      if (identical(paired, FALSE)) {
-        diff <- func(t) - func(c)
-        # For two.boot, note that the first vector is the test vector.
-        boot <- simpleboot::two.boot(t, c, FUN = func, R = reps)
-
-      } else {
-        if (length(c) != length(t)) {
-          stop("The two groups are not the same size, but paired = TRUE.")
-        }
-        paired_diff <- t - c
-        diff <- func(paired_diff)
-        boot <- simpleboot::one.boot(paired_diff, FUN = func, R = reps)
-      }
-
-
-
-      #### Compute confidence interval. ####
-      # check CI.
-      if (ci < 0 | ci > 100) {
-        err_string <- stringr::str_interp(
-          "`ci` must be between 0 and 100, not ${ci}"
-          )
-        stop(err_string)
-      }
-
-      bootci <- boot::boot.ci(boot, conf = ci/100, type = c("perc", "bca"))
-
-
-
-      #### Save pairwise result. ####
-      row <- tibble::tibble(
-        # Convert the name of `func` to a string.
-        control_group = group[1],
-        test_group = grp,
-        control_size = length(c),
-        test_size = length(t),
-        func = func_quoname,
-        paired = paired,
-        variable = y_quoname,
-        difference = diff,
-        ci = ci,
-        bca_ci_low = bootci$bca[4],
-        bca_ci_high = bootci$bca[5],
-        pct_ci_low = bootci$percent[4],
-        pct_ci_high = bootci$percent[5],
-        bootstraps = list(as.vector(boot$t)),
-        nboots = length(boot$t)
-      )
-      result <- dplyr::bind_rows(result, row)
-
-    }
-  }
-
-  result$control_group %<>% as.factor
-  result$test_group    %<>% as.factor
-
-  # Reset seed.
-  set.seed(NULL)
-
-
-
-  #### Compute summaries. ####
-  summaries <-
-    .data %>%
-    dplyr::filter(!!x_enquo %in% all_groups) %>%
-    dplyr::group_by(!!x_enquo) %>%
-    dplyr::summarize(func_quoname = func(!!y_enquo))
-
-  colnames(summaries) <- c(x_quoname, func_quoname)
-
-  # Order the summaries by the idx.
-  summaries[[x_quoname]] <-
-    summaries[[x_quoname]] %>%
-    factor(all_groups, ordered = TRUE)
-
-  summaries <- summaries %>% dplyr::arrange(!!x_enquo)
-
 
 
   #### Assemble only the data used to create the plot. ####
@@ -387,19 +197,20 @@ dabest <- function(
   # and now forcats::as_factor() should only take the object to coerce.
   data.out[[x_quoname]] <- forcats::as_factor(data.out[[x_quoname]])
 
-  data.out <- dplyr::filter(data.out, !!x_enquo %in% all_groups)
+  data.out <- filter(data.out, !!x_enquo %in% all.groups)
 
 
 
   #### Collate output. ####
   out = list(
-    data = data.out,
-    x = x_enquo,
-    y = y_enquo,
-    idx = group_list,
-    id.column = id.col_enquo,
-    result = result,
-    summary = summaries
+    data        = data.out,
+    x           = x_enquo,
+    y           = y_enquo,
+    idx         = group_list,
+    is.paired   = paired,
+    id.column   = id.col_enquo,
+    .data.name  = data_quoname,
+    .all.groups = all.groups
   )
 
 
@@ -408,22 +219,20 @@ dabest <- function(
   class(out) <- c("dabest", "list")
 
 
-
   #### Return the output. ####
   return(out)
 }
 
 
+
+
 #' Print a `dabest` object
 #'
-#' @param x A \code{dabest} object, generated by the function of the same name.
+#' @param x A \code{\link{dabest}} object, generated by the function of the same name.
 #'
-#' @param signif_digits integer, default 3. All numerical values in the printout
-#' will be rounded to this many significant digits.
+#' @param ... S3 signature for generic plot function.
 #'
-#' @param ... Signature for S3 generic function.
-#'
-#' @return A summary of all the relevant effect sizes computed.
+#' @return A summary of the experimental designs.
 #'
 #' @examples
 #' # Performing unpaired (two independent groups) analysis.
@@ -435,66 +244,94 @@ dabest <- function(
 #' print(unpaired_mean_diff)
 #'
 #' @export
-print.dabest <- function(x, ..., signif_digits = 3) {
+print.dabest <- function(x, ...) {
 
   #### Check object class ####
   if (class(x)[1] != "dabest") {
     stop(paste(
       "The object you are plotting is not a `dabest` class object. ",
-      "Please check again! ")
-    )
+      "Please check again! "))
   } else {
     dabest.object <- x
   }
 
-  #### Get results table and y var. ####
-  tbl <- dabest.object$result
-  var <- rlang::quo_name(dabest.object$y)
+  #### Print greeting header. ####
+  print_greeting_header()
 
-  #### Create header. ####
+  #### Print head of data? ####
+  cat(str_interp("Dataset    :  ${dabest.object$.data.name}\n"))
+  cat("The first five rows are:\n")
+  print(head(dabest.object$data, n = 5L))
+  cat("\n")
+
+  #### Print xvar and yvar. ####
+  xvar = as_name(dabest.object$x)
+  yvar = as_name(dabest.object$y)
+
+  cat(str_interp("X Variable :  ${xvar}\n"))
+  cat(str_interp("Y Variable :  ${yvar}\n\n"))
+
+  #### Loop thru the groups and print out the comparisons to be done. ####
+  if (dabest.object$is.paired) {
+    es = "Paired effect size(s)"
+  } else {
+    es = "Effect sizes(s)"
+  }
+  cat(es, "will be computed for:\n")
+
+  print_each_comparison(dabest.object)
+
+  cat("\n")
+}
+
+
+
+print_greeting_header <- function() {
+  now = Sys.time()
+
+  now.hour <- as.integer(strftime(now, "%H"))
+
+  if (0 < now.hour & now.hour < 12) {
+    greeting = "Good morning!\n"
+  } else if (12 < now.hour & now.hour < 18) {
+    greeting = "Good afternoon!\n"
+  } else {
+    greeting = "Good evening!\n"
+  }
+
+
   dabest_ver <- utils::packageVersion("dabestr")
-  header     <- stringr::str_interp(
-    "DABEST (Data Analysis with Bootstrap Estimation) v${dabest_ver}\n")
+  header     <- str_interp(
+    "dabestr (Data Analysis with Bootstrap Estimation in R) v${dabest_ver}\n")
+
   cat(header)
 
   cat(rep('=', nchar(header) - 1), sep='')
   cat("\n\n")
 
-  cat(stringr::str_interp("Variable: ${var} \n\n"))
-
-  #### Print each row. ####
-  cat(apply(tbl, 1, printrow_dabest, sigdig = signif_digits),
-      sep = "\n")
-
-  #### Endnote about BCa. ####
-  cat(stringr::str_interp("${tbl$nboots[1]} bootstrap resamples.\n"))
-  cat("All confidence intervals are bias-corrected and accelerated.\n\n")
-
+  cat(greeting)
+  cat("The current time is", strftime(now, "%R %p on %A %B %d, %Y."))
+  cat("\n\n")
 }
 
 
 
+print_each_comparison <- function(dabest.object, ...) {
 
-printrow_dabest <- function(my.row, sigdig = 3) {
-  if (identical(my.row$paired, TRUE)) p <- "Paired" else p <- "Unpaired"
-  ffunc <- my.row$func
-  line1 <- stringr::str_interp(
-    c(
-      "${p} ${ffunc} difference of ",
-      "${my.row$test_group} ",
-      "(n = ${my.row$test_size}) ",
-      "minus ${my.row$control_group} ",
-      "(n = ${my.row$control_size})\n"
-    )
-  )
+  i <- 1
 
+  for (group in dabest.object$idx) {
+    # Get test groups (everything else in group), loop through them and compute
+    # the difference between group[1] and each group.
+    # Test groups are the 2nd element of group onwards.
 
-  line2 <- stringr::str_interp(
-    c("${signif(my.row$difference, sigdig)} ",
-      "[${signif(my.row$ci, sigdig)}CI  ",
-      "${signif(my.row$bca_ci_low, sigdig)}; ",
-      "${signif(my.row$bca_ci_high, sigdig)}]\n\n")
-  )
+    control_group = group[1]
+    test_groups <- group[2: length(group)]
 
-  cat(line1, line2)
+    for (current_test_group in test_groups) {
+      cat(str_interp("  ${i}. ${current_test_group} minus ${control_group}\n"))
+      i <- i + 1
+    }
+  }
+
 }

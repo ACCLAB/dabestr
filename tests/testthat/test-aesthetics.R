@@ -11,13 +11,15 @@ test_that("Gardner-Altman custom aesthetics", {
     test.data %>%
     dabest(Group, Measurement,
            idx = c("Control1", "Group1"),
-           paired = FALSE)
+           paired = FALSE) %>% mean_diff()
+
 
   paired <-
     test.data %>%
     dabest(Group, Measurement,
            idx = c("Control1", "Group1"),
-           paired = TRUE, id.col = ID)
+           paired = TRUE, id.col = ID) %>% mean_diff()
+
 
   #### Unpaired Gardner-Altman plot. ####
   # Test custom ylims.
@@ -54,7 +56,7 @@ test_that("Gardner-Altman custom aesthetics", {
          palette = c("moccasin", "honeydew2")
     )
 
-  vdiffr::expect_doppelganger("Gardner-Altman unpaired manaul palette",
+  vdiffr::expect_doppelganger("Gardner-Altman unpaired manual palette",
                               gardner.altman.unpaired.manual.palette)
 
 
@@ -114,7 +116,7 @@ test_that("Gardner-Altman custom aesthetics", {
   # Test palette, RcolorBrewer.
   gardner.altman.paired.RcolorBrewer.palette <-
     plot(paired, color.column = Gender,
-         palette = "Set1" # The default is "Set2".
+         palette = "Set2" # The default is "Set1".
     )
 
   vdiffr::expect_doppelganger("Gardner-Altman paired RcolorBrewer palette",
@@ -145,8 +147,8 @@ test_that("Cumming custom aesthetics", {
     dabest(Group, Measurement,
            idx = list(c("Control1", "Group1", "Group3"),
                       c("Control2", "Group2", "Group4")),
-           paired = FALSE
-    )
+           paired = FALSE) %>%
+    mean_diff()
 
 
   #### Multi-group Cumming plot. ####
