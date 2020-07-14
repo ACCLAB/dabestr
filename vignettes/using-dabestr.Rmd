@@ -53,7 +53,7 @@ This dataset is a [tidy dataset](https://vita.had.co.nz/papers/tidy-data.html), 
 
 ## Unpaired
 
-The `dabest` function is the main workhorse of the `dabestr` package. To create a two-group estimation plot (_aka_ a [Gardner-Altman plot](https://en.wikipedia.org/wiki/Estimation_statistics#Gardner-Altman_plot)), specify:
+The `dabest` function is the main workhorse of the `dabestr` package. To create a two-group estimation plot (_aka_ a [Gardner-Altman plot](https://en.wikipedia.org/wiki/Estimation_statistics#Gardner-Altman_plot)), we must first specify the following:
 
 * the `x` and `y` columns, 
 * whether the comparison is `paired = TRUE` or `paired = FALSE`, 
@@ -76,12 +76,27 @@ two.group.unpaired <-
 two.group.unpaired 
 ```
 
-To create a two-group estimation plot (_aka_ a [Gardner-Altman plot](https://en.wikipedia.org/wiki/Estimation_statistics#Gardner-Altman_plot)), simply use `plot(dabest.object)`. 
+To compute the mean difference between `Group1` and `Control1`, we apply the `mean_diff()` function to the `dabest` object created above.
 
-_Advanced R users would be interested to learn that `dabest` produces an object of class `dabest`. There is a generic S3 `plot` method for `dabest` objects that produces the estimation plot._
+```{r compute.mean.diff}
+two.group.unpaired.meandiff <- mean_diff(two.group.unpaired)
 
-```{r create.gardner.altman.plot, fig.width = 7, fig.height = 4}
-plot(two.group.unpaired, color.column = Gender)
+# Calling the above object produces a textual summary of the computed effect size.
+two.group.unpaired.meandiff
+```
+
+As of `dabest` v0.3.0, there are five effect sizes available:
+
+- The mean difference, given by `mean_diff()`.
+- The median difference, given by `median_diff()`.
+- Cohen's d, given by `cohens_d()`.
+- Hedges' g, given by `hedges_g()`.
+- Cliff's delta, given by `cliffs_delta()`.
+
+To create a two-group estimation plot (_aka_ a [Gardner-Altman plot](https://en.wikipedia.org/wiki/Estimation_statistics#Gardner-Altman_plot)) from this data, simply use `plot(dabest_effsize.object)`. 
+
+```{r create.gardner.altman.plot1, fig.width = 7, fig.height = 4}
+plot(two.group.unpaired.meandiff, color.column = Gender)
 ```
 
 This is known as a Gardner-Altman estimation plot, after [Martin J. Gardner](https://www.independent.co.uk/news/people/obituary-professor-martin-gardner-1470261.html) and [Douglas Altman](https://www.bmj.com/content/361/bmj.k2588) who were the first to [publish it](https://www.bmj.com/content/bmj/292/6522/746.full.pdf) in 1986.
@@ -95,6 +110,12 @@ The estimation plot produced by `dabest` differs from the one first introduced b
 
 The 95% CI presented is bias-corrected and accelerated (ie. a BCa bootstrap). You can read more about bootstrap resampling and BCa correction [here](https://acclab.github.io/bootstrap-confidence-intervals.html). 
 
+You can also obtain Gardner-Altman plots for the median difference, Cohen's _d_, and Hedges' _g_ effect sizes. Below we demonstrate how to obtain one for the Hedges' _g_ of the loaded `two.group.unpaired` dataset.
+
+```{r create.gardner.altman.plot2, fig.width = 7, fig.height = 4}
+two.group.unpaired %>% hedges_g() %>% plot(color.column = Gender)
+```
+
 ## Paired
 
 If you have paired or repeated observations, you must specify the `id.col`, a column in the data that indicates the identity of each paired observation. This will produce a [Tufte slopegraph](http://charliepark.org/slopegraphs/) instead of a swarmplot.
@@ -106,10 +127,15 @@ two.group.paired <-
          idx = c("Control1", "Group1"), 
          paired = TRUE, id.col = ID)
 
-# The summary indicates this is a paired comparison. 
-two.group.paired 
 
-plot(two.group.paired, color.column = Gender)
+# The summary indicates this is a paired comparison. 
+two.group.paired
+
+
+# Create a paired plot.
+two.group.paired %>% 
+  mean_diff() %>% 
+  plot(color.column = Gender)
 ```
 
 # The Cummings estimation plot
@@ -126,20 +152,25 @@ multi.two.group.unpaired <-
   dabest(Group, Measurement, 
          idx = list(c("Control1", "Group1"), 
                     c("Control2", "Group2")),
-         paired = FALSE
-         )
+         paired = FALSE)
 
-multi.two.group.unpaired 
 
-plot(multi.two.group.unpaired, color.column = Gender)
+# Compute the mean difference.
+multi.two.group.unpaired.meandiff <- mean_diff(multi.two.group.unpaired)
+
+
+# Create a multi-two group plot.
+multi.two.group.unpaired.meandiff %>% 
+  plot(color.column = Gender)
 ```
 
 This is a Cumming estimation plot. It is heavily influenced by the plot designs of [Geoff Cumming](https://www.youtube.com/watch?v=nDN-hcKR7j8) in his 2012 text [Understanding the New Statistics](https://www.routledge.com/Understanding-The-New-Statistics-Effect-Sizes-Confidence-Intervals-and/Cumming/p/book/9780415879682). The effect size and 95% CIs are plotted a separate axes that is now positioned below the raw data. In addition, summary measurements are displayed as gapped lines to the right of each group. These vertical lines are identical to conventional mean ± standard deviation error bars. Here, the mean of each group is indicated as a gap in the line, drawing inspiration from Edward Tufte's low data-ink ratio dictum.
 
-By default, `dabest` plots the mean ± standard deviation of each group as a gapped line beside each group. The  `group.summaries = 'median_quartiles'` parameter will plot the median and 25th & 75th percentiles of each group is plotted instead. If `group.summaries = NULL`, the summaries are not shown.
+By default, `dabestr` plots the mean ± standard deviation of each group as a gapped line beside each group. The  `group.summaries = 'median_quartiles'` parameter will plot the median and 25th & 75th percentiles of each group is plotted instead. If `group.summaries = NULL`, the summaries are not shown.
 
 ```{r multi.two.group.unpaired.median.summaries, fig.width = 7, fig.height = 4}
-plot(multi.two.group.unpaired, color.column = Gender, 
+plot(multi.two.group.unpaired.meandiff, 
+     color.column = Gender, 
      group.summaries = "median_quartiles")
 ```
 
@@ -157,9 +188,13 @@ multi.two.group.paired <-
          paired = TRUE, id.col = ID
          )
 
-multi.two.group.paired 
 
-plot(multi.two.group.paired, color.column = Gender, slopegraph = TRUE)
+multi.two.group.paired.mean_diff <- mean_diff(multi.two.group.paired)
+
+
+plot(multi.two.group.paired.mean_diff, 
+     color.column = Gender, 
+     slopegraph = TRUE)
 ```
 
 ## Shared Control
@@ -175,9 +210,11 @@ shared.control <-
          paired = FALSE
          )
 
-shared.control 
+shared.control.mean_diff <- shared.control %>% mean_diff()
 
-plot(shared.control, color.column = Gender, rawplot.type = "swarmplot")
+plot(shared.control.mean_diff, 
+     color.column = Gender,
+     rawplot.type = "swarmplot")
 
 ```
 
@@ -193,9 +230,9 @@ multi.group <-
          paired = FALSE
         )
 
-multi.group 
+multi.group.mean_diff <- multi.group %>% mean_diff() 
 
-plot(multi.group, color.column = Gender)
+plot(multi.group.mean_diff, color.column = Gender)
 ```
 
 # Controlling Aesthetics
@@ -206,7 +243,8 @@ Use the `rawplot.ylim` and `effsize.ylim` parameters to supply custom y-limits f
 
 ```{r ylim.demo, fig.width = 7, fig.height = 4}
 
-plot(multi.group, color.column = Gender,
+plot(multi.group.mean_diff, 
+     color.column = Gender,
      rawplot.ylim = c(-100, 200),
      effsize.ylim = c(-60, 60)
     )
@@ -219,7 +257,8 @@ To obtain an aesthetically-pleasing plot, You should use this option in tandem w
 
 ```{r markersize.groupwidth.demo, fig.width = 7, fig.height = 4}
 
-plot(multi.group, color.column = Gender,
+plot(multi.group.mean_diff, 
+     color.column = Gender,
      rawplot.markersize = 1,
      rawplot.groupwidth = 0.4
     )
@@ -229,7 +268,8 @@ The `rawplot.ylabel` and `effsize.ylabel` parameters control the y-axis titles f
 
 ```{r ylabel.demo, fig.width = 7, fig.height = 4}
 
-plot(multi.group, color.column = Gender,
+plot(multi.group.mean_diff, 
+     color.column = Gender,
      rawplot.ylabel = "Rawplot Title?",
      effsize.ylabel = "My delta plot!"
     )
@@ -239,7 +279,8 @@ The `axes.title.fontsize` parameter determines the fontsize of both the rawplot 
 
 ```{r ylabel.fontsize, fig.width = 7, fig.height = 4}
 
-plot(multi.group, color.column = Gender,
+plot(multi.group.mean_diff, 
+     color.column = Gender,
      axes.title.fontsize = 10 # default is 14.
     )
 ```
@@ -250,14 +291,16 @@ The `palette` parameter accepts either one of the following:
 2. A vector of colors. (_Introduced in v0.2.5_) 
 
 ```{r palette.demo1, fig.width = 7, fig.height = 4}
-plot(multi.group, color.column = Gender,
-     palette = "Dark2" # The default is "Set2".
+plot(multi.group.mean_diff, 
+     color.column = Gender,
+     palette = "Dark2" # The default is "Set1".
      )
 ```
 
 
 ```{r palette.demo2, fig.width = 7, fig.height = 4}
-plot(multi.group, color.column = Gender,
+plot(multi.group.mean_diff, 
+     color.column = Gender,
      # A custom palette consisting of a vector of colors,
      # specified as RGB hexcode, or as a R named color.
      # See all 657 named R colors with `colors()`.
@@ -268,7 +311,8 @@ plot(multi.group, color.column = Gender,
 You can use the `theme` parameter to pass along any ggplot2 themes. The default `ggplot2` theme is `theme_classic()`.
 
 ```{r different.theme, fig.width = 7, fig.height = 4}
-plot(multi.group, color.column = Gender,
+plot(multi.group.mean_diff, 
+     color.column = Gender,
      theme = ggplot2::theme_gray()
      )
 ```

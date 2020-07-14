@@ -54,14 +54,20 @@ library(dabestr)
 # Performing unpaired (two independent groups) analysis.
 unpaired_mean_diff <- dabest(iris, Species, Petal.Width,
                              idx = c("setosa", "versicolor", "virginica"),
-                             paired = FALSE)
+                             paired = FALSE) %>% 
+                      mean_diff()
 
 # Display the results in a user-friendly format.
 unpaired_mean_diff
-#> DABEST (Data Analysis with Bootstrap Estimation) v0.2.2
-#> =======================================================
+#> DABEST (Data Analysis with Bootstrap Estimation in R) v0.3.0
+#> ============================================================
 #> 
-#> Variable: Petal.Width 
+#> Good morning!
+#> The current time is 11:10 AM on Monday July 13, 2020.
+#> 
+#> Dataset    :  iris
+#> X Variable :  Species
+#> Y Variable :  Petal.Width
 #> 
 #> Unpaired mean difference of versicolor (n=50) minus setosa (n=50)
 #>  1.08 [95CI  1.01; 1.14]

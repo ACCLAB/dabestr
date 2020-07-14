@@ -11,26 +11,35 @@ test_that("Gardner-Altman unpaired", {
     dabest(Group, Measurement,
            idx = c("Control1", "Group1"), paired = FALSE)
 
-  gardner.altman.unpaired <- plot(unpaired, color.column = Gender)
-
-  vdiffr::expect_doppelganger("Gardner-Altman unpaired",
-                              gardner.altman.unpaired)
-})
 
 
+  unpaired.mean.diff <- unpaired %>% mean_diff()
 
-test_that("Gardner-Altman unpaired reverse", {
-  test.data <- generate.canned.data()
+  unpaired.mean.diff.legend <- unpaired.mean.diff %>%
+                               plot(color.column = Gender)
 
-  unpaired <-
-    test.data %>%
-    dabest(Group, Measurement,
-           idx = c("Group1", "Control1"), paired = FALSE)
+  vdiffr::expect_doppelganger("Gardner-Altman unpaired mean diff",
+                              unpaired.mean.diff.legend)
 
-  gardner.altman.unpaired.rev <- plot(unpaired, color.column = Gender)
 
-  vdiffr::expect_doppelganger("Gardner-Altman unpaired reverse",
-                              gardner.altman.unpaired.rev)
+
+
+  unpaired.mean.diff.no.legend <- unpaired.mean.diff %>%
+                              plot(color.column = Gender,
+                                   show.legend = FALSE)
+
+  vdiffr::expect_doppelganger("Gardner-Altman unpaired mean diff no legend",
+                              unpaired.mean.diff.no.legend)
+
+
+
+
+  unpaired.hedges.g <- unpaired %>% hedges_g() %>%
+                        plot(color.column = Gender,
+                             palette = c("darkorange", "black"))
+
+  vdiffr::expect_doppelganger("Gardner-Altman unpaired Hedges' g",
+                              unpaired.hedges.g)
 })
 
 
@@ -41,30 +50,30 @@ test_that("Gardner-Altman paired", {
   paired <-
     test.data %>%
     dabest(Group, Measurement,
-           idx = c("Control1", "Group1"), paired = TRUE, id.col = ID)
+           idx = c("Control1", "Group1"),
+           paired = TRUE, id.col = ID)
 
-  gardner.altman.paired <- plot(paired, color.column = Gender)
 
-  vdiffr::expect_doppelganger("Gardner-Altman paired",
-                              gardner.altman.paired)
+
+  gardner.altman.paired.mean.diff <- paired %>% mean_diff() %>%
+                                     plot(color.column = Gender)
+
+  vdiffr::expect_doppelganger("Gardner-Altman paired mean diff",
+                              gardner.altman.paired.mean.diff)
+
+
+
+  gardner.altman.paired.hedges.g <- paired %>% hedges_g() %>%
+                                    plot(color.column = Gender,
+                                         palette = c("darkorange", "black"))
+
+  vdiffr::expect_doppelganger("Gardner-Altman paired Hedges' g",
+                              gardner.altman.paired.hedges.g)
+
 })
 
 
 
-
-test_that("Gardner-Altman paired reverse", {
-  test.data <- generate.canned.data()
-
-  paired <-
-    test.data %>%
-    dabest(Group, Measurement,
-           idx = c("Group1", "Control1"), paired = TRUE, id.col = ID)
-
-  gardner.altman.paired.rev <- plot(paired, color.column = Gender)
-
-  vdiffr::expect_doppelganger("Gardner-Altman paired reverse",
-                              gardner.altman.paired.rev)
-})
 
 
 
