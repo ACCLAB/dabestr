@@ -294,19 +294,31 @@ effsize_boot <- function(data, effsize_func, R = 5000, paired = FALSE) {
          rep(2, length(data$test)))
 
 
+  # accounts for paired or unpaired.
   bootboot <- function(d, indicies, paired) {
-    c <- d[indicies[s == 1]]
-    t <- d[indicies[s == 2]]
-
+    if (identical(paired, FALSE)) {
+      c <- d[indicies[s == 1]]
+      t <- d[indicies[s == 2]]
+    } else {
+      c <- d[indicies,1]
+      t <- d[indicies,2]
+    }
     return(func(c, t, paired))
   }
-
-  b <- boot(
-    c(data$control, data$test),
-    statistic = bootboot,
-    R = R,
-    strata = s,
-    paired = paired)
+  if (identical(paired, FALSE)) {
+    b <- boot(
+      c(data$control, data$test),
+      statistic = bootboot,
+      R = R,
+      strata = s,
+      paired = paired)
+  } else {
+    b <- boot(
+      data.frame(data$control, data$test),
+      statistic = bootboot,
+      R = R,
+      paired = paired)
+  }
 
   return(b)
 
