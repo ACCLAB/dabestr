@@ -293,23 +293,33 @@ effsize_boot <- function(data, effsize_func, R = 5000, paired = FALSE) {
   s <- c(rep(1, length(data$control)),
          rep(2, length(data$test)))
 
-
+  # accounts for paired or unpaired.
   bootboot <- function(d, indicies, paired) {
-    c <- d[indicies[s == 1]]
-    t <- d[indicies[s == 2]]
-
+    if (identical(paired, FALSE)) {
+      c <- d[indicies[s == 1]]
+      t <- d[indicies[s == 2]]
+    } else {
+      c <- d[indicies,1]
+      t <- d[indicies,2]
+    }
     return(func(c, t, paired))
   }
-
-  b <- boot(
-    c(data$control, data$test),
-    statistic = bootboot,
-    R = R,
-    strata = s,
-    paired = paired)
-
+  if (identical(paired, FALSE)) {
+    b <- boot(
+      c(data$control, data$test),
+      statistic = bootboot,
+      R = R,
+      strata = s,
+      paired = paired)
+  } else {
+    b <- boot(
+      data.frame(data$control, data$test),
+      statistic = bootboot,
+      R = R,
+      paired = paired)
+  }
+  
   return(b)
-
 }
 
 
@@ -347,7 +357,9 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
   paired              <-  .data$is.paired
   data.name           <-  .data$.data.name
   is.paired           <-  .data$is.paired
-
+  # added time.type 
+  time.type <- .data$time.type
+  
   plot.groups.sizes   <-  unlist(lapply(idx, length))
 
   # The variables below should are quosures!
@@ -401,13 +413,17 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
 
       stop(paste(err1, err2))
     }
+    # stored control group in variable ctrl.grp 
+    # If time.type is sequential, then the current test group will
+    # become the next control group. 
+    ctrl.grp <- group[1]
 
     # Patch in v0.2.2.
     # Note how we have to unquote both the x_enquo, and the group name!
     ctrl <- raw.data %>% filter(!!x_enquo == !!group[1])
 
     ctrl <- ctrl[[y_quoname]]
-
+    
     c <- na.omit(ctrl)
 
     # If ctrl is length 0, stop!
@@ -451,7 +467,7 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
       }
 
 
-
+      
       #### Compute bootstrap. ####
       datalist <- list(control = ctrl, test = test)
 
@@ -492,7 +508,7 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
       #### Save pairwise result. ####
       row <- tibble(
         # Convert the name of `func` to a string.
-        control_group = group[1],
+        control_group = ctrl.grp,
         test_group = grp,
         control_size = length(c),
         test_size = length(t),
@@ -509,6 +525,16 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
         nboots = length(boot_result$t)
       )
       result <- bind_rows(result, row)
+      
+      
+      # sequential is grp i - grp_i-1
+      # baseline is still grp i - control
+      if (identical(time.type, "sequential")) {
+        ctrl.grp <- grp
+        ctrl <- test
+        c <- t
+      }
+      
     }
   }
 
@@ -558,7 +584,10 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
     effect.size = effect.size,
     .data.name = data.name,
     result = result,
-    summary = summaries
+    summary = summaries,
+    
+    # added time.type parameter
+    time.type = time.type
   )
 
 
