@@ -285,7 +285,7 @@ cohen_d_standardizers <- function(x1, x2) {
 
 
 
-effsize_boot <- function(data, effsize_func, R = 5000, paired = FALSE) {
+effsize_boot <- function(data, effsize_func, paired, R = 5000) {
 
   func <- match.fun(effsize_func)
 
@@ -408,10 +408,10 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
 
     ctrl <- ctrl[[y_quoname]]
 
-    c <- na.omit(ctrl)
+    con <- na.omit(ctrl)
 
     # If ctrl is length 0, stop!
-    if (length(c) == 0) {
+    if (length(con) == 0) {
       stop(
         str_interp(
           c("There are zero numeric observations in the group ${group[1]}.")
@@ -457,7 +457,7 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
 
       set.seed(seed)
       boot_result <- effsize_boot(datalist, effsize_func = es,
-                                  R = reps, paired = paired)
+                                  paired = is.paired, R = reps)
 
       set.seed(NULL)
 
