@@ -285,7 +285,7 @@ cohen_d_standardizers <- function(x1, x2) {
 
 
 
-effsize_boot <- function(data, effsize_func, paired, R = 5000) {
+effsize_boot <- function(data, effsize_func, R = 5000, paired = FALSE) {
 
   func <- match.fun(effsize_func)
 
@@ -294,19 +294,31 @@ effsize_boot <- function(data, effsize_func, paired, R = 5000) {
          rep(2, length(data$test)))
 
 
+  # accounts for paired or unpaired.
   bootboot <- function(d, indicies, paired) {
-    c <- d[indicies[s == 1]]
-    t <- d[indicies[s == 2]]
-
+    if (identical(paired, FALSE)) {
+      c <- d[indicies[s == 1]]
+      t <- d[indicies[s == 2]]
+    } else {
+      c <- d[indicies,1]
+      t <- d[indicies,2]
+    }
     return(func(c, t, paired))
   }
-
-  b <- boot(
-    c(data$control, data$test),
-    statistic = bootboot,
-    R = R,
-    strata = s,
-    paired = paired)
+  if (identical(paired, FALSE)) {
+    b <- boot(
+      c(data$control, data$test),
+      statistic = bootboot,
+      R = R,
+      strata = s,
+      paired = paired)
+  } else {
+    b <- boot(
+      data.frame(data$control, data$test),
+      statistic = bootboot,
+      R = R,
+      paired = paired)
+  }
 
   return(b)
 
@@ -408,10 +420,10 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
 
     ctrl <- ctrl[[y_quoname]]
 
-    con <- na.omit(ctrl)
+    c <- na.omit(ctrl)
 
     # If ctrl is length 0, stop!
-    if (length(con) == 0) {
+    if (length(c) == 0) {
       stop(
         str_interp(
           c("There are zero numeric observations in the group ${group[1]}.")
@@ -457,7 +469,7 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
 
       set.seed(seed)
       boot_result <- effsize_boot(datalist, effsize_func = es,
-                                  paired = is.paired, R = reps)
+                                  R = reps, paired = paired)
 
       set.seed(NULL)
 
@@ -677,6 +689,3 @@ printrow_ <- function(my.row, sigdig = 3) {
 
   cat(line1, line2)
 }
-
-
-
