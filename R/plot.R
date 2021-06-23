@@ -185,7 +185,11 @@ plot.dabest_effsize <- function(x, ...,
 
                                 swarmplot.params    = NULL,
                                 sinaplot.params     = NULL,
-                                slopegraph.params   = NULL ){
+                                slopegraph.params   = NULL,
+                                
+                                # added show.pairs, which will plot
+                                # slopegraph if TRUE (for 3 or more groups)  
+                                show.pairs = TRUE){
 
 
   #### Check dots are empty ####
@@ -212,6 +216,8 @@ plot.dabest_effsize <- function(x, ...,
   effect.size        <-  dabest_effsize.object$effect.size
   is.paired          <-  dabest_effsize.object$is.paired
   summary            <-  dabest_effsize.object$summary
+  # Added time type
+  time.type          <-  dabest_effsize.object$time.type
 
   plot.groups.sizes  <-  unlist(lapply(idx, length))
   all.groups         <-  unlist(idx)
@@ -227,11 +233,16 @@ plot.dabest_effsize <- function(x, ...,
   if (isFALSE(is.paired)) slopegraph <- FALSE
 
   if (effect.size == "cliffs_delta") float.contrast <- FALSE
-
+  
   if (max(plot.groups.sizes) > 2) {
     float.contrast <- FALSE
-    slopegraph     <- FALSE
-  }
+    # based on whether the show pairs function is available
+    slopegraph     <- show.pairs
+  } 
+  
+  
+  # if its sequential time effects then slopegraph is always true
+  if (identical(time.type, "sequential")) slopegraph     <- TRUE
 
   if (length(all.groups) > 2) {
     float.contrast <- FALSE
@@ -850,11 +861,28 @@ plot.dabest_effsize <- function(x, ...,
     for (subplot_groups in idx) {
       control_group <- subplot_groups[1]
       test_groups   <- subplot_groups[2: length(subplot_groups)]
-
-      labels <- c(" ",
-                  paste(test_groups, str_interp("minus\n${control_group}"),
-                        sep = "\n"))
-
+      
+      # old code
+      #labels <- c(" ",
+      #            paste(test_groups, str_interp("minus\n${control_group}"),
+      #                  sep = "\n"))
+      
+      #new code
+      # rewrite of the old code, except now it takes into account whether 
+      # the effects are sequential and edits the name accordingly
+      labels <- " "
+      prev_test_grp <- control_group
+      for (test_grp in test_groups) {
+        labels <- c(labels,  
+                    paste(test_grp, str_interp("minus\n${prev_test_grp}"),
+                    sep = "\n"))
+        #if sequential then edit the title
+        if (identical(time.type, "sequential")) {
+          prev_test_grp <- test_grp
+        }
+        
+      }
+      
       delta.tick.labs[[i]] = labels
       i <- i + 1
     }
