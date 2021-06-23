@@ -706,6 +706,3 @@ printrow_ <- function(my.row, sigdig = 3) {
 
   cat(line1, line2)
 }
-
-
-
