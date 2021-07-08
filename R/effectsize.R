@@ -333,7 +333,7 @@ effsize_boot <- function(data, effsize_func, R = 5000, paired = FALSE) {
 # }
 
 
-#' function that computes jackknife and bootstrap estimates
+#' function that computes jackknife estimates
 #' @param x the numeric form of deltadelta
 #' 
 #' @param fun the function used
@@ -343,8 +343,7 @@ effsize_boot <- function(data, effsize_func, R = 5000, paired = FALSE) {
 #' @return a list of 4 values
 #' theta.j: n-1 x n matrix of jackknife estimate
 #' se.j: the standard error of jackknife estimate
-#' theta.b: n-1 x n matrix of bootstrap estimate 
-#' se.b: the standard error of bootstrap estimate
+
 
 dd.calc <- function(x, fun, reps = 5000) {
   
@@ -358,16 +357,9 @@ dd.calc <- function(x, fun, reps = 5000) {
   theta.j = apply(a,2,fun)
   se.j = sqrt( ((n-1)/n) * sum( (theta.j - fun(theta.j))^2 ))
   
-  # bootstrap estimates
-  b <- as.matrix(x)
+
   
-  new.x.samples <- replicate(reps, b[sample.int(n, replace = TRUE), ])
-  
-  theta.b = apply(new.x.samples,2,fun)
-  se.b = sd(theta.b)
-  
-  
-  return(list(theta.j = theta.j ,se.j = se.j, theta.b = theta.b ,se.b = se.b))
+  return(list(theta.j = theta.j ,se.j = se.j)) 
 }
 
 #' function that computes the bca confidence interval
@@ -391,7 +383,7 @@ dd.all <- function(x, fun,  reps = 5000, alpha = 0.975) {
   
   a.top.1 <- (fun(dd.measurements$theta.j) - dd.measurements$theta.j)^3
   a.top <- sum(a.top.1)
-  a.bot.1 <- (dd.measurements$se.j^2) * (n/(n-1))
+  a.bot.1 <- (dd.measurements$se.j^2) * (2)
   a.bot <- 6 * (a.bot.1)^(3/2)
   dd.acc <- a.top/a.bot
   
@@ -406,7 +398,7 @@ dd.all <- function(x, fun,  reps = 5000, alpha = 0.975) {
               theta.j = dd.measurements$theta.j,
               se.j = dd.measurements$se.j,
               theta.b = x, 
-              se.b = dd.measurements$se.b, 
+              se.b = sd(x), 
               bca.ci = dd.bca.ci))
 }
 
