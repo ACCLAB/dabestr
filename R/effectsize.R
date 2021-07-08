@@ -293,23 +293,33 @@ effsize_boot <- function(data, effsize_func, R = 5000, paired = FALSE) {
   s <- c(rep(1, length(data$control)),
          rep(2, length(data$test)))
 
-
+  # accounts for paired or unpaired.
   bootboot <- function(d, indicies, paired) {
-    c <- d[indicies[s == 1]]
-    t <- d[indicies[s == 2]]
-
+    if (identical(paired, FALSE)) {
+      c <- d[indicies[s == 1]]
+      t <- d[indicies[s == 2]]
+    } else {
+      c <- d[indicies,1]
+      t <- d[indicies,2]
+    }
     return(func(c, t, paired))
   }
-
-  b <- boot(
-    c(data$control, data$test),
-    statistic = bootboot,
-    R = R,
-    strata = s,
-    paired = paired)
-
+  if (identical(paired, FALSE)) {
+    b <- boot(
+      c(data$control, data$test),
+      statistic = bootboot,
+      R = R,
+      strata = s,
+      paired = paired)
+  } else {
+    b <- boot(
+      data.frame(data$control, data$test),
+      statistic = bootboot,
+      R = R,
+      paired = paired)
+  }
+  
   return(b)
-
 }
 
 
@@ -321,6 +331,85 @@ effsize_boot <- function(data, effsize_func, R = 5000, paired = FALSE) {
 #
 #   return(cd)
 # }
+
+
+#' function that computes jackknife and bootstrap estimates
+#' @param x the numeric form of deltadelta
+#' 
+#' @param fun the function used
+#' 
+#' @param reps the number of reps for bootstrap, default 5000
+#' 
+#' @return a list of 4 values
+#' theta.j: n-1 x n matrix of jackknife estimate
+#' se.j: the standard error of jackknife estimate
+#' theta.b: n-1 x n matrix of bootstrap estimate 
+#' se.b: the standard error of bootstrap estimate
+
+dd.calc <- function(x, fun, reps = 5000) {
+  
+  # jackknife estimates
+  n <- length(x)
+  a <- matrix(0, n-1, n)
+  for (i in 1:n) {
+    a[,i] <- x[-i]
+  }
+  
+  theta.j = apply(a,2,fun)
+  se.j = sqrt( ((n-1)/n) * sum( (theta.j - fun(theta.j))^2 ))
+  
+  # bootstrap estimates
+  b <- as.matrix(x)
+  
+  new.x.samples <- replicate(reps, b[sample.int(n, replace = TRUE), ])
+  
+  theta.b = apply(new.x.samples,2,fun)
+  se.b = sd(theta.b)
+  
+  
+  return(list(theta.j = theta.j ,se.j = se.j, theta.b = theta.b ,se.b = se.b))
+}
+
+#' function that computes the bca confidence interval
+#' @param x the numeric form of deltadelta
+#' 
+#' @param fun the function used
+#' 
+#' @param reps the number of reps for the bootstrap estimate 
+#' 
+#' @param alpha the alpha for the confidence interval
+#' 
+#' @return a list of 6 items
+
+dd.all <- function(x, fun,  reps = 5000, alpha = 0.975) {
+  n = length(x) 
+  dd.measurements <- dd.calc(x, fun, reps)
+  
+  # calculating the bias and the acceleration factor
+  fraction <- sum(fun(x) < dd.measurements$theta.b) / n
+  dd.bias <- qnorm(fraction)
+  
+  a.top.1 <- (fun(dd.measurements$theta.j) - dd.measurements$theta.j)^3
+  a.top <- sum(a.top.1)
+  a.bot.1 <- (dd.measurements$se.j^2) * (n/(n-1))
+  a.bot <- 6 * (a.bot.1)^(3/2)
+  dd.acc <- a.top/a.bot
+  
+  # calculating the bca ci
+  al1 <- qnorm(alpha)
+  al2 <- qnorm(1-alpha)
+  uppc <- pnorm(dd.bias + (dd.bias + al1)/ (1 - dd.acc* (dd.bias + al1)))
+  lowc <- pnorm(dd.bias + (dd.bias + al2)/ (1 - dd.acc* (dd.bias + al2)))
+  dd.bca.ci <- quantile(dd.measurements$theta.b , probs=c(lowc,uppc))
+  
+  return(list(difference = fun(dd.measurements$theta.b),
+              theta.j = dd.measurements$theta.j,
+              se.j = dd.measurements$se.j,
+              theta.b = dd.measurements$theta.b, 
+              se.b = dd.measurements$se.b, 
+              bca.ci = dd.bca.ci))
+}
+
 
 
 
@@ -347,7 +436,12 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
   paired              <-  .data$is.paired
   data.name           <-  .data$.data.name
   is.paired           <-  .data$is.paired
-
+  # added time.type 
+  time.type <- .data$time.type
+  # added deltadelta
+  del.del             <- .data$del.del
+  
+  
   plot.groups.sizes   <-  unlist(lapply(idx, length))
 
   # The variables below should are quosures!
@@ -362,6 +456,11 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
   # effect.size_quoname <-  rlang::quo_name(effect.size_enquo)
 
   id.col_enquo        <-  .data$id.column
+  
+  #### check delta delta is only available for mean diff ####
+  if (effect.size != "mean_diff" & isTRUE(del.del)) {
+    stop("Deltadelta is only available for mean difference!")
+  }
 
   # Parse the effect.size.
   if (effect.size == "mean_diff") {
@@ -401,13 +500,17 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
 
       stop(paste(err1, err2))
     }
+    # stored control group in variable ctrl.grp 
+    # If time.type is sequential, then the current test group will
+    # become the next control group. 
+    ctrl.grp <- group[1]
 
     # Patch in v0.2.2.
     # Note how we have to unquote both the x_enquo, and the group name!
     ctrl <- raw.data %>% filter(!!x_enquo == !!group[1])
 
     ctrl <- ctrl[[y_quoname]]
-
+    
     c <- na.omit(ctrl)
 
     # If ctrl is length 0, stop!
@@ -451,7 +554,7 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
       }
 
 
-
+      
       #### Compute bootstrap. ####
       datalist <- list(control = ctrl, test = test)
 
@@ -492,7 +595,7 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
       #### Save pairwise result. ####
       row <- tibble(
         # Convert the name of `func` to a string.
-        control_group = group[1],
+        control_group = ctrl.grp,
         test_group = grp,
         control_size = length(c),
         test_size = length(t),
@@ -509,9 +612,60 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
         nboots = length(boot_result$t)
       )
       result <- bind_rows(result, row)
+      
+      
+      # sequential is grp i - grp_i-1
+      # baseline is still grp i - control
+      if (identical(time.type, "sequential")) {
+        ctrl.grp <- grp
+        ctrl <- test
+        c <- t
+      }
+      
     }
   }
 
+  # computes deltadelta
+  row_dd <- ""
+  if (identical(del.del, TRUE)) {
+    # bootstrapping it instead
+    dd.control <- result[1,]$bootstraps
+    dd.test <- result[2,]$bootstraps
+    dd.control <- unlist(dd.control)
+    dd.test <- unlist(dd.test)
+    dd.boot <- dd.test - dd.control
+    
+    # check CI.
+    if (ci < 0 | ci > 100) {
+      err_string <- str_interp(
+        "`ci` must be between 0 and 100, not ${ci}"
+      )
+      stop(err_string)
+    }
+    
+    set.seed(seed)
+    alpha.dd = ci/100 + (1 - ci/100)/2
+    boot_result_dd <- dd.all(dd.boot, mean, reps, alpha.dd)
+    
+    #### Save pairwise result. ####
+    row_dd <- tibble(
+      # Convert the name of `func` to a string.
+      control_group = "Delta of Control",
+      test_group = "Delta of Test",
+      control_size = length(dd.control),
+      test_size = length(dd.test),
+      effect_size = effect.size,
+      paired = paired,
+      variable = y_quoname,
+      difference = boot_result_dd$difference,
+      ci = ci,
+      bca_ci_low = boot_result_dd$bca.ci[1],
+      bca_ci_high = boot_result_dd$bca.ci[2],
+      bootstraps = list(as.vector(boot_result_dd$theta.b)),
+      nboots = length(boot_result_dd$theta.b)
+    )
+  }
+  
   # Reset seed.
   set.seed(NULL)
 
@@ -558,7 +712,13 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
     effect.size = effect.size,
     .data.name = data.name,
     result = result,
-    summary = summaries
+    summary = summaries,
+    
+    # added time.type parameter
+    time.type = time.type,
+    # added deltadelta
+    del.del = del.del,
+    del.del.store = row_dd
   )
 
 
@@ -614,6 +774,8 @@ print.dabest_effsize <- function(x, ..., signif_digits = 3) {
   #### Get results table and y var. ####
   tbl <- dabest.effsize$result
   var <- quo_name(dabest.effsize$y)
+  deldel <- dabest.effsize$del.del
+  dd <- dabest.effsize$del.del.store
 
   #### Print greeting header. ####
   print_greeting_header()
@@ -638,6 +800,12 @@ print.dabest_effsize <- function(x, ..., signif_digits = 3) {
   #### Print each row. ####
   cat(apply(tbl, 1, printrow_, sigdig = signif_digits),
       sep = "\n")
+  
+  #### Print deltadelta ####
+  if (identical(deldel, TRUE)) {
+    cat(printrow_(dd))
+  }
+  
 
   #### Endnote about BCa. ####
   cat(str_interp("${tbl$nboots[1]} bootstrap resamples.\n"))
@@ -677,6 +845,3 @@ printrow_ <- function(my.row, sigdig = 3) {
 
   cat(line1, line2)
 }
-
-
-
