@@ -727,7 +727,18 @@ plot.dabest_effsize <- function(x, ...,
     effsize.ylim <- range( na.omit(boots.for.plot[y_quoname]) )
   }
 
-
+  #### Check the effsize.ylim for deltadelta ####
+  if (isTRUE(del.del)) {
+    boots.for.plot.dd <- tibble::as_tibble(data.frame(del.del.store$bootstraps))
+    colnames(boots.for.plot.dd) <- del.del.store$test_group
+    boots.for.plot.dd <-
+      tidyr::gather(boots.for.plot.dd, "DeltaDelta" , "Differences")
+    effsize.ylim <-  range( na.omit(boots.for.plot[y_quoname]), 
+                            na.omit(boots.for.plot.dd["Differences"]) )
+    
+  }
+  
+  
 
   #### Plot bootstraps. ####
   float.reflines.xstart <- 0.4
@@ -901,10 +912,6 @@ plot.dabest_effsize <- function(x, ...,
 
   #### Added deltadelta ####
   if (isTRUE(del.del)) {
-    boots.for.plot.dd <- tibble::as_tibble(data.frame(del.del.store$bootstraps))
-    colnames(boots.for.plot.dd) <- del.del.store$test_group
-    boots.for.plot.dd <-
-      tidyr::gather(boots.for.plot.dd, "DeltaDelta" , "Differences")
     
     # making the plot
     dd.plot <-

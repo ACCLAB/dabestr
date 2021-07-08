@@ -386,7 +386,7 @@ dd.all <- function(x, fun,  reps = 5000, alpha = 0.975) {
   dd.measurements <- dd.calc(x, fun, reps)
   
   # calculating the bias and the acceleration factor
-  fraction <- sum(fun(x) < dd.measurements$theta.b) / n
+  fraction <- sum(fun(x) < x) / n
   dd.bias <- qnorm(fraction)
   
   a.top.1 <- (fun(dd.measurements$theta.j) - dd.measurements$theta.j)^3
@@ -400,12 +400,12 @@ dd.all <- function(x, fun,  reps = 5000, alpha = 0.975) {
   al2 <- qnorm(1-alpha)
   uppc <- pnorm(dd.bias + (dd.bias + al1)/ (1 - dd.acc* (dd.bias + al1)))
   lowc <- pnorm(dd.bias + (dd.bias + al2)/ (1 - dd.acc* (dd.bias + al2)))
-  dd.bca.ci <- quantile(dd.measurements$theta.b , probs=c(lowc,uppc))
+  dd.bca.ci <- quantile(x , probs=c(lowc,uppc))
   
-  return(list(difference = fun(dd.measurements$theta.b),
+  return(list(difference = fun(x),
               theta.j = dd.measurements$theta.j,
               se.j = dd.measurements$se.j,
-              theta.b = dd.measurements$theta.b, 
+              theta.b = x, 
               se.b = dd.measurements$se.b, 
               bca.ci = dd.bca.ci))
 }
