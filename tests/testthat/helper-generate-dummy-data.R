@@ -43,3 +43,31 @@ generate.canned.data <- function() {
   my.data <- wide.data %>%
     tidyr::gather(key = Group, value = Measurement, -ID, -Gender)
 }
+
+generate.time.groups <- function(sampleN = 40, populationN = 10000,
+                                 control_mean = 100, sd = 50,
+                                 difference = 25, seed = 54321) {
+  set.seed(seed)
+  
+  # 3 time points
+  time1 <- rnorm(populationN, mean = control_mean, sd = sd)
+  
+  time2 <- rnorm(populationN, mean = control_mean + difference, sd = sd)
+  
+  time3 <- rnorm(populationN, mean = control_mean + difference + difference, sd = sd)
+  
+  sample1 <- sample(time1, sampleN)
+  
+  sample2 <- sample(time2, sampleN)
+  
+  sample3 <- sample(time3, sampleN)
+  
+  id      <- seq(1: sampleN)
+  
+  my.data <-
+    tibble::tibble(Timepoint1 = sample1, Timepoint2 = sample2, 
+                   Timepoint3 = sample3, ID = id) %>%
+    tidyr::gather(key = Group, value = Value, -ID)
+  
+  return(my.data)
+}

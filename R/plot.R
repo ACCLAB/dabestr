@@ -719,23 +719,28 @@ plot.dabest_effsize <- function(x, ...,
 
   boots.for.plot <-
     dplyr::arrange(boots.for.plot, !!x_enquo)
-
-
-
-  #### Set delta plot ylims. ####
-  if (is.null(effsize.ylim)) {
-    effsize.ylim <- range( na.omit(boots.for.plot[y_quoname]) )
-  }
-
+  
+  # Order the bootstraps for deltadelta
   #### Check the effsize.ylim for deltadelta ####
   if (isTRUE(del.del)) {
     boots.for.plot.dd <- tibble::as_tibble(data.frame(del.del.store$bootstraps))
     colnames(boots.for.plot.dd) <- del.del.store$test_group
     boots.for.plot.dd <-
       tidyr::gather(boots.for.plot.dd, "DeltaDelta" , "Differences")
-    effsize.ylim <-  range( na.omit(boots.for.plot[y_quoname]), 
-                            na.omit(boots.for.plot.dd["Differences"]) )
+
     
+  }
+  
+  #### Set delta plot ylims. ####
+  if (is.null(effsize.ylim)) {
+    # Edit if there is deltadelta
+    if (isTRUE(del.del)) {
+      effsize.ylim <-  range( na.omit(boots.for.plot[y_quoname]), 
+                              na.omit(boots.for.plot.dd["Differences"]) )
+    } else {
+      effsize.ylim <- range( na.omit(boots.for.plot[y_quoname]) )
+    }
+
   }
   
   
@@ -956,8 +961,7 @@ plot.dabest_effsize <- function(x, ...,
     dd.ctrl_grp <- del.del.store$control_group
     labels.dd <- c(str_interp("${dd.test_grp}\nminus\n${dd.ctrl_grp}"))
     dd.plot <- dd.plot +
-      ggplot2::coord_cartesian(xlim = both.xlim,
-                               ylim = effsize.ylim) +
+      ggplot2::coord_cartesian(ylim = effsize.ylim) +
       ggplot2::scale_x_discrete(breaks = dd.test_grp, labels = labels.dd) +
       non.floating.theme
   }

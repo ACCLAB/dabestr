@@ -431,7 +431,8 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
   # added time.type 
   time.type <- .data$time.type
   # added deltadelta
-  del.del             <- .data$del.del
+  del.del             <-  .data$del.del
+  del.del.name        <-  .data$del.del.name
   
   
   plot.groups.sizes   <-  unlist(lapply(idx, length))
@@ -642,8 +643,8 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
     #### Save pairwise result. ####
     row_dd <- tibble(
       # Convert the name of `func` to a string.
-      control_group = "Delta of Control",
-      test_group = "Delta of Test",
+      control_group = del.del.name[1],
+      test_group = del.del.name[2],
       control_size = length(dd.control),
       test_size = length(dd.test),
       effect_size = effect.size,

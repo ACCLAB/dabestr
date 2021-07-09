@@ -138,8 +138,10 @@
 #'@importFrom dplyr select arrange filter
 #'@export
 dabest <- function(
-  .data, x, y, idx, paired = FALSE, id.column = NULL, deltadelta = FALSE) {
+  .data, x, y, idx, paired = FALSE, id.column = NULL, 
+  deltadelta = FALSE, deltadelta.name = NULL) {
 
+  
   #### Create quosures and quonames. ####
   data_enquo     <- enquo(.data)
   data_quoname   <- as_name(data_enquo)
@@ -215,8 +217,21 @@ dabest <- function(
     err1 <- str_interp("${deltadelta} is not a recognized option.")
     err2 <- "Accepted `deltadelta` options are boolean TRUE or FALSE."
     stop(paste(err1, err2))
-  } else if (identical(deltadelta, TRUE) & length(idx)!=2 & length(all.groups) != 4) {
-    stop("'deltadelta' is currently only available for groups of length 2 by 2!")
+  } else if (identical(deltadelta, TRUE) & length(idx)!=2) {
+    stop("'deltadelta' is currently only available for groups of length 2 by 2.")
+  } else if (identical(deltadelta, TRUE) & length(all.groups) != 4) {
+    stop("'deltadelta' is currently only available for groups of length 2 by 2.")
+    
+  }
+  if (!is.null(deltadelta.name)) {
+    if (isFALSE(deltadelta)) {
+      stop("'deltadelta.name' supplied but 'deltadelta' is FALSE.")
+    }
+    if (length(deltadelta.name) != 2) {
+      stop("'deltadelta.name' is not of length 2.")
+    } 
+  } else if (isTRUE(deltadelta)) {
+    deltadelta.name <- c("Delta of Control", "Delta of Test")
   }
 
 
@@ -247,7 +262,8 @@ dabest <- function(
     #added time.type
     time.type   = time_type,
     # added deltadelta
-    del.del = deltadelta
+    del.del = deltadelta,
+    del.del.name = deltadelta.name
   )
 
 
