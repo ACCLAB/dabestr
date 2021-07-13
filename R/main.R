@@ -139,7 +139,7 @@
 #'@export
 dabest <- function(
   .data, x, y, idx, paired = FALSE, id.column = NULL, 
-  deltadelta = FALSE, deltadelta.name = NULL) {
+  delta2 = FALSE, delta2.name = NULL) {
 
   
   #### Create quosures and quonames. ####
@@ -160,20 +160,23 @@ dabest <- function(
   # time_type will be "sequential" if paired is TRUE or "baseline"
   time_type      <- NULL
   if (identical(paired, "baseline")) {
-    time_type <- "baseline"
-    paired <- TRUE
+    time_type     <- "baseline"
+    paired        <- TRUE
   } else if (identical(paired, TRUE)) {
-    time_type <- "baseline"
-    paired <- TRUE
+    time_type     <- "baseline"
+    paired        <- TRUE
   } else if (identical(paired, "sequential")) {
-    time_type <- "sequential"
-    paired <- TRUE
+    time_type     <- "sequential"
+    paired        <- TRUE
   } else if (!identical(paired, FALSE) & !identical(paired, TRUE)) {
     err1 <- str_interp("${paired} is not a recognized option.")
     err2 <- "Accepted `paired` options are boolean, 'baseline' or 'sequential'."
     stop(paste(err1, err2))
   }
   
+  #deltadelta
+  deltadelta      <- delta2
+  deltadelta.name <- delta2.name
   
   
   
@@ -215,20 +218,20 @@ dabest <- function(
   #### check if delta delta is computable ####
   if (!identical(deltadelta, FALSE) & !identical(deltadelta, TRUE)) {
     err1 <- str_interp("${deltadelta} is not a recognized option.")
-    err2 <- "Accepted `deltadelta` options are boolean TRUE or FALSE."
+    err2 <- "Accepted `delta2` options are boolean TRUE or FALSE."
     stop(paste(err1, err2))
   } else if (identical(deltadelta, TRUE) & length(idx)!=2) {
-    stop("'deltadelta' is currently only available for groups of length 2 by 2.")
+    stop("'delta2' is currently only available for groups of length 2 by 2.")
   } else if (identical(deltadelta, TRUE) & length(all.groups) != 4) {
-    stop("'deltadelta' is currently only available for groups of length 2 by 2.")
+    stop("'delta2' is currently only available for groups of length 2 by 2.")
     
   }
   if (!is.null(deltadelta.name)) {
     if (isFALSE(deltadelta)) {
-      stop("'deltadelta.name' supplied but 'deltadelta' is FALSE.")
+      stop("'delta2.name' supplied but 'deltadelta' is FALSE.")
     }
     if (length(deltadelta.name) != 2) {
-      stop("'deltadelta.name' is not of length 2.")
+      stop("'delta2.name' is not of length 2.")
     } 
   } else if (isTRUE(deltadelta)) {
     deltadelta.name <- c("Delta of Control", "Delta of Test")

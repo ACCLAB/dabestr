@@ -452,7 +452,7 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
   
   #### check delta delta is only available for mean diff ####
   if (effect.size != "mean_diff" & isTRUE(del.del)) {
-    stop("Deltadelta is only available for mean difference!")
+    stop("Delta2 is only available for mean difference!")
   }
 
   # Parse the effect.size.
