@@ -53,9 +53,10 @@ test_that("Using `grp` as x column is kosher", {
   expect_equal(df_analysed.result$control_size, 54)
   expect_equal(df_analysed.result$test_size, 46)
 
-  expect_equal(df_analysed.result$difference, -0.02769726)
+  #edited the tolerance
+  expect_equal(df_analysed.result$difference, -0.02769726, tolerance = 1e-06)
   expect_equal(df_analysed.result$bca_ci_low, -0.1283135, tolerance = 1e-06)
-  expect_equal(df_analysed.result$bca_ci_high, 0.0698794)
+  expect_equal(df_analysed.result$bca_ci_high, 0.0698794, tolerance = 1e-06)
 
   gardner.altman.renamed <- plot(df_analysed)
 
