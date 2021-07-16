@@ -228,7 +228,7 @@ dabest <- function(
   }
   if (!is.null(deltadelta.name)) {
     if (isFALSE(deltadelta)) {
-      stop("'delta2.name' supplied but 'deltadelta' is FALSE.")
+      stop("'delta2.name' supplied but 'delta2' is FALSE.")
     }
     if (length(deltadelta.name) != 2) {
       stop("'delta2.name' is not of length 2.")
