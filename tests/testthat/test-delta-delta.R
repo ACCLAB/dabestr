@@ -2,13 +2,13 @@ library(dabestr)
 context("delta delta")
 #' @details data obtained from 
 #' Abebe, A. (n.d.). 
-#' Introduction to Design and Analysis of Experiments with the Sas System. Lecture. 
+#' Introduction to Design and Analysis of Experiments with the Sas System. Lecture. Pg 137. 
 #' http://halweb.uc3m.es/esp/Personal/personas/jmmarin/esp/Disenno/CursoDisExpSAS.pdf. 
 
 ################################ 
 # Testing the Numerical Output #
 ################################
-test_that("Deltadelta is false but deltadelta name is provided", {
+test_that("Delta2 is false but delta2 name is provided", {
   test.data <- generate.dd.data()
   expect_error(dabest(test.data, Group, Value, paired = FALSE,
                       idx = list(c("T1 Control", "T2 Control"),
@@ -18,7 +18,7 @@ test_that("Deltadelta is false but deltadelta name is provided", {
   
 })
 
-test_that("Deltadelta is true but data does not fit", {
+test_that("Delta2 is true but data does not fit", {
   test.data <- generate.dd.data()
   expect_error(dabest(test.data, Group, Value, paired = FALSE,
                       idx = list(c("T1 Control", "T2 Control"),
@@ -29,7 +29,7 @@ test_that("Deltadelta is true but data does not fit", {
 })
 
 
-test_that("Deltadelta name is of the wrong size", {
+test_that("Delta2 name is of the wrong size", {
   test.data <- generate.dd.data()
   expect_error(dabest(test.data, Group, Value, paired = FALSE,
                       idx = list(c("T1 Control", "T2 Control"),
@@ -40,7 +40,7 @@ test_that("Deltadelta name is of the wrong size", {
 })
 
 
-test_that("Unpaired deltadelta within 95 CI", {
+test_that("Unpaired delta2 within 95 CI", {
   dummy.data  <- generate.dd.data()
   diff.ctrl <- mean(dummy.data[dummy.data$Group == "T2 Control",]$Value) - 
     mean(dummy.data[dummy.data$Group == "T1 Control",]$Value)
@@ -74,7 +74,7 @@ test_that("Unpaired deltadelta within 95 CI", {
 })
 
 
-test_that("Paired deltadelta within 95 CI", {
+test_that("Paired delta2 within 95 CI", {
   dummy.data  <- generate.dd.data()
   diff.ctrl <- mean(dummy.data[dummy.data$Group == "T2 Control",]$Value) - 
     mean(dummy.data[dummy.data$Group == "T1 Control",]$Value)
@@ -112,7 +112,7 @@ test_that("Paired deltadelta within 95 CI", {
 # Testing the Graphical Output #
 ################################
 
-test_that("Deltadelta graph matches", {
+test_that("Delta2 graph matches", {
   test.data <- generate.canned.data()
   # dd is TRUE
   test.mean.unpaired.dd <- 
