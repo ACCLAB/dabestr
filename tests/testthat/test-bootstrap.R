@@ -96,6 +96,7 @@ test_that("Two-group paired reports accurately", {
 
 
 
+
 test_that("Two-group paired mean diff requires id.col", {
   expect_error(dabest(dummy.data, Group, Value, paired = TRUE,
                       # Missing `id.col` parameter.
@@ -103,94 +104,3 @@ test_that("Two-group paired mean diff requires id.col", {
                "`paired` is TRUE but no `id.col` was supplied.")
 
 })
-
-
-
-test_that("Two-group paired mean diff falls within 95 CI", {
-  diff        <- sample(50: 100, 1)
-  dummy.data  <- generate.two.groups(difference = diff)
-  
-  ci.for.test <- 95
-  ci.failures <- 0
-  seeds       <- seq(51: 100)
-  
- 
-  my.data <- dabest(dummy.data, Group, Value, paired = TRUE, 
-                    id.col = ID,
-                    idx = c("Control", "Test"))
-  
-  for (s in seeds) {
-    boot.result <- my.data %>% mean_diff(seed = s * s)
-    
-    report      <- boot.result$result
-    
-    if (diff < report$bca_ci_low || diff > report$bca_ci_high) {
-      ci.failures <- ci.failures + 1
-    }
-  }
-  
-  max.errors <- ceiling((1 - (ci.for.test/100)) * length(seeds))
-  
-  expect_lte(ci.failures, max.errors)
-})
-
-
-
-test_that("Two-group baseline mean diff falls within 95 CI", {
-  diff        <- sample(50: 100, 1)
-  dummy.data  <- generate.two.groups(difference = diff)
-  
-  ci.for.test <- 95
-  ci.failures <- 0
-  seeds       <- seq(51: 100)
-  
-  
-  my.data <- dabest(dummy.data, Group, Value, paired = "baseline", 
-                    id.col = ID,
-                    idx = c("Control", "Test"))
-  
-  for (s in seeds) {
-    boot.result <- my.data %>% mean_diff(seed = s * s)
-    
-    report      <- boot.result$result
-    
-    if (diff < report$bca_ci_low || diff > report$bca_ci_high) {
-      ci.failures <- ci.failures + 1
-    }
-  }
-  
-  max.errors <- ceiling((1 - (ci.for.test/100)) * length(seeds))
-  
-  expect_lte(ci.failures, max.errors)
-})
-
-
-
-test_that("Two-group sequential mean diff falls within 95 CI", {
-  diff        <- sample(50: 100, 1)
-  dummy.data  <- generate.two.groups(difference = diff)
-  
-  ci.for.test <- 95
-  ci.failures <- 0
-  seeds       <- seq(51: 100)
-  
-  
-  my.data <- dabest(dummy.data, Group, Value, paired = "sequential", 
-                    id.col = ID,
-                    idx = c("Control", "Test"))
-  
-  for (s in seeds) {
-    boot.result <- my.data %>% mean_diff(seed = s * s)
-    
-    report      <- boot.result$result
-    
-    if (diff < report$bca_ci_low || diff > report$bca_ci_high) {
-      ci.failures <- ci.failures + 1
-    }
-  }
-  
-  max.errors <- ceiling((1 - (ci.for.test/100)) * length(seeds))
-  
-  expect_lte(ci.failures, max.errors)
-})
-
