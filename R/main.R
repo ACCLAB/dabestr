@@ -138,7 +138,7 @@
 #'@importFrom dplyr select arrange filter
 #'@export
 dabest <- function(
-  .data, x, y, idx, paired = FALSE, id.column = NULL) {
+  .data, x, y, idx, paired = FALSE, id.column = NULL ) {
 
   #### Create quosures and quonames. ####
   data_enquo     <- enquo(.data)
@@ -151,8 +151,30 @@ dabest <- function(
   y_quoname      <-  as_name(y_enquo)
 
   id.col_enquo   <-  enquo(id.column)
-
-
+  
+  
+  # time_type will be NULL if paired is FALSE, 
+  # time_type will be "baseline" if paired is TRUE or "baseline"
+  # time_type will be "sequential" if paired is TRUE or "baseline"
+  time_type      <- NULL
+  if (identical(paired, "baseline")) {
+    time_type <- "baseline"
+    paired <- TRUE
+  } else if (identical(paired, TRUE)) {
+    time_type <- "baseline"
+    paired <- TRUE
+  } else if (identical(paired, "sequential")) {
+    time_type <- "sequential"
+    paired <- TRUE
+  } else if (!identical(paired, FALSE) & !identical(paired, TRUE)) {
+    err1 <- str_interp("${paired} is not a recognized option.")
+    err2 <- "Accepted `paired` options are boolean, 'baseline' or 'sequential'."
+    stop(paste(err1, err2))
+  }
+  
+  
+  
+  
   if (identical(paired, TRUE) & quo_is_null(id.col_enquo)) {
     stop("`paired` is TRUE but no `id.col` was supplied.")
   }
@@ -199,7 +221,9 @@ dabest <- function(
 
   data.out <- filter(data.out, !!x_enquo %in% all.groups)
 
-
+  
+  
+  # adds in a new parameter in the object (baseline, sequential, or NULL)
 
   #### Collate output. ####
   out = list(
@@ -210,7 +234,9 @@ dabest <- function(
     is.paired   = paired,
     id.column   = id.col_enquo,
     .data.name  = data_quoname,
-    .all.groups = all.groups
+    .all.groups = all.groups,
+    #added time.type
+    time.type   = time_type
   )
 
 
