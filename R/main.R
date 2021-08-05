@@ -138,8 +138,10 @@
 #'@importFrom dplyr select arrange filter
 #'@export
 dabest <- function(
-  .data, x, y, idx, paired = FALSE, id.column = NULL) {
+  .data, x, y, idx, paired = FALSE, id.column = NULL, 
+  delta2 = FALSE, delta2.name = NULL, mini.meta = FALSE) {
 
+  
   #### Create quosures and quonames. ####
   data_enquo     <- enquo(.data)
   data_quoname   <- as_name(data_enquo)
@@ -151,8 +153,37 @@ dabest <- function(
   y_quoname      <-  as_name(y_enquo)
 
   id.col_enquo   <-  enquo(id.column)
-
-
+  
+  
+  # time_type will be NULL if paired is FALSE, 
+  # time_type will be "baseline" if paired is TRUE or "baseline"
+  # time_type will be "sequential" if paired is TRUE or "baseline"
+  time_type      <- NULL
+  if (identical(paired, "baseline")) {
+    time_type     <- "baseline"
+    paired        <- TRUE
+  } else if (identical(paired, TRUE)) {
+    time_type     <- "baseline"
+    paired        <- TRUE
+  } else if (identical(paired, "sequential")) {
+    time_type     <- "sequential"
+    paired        <- TRUE
+  } else if (!identical(paired, FALSE) & !identical(paired, TRUE)) {
+    err1 <- str_interp("${paired} is not a recognized option.")
+    err2 <- "Accepted `paired` options are boolean, 'baseline' or 'sequential'."
+    stop(paste(err1, err2))
+  }
+  
+  #deltadelta
+  deltadelta      <- delta2
+  deltadelta.name <- delta2.name
+  
+  #mini meta
+  mini_meta <- mini.meta
+  
+  
+  
+  
   if (identical(paired, TRUE) & quo_is_null(id.col_enquo)) {
     stop("`paired` is TRUE but no `id.col` was supplied.")
   }
@@ -185,9 +216,59 @@ dabest <- function(
   } else if (class(idx) == "list") {
     # This is a multiplot. Give it a new name.
     group_list  <-  idx
+    
     all.groups  <-  unique(unlist(group_list)) # Flatten `group_list`.
   }
 
+  #### Check delta delta and mini meta not both TRUE ####
+  if (identical(deltadelta, TRUE) & identical(mini_meta, TRUE)) {
+    stop("'delta2' and 'mini.meta' can not be both TRUE." )
+  }
+  #### check if delta delta can be calculated ####
+  if (!identical(deltadelta, FALSE) & !identical(deltadelta, TRUE)) {
+    err1 <- str_interp("${deltadelta} is not a recognized option.")
+    err2 <- "Accepted `delta2` options are boolean TRUE or FALSE."
+    stop(paste(err1, err2))
+  } else if (identical(deltadelta, TRUE) & length(idx)!=2) {
+    stop("'delta2' is currently only available for groups of length 2 by 2.")
+  } else if (identical(deltadelta, TRUE) & length(all.groups) != 4) {
+    stop("'delta2' is currently only available for groups of length 2 by 2.")
+    
+  } else if (identical(deltadelta, TRUE)) {
+    for (grp in 1:length(group_list)) {
+      if (length(unlist(group_list[grp])) != 2) {
+        stop("'delta2' is currently only available for groups of length 2 by 2.")
+      }
+    }
+  }
+  if (!is.null(deltadelta.name)) {
+    if (isFALSE(deltadelta)) {
+      stop("'delta2.name' supplied but 'delta2' is FALSE.")
+    }
+    if (length(deltadelta.name) != 2) {
+      stop("'delta2.name' is not of length 2.")
+    } 
+  } else if (isTRUE(deltadelta)) {
+    deltadelta.name <- c("Delta of Control", "Delta of Test")
+  }
+
+  #### Check if mini meta can be calculated ####
+  if (!identical(mini_meta, FALSE) & !identical(mini_meta, TRUE)) {
+    err1 <- str_interp("${mini_meta} is not a recognized option.")
+    err2 <- "Accepted `mini.meta` options are boolean TRUE or FALSE."
+    stop(paste(err1, err2))
+  }
+  # Check if data is structured correctly
+  if (isTRUE(mini_meta)){
+    for (grp in 1:length(group_list)) {
+      if (length(unlist(group_list[grp])) != 2) {
+        stop("'mini.meta' is currently only available for groups of size 2.")
+      }
+    }
+  }
+  
+  
+  
 
   #### Assemble only the data used to create the plot. ####
   data.out <- .data
@@ -199,7 +280,9 @@ dabest <- function(
 
   data.out <- filter(data.out, !!x_enquo %in% all.groups)
 
-
+  
+  
+  # adds in a new parameter in the object (baseline, sequential, or NULL)
 
   #### Collate output. ####
   out = list(
@@ -210,7 +293,14 @@ dabest <- function(
     is.paired   = paired,
     id.column   = id.col_enquo,
     .data.name  = data_quoname,
-    .all.groups = all.groups
+    .all.groups = all.groups,
+    #added time.type
+    time.type   = time_type,
+    # added deltadelta
+    del.del      = deltadelta,
+    del.del.name = deltadelta.name,
+    # added minimeta
+    mini.meta    = mini_meta
   )
 
 

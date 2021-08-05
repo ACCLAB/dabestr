@@ -185,7 +185,11 @@ plot.dabest_effsize <- function(x, ...,
 
                                 swarmplot.params    = NULL,
                                 sinaplot.params     = NULL,
-                                slopegraph.params   = NULL ){
+                                slopegraph.params   = NULL,
+                                
+                                # added show.pairs, which will plot
+                                # slopegraph if TRUE (for 3 or more groups)  
+                                show.pairs = TRUE){
 
 
   #### Check dots are empty ####
@@ -212,7 +216,15 @@ plot.dabest_effsize <- function(x, ...,
   effect.size        <-  dabest_effsize.object$effect.size
   is.paired          <-  dabest_effsize.object$is.paired
   summary            <-  dabest_effsize.object$summary
-
+  # Added time type
+  time.type          <-  dabest_effsize.object$time.type
+  # Added deltadelta
+  del.del            <-  dabest_effsize.object$del.del
+  del.del.store      <-  dabest_effsize.object$del.del.store
+  # Added minimeta
+  mini.meta          <-  dabest_effsize.object$mini.meta
+  mini.meta.store    <-  dabest_effsize.object$mini.meta.store
+  
   plot.groups.sizes  <-  unlist(lapply(idx, length))
   all.groups         <-  unlist(idx)
 
@@ -227,11 +239,16 @@ plot.dabest_effsize <- function(x, ...,
   if (isFALSE(is.paired)) slopegraph <- FALSE
 
   if (effect.size == "cliffs_delta") float.contrast <- FALSE
-
+  
   if (max(plot.groups.sizes) > 2) {
     float.contrast <- FALSE
-    slopegraph     <- FALSE
-  }
+    # based on whether the show pairs function is available
+    slopegraph     <- show.pairs
+  } 
+  
+  
+  # if its sequential time effects then slopegraph is always true
+  if (identical(time.type, "sequential")) slopegraph     <- TRUE
 
   if (length(all.groups) > 2) {
     float.contrast <- FALSE
@@ -680,6 +697,15 @@ plot.dabest_effsize <- function(x, ...,
 
 
   #### Munge bootstraps. ####
+  
+  #Add additional plot in graph if mini meta is true
+  all.groups.delta <- all.groups
+  if(isTRUE(mini.meta)){
+    boot.result <- rbind(boot.result, mini.meta.store)
+    all.groups.delta <- c(all.groups.delta, "weighted control", "weighted test")
+    
+  }
+  
   # Munge bootstraps into tibble for easy plotting with ggplot.
   boots.for.plot <- tibble::as_tibble(data.frame(boot.result$bootstraps))
   colnames(boots.for.plot) <- boot.result$test_group
@@ -701,19 +727,37 @@ plot.dabest_effsize <- function(x, ...,
 
   # Order the bootstraps so they plot in the correct order.
   boots.for.plot[[x_quoname]] <-
-    factor(boots.for.plot[[x_quoname]], all.groups, ordered = TRUE)
+    factor(boots.for.plot[[x_quoname]], all.groups.delta, ordered = TRUE)
 
   boots.for.plot <-
     dplyr::arrange(boots.for.plot, !!x_enquo)
+  
+  
+  # Order the bootstraps for deltadelta
+  #### Check the effsize.ylim for deltadelta ####
+  if (isTRUE(del.del)) {
+    boots.for.plot.dd <- tibble::as_tibble(data.frame(del.del.store$bootstraps))
+    colnames(boots.for.plot.dd) <- del.del.store$test_group
+    boots.for.plot.dd <-
+      tidyr::gather(boots.for.plot.dd, "DeltaDelta" , "Differences")
 
-
-
+    
+  }
+  
+  
   #### Set delta plot ylims. ####
   if (is.null(effsize.ylim)) {
-    effsize.ylim <- range( na.omit(boots.for.plot[y_quoname]) )
+    # Edit if there is deltadelta
+    if (isTRUE(del.del)) {
+      effsize.ylim <-  range( na.omit(boots.for.plot[y_quoname]), 
+                              na.omit(boots.for.plot.dd["Differences"]) )
+    } else {
+      effsize.ylim <- range( na.omit(boots.for.plot[y_quoname]) )
+    }
+
   }
-
-
+  
+  
 
   #### Plot bootstraps. ####
   float.reflines.xstart <- 0.4
@@ -731,8 +775,9 @@ plot.dabest_effsize <- function(x, ...,
     flat.violin.width   <- 0.75
     flat.violin.adjust  <- 3
     x.start             <- 0
-    x.end               <- length(all.groups) + es0.trimming
+    x.end               <- length(all.groups.delta) + es0.trimming
   }
+  
 
   delta.plot <-
     ggplot2::ggplot(boots.for.plot, na.rm = TRUE) +
@@ -752,8 +797,7 @@ plot.dabest_effsize <- function(x, ...,
       y      =  0,
       yend   =  0)
 
-
-
+  
   #### Plot effect sizes and CIs. ####
 
   delta.plot <-
@@ -772,8 +816,7 @@ plot.dabest_effsize <- function(x, ...,
       aes(x    = test_group,
                    ymin = bca_ci_low,
                    ymax = bca_ci_high))
-
-
+  
 
   #### Float vs nonfloat delta plots. ####
   if (isTRUE(float.contrast)) {
@@ -850,24 +893,112 @@ plot.dabest_effsize <- function(x, ...,
     for (subplot_groups in idx) {
       control_group <- subplot_groups[1]
       test_groups   <- subplot_groups[2: length(subplot_groups)]
-
-      labels <- c(" ",
-                  paste(test_groups, str_interp("minus\n${control_group}"),
-                        sep = "\n"))
-
+      
+      # old code
+      #labels <- c(" ",
+      #            paste(test_groups, str_interp("minus\n${control_group}"),
+      #                  sep = "\n"))
+      
+      #new code
+      # rewrite of the old code, except now it takes into account whether 
+      # the effects are sequential and edits the name accordingly
+      labels <- " "
+      prev_test_grp <- control_group
+      for (test_grp in test_groups) {
+        labels <- c(labels,  
+                    paste(test_grp, str_interp("minus\n${prev_test_grp}"),
+                    sep = "\n"))
+        #if sequential then edit the title
+        if (identical(time.type, "sequential")) {
+          prev_test_grp <- test_grp
+        }
+        
+      }
+      
       delta.tick.labs[[i]] = labels
       i <- i + 1
     }
-
+    
+    # change both.xlim if mini meta is true
+    if (isTRUE(mini.meta)) {
+      both.xlim <- both.xlim + c(0,2)
+      
+      delta.tick.labs <- c( delta.tick.labs, "", "Weighted delta")
+      
+    }
+    
+    
     # Equalize the xlims across both plots, and set ylims for deltaplot.
+    
     delta.plot <- delta.plot +
       ggplot2::coord_cartesian(xlim = both.xlim,
                                ylim = effsize.ylim) +
-      ggplot2::scale_x_discrete(breaks = all.groups,
+      ggplot2::scale_x_discrete(breaks = all.groups.delta,
                                 labels = delta.tick.labs) +
       non.floating.theme
   }
+  
+  
 
+  #### Added deltadelta ####
+  if (isTRUE(del.del)) {
+    
+    # making the plot
+    dd.plot <-
+      ggplot2::ggplot(boots.for.plot.dd, na.rm = TRUE) +
+      geom_flat_violin(
+        aes(DeltaDelta, Differences),
+        na.rm  =  TRUE,
+        width  =  flat.violin.width,
+        adjust =  flat.violin.adjust,
+        size   =  0 # width of the line.
+      ) +
+      # This is the line representing the null effect size.
+      ggplot2::geom_segment(
+        color  =  "black",
+        size   =  horizontal.line.width,
+        x      =  x.start,
+        xend   =  x.end,
+        y      =  0,
+        yend   =  0)
+    
+    
+    if (isTRUE(is.paired)) {
+      effsize.ylabel.dd <-
+        str_interp("Paired mean deltadelta")
+    } else {
+      effsize.ylabel.dd <-
+        str_interp("Unpaired mean deltadelta")
+    }
+    
+    dd.plot <-
+      dd.plot +
+      ggplot2::ylab(effsize.ylabel.dd) +
+      # the dot
+      ggplot2::geom_point(
+        data  = del.del.store,
+        color = "black",
+        size  = effsize.markersize,
+        aes(test_group, difference)) +
+      # the line
+      ggplot2::geom_errorbar(
+        data  = del.del.store,
+        color = "black",
+        width = 0,
+        size  = 0.75,
+        aes(x    = test_group,
+            ymin = bca_ci_low,
+            ymax = bca_ci_high))
+    
+    dd.test_grp <- del.del.store$test_group
+    dd.ctrl_grp <- del.del.store$control_group
+    labels.dd <- c(str_interp("${dd.test_grp}\nminus\n${dd.ctrl_grp}"))
+    dd.plot <- dd.plot +
+      ggplot2::coord_cartesian(ylim = effsize.ylim) +
+      ggplot2::scale_x_discrete(breaks = dd.test_grp, labels = labels.dd) +
+      non.floating.theme
+  }
+  
 
 
   #### Trim rawdata axes. ####
@@ -889,6 +1020,7 @@ plot.dabest_effsize <- function(x, ...,
   padding            <- 0.25
 
   # Re-draw the trimmed axes.
+  
   for (size in plot.groups.sizes) {
     end.idx      <- start.idx + size - 1
 
@@ -930,11 +1062,9 @@ plot.dabest_effsize <- function(x, ...,
     start.idx  <- start.idx + size
   }
 
-
-
-
   #### Trim deltaplot axes. ####
   delta.plot  <-  delta.plot + remove.axes
+  
 
   # Get the ylims.
   delta.plot.build         <- ggplot2::ggplot_build(delta.plot)
@@ -962,7 +1092,7 @@ plot.dabest_effsize <- function(x, ...,
       xstart     <- start.idx - padding
       xend       <- end.idx   + padding
     }
-
+    
     delta.plot <-
       delta.plot +
       ggplot2::geom_segment(x    = xstart,
@@ -973,9 +1103,72 @@ plot.dabest_effsize <- function(x, ...,
 
     start.idx  <- start.idx + size
   }
+  
+  #### Extends the line if mini meta is true ####
+  if (isTRUE(mini.meta)) {
+    end.idx      <- start.idx + 2 - 1
+    
+    if (isTRUE(float.contrast)) {
+      xstart     <- delta.plot.lower.xlim
+      xend       <- delta.plot.upper.xlim
+      
+    } else {
+      xstart     <- start.idx - padding
+      xend       <- end.idx   + padding
+    }
+    
+    delta.plot <-
+      delta.plot +
+      ggplot2::geom_segment(x    = xstart,
+                            xend = xend,
+                            y    = segment.ypos,
+                            yend = segment.ypos
+      )
+    
+    start.idx  <- start.idx + 2
+  }
+  
+
+  #### Trim deltadelta axes ####
+  
+  if (isTRUE(del.del)) {
+    dd.plot  <-  dd.plot + remove.axes + 
+      ggplot2::scale_y_continuous(position = "right")
+    
+    dd.plot.build            <- ggplot2::ggplot_build(dd.plot)
+    dd.plot.build.panel      <- dd.plot.build$layout$panel_params[[1]]
+    dd.plot.ylim             <- dd.plot.build.panel$y.range
+    segment.ypos             <- dd.plot.ylim[1]
+    dd.plot.upper.ylim       <- dd.plot.ylim[2]
+    
+    dd.plot.xlim             <- dd.plot.build.panel$x.range
+    dd.plot.lower.xlim       <- dd.plot.xlim[1]
+    dd.plot.upper.xlim       <- dd.plot.xlim[2]
+    
+    
+    size.dd                  <- 1
+    start.idx.dd             <- 1
+    end.idx.dd               <- start.idx.dd + size.dd - 1
+    if (isTRUE(float.contrast)) {
+      xstart.dd              <- dd.plot.lower.xlim
+      xend.dd                <- dd.plot.upper.xlim
+      
+    } else {
+      xstart.dd              <- start.idx.dd - padding
+      xend.dd                <- end.idx.dd   + padding
+    }
+    
+    dd.plot <-
+      dd.plot +
+      ggplot2::geom_segment(x    = xstart.dd,
+                            xend = xend.dd,
+                            y    = segment.ypos,
+                            yend = segment.ypos
+      )
+  }
 
 
-
+  
   #### Handle color legend. ####
   if (!quo_is_null(color.col_enquo)) {
     legend <- cowplot::get_legend(rawdata.plot)
@@ -1026,7 +1219,6 @@ plot.dabest_effsize <- function(x, ...,
 
 
 
-
   #### Determine layout. ####
   if (isTRUE(float.contrast)) {
     # Side-by-side floating plot layout.
@@ -1056,21 +1248,83 @@ plot.dabest_effsize <- function(x, ...,
       ncols <- 3
       widths <- c(0.7, 0.3, 0.2)
     }
+    
 
   } else {
     # Above-below non-floating plot layout.
     aligned_spine = 'lr'
     nrows <- 2
+    
+    # Added deltadelta
+    if (isTRUE(del.del)) {
+      
+      if (quo_is_null(color.col_enquo) | isFALSE(show.legend)) {
+        plist <- list(rawdata.plot, NULL, delta.plot, dd.plot)
+        ncols <- 2
+        widths <- c(0.7,0.3)
+      
+      } else {
+        plist <- list(rawdata.plot, legend, delta.plot, dd.plot)
+        ncols <- 2
+        widths <- c(0.7, 0.3)
+        
+      }
+    } else if (isTRUE(mini.meta)) { 
+      # Shows the adjustment for mini meta (up to 6 groups)
+      mm.length <- function(x) {
+        if (x == 2) return(c(0.7, 0.3))
+        if (x == 3) return(c(0.8, 0.2))
+        if (x == 4) return(c(0.85, 0.15))
+        if (x == 5) return(c(0.85, 0.15))
+        
+        # else return a generic number
+        return(c(0.9, 0.1))
+      }
+      frac.mm <- mm.length(length(plot.groups.sizes))
+      
 
-    # Added in v0.3.0: option to not display the color legend.
-    if (quo_is_null(color.col_enquo) | isFALSE(show.legend)) {
-      plist <- list(rawdata.plot, delta.plot)
-      ncols <- 1
-      widths <- c(1)
+      
+      ncols.mm <- 2
+      #widths change according to how many plots there are 
+      widths.mm <- c(frac.mm[1], frac.mm[2])
+      # Combining the rawdata and legend together
+
+      if (quo_is_null(color.col_enquo) | isFALSE(show.legend)) {
+        top.part.graph <- cowplot::plot_grid(
+          plotlist   = list(rawdata.plot, NULL),
+          nrow       = 1,
+          ncol       = ncols.mm,
+          rel_widths = widths.mm,
+          axis       = aligned_spine)
+        plist <- list(top.part.graph, delta.plot)
+        ncols <- 1
+        widths <- c(1)
+        
+      } else {
+        top.part.graph <- cowplot::plot_grid(
+          plotlist   = list(rawdata.plot, legend),
+          nrow       = 1,
+          ncol       = ncols.mm,
+          rel_widths = widths.mm,
+          axis       = aligned_spine)
+        plist <- list(top.part.graph, delta.plot)
+        ncols <- 1
+        widths <- c(1)
+        
+      }
+      
     } else {
-      plist <- list(rawdata.plot, legend, delta.plot)
-      ncols <- 2
-      widths <- c(0.85, 0.15)
+    
+      # Added in v0.3.0: option to not display the color legend.
+      if (quo_is_null(color.col_enquo) | isFALSE(show.legend)) {
+        plist <- list(rawdata.plot, delta.plot)
+        ncols <- 1
+        widths <- c(1)
+      } else {
+        plist <- list(rawdata.plot, legend, delta.plot)
+        ncols <- 2
+        widths <- c(0.85, 0.15)
+      }
     }
   }
 

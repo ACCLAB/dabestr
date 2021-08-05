@@ -293,23 +293,33 @@ effsize_boot <- function(data, effsize_func, R = 5000, paired = FALSE) {
   s <- c(rep(1, length(data$control)),
          rep(2, length(data$test)))
 
-
+  # accounts for paired or unpaired.
   bootboot <- function(d, indicies, paired) {
-    c <- d[indicies[s == 1]]
-    t <- d[indicies[s == 2]]
-
+    if (identical(paired, FALSE)) {
+      c <- d[indicies[s == 1]]
+      t <- d[indicies[s == 2]]
+    } else {
+      c <- d[indicies,1]
+      t <- d[indicies,2]
+    }
     return(func(c, t, paired))
   }
-
-  b <- boot(
-    c(data$control, data$test),
-    statistic = bootboot,
-    R = R,
-    strata = s,
-    paired = paired)
-
+  if (identical(paired, FALSE)) {
+    b <- boot(
+      c(data$control, data$test),
+      statistic = bootboot,
+      R = R,
+      strata = s,
+      paired = paired)
+  } else {
+    b <- boot(
+      data.frame(data$control, data$test),
+      statistic = bootboot,
+      R = R,
+      paired = paired)
+  }
+  
   return(b)
-
 }
 
 
@@ -321,6 +331,79 @@ effsize_boot <- function(data, effsize_func, R = 5000, paired = FALSE) {
 #
 #   return(cd)
 # }
+
+
+#' function that computes jackknife estimates
+#' @param x the numeric form of deltadelta
+#' 
+#' @param fun the function used
+#' 
+#' @param reps the number of reps for bootstrap, default 5000
+#' 
+#' @return a list of 4 values
+#' theta.j: n-1 x n matrix of jackknife estimate
+#' se.j: the standard error of jackknife estimate
+
+
+dd.calc <- function(x, fun, reps = 5000) {
+  
+  # jackknife estimates
+  n <- length(x)
+  a <- matrix(0, n-1, n)
+  for (i in 1:n) {
+    a[,i] <- x[-i]
+  }
+  
+  theta.j = apply(a,2,fun)
+  se.j = sqrt( ((n-1)/n) * sum( (theta.j - fun(theta.j))^2 ))
+  
+
+  
+  return(list(theta.j = theta.j ,se.j = se.j)) 
+}
+
+#' function that computes the bca confidence interval
+#' @param x the numeric form of deltadelta
+#' 
+#' @param fun the function used
+#' 
+#' @param reps the number of reps for the bootstrap estimate 
+#' 
+#' @param alpha the alpha for the confidence interval
+#' 
+#' @return a list of 6 items
+
+dd.all <- function(x, fun,  reps = 5000, alpha = 0.975) {
+  n = length(x) 
+  dd.measurements <- dd.calc(x, fun, reps)
+  
+  # calculating the bias and the acceleration factor
+  fraction <- sum(fun(x) < x) / n
+  dd.bias <- qnorm(fraction)
+  
+  a.top.1 <- (fun(dd.measurements$theta.j) - dd.measurements$theta.j)^3
+  a.top <- sum(a.top.1)
+  a.bot.1 <- (dd.measurements$se.j^2) * (2)
+  a.bot <- 6 * (a.bot.1)^(3/2)
+  dd.acc <- a.top/a.bot
+  
+  # calculating the bca ci
+  al1 <- qnorm(alpha)
+  al2 <- qnorm(1-alpha)
+  uppc <- pnorm(dd.bias + (dd.bias + al1)/ (1 - dd.acc* (dd.bias + al1)))
+  lowc <- pnorm(dd.bias + (dd.bias + al2)/ (1 - dd.acc* (dd.bias + al2)))
+  dd.bca.ci <- quantile(x , probs=c(lowc,uppc))
+  dd.pct.ci <- quantile(x , probs=c(1-alpha, alpha))
+  
+  return(list(difference = fun(x),
+              theta.j = dd.measurements$theta.j,
+              se.j = dd.measurements$se.j,
+              theta.b = x, 
+              se.b = sd(x), 
+              bca.ci = dd.bca.ci,
+              pct.ci = dd.pct.ci))
+}
+
 
 
 
@@ -347,7 +430,14 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
   paired              <-  .data$is.paired
   data.name           <-  .data$.data.name
   is.paired           <-  .data$is.paired
-
+  # added time.type 
+  time.type <- .data$time.type
+  # added deltadelta
+  del.del             <-  .data$del.del
+  del.del.name        <-  .data$del.del.name
+  # added mini meta
+  mini.meta           <-  .data$mini.meta
+  
   plot.groups.sizes   <-  unlist(lapply(idx, length))
 
   # The variables below should are quosures!
@@ -362,6 +452,16 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
   # effect.size_quoname <-  rlang::quo_name(effect.size_enquo)
 
   id.col_enquo        <-  .data$id.column
+  
+  #### check delta delta is only available for mean diff ####
+  if (effect.size != "mean_diff" & isTRUE(del.del)) {
+    stop("'Delta2' is only available for mean difference!")
+  }
+  
+  #### check mini meta is only available for mean diff ####
+  if (effect.size != "mean_diff" & isTRUE(mini.meta)) {
+    stop("'mini.meta' is only available for mean difference!")
+  }
 
   # Parse the effect.size.
   if (effect.size == "mean_diff") {
@@ -390,9 +490,9 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
 
   #### Loop through each comparison group. ####
   result <- tibble() # To capture output.
-
+  # Storing weights of mini.meta
+  mm.weights <- tibble()
   for (group in idx) {
-
     # Check the control group (`group[1]`) is in the x-column.
     if (identical(group[1] %in% raw.data[[x_quoname]], FALSE)) {
 
@@ -401,13 +501,17 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
 
       stop(paste(err1, err2))
     }
+    # stored control group in variable ctrl.grp 
+    # If time.type is sequential, then the current test group will
+    # become the next control group. 
+    ctrl.grp <- group[1]
 
     # Patch in v0.2.2.
     # Note how we have to unquote both the x_enquo, and the group name!
     ctrl <- raw.data %>% filter(!!x_enquo == !!group[1])
 
     ctrl <- ctrl[[y_quoname]]
-
+    
     c <- na.omit(ctrl)
 
     # If ctrl is length 0, stop!
@@ -451,7 +555,7 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
       }
 
 
-
+      
       #### Compute bootstrap. ####
       datalist <- list(control = ctrl, test = test)
 
@@ -492,7 +596,7 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
       #### Save pairwise result. ####
       row <- tibble(
         # Convert the name of `func` to a string.
-        control_group = group[1],
+        control_group = ctrl.grp,
         test_group = grp,
         control_size = length(c),
         test_size = length(t),
@@ -509,13 +613,136 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
         nboots = length(boot_result$t)
       )
       result <- bind_rows(result, row)
+      
+      
+      # sequential is grp i - grp_i-1
+      # baseline is still grp i - control
+      if (identical(time.type, "sequential")) {
+        ctrl.grp <- grp
+        ctrl <- test
+        c <- t
+      }
+      
+    }
+    
+    # Compute the Dk of each grp for mini meta
+    if (identical(mini.meta, TRUE)) {
+      # the function sd()^2 is the same as s^2
+      mm.ctrl <- datalist$control
+      mm.test <- datalist$test
+      mm.vardk <- ((1/length(mm.ctrl)) * (sd(mm.ctrl)**2)) + 
+        ((1/length(mm.test)) * (sd(mm.test)**2))
+      
+      mm.row <- tibble(
+        control_group = ctrl.grp,
+        test_group = grp,
+        control_size = length(c),
+        test_size = length(t),
+        difference = boot_result$t0,
+        bootstraps = list(as.vector(boot_result$t)),
+        weight = 1/mm.vardk
+      )
+      mm.weights <- bind_rows(mm.weights, mm.row)
     }
   }
 
+  # computes deltadelta
+  row_dd <- ""
+  if (identical(del.del, TRUE)) {
+    # bootstrapping it instead
+    dd.control <- result[1,]$bootstraps
+    dd.test <- result[2,]$bootstraps
+    dd.control <- unlist(dd.control)
+    dd.test <- unlist(dd.test)
+    dd.boot <- dd.test - dd.control
+    
+    # check CI.
+    if (ci < 0 | ci > 100) {
+      err_string <- str_interp(
+        "`ci` must be between 0 and 100, not ${ci}"
+      )
+      stop(err_string)
+    }
+    
+    set.seed(seed)
+    alpha.dd = ci/100 + (1 - ci/100)/2
+    boot_result_dd <- dd.all(dd.boot, mean, reps, alpha.dd)
+    
+    #### Save pairwise result. ####
+    row_dd <- tibble(
+      # Convert the name of `func` to a string.
+      control_group = del.del.name[1],
+      test_group = del.del.name[2],
+      control_size = length(dd.control),
+      test_size = length(dd.test),
+      effect_size = effect.size,
+      paired = paired,
+      variable = y_quoname,
+      difference = boot_result_dd$difference,
+      ci = ci,
+      bca_ci_low = boot_result_dd$bca.ci[1],
+      bca_ci_high = boot_result_dd$bca.ci[2],
+      pct_ci_low = boot_result_dd$pct.ci[1],
+      pct_ci_high = boot_result_dd$pct.ci[2],
+      bootstraps = list(as.vector(boot_result_dd$theta.b)),
+      nboots = length(boot_result_dd$theta.b)
+    )
+  }
+  
   # Reset seed.
   set.seed(NULL)
 
-
+  #Computed mini meta pooled statistics
+  mini.meta.data <- tibble()
+  if (identical(mini.meta, TRUE)) {
+    pooled.diff        <- 0
+    pooled.weights     <- 0
+    pooled.bootstrap   <- 0
+    pooled.ctrl.size   <- 0
+    pooled.test.size   <- 0
+    
+    
+    
+    for (m_row in 1:nrow(mm.weights)) {
+      mm_row <- mm.weights[m_row,]
+      pooled.diff        <- pooled.diff + (mm_row$weight * mm_row$difference)
+      pooled.weights     <- pooled.weights + mm_row$weight
+      pooled.bootstrap   <- pooled.bootstrap + 
+        (mm_row$weight * unlist(mm_row$bootstraps))
+      pooled.ctrl.size   <- pooled.ctrl.size + mm_row$control_size
+      pooled.test.size   <- pooled.test.size + mm_row$test_size
+    }
+    
+    # dividing by weights 
+    pooled.diff        <- pooled.diff/ pooled.weights
+    pooled.bootstrap   <- pooled.bootstrap/ pooled.weights
+    
+    # using the same formula that calculates the bca ci from deltadelta
+    set.seed(seed)
+    alpha.mm = ci/100 + (1 - ci/100)/2
+    boot_result_mm <- dd.all(pooled.bootstrap, mean, reps, alpha.mm)
+    set.seed(NULL)
+    pooled.stat <- tibble(
+      control_group = "weighted control",
+      test_group = "weighted test",
+      control_size = pooled.ctrl.size,
+      test_size = pooled.test.size,
+      effect_size = effect.size,
+      paired = paired,
+      variable = y_quoname,
+      difference = pooled.diff,
+      ci = ci,
+      bca_ci_low = boot_result_mm$bca.ci[1],
+      bca_ci_high = boot_result_mm$bca.ci[2],
+      pct_ci_low = boot_result_mm$pct.ci[1],
+      pct_ci_high = boot_result_mm$pct.ci[2],
+      bootstraps = list(as.vector(pooled.bootstrap)),
+      
+      nboots = length(pooled.bootstrap)
+    )
+    mini.meta.data <- bind_rows(mini.meta.data, pooled.stat)
+  
+  }
 
   #### Compute summaries. ####
   summaries <-
@@ -558,7 +785,17 @@ effect_size <- function(.data, ..., effect.size, ci, reps, seed) {
     effect.size = effect.size,
     .data.name = data.name,
     result = result,
-    summary = summaries
+    summary = summaries,
+    
+    # added time.type parameter
+    time.type = time.type,
+    # added deltadelta
+    del.del = del.del,
+    del.del.store = row_dd,
+    
+    # added minimeta
+    mini.meta = mini.meta,
+    mini.meta.store = mini.meta.data
   )
 
 
@@ -614,6 +851,10 @@ print.dabest_effsize <- function(x, ..., signif_digits = 3) {
   #### Get results table and y var. ####
   tbl <- dabest.effsize$result
   var <- quo_name(dabest.effsize$y)
+  deldel <- dabest.effsize$del.del
+  dd <- dabest.effsize$del.del.store
+  minimeta <- dabest.effsize$mini.meta
+  mm <- dabest.effsize$mini.meta.store
 
   #### Print greeting header. ####
   print_greeting_header()
@@ -638,6 +879,32 @@ print.dabest_effsize <- function(x, ..., signif_digits = 3) {
   #### Print each row. ####
   cat(apply(tbl, 1, printrow_, sigdig = signif_digits),
       sep = "\n")
+  
+  #### Print deltadelta ####
+  if (identical(deldel, TRUE)) {
+    cat(printrow_(dd))
+  }
+  
+  #### Print mini meta ####
+  if (identical(minimeta, TRUE)) {
+    if (identical(mm$paired, TRUE)) p <- "Paired" else p <- "Unpaired"
+    sigdig <- 3
+    line1 <- str_interp(
+      c(
+        "${p} weighted-average mean difference is \n"
+      )
+    )
+    
+    
+    line2 <- str_interp(
+      c("${signif(mm$difference, sigdig)} ",
+        "[${signif(mm$ci, sigdig)}CI  ",
+        "${signif(mm$bca_ci_low, sigdig)}; ",
+        "${signif(mm$bca_ci_high, sigdig)}]\n\n")
+    )
+    cat(line1, line2)
+    
+  }
 
   #### Endnote about BCa. ####
   cat(str_interp("${tbl$nboots[1]} bootstrap resamples.\n"))
@@ -677,6 +944,3 @@ printrow_ <- function(my.row, sigdig = 3) {
 
   cat(line1, line2)
 }
-
-
-
