@@ -235,6 +235,9 @@ dabest <- function(
     stop("'delta2' is currently only available for groups of length 2 by 2.")
     
   } else if (identical(deltadelta, TRUE)) {
+    if (class(idx) == "character") {
+      stop("'delta2' is not available for one group of 2 only.")
+    }
     for (grp in 1:length(group_list)) {
       if (length(unlist(group_list[grp])) != 2) {
         stop("'delta2' is currently only available for groups of length 2 by 2.")
@@ -260,6 +263,9 @@ dabest <- function(
   }
   # Check if data is structured correctly
   if (isTRUE(mini_meta)){
+    if (class(idx) == "character") {
+      stop("'mini.meta' is not available for one group of 2 only.")
+    }
     for (grp in 1:length(group_list)) {
       if (length(unlist(group_list[grp])) != 2) {
         stop("'mini.meta' is currently only available for groups of size 2.")
