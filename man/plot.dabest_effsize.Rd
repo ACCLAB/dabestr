@@ -26,7 +26,8 @@
   show.legend = TRUE,
   swarmplot.params = NULL,
   sinaplot.params = NULL,
-  slopegraph.params = NULL
+  slopegraph.params = NULL,
+  show.pairs = TRUE
 )
 }
 \arguments{
@@ -119,6 +120,9 @@ value} pairs to \code{\link[ggforce:geom_sina]{ggforce::geom_sina()}}.}
 value} pairs to \code{ggplot2}'s
 \code{\link[ggplot2:geom_path]{geom_line()}}.
 This controls the appearance of the lines plotted for a paired slopegraph.}
+
+\item{show.pair}{default \code{TRUE}. If \code{FALSE}, will not plot
+slopegraph for groups of 3 or more.}
 }
 \value{
 A \code{\link[ggplot2]{ggproto}} object. This object is actually
@@ -164,7 +168,7 @@ plot(unpaired_mean_diff)
 
 \dontrun{
 # Comparing versicolor and virginica petal widths to setosa petal width.
-shared_control_data <- dabeıst(iris, Species, Petal.Width,
+shared_control_data <- dabeÄ±st(iris, Species, Petal.Width,
                               idx = c("setosa", "versicolor", "virginica")) \%>\%
                        mean_diff()
 

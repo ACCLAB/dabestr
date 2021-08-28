@@ -104,6 +104,9 @@
 #'   value} pairs to \code{ggplot2}'s
 #'   \code{\link[ggplot2:geom_path]{geom_line()}}.
 #'   This controls the appearance of the lines plotted for a paired slopegraph.
+#'   
+#' @param show.pair default \code{TRUE}. If \code{FALSE}, will not plot
+#'   slopegraph for groups of 3 or more.
 #'
 #'
 #'

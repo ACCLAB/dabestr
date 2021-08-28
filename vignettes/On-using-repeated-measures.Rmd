@@ -1,0 +1,181 @@
+---
+title: "On-using-repeated-measures"
+output: rmarkdown::html_vignette
+subtitle: How to use repeated measures
+vignette: >
+  %\VignetteIndexEntry{On-using-repeated-measures}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+set.seed(12345)
+```
+## Introduction
+The repeated measure feature allows the visualization of of experiments with 
+one control and multiple test time points. 
+
+The new additions to this feature is that there is now an option for paired data 
+to calculate effect sizes based on `sequential` time points (timepoint t vs 
+timepoint t + 1) or `baseline` groups (control vs group i). The default options
+for the parameter `paired` are still functionable, although it should be noted 
+that `paired = TRUE` and `paired = "baseline"` are essentially the same. 
+
+## Create Data
+
+For this vignette, we will create and use the synthetic dataset used in the 
+using-dabestr vignette.
+
+```{r create.data, message=FALSE}
+library(dplyr)
+
+N = 40
+c1 <- rnorm(N, mean = 100, sd = 25)
+c2 <- rnorm(N, mean = 100, sd = 50)
+g1 <- rnorm(N, mean = 120, sd = 25)
+g2 <- rnorm(N, mean = 80, sd = 50)
+g3 <- rnorm(N, mean = 100, sd = 12)
+g4 <- rnorm(N, mean = 100, sd = 50)
+gender <- c(rep('Male', N/2), rep('Female', N/2))
+dummy <- rep("Dummy", N)
+id <- 1: N
+
+
+wide.data <- 
+  tibble::tibble(
+    Control1 = c1, Control2 = c2,
+    Group1 = g1, Group2 = g2, Group3 = g3, Group4 = g4,
+    Dummy = dummy,
+    Gender = gender, ID = id)
+
+
+my.data   <- 
+  wide.data %>%
+  tidyr::gather(key = Group, value = Measurement, -ID, -Gender, -Dummy)
+
+head(my.data)
+```
+
+As unpaired remains unchanged, it will not be covered in this vignette. For more
+information for unpaired plots, please read the using-dabestr vignette.
+
+## Paired `baseline`
+
+This is when parameter `paired = TRUE` or `paired = "baseline"`. 
+
+
+```{r paired baseline setup}
+library(dabestr)
+
+baseline.single <- my.data %>% dabest(Group, Measurement, 
+                                      idx = list(c("Control1", "Group1", "Group2")), 
+                                      paired = "baseline", id.col = ID)
+
+```
+
+We input in the effect size, in this case for mean difference. Notice that the 
+mean difference is calculated between the control group and each test group.
+
+```{r paired baseline compute.mean.diff}
+baseline.meandiff <- mean_diff(baseline.single)
+
+# Calling the above object produces a textual summary of the computed effect size.
+baseline.meandiff
+```
+
+Now we can plot the graphical output. The parameter `show.pairs` toggle the output
+between a swarm graph with `show.pairs = FALSE` and a slope graph with 
+`show.pairs = TRUE`. The default is a slope graph. 
+
+```{r create.paired.baseline.slope.plot, fig.width = 7, fig.height = 4}
+plot(baseline.meandiff, color.column = Gender, show.pairs = TRUE)
+```
+
+
+```{r create.paired.baseline.swarm.plot, fig.width = 7, fig.height = 4}
+plot(baseline.meandiff, color.column = Gender, show.pairs = FALSE)
+```
+
+Below is an example of the output of the same data except the parameter is now
+`paired = TRUE`. It should be identical to the output of `paired = "baseline"`
+
+```{r create.paired.plot, fig.width = 7, fig.height = 4}
+paired.single <- my.data %>% dabest(Group, Measurement, 
+                                      idx = list(c("Control1", "Group1", "Group2")), 
+                                      paired = TRUE, id.col = ID)
+paired.meandiff <- mean_diff(paired.single)
+# Calling the above object produces a textual summary of the computed effect size.
+paired.meandiff
+
+# Plotting graphical output
+plot(paired.meandiff, color.column = Gender, show.pairs = FALSE)
+```
+
+## Paired `sequential`
+
+This is when parameter `paired = "sequential"`. In this case, each group in every
+element in the list is treated as a time point. Hence calculations will be 
+sequential. 
+
+
+```{r paired sequential setup}
+library(dabestr)
+
+sequential.single <- my.data %>% dabest(Group, Measurement, 
+                                      idx = list(c("Control1", "Group1", "Group2")), 
+                                      paired = "sequential", id.col = ID)
+
+```
+
+We input in the effect size, in this case for mean difference. Notice that the 
+mean difference is calculated between the each group and the group after.
+
+```{r paired sequential compute.mean.diff}
+sequential.meandiff <- mean_diff(sequential.single)
+
+# Calling the above object produces a textual summary of the computed effect size.
+sequential.meandiff
+```
+
+Now we can plot the graphical output. Unlike the other options, the parameter 
+`show.pairs` will not toggle the output between a swarm graph and a slope graph.
+Instead, the output will always be a slope graph. This is because each group is
+treated as a time point.
+
+```{r create.paired.sequential.slope.plot, fig.width = 7, fig.height = 4}
+plot(sequential.meandiff, color.column = Gender)
+```
+
+## Multigroup 
+Below shows a quick example of adding more than one experiment groups. 
+
+```{r multi paired sequential setup}
+library(dabestr)
+
+sequential.multi <- my.data %>% dabest(Group, Measurement, 
+                                      idx = list(c("Control1", "Group1", "Group2"),
+                                                 c("Control2", "Group3", "Group4")), 
+                                      paired = "sequential", id.col = ID)
+
+```
+
+We input in the effect size, in this case for mean difference. Notice that the 
+mean difference is calculated between the each group and the group after.
+
+```{r multi paired sequential compute.mean.diff}
+sequential.multi.meandiff <- mean_diff(sequential.multi)
+
+# Calling the above object produces a textual summary of the computed effect size.
+sequential.multi.meandiff
+```
+
+Now we can plot the graphical output.
+
+```{r create.multi.paired.sequential.slope.plot, fig.width = 7, fig.height = 4}
+plot(sequential.multi.meandiff, color.column = Gender)
+```
+

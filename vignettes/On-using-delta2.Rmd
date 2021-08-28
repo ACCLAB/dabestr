@@ -1,0 +1,159 @@
+---
+title: "On-using-delta2"
+output: rmarkdown::html_vignette
+subtitle: How to use delta2
+vignette: >
+  %\VignetteIndexEntry{On-using-delta2}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+set.seed(12345)
+```
+
+## Introduction
+The `delta2` parameter allows the addition of the estimation statistics of a 2x2
+ANOVA. It is currently only available for datasets of size 2x2 and only for the
+effect size of mean difference. 
+
+`delta2` calculates the effect of the difference in the control groups and the 
+test groups.
+
+## Create Data
+
+For this vignette, we will be using data obtained from 
+Abebe, A. (n.d.). 
+Introduction to Design and Analysis of Experiments with the Sas System. Lecture. Pg 137. 
+http://halweb.uc3m.es/esp/Personal/personas/jmmarin/esp/Disenno/CursoDisExpSAS.pdf. .
+
+```{r create.data, message=FALSE}
+library(dplyr)
+
+# Converting the data to be used in R
+generate.dd.data <- function() {
+  ax23.t1 <- c(72, 78, 71, 72, 66, 74, 62, 69)
+  ax23.t2 <- c(86, 83, 82, 83, 79, 83, 73, 75)
+  ax23.t3 <- c(81, 88, 81, 83, 77, 84, 78, 76)
+  ax23.t4 <- c(77, 81, 75, 69, 66, 77, 70, 70)
+  ax23 <- c(ax23.t1, ax23.t2, ax23.t3, ax23.t4)
+  
+  bww9.t1 <- c(85, 82, 71, 83, 86, 85, 79, 83)
+  bww9.t2 <- c(86, 86, 78, 88, 85, 82, 83, 84)
+  bww9.t3 <- c(83, 80, 70, 79, 76, 83, 80, 78)
+  bww9.t4 <- c(80, 84, 75, 81, 76, 80, 81, 81)
+  bww9 <- c(bww9.t1, bww9.t2, bww9.t3, bww9.t4)
+  
+  ctrl.t1 <- c(69, 66, 84, 80, 72, 65, 75, 71)
+  ctrl.t2 <- c(73, 62, 90, 81, 72, 62, 69, 70)
+  ctrl.t3 <- c(72, 67, 88, 77, 69, 65, 69, 65)
+  ctrl.t4 <- c(74, 73, 87, 72, 70, 61, 68, 65)
+  ctrl <- c(ctrl.t1, ctrl.t2, ctrl.t3, ctrl.t4)
+  
+  id <- c(1:8, 1:8, 1:8, 1:8)
+  treatment <- c(rep("T1", 8), rep("T2", 8),
+                 rep("T3", 8), rep("T4", 8))
+  
+  Value <- c(ctrl, ax23, bww9)
+  ids <- c(id, id, id)
+  Group <- c(paste(treatment, "Control"),
+             paste(treatment, "AX23"),
+             paste(treatment, "BWW9"))
+  
+  data.test3 <- tibble::tibble(ids, Value, Group)
+  
+  return(data.test3)
+}
+
+
+my.data   <- generate.dd.data()
+
+head(my.data)
+```
+
+
+
+## Setting up `dabest` object
+There are two new parameters to take note of to use delta2. 
+The first parameter is `delta2 = TRUE` which toggles the delta2. If you are not
+intending to calculate delta2, the parameter will be `delta2 = FALSE` or omitted.
+The second parameter `delta2.name` allows for the customization of the names of
+the calculated delta2 values. Take note that `delta2.name` is only allowed when
+the `delta2 = TRUE`. 
+
+Note:
+
+For usage of the `delta2` feature, we will need to specify a list, with the first
+element of the list corresponding to the controls and the second element of the 
+list corresponding to the tests. 
+
+## Unpaired `delta2` 
+
+Firstly, we set up the `dabest` object.
+```{r unpaired setup}
+library(dabestr)
+
+unpaired.data <- dabest(my.data, Group, Value, paired = FALSE,
+                      idx = list(c("T1 Control", "T2 Control"),
+                                 c("T1 BWW9", "T2 BWW9")), 
+                      delta2 = TRUE, delta2.name = c("Ctrl", "Test"))
+
+
+```
+
+Next, we input in the effect size (in this case we will calculate mean difference).
+This will compute the mean difference between the two Control groups and the two
+Test groups, and the mean difference of the mean differences of the Control groups
+and the Test groups (`delta2`).
+
+```{r unpaired compute.mean.diff}
+unpaired.meandiff <- mean_diff(unpaired.data)
+
+# Calling the above object produces a textual summary of the computed effect size.
+unpaired.meandiff
+```
+
+The graph of `delta2` will be on a separate axis. It is a plot of the mean 
+difference of the mean differences of the Control groups and the Test 
+groups. (`delta2`)
+```{r create.unpaired.plot, fig.width = 7, fig.height = 4}
+plot(unpaired.meandiff)
+```
+
+## Paired `delta2` 
+
+Firstly, we set up the `dabest` object.
+```{r paired setup}
+library(dabestr)
+
+paired.data <- dabest(my.data, Group, Value, paired = TRUE,
+                      idx = list(c("T1 Control", "T2 Control"),
+                                 c("T1 BWW9", "T2 BWW9")), id.col =ids, 
+                      delta2 = TRUE, delta2.name = c("Ctrl", "Test"))
+
+
+```
+
+Next, we input in the effect size (in this case we will calculate mean difference).
+This will compute the mean difference between the two Control groups and the two
+Test groups, and the mean difference of the mean differences of the Control groups
+and the Test groups (`delta2`).
+
+```{r paired compute.mean.diff}
+paired.meandiff <- mean_diff(paired.data)
+
+# Calling the above object produces a textual summary of the computed effect size.
+paired.meandiff
+```
+
+The graph of `delta2` will be on a separate axis. It is a plot of the mean 
+difference of the mean differences of the Control groups and the Test 
+groups. (`delta2`)
+```{r create.paired.plot, fig.width = 7, fig.height = 4}
+plot(paired.meandiff)
+```
+

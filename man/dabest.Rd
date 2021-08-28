@@ -4,7 +4,17 @@
 \alias{dabest}
 \title{Prepare Data for Analysis with dabestr}
 \usage{
-dabest(.data, x, y, idx, paired = FALSE, id.column = NULL)
+dabest(
+  .data,
+  x,
+  y,
+  idx,
+  paired = FALSE,
+  id.column = NULL,
+  delta2 = FALSE,
+  delta2.name = NULL,
+  mini.meta = FALSE
+)
 }
 \arguments{
 \item{.data}{A data.frame or tibble.}
@@ -16,16 +26,27 @@ These must be quoted (ie. surrounded by quotation marks). The first element
 will be the control group, so all differences will be computed for every
 other group and this first group.}
 
-\item{paired}{Boolean, default FALSE. If TRUE, the two groups are treated as
-paired samples. The first group is treated as pre-intervention and the
-second group is considered post-intervention.}
+\item{paired}{Boolean or String, default \code{FALSE}. If \code{TRUE}/ 
+\code{"baseline"}, the groups are treated as paired samples. Calculation
+is done between the control group and group i. If \code{"sequential"}, 
+the groups are treated as time points. Calculations is done between group i 
+and group i + 1.}
 
-\item{id.column}{Default NULL. A column name indicating the identity of the
-datapoint if the data is paired. \emph{This must be supplied if paired is
-\code{TRUE}.}}
+\item{id.column}{Default \code{NULL}. A column name indicating the identity of
+the datapoint if the data is paired. \emph{This must be supplied if paired
+is \code{TRUE}.}}
+
+\item{delta2}{Boolean, default \code{FALSE}. If \code{TRUE}, calculate delta2, 
+which is the estimation statistics of a 2x2 ANOVA.}
+
+\item{delta2.name}{Default \code{NULL}. Name for delta2 curve indicating the
+names of the delta test if delta2 is calculated.}
+
+\item{mini.meta}{Boolean, default \code{FALSE}. If \code{TRUE}, calculate the 
+mini meta, which is the weighted-average delta distribution curve.}
 }
 \value{
-A \code{dabest} object with 8 elements.
+A \code{dabest} object with 12 elements.
 
  \describe{
 
@@ -54,6 +75,17 @@ A \code{dabest} object with 8 elements.
 
  \item{\code{.all.groups}}{ All groups as indicated in the \code{idx}
  argument. }
+ 
+ \item{\code{.time.type}}{ Whether the experiment consists of baseline 
+ (aka repeated) observations or sequential (aka ordered by time) 
+ observations. }
+ 
+ \item{\code{del.del}}{ Whether estimated 2x2 ANOVA is calculated. }
+ 
+ \item{\code{del.del.name}}{ Names of the control and test group of the 2x2
+ ANOVA as indicated in the \code{delta2.name} argument. }
+ 
+ \item{\code{mini.meta}}{ Whether weighted-average delta is calculated. }
 
  }
 }

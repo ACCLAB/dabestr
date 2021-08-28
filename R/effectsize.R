@@ -25,7 +25,7 @@
 #'
 #'
 #'
-#' @return A \code{dabest_effsize} object with 10 elements.
+#' @return A \code{dabest_effsize} object with 15 elements.
 #'
 #'   \describe{
 #'
@@ -88,7 +88,21 @@
 #'   \item{pct_ci_low, pct_ci_high}{ The lower and upper limits of the
 #'   percentile bootstrap confidence interval. }
 #'
-#'   \item{bootstraps}{ The vector of bootstrap resamples generated. } } }
+#'   \item{time.type}{ Whether the experiment consists of baseline 
+#'   (aka repeated) observations or sequential (aka ordered by time) 
+#'   observations. } 
+#'   
+#'   \item{del.del}{ Whether estimated 2x2 ANOVA is calculated. } 
+#'   
+#'   \item{del.del.store}{ The calculated estimated 2x2 ANOVA of the dataset, 
+#'   stored as a \code{\link[tibble]{tibble}}. } 
+#'   
+#'   \item{mini.meta}{ Whether weighted-average delta is calculated. } 
+#'   
+#'   \item{mini.meta.store}{ The calculated weighted-average delta of the 
+#'   dataset, stored as a \code{\link[tibble]{tibble}}. } 
+#'   
+#'   } }
 #'
 #'   }
 #'
@@ -333,16 +347,23 @@ effsize_boot <- function(data, effsize_func, R = 5000, paired = FALSE) {
 # }
 
 
-#' function that computes jackknife estimates
-#' @param x the numeric form of deltadelta
-#' 
-#' @param fun the function used
-#' 
-#' @param reps the number of reps for bootstrap, default 5000
-#' 
-#' @return a list of 4 values
-#' theta.j: n-1 x n matrix of jackknife estimate
-#' se.j: the standard error of jackknife estimate
+# For own review
+# function that computes jackknife estimates
+# @param x the numeric form of deltadelta
+# 
+# @param fun the function used
+# 
+# @param reps the number of reps for bootstrap, default 5000
+# 
+# @return a \code{\link[list]{list}} object with 2 elements
+#  \describe{
+#
+#  \item{\code{theta.j}}{ n-1 x n matrix of jackknife estimate. }
+# 
+#  \item{\code{se.j}}{ standard error of jackknife estimate. }
+#  }
+# 
+#
 
 
 dd.calc <- function(x, fun, reps = 5000) {
@@ -362,16 +383,35 @@ dd.calc <- function(x, fun, reps = 5000) {
   return(list(theta.j = theta.j ,se.j = se.j)) 
 }
 
-#' function that computes the bca confidence interval
-#' @param x the numeric form of deltadelta
-#' 
-#' @param fun the function used
-#' 
-#' @param reps the number of reps for the bootstrap estimate 
-#' 
-#' @param alpha the alpha for the confidence interval
-#' 
-#' @return a list of 6 items
+# For own review
+# function that computes the bca confidence interval
+# @param x the numeric form of deltadelta
+# 
+# @param fun the function used
+# 
+# @param reps the number of reps for the bootstrap estimate 
+# 
+# @param alpha the alpha for the confidence interval
+# 
+# @return a \code{\link[list]{list}} object with 7 elements
+#  \describe{
+#
+#  \item{\code{difference}}{ the value of bootstrap after applying effectsize 
+#  function. }
+#  
+#  \item{\code{theta.j}}{ n-1 x n matrix of jackknife estimate. }
+#  
+#  \item{\code{se.j}}{ standard error of jackknife estimate. }
+#  
+#  \item{\code{theta.b}}{ list of bootstrap estimate. }
+#  
+#  \item{\code{se.b}}{ standard error of bootstrap estimate. }
+#  
+#  \item{\code{bca.ci}}{ the bca confidence interval of bootstrap. }
+#  
+#  \item{\code{pct.ci}}{ the pct confidence interval of bootstrap. }
+#  }
+#  
 
 dd.all <- function(x, fun,  reps = 5000, alpha = 0.975) {
   n = length(x) 

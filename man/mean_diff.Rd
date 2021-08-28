@@ -34,7 +34,7 @@ confidence intervals for the same data will remain stable over separate
 runs/calls of this function. See \link{set.seed} for more details.}
 }
 \value{
-A \code{dabest_effsize} object with 10 elements.
+A \code{dabest_effsize} object with 15 elements.
 
   \describe{
 
@@ -97,7 +97,21 @@ A \code{dabest_effsize} object with 10 elements.
   \item{pct_ci_low, pct_ci_high}{ The lower and upper limits of the
   percentile bootstrap confidence interval. }
 
-  \item{bootstraps}{ The vector of bootstrap resamples generated. } } }
+  \item{time.type}{ Whether the experiment consists of baseline 
+  (aka repeated) observations or sequential (aka ordered by time) 
+  observations. } 
+  
+  \item{del.del}{ Whether estimated 2x2 ANOVA is calculated. } 
+  
+  \item{del.del.store}{ The calculated estimated 2x2 ANOVA of the dataset, 
+  stored as a \code{\link[tibble]{tibble}}. } 
+  
+  \item{mini.meta}{ Whether weighted-average delta is calculated. } 
+  
+  \item{mini.meta.store}{ The calculated weighted-average delta of the 
+  dataset, stored as a \code{\link[tibble]{tibble}}. } 
+  
+  } }
 
   }
 }

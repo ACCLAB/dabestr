@@ -1,0 +1,162 @@
+---
+title: "On-using-mini-meta"
+output: rmarkdown::html_vignette
+subtitle: How to use mini meta
+vignette: >
+  %\VignetteIndexEntry{On-using-mini-meta}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+set.seed(12345)
+```
+
+## Introduction
+The `mini.meta` parameter allows for the calculation of the weighted-average delta
+of each experiment group for meta-analysis.
+
+Currently only available for mean differences. 
+
+## Create Data
+
+For this vignette, we will create and use the synthetic dataset used in the 
+using-dabestr vignette.
+
+```{r create.data, message=FALSE}
+library(dplyr)
+
+N = 40
+c1 <- rnorm(N, mean = 100, sd = 25)
+c2 <- rnorm(N, mean = 100, sd = 50)
+g1 <- rnorm(N, mean = 120, sd = 25)
+g2 <- rnorm(N, mean = 80, sd = 50)
+g3 <- rnorm(N, mean = 100, sd = 12)
+g4 <- rnorm(N, mean = 100, sd = 50)
+gender <- c(rep('Male', N/2), rep('Female', N/2))
+dummy <- rep("Dummy", N)
+id <- 1: N
+
+
+wide.data <- 
+  tibble::tibble(
+    Control1 = c1, Control2 = c2,
+    Group1 = g1, Group2 = g2, Group3 = g3, Group4 = g4,
+    Dummy = dummy,
+    Gender = gender, ID = id)
+
+
+my.data   <- 
+  wide.data %>%
+  tidyr::gather(key = Group, value = Measurement, -ID, -Gender, -Dummy)
+
+head(my.data)
+```
+
+## Setting up `dabest` object
+There are one new parameters to take note of to use mini meta. The `mini.meta` 
+parameter toggles mini meta. If `mini.meta = TRUE`, then there will be an 
+additional calculation of the weighted-average delta of the dabest object. If 
+`mini.meta = FALSE`, there will be no calculation of weighted-average delta. 
+
+Note: 
+
+The input data should be structured in a list with each element in the list 
+containing 2 groups (the Control group and the Test group). 
+
+## Unpaired `mini.meta`
+
+Firstly, we set up the `dabest` object.
+
+```{r unpaired setup}
+library(dabestr)
+unpaired.data <- dabest(my.data, Group, Measurement,
+                        idx = list(c("Control1", "Group1"),
+                                   c("Control2", "Group2")),
+                        paired = FALSE, mini.meta = TRUE)
+```
+
+Next, we input in the effect size (in this case we will calculate mean difference).
+The weighted-average delta will also be calculated and displayed automatically.
+
+```{r unpaired compute.mean.diff}
+unpaired.meandiff <- mean_diff(unpaired.data)
+
+# Calling the above object produces a textual summary of the computed effect size.
+unpaired.meandiff
+```
+
+As `mini.meta` calculates the weighted-average delta, the weighted-average delta
+distribution curve will be on the same axis as the original plot. 
+
+```{r create.unpaired.plot, fig.width = 7, fig.height = 4}
+plot(unpaired.meandiff)
+```
+
+## Paired `mini.meta`
+
+Firstly, we set up the `dabest` object.
+
+```{r paired setup}
+library(dabestr)
+paired.data <- dabest(my.data, Group, Measurement,
+                      idx = list(c("Control1", "Group1"),
+                                 c("Control2", "Group2")),
+                      paired = TRUE, mini.meta = TRUE, id.col = ID) 
+```
+
+Next, we input in the weighted-average delta (in this case we will calculate mean
+difference). The weighted-average delta will also be calculated and displayed
+automatically.
+
+```{r paired compute.mean.diff}
+paired.meandiff <- mean_diff(paired.data)
+
+# Calling the above object produces a textual summary of the computed effect size.
+paired.meandiff
+```
+
+As `mini.meta` calculates the weighted-average delta, the weighted-average delta
+distribution curve will be on the same axis as the original plot. 
+
+```{r create.paired.plot, fig.width = 7, fig.height = 4}
+plot(paired.meandiff)
+```
+
+## Multi plot
+As `mini.meta` is just weighted-average delta, it can be used for 2 or more groups.
+
+Below is a short example for using `mini.meta` for 3 groups. 
+
+Firstly, we set up the `dabest` object.
+
+```{r multi paired setup}
+library(dabestr)
+multi.paired.data <- dabest(my.data, Group, Measurement,
+                      idx = list(c("Control1", "Group1"),
+                                 c("Control2", "Group2"),
+                                 c("Group3", "Group4")),
+                      paired = TRUE, mini.meta = TRUE, id.col = ID) 
+```
+
+Next, we input in the weighted-average delta (in this case we will calculate mean
+difference). The weighted-average delta will also be calculated and displayed
+automatically.
+
+```{r multi paired compute.mean.diff}
+multi.paired.meandiff <- mean_diff(multi.paired.data)
+
+# Calling the above object produces a textual summary of the computed effect size.
+multi.paired.meandiff
+```
+
+As `mini.meta` calculates the weighted-average delta, the weighted-average delta
+distribution curve will be on the same axis as the original plot. 
+
+```{r create.multi.paired.plot, fig.width = 7, fig.height = 4}
+plot(multi.paired.meandiff)
+```

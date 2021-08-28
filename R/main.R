@@ -25,16 +25,27 @@
 #'  will be the control group, so all differences will be computed for every
 #'  other group and this first group.
 #'
-#'@param paired Boolean, default FALSE. If TRUE, the two groups are treated as
-#'  paired samples. The first group is treated as pre-intervention and the
-#'  second group is considered post-intervention.
+#'@param paired Boolean or String, default \code{FALSE}. If \code{TRUE}/ 
+#'  \code{"baseline"}, the groups are treated as paired samples. Calculation
+#'  is done between the control group and group i. If \code{"sequential"}, 
+#'  the groups are treated as time points. Calculations is done between group i 
+#'  and group i + 1.
 #'
-#'@param id.column Default NULL. A column name indicating the identity of the
-#'  datapoint if the data is paired. \emph{This must be supplied if paired is
-#'  \code{TRUE}.}
+#'@param id.column Default \code{NULL}. A column name indicating the identity of
+#'  the datapoint if the data is paired. \emph{This must be supplied if paired
+#'  is \code{TRUE}.}
+#'  
+#'@param delta2 Boolean, default \code{FALSE}. If \code{TRUE}, calculate delta2, 
+#'which is the estimation statistics of a 2x2 ANOVA.
+#'  
+#'@param delta2.name Default \code{NULL}. Name for delta2 curve indicating the
+#'  names of the delta test if delta2 is calculated.
 #'
+#'@param mini.meta Boolean, default \code{FALSE}. If \code{TRUE}, calculate the 
+#'  mini meta, which is the weighted-average delta distribution curve.
 #'
-#'@return A \code{dabest} object with 8 elements.
+#'  
+#'@return A \code{dabest} object with 12 elements.
 #'
 #'  \describe{
 #'
@@ -63,6 +74,17 @@
 #'
 #'  \item{\code{.all.groups}}{ All groups as indicated in the \code{idx}
 #'  argument. }
+#'  
+#'  \item{\code{.time.type}}{ Whether the experiment consists of baseline 
+#'  (aka repeated) observations or sequential (aka ordered by time) 
+#'  observations. }
+#'  
+#'  \item{\code{del.del}}{ Whether estimated 2x2 ANOVA is calculated. }
+#'  
+#'  \item{\code{del.del.name}}{ Names of the control and test group of the 2x2
+#'  ANOVA as indicated in the \code{delta2.name} argument. }
+#'  
+#'  \item{\code{mini.meta}}{ Whether weighted-average delta is calculated. }
 #'
 #'  }
 #'
