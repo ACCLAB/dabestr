@@ -180,8 +180,8 @@ GeomSankeyBar <- ggproto("GeomSankeyBar", Geom,
                          required_aes = c("x", "yfailure", "ysuccess", "proportionsuccess"),
                          default_aes = aes(col = NA,
                                            width = 0.2,
-                                           col_failure = "#818181",
-                                           col_success = "#db6159",
+                                           col_failure = NA,
+                                           col_success = NA,
                                            fill_failure = "#818181",
                                            fill_success = "#db6159",
                                            alpha = 1,
@@ -205,23 +205,23 @@ geom_sankeybar <- function(mapping = NULL, data = NULL, stat = "identity",
 }
 
 # SankeyFlow Geom
-draw_panel_sankey_flow <- function(data, panel_scales, coord) {
+draw_group_sankey_flow <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales) 
+  first_row <- coords[1, , drop = FALSE]
   
   flow <- polygonGrob(x = coords$x,
                       y = coords$y,
-                      gp = gpar(col = coords$fillcol,
-                                fill = coords$fillcol,
-                                alpha = coords$alpha))
-  
+                      gp = gpar(col = first_row$colour,
+                                fill = alpha(first_row$fillcol, first_row$alpha)))
 }
 
 GeomSankeyFlow <- ggproto("GeomSankeyFlow", Geom,
                           required_aes = c("x", "y"),
-                          default_aes = aes(fillcol = "gray50",
-                                            alpha = 0.8),
+                          default_aes = aes(colour = NA,
+                                            fillcol = "gray50",
+                                            alpha = 0.5),
                           draw_key = draw_key_polygon,
-                          draw_panel = draw_panel_sankey_flow)
+                          draw_group = draw_group_sankey_flow)
 
 geom_sankeyflow <- function(mapping = NULL, data = NULL, stat = "identity", 
                             position = "identity", show.legend = NA, 

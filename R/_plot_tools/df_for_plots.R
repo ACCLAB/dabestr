@@ -6,7 +6,7 @@
 #' Also includes `plot_slopegraph` (for plotting of slopegraph).
 
 #' Function for creation of df for tuftelines plot
-df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
+create_create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
   tufte_lines_df <- raw_data %>%
     dplyr::group_by(!!enquo_x) %>%
     dplyr::summarize(mean = mean(!!enquo_y),
@@ -17,7 +17,7 @@ df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
   
   if(isTRUE(proportional)){
     tufte_lines_df <- tufte_lines_df %>%
-      dplyr::mutate(sd = sd/10)
+      dplyr::mutate(sd = sd/7)
   }
   tufte_lines_df <- tufte_lines_df %>%
     dplyr::mutate(lower_sd = mean - sd, upper_sd = mean + sd)
@@ -26,76 +26,167 @@ df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
 }
 
 #' Function for creation of df for sankey plot
-create_dfs_for_sankey <- function(float_contrast = FALSE, 
-                                  raw_data, 
-                                  proportional_data, 
-                                  enquo_id_col, 
-                                  x_axis_raw, 
-                                  ind = 1,
-                                  scale_factor_sig = 0.8,
-                                  gap
-) {
-  ind <- 1
-  bar_width <- ifelse(float_contrast, 0.15, 0.10)
+create_dfs_for_sankey <-  function(float_contrast = FALSE,
+                                   raw_data,
+                                   proportional_data,
+                                   enquo_id_col,
+                                   x_axis_raw,
+                                   idx,
+                                   scale_factor_sig = 0.8,
+                                   gap) {
+  
+  type <- ifelse(length(unlist(idx)) <= 2, 
+                 "single sankey", 
+                 "multiple sankeys")
+  
+  flow_success_to_failure = tibble()
+  flow_success_to_success = tibble()
+  flow_failure_to_success = tibble()
+  flow_failure_to_failure = tibble()
+  bar_width <- ifelse(float_contrast, 0.15, 0.03)
+  
+  if(type == "single sankey" && float_contrast){
+    scale_factor_sig <- 0.72
+  } 
+  else if(type == "multiple sankeys"){
+    scale_factor_sig <- 0.92
+  }
+  else{
+    scale_factor_sig <- 0.95
+  }
   means_c_t <- proportional_data$proportion_success
-  #for() will use for loops for multiple plot groups
-  success_success <- raw_data %>%
-    group_by(!!enquo_id_col) %>%
-    summarise(success_change = 
-                any(Success == 1 & Group == "Control1") & 
-                any(Success == 1 & Group == "Test1")) %>%
-    filter(success_change) %>%
-    summarise(C1T1 = n()/N)
-  failure_failire <- raw_data %>%
-    group_by(!!enquo_id_col) %>%
-    summarise(success_change = 
-                any(Success == 0 & Group == "Control1") & 
-                any(Success == 0 & Group == "Test1")) %>%
-    filter(success_change) %>%
-    summarise(C1T1F = n()/N)
-  
-  # find values for lower flow success to failure flow
-  ss <- success_success$C1T1[1]
-  value_start1 <- success_success$C1T1[1] - gap/8
-  value_start2 <- means_c_t[1]- gap/2 - gap/8
-  value_end1 <- means_c_t[2] + gap/2 +gap/8
-  value_end2 <- 1- failure_failire$C1T1F[1] + gap/8
+  x_padding <- ifelse(float_contrast, 0.008, 0.006)
   
   
-  # find values for upper flppied flow success to failure flow
-  flow_start1 <- 1- failure_failire$C1T1F[1]
-  flow_end1 <- means_c_t[2] - gap/2
-  flow_start2 <- means_c_t[1] + gap/2
-  flow_end2 <- success_success$C1T1[1]
+  prop <- proportional_data
+  ind <- 1
+  x_start <- 1
   
-  # form dataframes from sigmoid/ flippedSig functions and the rectangles, later fit into sankeyflow
-  sig1 <- sigmoid(ind + bar_width, scale_factor_sig, value_start1, value_end1)
-  sig2 <- sigmoid(ind + bar_width, scale_factor_sig, value_start2, value_end2)
-  sig1 <- arrange(sig1, desc(x))
-  sig3 <- flipped_sig(ind + bar_width, scale_factor_sig, flow_start1, flow_end1)
-  sig4 <- flipped_sig(ind + bar_width, scale_factor_sig, flow_start2, flow_end2)
-  sig4 <- arrange(sig4, desc(x))
-  data_for_flow1 <- rbind(sig2, sig1)
-  data_for_flow2 <- rbind(sig3, sig4)
-  data_for_rect_top <- data.frame(
-    x = c(x_axis_raw, rev(x_axis_raw)), 
-    y = c(1, 1, rep(flow_start1, 2)))
-  data_for_rect_bot <- data.frame(
-    x = c(x_axis_raw, rev(x_axis_raw)), 
-    y = c(rep(ss,2), 0, 0))
+  for (group in idx) {
+    group_length <- length(group)
+    
+    for (i in 1: (group_length - 1)) {
+      #redraw_x_axis <- append(redraw_x_axis, x_start)
+      success_success <- raw_data %>%
+        group_by(!!enquo_id_col) %>%
+        summarise(success_change =
+                    any(Success == 1 & Group == group[i]) &
+                    any(Success == 1 &
+                          Group == group[i + 1])) %>%
+        filter(success_change) %>%
+        summarise(SS = n() / N)
+      
+      success_failure <- raw_data %>%
+        group_by(!!enquo_id_col) %>%
+        summarise(sf_change =
+                    any(Success == 1 & Group == group[i]) &
+                    any(Success == 0 &
+                          Group == group[i + 1])) %>%
+        filter(sf_change) %>%
+        summarise(SF = n() / N)
+      
+      failure_failire <- raw_data %>%
+        group_by(!!enquo_id_col) %>%
+        summarise(failure_change =
+                    any(Success == 0 & Group == group[i]) &
+                    any(Success == 0 &
+                          Group == group[i + 1])) %>%
+        filter(failure_change) %>%
+        summarise(FF = n() / N)
+      
+      failure_success <- raw_data %>%
+        group_by(!!enquo_id_col) %>%
+        summarise(failure_change =
+                    any(Success == 0 & Group == group[i]) &
+                    any(Success == 1 &
+                          Group == group[i + 1])) %>%
+        filter(failure_change) %>%
+        summarise(FS = n() / N)
+      # find values for lower flow success to failure flow
+      ss <- success_success$SS[1]
+      ff <- failure_failire$FF[1]
+      sf <- success_failure$SF[1]
+      fs <- failure_success$FS[1]
+      sf_start1 <- ss 
+      sf_start2 <- means_c_t[ind] - gap/2 
+      sf_end1 <- means_c_t[ind + 1] + gap/2 
+      sf_end2 <- 1 - ff 
+      
+      
+      # find values for upper flppied flow success to failure flow
+      fs_start1 <- 1 - ff
+      fs_start2 <- means_c_t[ind] + gap/2 
+      fs_end1 <- means_c_t[ind + 1] - gap/2 
+      fs_end2 <- ss
+      
+      # form dataframes from sigmoid / flippedSig functions and the rectangles, later fit into sankeyflow
+      sig_success_failure_bot <- sigmoid(x_start + bar_width - x_padding,
+                                         scale_factor_sig,
+                                         sf_start1 - 0.002,
+                                         sf_end1 + 0.002)
+      sig_success_failure_top <- sigmoid(x_start + bar_width - x_padding,
+                                         scale_factor_sig,
+                                         sf_start2 - 0.002,
+                                         sf_end2 + 0.002)
+      sig_success_failure_bot <- arrange(sig_success_failure_bot, desc(x))
+      sig_failure_success_top <- flipped_sig(x_start + bar_width - x_padding,
+                                             scale_factor_sig,
+                                             fs_start1 + 0.002,
+                                             fs_end1 - 0.002)
+      sig_failure_success_bot <- flipped_sig(x_start + bar_width - x_padding,
+                                             scale_factor_sig,
+                                             fs_start2 + 0.002,
+                                             fs_end2 - 0.002)
+      sig_failure_success_bot <- arrange(sig_failure_success_bot, desc(x))
+      
+      #number of points of data points
+      N_points <- length(sig_success_failure_bot)
+      # generate the tag column for all of these
+      tag <- rep(ind, N_points)
+      sankey_success_failure <- rbind(sig_success_failure_top,
+                                      sig_success_failure_bot)
+      sankey_success_failure <- cbind(sankey_success_failure, tag)
+      
+      sankey_failure_success <- rbind(sig_failure_success_top,
+                                      sig_failure_success_bot)
+      sankey_failure_success <- cbind(sankey_failure_success, tag)
+      
+      rect_flow_x <- c(x_start, x_start + 1)
+      
+      sankey_failure_failure <- data.frame(x = c(rect_flow_x, rev(rect_flow_x)),
+                                           y = c(1, 1, rep(fs_start1, 2)),
+                                           tag = c(rep(ind, 4)))
+      sankey_success_success <- data.frame(x = c(rect_flow_x, rev(rect_flow_x)),
+                                           y = c(rep(ss, 2), 0, 0),
+                                           tag = c(rep(ind, 4)))
+      
+      x_start <- x_start + 1
+      
+      ind <- ind + 1
+      #` update the 4 sankey flow dfs for plotting
+      flow_success_to_failure <- bind_rows(flow_success_to_failure,
+                                           sankey_success_failure)
+      flow_success_to_success <- bind_rows(flow_success_to_success,
+                                           sankey_success_success)
+      flow_failure_to_success <- bind_rows(flow_failure_to_success,
+                                           sankey_failure_success)
+      flow_failure_to_failure <- bind_rows(flow_failure_to_failure,
+                                           sankey_failure_failure)
+    }
+    
+    x_start <- x_start + 1
+    ind <- ind + 1
+  }
+  redraw_x_axis <- c(1 : length(unlist(idx)))
+  sankey_bars <- proportional_data
+  dfs_for_sankeys <- list(flow_success_to_failure = flow_success_to_failure,
+                          flow_failure_to_success = flow_failure_to_success,
+                          flow_success_to_success = flow_success_to_success,
+                          flow_failure_to_failure = flow_failure_to_failure,
+                          sankey_bars = sankey_bars,
+                          redraw_x_axis = redraw_x_axis)
   
-  #prepare data for bargraphs of paired proportional data
-  data_for_bars <- proportional_data
-  
-  
-  list_of_dfs <- list(
-    flow1 = data_for_flow1,
-    flow2 = data_for_flow2, 
-    rect_top = data_for_rect_top, 
-    rect_bot = data_for_rect_bot,
-    bars = proportional_data
-  )
-  list_of_dfs
+  return(dfs_for_sankeys)
 }
 
 #' Function for creation of df for xaxis redraw for float_contrast FALSE plot

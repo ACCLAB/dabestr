@@ -8,6 +8,7 @@ load <- function(
     data,
     x = NULL,
     y = NULL,
+    experiment = NULL,
     idx = NULL,
     paired = NULL,
     id_col = NULL,
@@ -33,6 +34,30 @@ load <- function(
   name_x <- as_name(enquo_x)
   name_y <- as_name(enquo_y)
   
+  if (isTRUE(delta2)) {
+    enquo_experiment <- enquo(experiment)
+    name_experiment <- as_name(enquo_experiment)
+    
+    # Make sure that data is a 2x2 ANOVA case
+    if (length(unique(data[[name_experiment]]))!=2) {
+      stop("`experiment` does not have a length of 2")
+    } 
+    
+    if (length(unique(data[[name_x]]))!=2) {
+      stop("`x` does not have a length of 2")
+    }
+    
+    data <- data %>%
+      mutate(grouping = !!enquo_x) %>%
+      unite(!!enquo_experiment,c(!!enquo_x,!!enquo_experiment),sep = " ",remove=FALSE)
+    if (as_label(enquo_colour) == "NULL") {
+      enquo_colour <- enquo_x
+    }
+    enquo_x <- enquo_experiment
+    name_x <- as_name(enquo_x)
+    is_colour <- TRUE
+  }
+  
   unlist_idx <- unlist(idx)
   
   if (!is.null(idx)){
@@ -57,10 +82,6 @@ load <- function(
       dplyr::group_by(!!enquo_x) %>%
       dplyr::count()
     Ns$swarmticklabs <- do.call(paste, c(Ns[c(name_x, "n")], sep = "\nN = "))
-    
-    # (Don't need the below code anymore due to change in implementation)
-    # buffer_Ns <- data.frame(Group = "", n = 0, swarmticklabs = "") 
-    # Ns <- rbind(Ns)
     
     if(isTRUE(proportional)){
       ## include checks here for data to see if it is proportional data

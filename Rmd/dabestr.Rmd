@@ -1,5 +1,5 @@
 ---
-title: "dabestr-v1"
+title: "dabestr"
 output: 
   html_document:
     toc: true
@@ -11,6 +11,7 @@ date: '2023-06-24'
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
+library(tidyr)
 library(dplyr)
 library(stringr)
 library(lubridate)
@@ -33,6 +34,7 @@ load <- function(
     data,
     x = NULL,
     y = NULL,
+    experiment = NULL,
     idx = NULL,
     paired = NULL,
     id_col = NULL,
@@ -57,6 +59,30 @@ load <- function(
   
   name_x <- as_name(enquo_x)
   name_y <- as_name(enquo_y)
+  
+  if (isTRUE(delta2)) {
+    enquo_experiment <- enquo(experiment)
+    name_experiment <- as_name(enquo_experiment)
+
+    # Make sure that data is a 2x2 ANOVA case
+    if (length(unique(data[[name_experiment]]))!=2) {
+      stop("`experiment` does not have a length of 2")
+    } 
+    
+    if (length(unique(data[[name_x]]))!=2) {
+      stop("`x` does not have a length of 2")
+    }
+    
+    data <- data %>%
+      mutate(grouping = !!enquo_x) %>%
+      unite(!!enquo_experiment,c(!!enquo_x,!!enquo_experiment),sep = " ",remove=FALSE)
+    if (as_label(enquo_colour) == "NULL") {
+      enquo_colour <- enquo_x
+    }
+    enquo_x <- enquo_experiment
+    name_x <- as_name(enquo_x)
+    is_colour <- TRUE
+  }
   
   unlist_idx <- unlist(idx)
   
@@ -148,7 +174,6 @@ load <- function(
 
 ## grp_var and bca function for final weighted bca cis
 ```{r}
-#grp variance 
 calculate_group_variance <- function(ctrl_var, 
                                      ctrl_N,
                                      test_var, 
@@ -159,9 +184,8 @@ calculate_group_variance <- function(ctrl_var,
   # return(ctrl_var/ctrl_N + test_var/test_N)
 }
 
-#bca function inverse variance method
 bca <- function(bootstraps, conf.level = .95){
-
+  # Inverse Variance Method
   if(var(bootstraps)==0){
     lower <- mean(bootstraps)
     upper <- mean(bootstraps)
@@ -199,6 +223,8 @@ boot_weighted_row <- function(boot_result, ci){
   weighted_result <- Map(function(x, w) x * w,
                          boot_result$bootstraps, boot_result$weight)
   weighted_bootstrap <- Reduce("+", weighted_result)
+  weighted_bootstrap <- weighted_bootstrap/sum(weights)
+
   
   weighted_difference <- calculate_weighted_delta(weight = boot_result$weight,
                                                   differences = boot_result$difference)
@@ -249,7 +275,36 @@ var_w_df <- function(measurement, size){
 }
 ```
 
-# Bootstrap helper functions
+## calculate the last row of boot_result to append the bootstrap delta-delta 
+```{r}
+boot_delta_delta <- function(boot_result,ci) {
+  bootstrap_delta_delta_neg <- Reduce("-",boot_result$bootstraps)
+  bootstrap_delta_delta <- bootstrap_delta_delta_neg *-1
+  difference_delta_delta <- calculate_delta_difference(boot_result$difference)
+  bca_delta_delta <- bca(bootstrap_delta_delta)
+  pct_interval <- confinterval(bootstrap_delta_delta,ci/100)
+  boot_last_row <- list(
+    control_group = 'Delta2 Overall Test',
+    test_group = 'Delta2 Overall Test',
+    bootstraps = list(as.vector(bootstrap_delta_delta)),
+    nboots = length(bootstrap_delta_delta),
+    bca_ci_low = bca_delta_delta[1],
+    bca_ci_high = bca_delta_delta[2],
+    pct_ci_low = pct_interval[1],
+    pct_ci_high = pct_interval[2],
+    ci = ci,
+    difference = difference_delta_delta,
+    weight = 1
+    )
+  }
+
+calculate_delta_difference <- function(differences) {
+  delta_difference <- differences[2]-differences[1]
+  return(delta_difference)
+}
+```
+
+# bootstrap helper functions
 ```{r}
 effsize_boot <- function(
     data, 
@@ -444,13 +499,17 @@ bootstrap <- function(
     boot_last_row <- boot_weighted_row(boot_result = boot_result, ci)
     boot_result <- bind_rows(boot_result, boot_last_row)
     delta_x_labels <- append(delta_x_labels, "Weighted Delta")
-    }
+  }
+  if (isTRUE(delta2)) {
+    boot_last_row <- boot_delta_delta(boot_result = boot_result,ci)
+    boot_result <- bind_rows(boot_result,boot_last_row)
+    delta_x_labels <- append(delta_x_labels, "delta-delta")
+  }
   
   out <- list(raw_data = raw_data,
               idx = idx,
               delta_x_labels = delta_x_labels,
               delta_y_labels = delta_y_labels,
-              raw_data = raw_data,
               is_paired = is_paired,
               is_colour = is_colour,
               paired = paired,
@@ -472,7 +531,7 @@ bootstrap <- function(
 }
 ```
 
-# Main effect_size functions
+# effect_size functions
 ```{r}
 mean_diff <- function(dabest_obj) {
   
@@ -580,7 +639,7 @@ hedges_correction <- function(x1, x2) {
 }
 ```
 
-# float_contrast/non_float_contrast themes
+## float_contrast/non_float_contrast themes
 ```{r}
 # Theme for left-right graph
 float_contrast_theme <- 
@@ -602,7 +661,7 @@ non_float_contrast_theme <-
 
 ```
 
-# helper math stats tool functions
+## math stats tool functions
 ```{r}
 sigmoid <- function(x_from, factor, y_from, y_to, smooth = 5.5, n = 300) {
   x <- seq(-smooth, smooth, length = n)
@@ -622,7 +681,7 @@ flipped_sig <- function(x_from, factor, y_from, y_to, smooth = 5.5, n = 300) {
 # df creation functions
 ```{r}
 # Function for creation of df for tuftelines plot
-df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
+create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
   tufte_lines_df <- raw_data %>%
     dplyr::group_by(!!enquo_x) %>%
     dplyr::summarize(mean = mean(!!enquo_y),
@@ -633,7 +692,7 @@ df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
   
   if(isTRUE(proportional)){
     tufte_lines_df <- tufte_lines_df %>%
-      dplyr::mutate(sd = sd/10)
+      dplyr::mutate(sd = sd/7)
   }
   tufte_lines_df <- tufte_lines_df %>%
     dplyr::mutate(lower_sd = mean - sd, upper_sd = mean + sd)
@@ -641,76 +700,167 @@ df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
   return(tufte_lines_df)
 }
 
-create_dfs_for_sankey <- function(float_contrast = FALSE, 
-                                 raw_data, 
-                                 proportional_data, 
-                                 enquo_id_col, 
-                                 x_axis_raw, 
-                                 ind = 1,
-                                 scale_factor_sig = 0.8,
-                                 gap
-                                 ) {
-  ind <- 1
-  bar_width <- ifelse(float_contrast, 0.15, 0.10)
+create_dfs_for_sankey <-  function(float_contrast = FALSE,
+                                   raw_data,
+                                   proportional_data,
+                                   enquo_id_col,
+                                   x_axis_raw,
+                                   idx,
+                                   scale_factor_sig = 0.8,
+                                   gap) {
+  
+  type <- ifelse(length(unlist(idx)) <= 2, 
+                 "single sankey", 
+                 "multiple sankeys")
+  
+  flow_success_to_failure = tibble()
+  flow_success_to_success = tibble()
+  flow_failure_to_success = tibble()
+  flow_failure_to_failure = tibble()
+  bar_width <- ifelse(float_contrast, 0.15, 0.03)
+  
+  if(type == "single sankey" && float_contrast){
+    scale_factor_sig <- 0.72
+  } 
+  else if(type == "multiple sankeys"){
+    scale_factor_sig <- 0.92
+  }
+  else{
+    scale_factor_sig <- 0.95
+  }
   means_c_t <- proportional_data$proportion_success
-  #for() will use for loops for multiple plot groups
-  success_success <- raw_data %>%
-    group_by(!!enquo_id_col) %>%
-    summarise(success_change = 
-                any(Success == 1 & Group == "Control1") & 
-                any(Success == 1 & Group == "Test1")) %>%
-    filter(success_change) %>%
-    summarise(C1T1 = n()/N)
-  failure_failire <- raw_data %>%
-    group_by(!!enquo_id_col) %>%
-    summarise(success_change = 
-                any(Success == 0 & Group == "Control1") & 
-                any(Success == 0 & Group == "Test1")) %>%
-    filter(success_change) %>%
-    summarise(C1T1F = n()/N)
+  x_padding <- ifelse(float_contrast, 0.008, 0.006)
+   
   
-  # find values for lower flow success to failure flow
-  ss <- success_success$C1T1[1]
-  value_start1 <- success_success$C1T1[1] - gap/8
-  value_start2 <- means_c_t[1]- gap/2 - gap/8
-  value_end1 <- means_c_t[2] + gap/2 +gap/8
-  value_end2 <- 1- failure_failire$C1T1F[1] + gap/8
+  prop <- proportional_data
+  ind <- 1
+  x_start <- 1
   
+  for (group in idx) {
+    group_length <- length(group)
+    
+    for (i in 1: (group_length - 1)) {
+      #redraw_x_axis <- append(redraw_x_axis, x_start)
+      success_success <- raw_data %>%
+        group_by(!!enquo_id_col) %>%
+        summarise(success_change =
+                    any(Success == 1 & Group == group[i]) &
+                    any(Success == 1 &
+                          Group == group[i + 1])) %>%
+        filter(success_change) %>%
+        summarise(SS = n() / N)
+      
+      success_failure <- raw_data %>%
+        group_by(!!enquo_id_col) %>%
+        summarise(sf_change =
+                    any(Success == 1 & Group == group[i]) &
+                    any(Success == 0 &
+                          Group == group[i + 1])) %>%
+        filter(sf_change) %>%
+        summarise(SF = n() / N)
+      
+      failure_failire <- raw_data %>%
+        group_by(!!enquo_id_col) %>%
+        summarise(failure_change =
+                    any(Success == 0 & Group == group[i]) &
+                    any(Success == 0 &
+                          Group == group[i + 1])) %>%
+        filter(failure_change) %>%
+        summarise(FF = n() / N)
+      
+      failure_success <- raw_data %>%
+        group_by(!!enquo_id_col) %>%
+        summarise(failure_change =
+                    any(Success == 0 & Group == group[i]) &
+                    any(Success == 1 &
+                          Group == group[i + 1])) %>%
+        filter(failure_change) %>%
+        summarise(FS = n() / N)
+      # find values for lower flow success to failure flow
+      ss <- success_success$SS[1]
+      ff <- failure_failire$FF[1]
+      sf <- success_failure$SF[1]
+      fs <- failure_success$FS[1]
+      sf_start1 <- ss 
+      sf_start2 <- means_c_t[ind] - gap/2 
+      sf_end1 <- means_c_t[ind + 1] + gap/2 
+      sf_end2 <- 1 - ff 
+      
+      
+      # find values for upper flppied flow success to failure flow
+      fs_start1 <- 1 - ff
+      fs_start2 <- means_c_t[ind] + gap/2 
+      fs_end1 <- means_c_t[ind + 1] - gap/2 
+      fs_end2 <- ss
+      
+      # form dataframes from sigmoid / flippedSig functions and the rectangles, later fit into sankeyflow
+      sig_success_failure_bot <- sigmoid(x_start + bar_width - x_padding,
+                                         scale_factor_sig,
+                                         sf_start1 - 0.002,
+                                         sf_end1 + 0.002)
+      sig_success_failure_top <- sigmoid(x_start + bar_width - x_padding,
+                                         scale_factor_sig,
+                                         sf_start2 - 0.002,
+                                         sf_end2 + 0.002)
+      sig_success_failure_bot <- arrange(sig_success_failure_bot, desc(x))
+      sig_failure_success_top <- flipped_sig(x_start + bar_width - x_padding,
+                                             scale_factor_sig,
+                                             fs_start1 + 0.002,
+                                             fs_end1 - 0.002)
+      sig_failure_success_bot <- flipped_sig(x_start + bar_width - x_padding,
+                                             scale_factor_sig,
+                                             fs_start2 + 0.002,
+                                             fs_end2 - 0.002)
+      sig_failure_success_bot <- arrange(sig_failure_success_bot, desc(x))
+      
+      #number of points of data points
+      N_points <- length(sig_success_failure_bot)
+      # generate the tag column for all of these
+      tag <- rep(ind, N_points)
+      sankey_success_failure <- rbind(sig_success_failure_top,
+                                      sig_success_failure_bot)
+      sankey_success_failure <- cbind(sankey_success_failure, tag)
+      
+      sankey_failure_success <- rbind(sig_failure_success_top,
+                                      sig_failure_success_bot)
+      sankey_failure_success <- cbind(sankey_failure_success, tag)
+      
+      rect_flow_x <- c(x_start, x_start + 1)
+      
+      sankey_failure_failure <- data.frame(x = c(rect_flow_x, rev(rect_flow_x)),
+                                           y = c(1, 1, rep(fs_start1, 2)),
+                                           tag = c(rep(ind, 4)))
+      sankey_success_success <- data.frame(x = c(rect_flow_x, rev(rect_flow_x)),
+                                           y = c(rep(ss, 2), 0, 0),
+                                           tag = c(rep(ind, 4)))
+      
+      x_start <- x_start + 1
+      
+      ind <- ind + 1
+      #` update the 4 sankey flow dfs for plotting
+      flow_success_to_failure <- bind_rows(flow_success_to_failure,
+                                           sankey_success_failure)
+      flow_success_to_success <- bind_rows(flow_success_to_success,
+                                           sankey_success_success)
+      flow_failure_to_success <- bind_rows(flow_failure_to_success,
+                                           sankey_failure_success)
+      flow_failure_to_failure <- bind_rows(flow_failure_to_failure,
+                                           sankey_failure_failure)
+    }
+    
+    x_start <- x_start + 1
+    ind <- ind + 1
+  }
+  redraw_x_axis <- c(1 : length(unlist(idx)))
+  sankey_bars <- proportional_data
+  dfs_for_sankeys <- list(flow_success_to_failure = flow_success_to_failure,
+                          flow_failure_to_success = flow_failure_to_success,
+                          flow_success_to_success = flow_success_to_success,
+                          flow_failure_to_failure = flow_failure_to_failure,
+                          sankey_bars = sankey_bars,
+                          redraw_x_axis = redraw_x_axis)
   
-  # find values for upper flppied flow success to failure flow
-  flow_start1 <- 1- failure_failire$C1T1F[1]
-  flow_end1 <- means_c_t[2] - gap/2
-  flow_start2 <- means_c_t[1] + gap/2
-  flow_end2 <- success_success$C1T1[1]
-  
-  # form dataframes from sigmoid/ flippedSig functions and the rectangles, later fit into sankeyflow
-  sig1 <- sigmoid(ind + bar_width, scale_factor_sig, value_start1, value_end1)
-  sig2 <- sigmoid(ind + bar_width, scale_factor_sig, value_start2, value_end2)
-  sig1 <- arrange(sig1, desc(x))
-  sig3 <- flipped_sig(ind + bar_width, scale_factor_sig, flow_start1, flow_end1)
-  sig4 <- flipped_sig(ind + bar_width, scale_factor_sig, flow_start2, flow_end2)
-  sig4 <- arrange(sig4, desc(x))
-  data_for_flow1 <- rbind(sig2, sig1)
-  data_for_flow2 <- rbind(sig3, sig4)
-  data_for_rect_top <- data.frame(
-    x = c(x_axis_raw, rev(x_axis_raw)), 
-    y = c(1, 1, rep(flow_start1, 2)))
-  data_for_rect_bot <- data.frame(
-    x = c(x_axis_raw, rev(x_axis_raw)), 
-    y = c(rep(ss,2), 0, 0))
-  
-  #prepare data for bargraphs of paired proportional data
-  data_for_bars <- proportional_data
-  
-  
-  list_of_dfs <- list(
-    flow1 = data_for_flow1,
-    flow2 = data_for_flow2, 
-    rect_top = data_for_rect_top, 
-    rect_bot = data_for_rect_bot,
-    bars = proportional_data
-  )
-  list_of_dfs
+  return(dfs_for_sankeys)
 }
 
 create_dfs_for_xaxis_redraw <- function(idx) {
@@ -790,6 +940,7 @@ create_rawplot_components <- function(proportional,
 }
 ```
 
+## assign plot kwargs
 ```{r}
 assign_plot_kwargs <- function(plot_kwargs) {
   colour_col <- NULL
@@ -838,7 +989,7 @@ assign_plot_kwargs <- function(plot_kwargs) {
 }
 ```
 
-# custom proportionbar geom
+# proportionbar geom
 ```{r}
 "%||%" <- function(a, b) {
   if (!is.null(a)) a else b
@@ -912,7 +1063,8 @@ geom_proportionbar <- function(mapping = NULL, data = NULL,
 }
 ```
 
-# create sankey diagrams
+
+# sankey geoms
 ```{r}
 # sankey bars
 draw_panel_sankey_bar <- function(data, panel_scales, coord) {
@@ -942,8 +1094,8 @@ GeomSankeyBar <- ggproto("GeomSankeyBar", Geom,
                       required_aes = c("x", "yfailure", "ysuccess", "proportionsuccess"),
                       default_aes = aes(col = NA,
                                         width = 0.2,
-                                        col_failure = "#818181",
-                                        col_success = "#db6159",
+                                        col_failure = NA,
+                                        col_success = NA,
                                         fill_failure = "#818181",
                                         fill_success = "#db6159",
                                         alpha = 1,
@@ -967,35 +1119,35 @@ geom_sankeybar <- function(mapping = NULL, data = NULL, stat = "identity",
 }
 
 # sankey flows
-draw_panel_sankey_flow <- function(data, panel_scales, coord) {
+draw_group_sankey_flow <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales) 
+  first_row <- coords[1, , drop = FALSE]
   
   flow <- polygonGrob(x = coords$x,
                       y = coords$y,
-                      gp = gpar(col = coords$fillcol,
-                                fill = coords$fillcol,
-                                alpha = coords$alpha))
-
+                      gp = gpar(col = first_row$colour,
+                                fill = alpha(first_row$fillcol, first_row$alpha)))
 }
 
 GeomSankeyFlow <- ggproto("GeomSankeyFlow", Geom,
                           required_aes = c("x", "y"),
-                          default_aes = aes(fillcol = "gray50",
-                                            alpha = 0.8),
+                          default_aes = aes(colour = NA,
+                                            fillcol = "gray50",
+                                            alpha = 0.5),
                           draw_key = draw_key_polygon,
-                          draw_panel = draw_panel_sankey_flow)
+                          draw_group = draw_group_sankey_flow)
 
 geom_sankeyflow <- function(mapping = NULL, data = NULL, stat = "identity", 
-                           position = "identity", show.legend = NA, 
-                           na.rm = FALSE, inherit.aes = TRUE, ...) {
-        layer(data = data, 
-              mapping = mapping,
-              stat = stat,
-              geom = GeomSankeyFlow,
-              position = position,
-              show.legend = show.legend,
-              inherit.aes = inherit.aes,
-              params = list(na.rm = na.rm, ...))
+                            position = "identity", show.legend = NA, 
+                            na.rm = FALSE, inherit.aes = TRUE, ...) {
+  layer(data = data, 
+        mapping = mapping,
+        stat = stat,
+        geom = GeomSankeyFlow,
+        position = position,
+        show.legend = show.legend,
+        inherit.aes = inherit.aes,
+        params = list(na.rm = na.rm, ...))
 }
 ```
 
@@ -1049,7 +1201,7 @@ plot_slopegraph <- function(dabest_effectsize_obj) {
 }
 ```
 
-# raw plot function
+# raw_plot function
 ```{r}
 plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   enquo_x = dabest_effectsize_obj$enquo_x
@@ -1100,25 +1252,26 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   is_tufte_lines <- plot_components$is_tufte_lines
   
   if(main_plot_type == "sankey"){
-    sankey_bar_gap <- 0.02
+    sankey_bar_gap <- 0.025
     sankey_df <- create_dfs_for_sankey(float_contrast = float_contrast, 
                                        raw_data = raw_data,
                                        proportional_data = proportional_data,
                                        enquo_id_col = enquo_id_col,
                                        x_axis_raw = x_axis_raw,
-                                       gap = sankey_bar_gap)
-    flow1 <- sankey_df$flow1
-    flow2 <- sankey_df$flow2
-    rect_top <- sankey_df$rect_top
-    rect_bot <- sankey_df$rect_bot
-    bars <- sankey_df$bars
+                                       gap = sankey_bar_gap,
+                                       idx = idx)
+    flow_success_to_failure <- sankey_df$flow_success_to_failure
+    flow_failure_to_success <- sankey_df$flow_failure_to_success
+    flow_success_to_success <- sankey_df$flow_success_to_success
+    flow_failure_to_failure <- sankey_df$flow_failure_to_failure
+    sankey_bars <- sankey_df$sankey_bars
   }
   
   if(as_label(enquo_colour) == "NULL" && main_plot_type != "slope") {
     enquo_colour <- enquo_x
   }
   
-  bar_width <- ifelse(float_contrast, 0.15, 0.10)
+  bar_width <- ifelse(float_contrast, 0.15, 0.03)
   
   #### Initialise raw_plot & Add main_plot_type component ####
   raw_plot <- switch(
@@ -1130,7 +1283,10 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                     aes(x = x_axis_raw, 
                         y = !!enquo_y, 
                         colour = !!enquo_colour),
-                    cex = 2),
+                    cex = 2,
+                    method = "swarm",
+                    corral = "wrap",
+                    corral.width = 0.3),
     
     "slope" = 
       plot_slopegraph(dabest_effectsize_obj),
@@ -1146,15 +1302,15 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     
     "sankey" =
       ggplot() +
-      geom_sankeyflow(data = flow1, 
-                      aes(x = x, y = y, fillcol = "#db6159")) +
-      geom_sankeyflow(data = flow2, 
-                      aes(x = x, y = y, fillcol = "#818181")) +
-      geom_sankeyflow(data = rect_top, 
-                      aes(x = x, y = y, fillcol = "#818181")) +
-      geom_sankeyflow(data = rect_bot, 
-                      aes(x = x, y = y, fillcol = "#db6159")) +
-      geom_sankeybar(data = bars, 
+      geom_sankeyflow(data = flow_success_to_failure, 
+                      aes(x = x, y = y, fillcol = "#db6159", group = tag)) +
+      geom_sankeyflow(data = flow_failure_to_success, 
+                      aes(x = x, y = y, fillcol = "#818181", group = tag)) +
+      geom_sankeyflow(data = flow_success_to_success, 
+                      aes(x = x, y = y, fillcol = "#db6159", group = tag)) +
+      geom_sankeyflow(data = flow_failure_to_failure, 
+                      aes(x = x, y = y, fillcol = "#818181", group = tag)) +
+      geom_sankeybar(data = sankey_bars, 
                      aes(x = x_axis_raw,
                          ysuccess = y_success, 
                          yfailure = y_failure, 
@@ -1190,14 +1346,14 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   
   #### Add tufte_lines component ####
   if(isTRUE(is_tufte_lines)) {
-    tufte_lines_df <- df_for_tufte(raw_data, enquo_x, enquo_y, proportional)
+    tufte_lines_df <- create_df_for_tufte(raw_data, enquo_x, enquo_y, proportional)
     if(main_plot_type == "sankey"){
       tufte_gap_value <- sankey_bar_gap
     } else {
       tufte_gap_value <- ifelse(proportional, min(tufte_lines_df$mean)/20, min(tufte_lines_df$mean)/50)
-      tufte_gap_value <- ifelse(float_contrast, tufte_gap_value, tufte_gap_value*2)
+      tufte_gap_value <- ifelse(float_contrast, tufte_gap_value, tufte_gap_value)
     }
-    tufte_side_adjust_value <- ifelse(proportional, 0, 0.10)
+    tufte_side_adjust_value <- ifelse(proportional, 0, 0.20)
     
     row_num <- max(x_axis_raw)
     row_ref <- c(seq(1, row_num, 1)) + tufte_side_adjust_value
@@ -1258,7 +1414,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   if(isTRUE(float_contrast)) {
     raw_plot <- raw_plot +
       float_contrast_theme +
-      geom_segment(linewidth = 0.45, 
+      geom_segment(linewidth = 0.4, 
                    color = "black",
                    aes(x = 0.6, xend = raw_x_max+0.2, y = raw_y_min, yend = raw_y_min))
     
@@ -1277,8 +1433,8 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                    color = "black",
                    aes(x = x, 
                        xend = xend, 
-                       y = raw_y_min + raw_y_mean/20, 
-                       yend = raw_y_min + raw_y_mean/20))  +
+                       y = raw_y_min + raw_y_mean/40, 
+                       yend = raw_y_min + raw_y_mean/40))  +
       # Redraw xaxis ticks
       geom_segment(data = df_for_ticks,
                    linewidth = 0.5,
@@ -1286,7 +1442,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                    color = "black",
                    aes(x = x, 
                        xend = x, 
-                       y = raw_y_min + raw_y_mean/20, 
+                       y = raw_y_min + raw_y_mean/40, 
                        yend = raw_y_min))
   }
   
@@ -1303,7 +1459,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
 }
 ```
 
-# custom violin & boot_ci geoms
+# halfviolin geom
 ```{r}
 draw_group_halfviolin <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales) 
@@ -1337,7 +1493,10 @@ geom_halfviolin <- function(mapping = NULL, data = NULL, stat = "identity",
               inherit.aes = inherit.aes,
               params = list(na.rm = na.rm, ...))
 }
+```
 
+# bootci geom
+```{r}
 draw_panel_boot_ci <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales) 
         
@@ -1592,11 +1751,6 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     # Extend xaxis for minimeta/deltadelta.
     if (isTRUE(minimeta) || isTRUE(delta2)) {
       delta_x_max <- delta_x_max + 2
-      
-      if (isTRUE(minimeta)) {
-      } else {
-        delta_x_labels <- append(delta_x_labels, "delta-delta")
-      }
     }
     
     delta_plot <- delta_plot +
@@ -1658,8 +1812,8 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                    color = "black",
                    aes(x = x, 
                        xend = xend, 
-                       y = delta_y_min - delta_y_mean/3.5, 
-                       yend = delta_y_min - delta_y_mean/3.5)) +
+                       y = delta_y_min - delta_y_mean/2.5, 
+                       yend = delta_y_min - delta_y_mean/2.5)) +
       
       # Redraw xaxis ticks
       geom_segment(data = df_for_ticks,
@@ -1668,17 +1822,21 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                    color = "black",
                    aes(x = x, 
                        xend = x, 
-                       y = delta_y_min - delta_y_mean/3.5, 
+                       y = delta_y_min - delta_y_mean/2.5, 
                        yend = delta_y_min - delta_y_mean/2))
   }
   
   #### Add y = 0 line Component ####
   if (isFALSE(float_contrast)) {
+    zero_line_xend <- delta_x_max + 0.3
+    if (isTRUE(is_deltadelta)) {
+      zero_line_xend <- zero_line_xend + 0.2
+    }
     delta_plot <- delta_plot +
       geom_segment(colour = "black", 
                    linewidth = 0.3, 
                    aes(x = 0.6, 
-                       xend = delta_x_max+0.5, 
+                       xend = zero_line_xend, 
                        y = 0, 
                        yend = 0))
   }
@@ -1709,11 +1867,11 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     
     delta_plot <- cowplot::plot_grid(
       plotlist = list(delta_plot + theme(legend.position="none",
-                                         plot.margin = ggplot2::unit(c(5.5, 0, 5.5, 0), "pt")), 
+                                         plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt")), 
                       delta_delta_plot + theme(legend.position="none",
-                                               plot.margin = ggplot2::unit(c(5.5, 0, 5.5, 0), "pt"))),
+                                               plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt"))),
       nrow = 1, 
-      rel_widths = c(1, 0.1),
+      rel_widths = c(0.9, 0.1),
       axis = "lr",
       align = "h"
       )
@@ -1723,7 +1881,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
 }
 ```
 
-# palette applier
+## palette applier
 ```{r}
 apply_palette <- function(ggplot_object, palette_name) {
   ggplot_object <- switch(
@@ -1788,6 +1946,7 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
   custom_palette <- plot_kwargs$custom_palette
   
   is_colour <- dabest_obj.mean_diff$is_colour
+  is_deltadelta <- dabest_obj.mean_diff$delta2
   idx <- dabest_obj.mean_diff$idx
   raw_legend <- NULL
   
@@ -1795,41 +1954,50 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
     float_contrast <- FALSE
   }
   
-  if (isFALSE(float_contrast)) {
-    
+  if(isFALSE(float_contrast)) {
     raw_plot <- apply_palette(plot_raw(dabest_obj.mean_diff, float_contrast=FALSE, plot_kwargs), custom_palette)
     delta_plot <- apply_palette(plot_delta(dabest_obj.mean_diff, float_contrast=FALSE, plot_kwargs), custom_palette)
     
-    if(isTRUE(is_colour)) {
-      raw_legend <- get_legend(raw_plot + 
-                                 guides(alpha = "none") +
-                                 theme(legend.box.margin = margin(0, 0, 0, 0)))
+    raw_legend <- get_legend(raw_plot + 
+                         guides(alpha = "none") +
+                         theme(legend.box.margin = margin(0, 0, 0, 0)))
+    
+    if(isTRUE(is_deltadelta)) {
+      raw_plot <- cowplot::plot_grid(
+        plotlist = list(raw_plot + theme(legend.position="none"), 
+                        NULL), 
+        nrow = 1, 
+        ncol = 2, 
+        rel_widths = c(0.9, 0.1)
+        )
     }
     
     final_plot <- cowplot::plot_grid(
       plotlist   = list(raw_plot + theme(legend.position="none"), 
-                        raw_legend, 
-                        delta_plot + theme(legend.position="none"),
-                        NULL),
+                      delta_plot + theme(legend.position="none")),
       nrow       = 2,
-      ncol       = 2,
-      rel_widths = c(0.9, 0.1),
-      axis       = "lr",
-      align      = "b")
-    
-    return(final_plot)
-    
-  } else {
-    
-    raw_plot <-  apply_palette(plot_raw(dabest_obj.mean_diff, float_contrast=TRUE, plot_kwargs), custom_palette)
-    delta_plot <- apply_palette(plot_delta(dabest_obj.mean_diff, float_contrast=TRUE, plot_kwargs), custom_palette)
+      ncol       = 1,
+      axis       = "tblr",
+      align      = "vh"
+      )
     
     if(isTRUE(is_colour)) {
-      raw_legend <- get_legend(raw_plot + 
-                                 guides(color = guide_legend(nrow = 1),
-                                        alpha = "none") + 
-                                 theme(legend.position = "bottom"))
+      legend_plot <- cowplot::plot_grid(
+        plotlist = list(raw_legend, NULL),
+        nrow = 2,
+        ncol = 1,
+        rel_heights = c(0.1, 0.9)
+        )
+      
+      final_plot <- cowplot::plot_grid(final_plot, legend_plot, ncol = 2, nrow = 1, rel_widths = c(0.9, 0.1))
     }
+  
+    return(final_plot)
+
+  } else {
+    #isTRUE(float_contrast)
+    raw_plot <-  apply_palette(plot_raw(dabest_obj.mean_diff, float_contrast=TRUE, plot_kwargs), custom_palette)
+    delta_plot <- apply_palette(plot_delta(dabest_obj.mean_diff, float_contrast=TRUE, plot_kwargs), custom_palette)
     
     final_plot <- cowplot::plot_grid(
       plotlist   = list(raw_plot + theme(legend.position="none"), 
@@ -1838,18 +2006,23 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
       ncol       = 2,
       rel_widths = c(0.8, 0.2),
       axis       = "lr",
-      align      = "h")
-    
-    final_plot <- cowplot::plot_grid(final_plot, raw_legend, ncol = 1, rel_heights = c(1, 0.1))
-    
+      align      = "h"
+      )
+
+    if(isTRUE(is_colour)) {
+      raw_legend <- get_legend(raw_plot + 
+                                 guides(color = guide_legend(nrow = 1),
+                                        alpha = "none") + 
+                                 theme(legend.position = "bottom"))
+      
+      final_plot <- cowplot::plot_grid(final_plot, raw_legend, ncol = 1, rel_heights = c(0.9, 0.1))
+    }
     return(final_plot)
   }
-  
-  final_plot
 }
 ```
 
-# Testing dataset
+# 2group dataset
 ```{r}
 set.seed(12345)
 
@@ -1874,8 +2047,6 @@ my.data <- wide.data %>%
   tidyr::gather(key = Group, value = Measurement, -ID, -Gender, -Dummy)
 ```
 
-
-# Testing unpaired plots
 ```{r}
 dabest_obj <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1"))
 dabest_obj.mean_diff <- mean_diff(dabest_obj)
@@ -1889,6 +2060,7 @@ dabest_obj.mean_diff <- mean_diff(dabest_obj)
 # dabest_obj.mean_diff.plot
 ```
 
+## unpaired
 ```{r}
 dabest_plot(dabest_obj.mean_diff, TRUE)
 dabest_plot(dabest_obj.mean_diff, FALSE, custom_palette = "nejm")
@@ -1903,8 +2075,79 @@ dabest_plot(dabest_obj.colour_mean_diff, TRUE, custom_palette = "jama")
 dabest_plot(dabest_obj.colour_mean_diff, FALSE, custom_palette = "jco")
 ```
 
+
+## testing export as pdf/png/jepg
+```{r}
+pdf(file = "figures/2group/2group_float_true.pdf",
+    width = 5.5,
+    height = 5.5,
+    pointsize = 12)
+dabest_plot(dabest_obj.mean_diff, TRUE)
+dabest_plot(dabest_obj.colour_mean_diff, TRUE)
+dev.off()
+
+pdf(file = "figures/2group/2group_float_false.pdf",
+    width = 5.5,
+    height = 7,
+    pointsize = 12)
+dabest_plot(dabest_obj.mean_diff, FALSE)
+dabest_plot(dabest_obj.colour_mean_diff, FALSE)
+dev.off()
+```
+
+```{r}
+png(file = "figures/2group/2group_float_true.png",
+    width = 5.5,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
+dabest_plot(dabest_obj.mean_diff, TRUE)
+dev.off()
+
+jpeg(file = "figures/2group/2group_float_false.jpeg",
+    width = 5.5,
+    height = 7,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    quality = 100,
+    bg = "white")
+dabest_plot(dabest_obj.mean_diff, FALSE)
+dev.off()
+```
+
+# multiplot dataset
+```{r}
+set.seed(12345)
+
+N = 40
+c1 <- rnorm(N, mean = 3, sd = 0.4)
+c2 <- rnorm(N, mean = 3.5, sd = 0.75)
+c3 <- rnorm(N, mean = 3.25, sd = 0.4)
+
+g1 <- rnorm(N, mean = 3.5, sd = 0.5)
+g2 <- rnorm(N, mean = 2.5, sd = 0.6)
+g3 <- rnorm(N, mean = 3, sd = 0.75)
+
+gender <- c(rep('Male', N/2), rep('Female', N/2))
+dummy <- rep("Dummy", N)
+id <- 1: N
+
+wide.data <- tibble::tibble(
+  Control1 = c1, Control2 = c2, Control3 = c3,
+  Group1 = g1, Group2 = g2, Group3 = g3, 
+  Dummy = dummy,
+  Gender = gender, ID = id)
+
+my.data <- wide.data %>%
+  tidyr::gather(key = Group, value = Measurement, -ID, -Gender, -Dummy)
 # multigroup
 ## multigroup unpaired
+```
+
+## unpaired
 ```{r}
 dabest_obj_multigroup <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control1", "Group1"), c("Control2", "Group2", "Group3")))
 dabest_obj_multigroup.mean_diff <- mean_diff(dabest_obj_multigroup)
@@ -1915,7 +2158,7 @@ dabest_plot(dabest_obj_multigroup.mean_diff, TRUE)
 dabest_plot(dabest_obj_multigroup.mean_diff, FALSE, custom_palette = "jama")
 ```
 
-## unpaired multiplot colour
+## unpaired colour
 ```{r}
 dabest_obj.colour_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1", "Group2", "Group3"), colour = Gender) %>%
   mean_diff()
@@ -1923,8 +2166,41 @@ dabest_obj.colour_mean_diff <- load(data = my.data, x = Group, y = Measurement, 
 dabest_plot(dabest_obj.colour_mean_diff, FALSE, custom_palette = "jco")
 ```
 
+## testing export as pdf/png/jepg
+```{r}
+pdf(file = "figures/multigroup/multigroup_unpaired.pdf",
+    width = 5.5,
+    height = 7,
+    pointsize = 12)
+dabest_plot(dabest_obj_multigroup.mean_diff, FALSE)
+dabest_plot(dabest_obj.colour_mean_diff, FALSE)
+dev.off()
+```
 
-# Testing paired plots 
+```{r}
+png(file = "figures/multigroup/multigroup_unpaired.png",
+    width = 5.5,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
+dabest_plot(dabest_obj_multigroup.mean_diff, FALSE)
+dev.off()
+
+jpeg(file = "figures/multigroup/multigroup_unpaired_colour.jpeg",
+    width = 7,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    quality = 100,
+    bg = "white")
+dabest_plot(dabest_obj.colour_mean_diff, FALSE)
+dev.off()
+```
+
+## paired
 ```{r}
 dabest_obj_multigroup_sequential <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "sequential", id_col = ID)
 dabest_obj_multigroup_sequential.mean_diff <- mean_diff(dabest_obj_multigroup_sequential)
@@ -1938,6 +2214,7 @@ dabest_plot(dabest_obj_multigroup_sequential.mean_diff, FALSE)
 dabest_plot(dabest_obj_multigroup_baseline.mean_diff, FALSE)
 ```
 
+## paired colour
 ```{r}
 dabest_obj.colour_baseline_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "baseline", id_col = ID, colour = Gender) %>%
   mean_diff()
@@ -1951,7 +2228,30 @@ dabest_plot(dabest_obj.colour_baseline_mean_diff, TRUE, custom_palette = "nejm")
 dabest_plot(dabest_obj.colour_sequential_mean_diff, TRUE, custom_palette = "jco")
 ```
 
-# Testing proportional dataset
+```{r}
+png(file = "figures/multigroup/multigroup_sequential.png",
+    width = 5.5,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
+dabest_plot(dabest_obj_multigroup_sequential.mean_diff, FALSE)
+dev.off()
+
+jpeg(file = "figures/multigroup/multigroup_baseline_colour.jpeg",
+    width = 7,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    quality = 100,
+    bg = "white")
+dabest_plot(dabest_obj.colour_baseline_mean_diff, FALSE)
+dev.off()
+```
+
+# proportional dataset
 ```{r}
 set.seed(54321)
 
@@ -1975,8 +2275,26 @@ my.data.test_proportion2 <- data.frame(
 my.data.test_proportion2$Success <- numeric(nrow(my.data.test_proportion2))
 my.data.test_proportion2$Success[sample(nrow(my.data.test_proportion2), 15)] <- 1
 
-my.data.proportional <- rbind(my.data.control_proportional, my.data.test_proportion1, my.data.test_proportion2)
-id <- data.frame(ID = rep(c(1:40), 3))
+my.data.test_proportion3 <- data.frame(
+  Group = sample(c("Test3"), 40, TRUE)
+)
+my.data.test_proportion3$Success <- numeric(nrow(my.data.test_proportion3))
+my.data.test_proportion3$Success[sample(nrow(my.data.test_proportion3), 18)] <- 1
+
+my.data.test_proportion4 <- data.frame(
+  Group = sample(c("Test4"), 40, TRUE)
+)
+my.data.test_proportion4$Success <- numeric(nrow(my.data.test_proportion4))
+my.data.test_proportion4$Success[sample(nrow(my.data.test_proportion4), 20)] <- 1
+
+my.data.test_proportion5 <- data.frame(
+  Group = sample(c("Control2"), 40, TRUE)
+)
+my.data.test_proportion5$Success <- numeric(nrow(my.data.test_proportion5))
+my.data.test_proportion5$Success[sample(nrow(my.data.test_proportion5), 4)] <- 1
+
+my.data.proportional <- rbind(my.data.control_proportional, my.data.test_proportion1, my.data.test_proportion2, my.data.test_proportion3, my.data.test_proportion4, my.data.test_proportion5)
+id <- data.frame(ID = rep(c(1:40), 6))
 my.data.proportional <- cbind(my.data.proportional, id)
 ```
 
@@ -1989,6 +2307,7 @@ dabest_obj_proportional.mean_diff <- load(data = my.data.proportional,
   mean_diff()
 ```
 
+## unpaired
 ```{r}
 dabest_plot(dabest_obj_proportional.mean_diff, TRUE, custom_palette = "igv") 
 dabest_plot(dabest_obj_proportional.mean_diff, FALSE, custom_palette = "uchicago")
@@ -2003,10 +2322,44 @@ dabest_obj_proportional_multigroup.cohens_h <- load(data = my.data.proportional,
   cohens_h()
 ```
 
+## multi unpaired
 ```{r}
 
 dabest_plot(dabest_obj_proportional_multigroup.cohens_h, TRUE, custom_palette = "brewer")
 dabest_plot(dabest_obj_proportional_multigroup.cohens_h, FALSE)
+```
+
+```{r}
+png(file = "figures/proportion/2group_proportion_float_false.png",
+    width = 5.5,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
+dabest_plot(dabest_obj_proportional.mean_diff, FALSE)
+dev.off()
+
+png(file = "figures/proportion/2group_proportion_float_true.png",
+    width = 5.5,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
+dabest_plot(dabest_obj_proportional.mean_diff, TRUE)
+dev.off()
+
+jpeg(file = "figures/proportion/multigroup_proportion.jpeg",
+    width = 5.5,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    quality = 100,
+    bg = "white")
+dabest_plot(dabest_obj_proportional_multigroup.cohens_h, FALSE)
+dev.off()
 ```
 
 ```{r}
@@ -2020,10 +2373,71 @@ dabest_obj_sankey.mean_diff <- load(data = my.data.proportional,
   mean_diff()
 ```
 
+## sankey
 ```{r}
+dabest_plot(dabest_obj_sankey.mean_diff, TRUE)
 dabest_plot(dabest_obj_sankey.mean_diff, FALSE)
 ```
-# Testing minimeta dataset
+
+```{r}
+dabest_obj_baseline_sankey.mean_diff <- load(data = my.data.proportional, 
+                                  x = Group, 
+                                  y = Success, 
+                                  idx = list(c("Control1", "Test1", "Test2", "Test3"),c("Control2", "Test4")),
+                                  proportional = TRUE,
+                                  paired = "baseline",
+                                  id_col = ID) %>%
+  mean_diff()
+
+dabest_obj_sequential_sankey.mean_diff <- load(data = my.data.proportional, 
+                                  x = Group, 
+                                  y = Success, 
+                                  idx = list(c("Control1", "Test1", "Test2", "Test3"),c("Control2", "Test4")),
+                                  proportional = TRUE,
+                                  paired = "sequential",
+                                  id_col = ID) %>%
+  mean_diff()
+```
+
+## multi sankey
+```{r}
+dabest_plot(dabest_obj_baseline_sankey.mean_diff, FALSE)
+dabest_plot(dabest_obj_sequential_sankey.mean_diff, FALSE)
+```
+```{r}
+png(file = "figures/proportion/2group_sankey_float_true.png",
+    width = 5.5,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
+dabest_plot(dabest_obj_sankey.mean_diff, TRUE)
+dev.off()
+
+png(file = "figures/proportion/multigroup_sankey_baseline.png",
+    width = 5.5,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
+dabest_plot(dabest_obj_baseline_sankey.mean_diff, FALSE)
+dev.off()
+
+jpeg(file = "figures/proportion/multigroup_sankey_sequential.png",
+    width = 5.5,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    quality = 100,
+    bg = "white")
+dabest_plot(dabest_obj_sequential_sankey.mean_diff, FALSE)
+dev.off()
+```
+
+# minimeta dataset
 ```{r}
 set.seed(12345)
 
@@ -2048,18 +2462,85 @@ my.data <- wide.data %>%
   tidyr::gather(key = Group, value = Measurement, -ID, -Gender, -Dummy)
 ```
 
-# Testing minimeta & deltadelta w/0 actual minimeta and deltadelta functionalities
+## unpaired
 ```{r}
 dabest_obj_multigroup_minimeta <- load(data = my.data, x = Group, y = Measurement, minimeta = TRUE, idx = list(c("Control1", "Group1"), c("Control2", "Group2"), c("Control3", "Group3")))
 dabest_obj_multigroup_minimeta.mean_diff <- mean_diff(dabest_obj_multigroup_minimeta)
-
-dabest_obj_multigroup_deltadelta <- load(data = my.data, x = Group, y = Measurement, delta2 = TRUE, idx = list(c("Control1", "Group1"), c("Control2", "Group2", "Group3")))
-dabest_obj_multigroup_deltadelta.mean_diff <- mean_diff(dabest_obj_multigroup_deltadelta)
-dabest_obj_multigroup_deltadelta.mean_diff$boot_result <- 
-  rbind(dabest_obj_multigroup_deltadelta.mean_diff$boot_result, dabest_obj_multigroup_deltadelta.mean_diff$boot_result[3,])
+dabest_plot(dabest_obj_multigroup_minimeta.mean_diff, TRUE)
 ```
 
 ```{r}
+png(file = "figures/minimeta/multigroup_minimeta.png",
+    width = 7,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
 dabest_plot(dabest_obj_multigroup_minimeta.mean_diff, TRUE)
+dev.off()
+```
+
+# deltadelta dataset
+```{r}
+set.seed(12345)
+
+N = 40
+placebo <- rnorm(N, mean = 3, sd = 0.4)
+drug <- rnorm(N, mean = 3.5, sd = 0.75)
+genotype <- c(rep('M', N/2), rep('W', N/2))
+dummy <- rep("Dummy", N)
+id <- 1: N
+Rep <- rep(c("Rep1", "Rep2"), N/2)
+
+wide.data <- tibble::tibble(
+  Placebo = placebo,
+  Drug = drug,
+  Dummy = dummy,
+  Genotype = genotype, 
+  ID = id,
+  Rep = Rep)
+
+my.data <- wide.data %>%
+  tidyr::gather(key = Treatment, value = Measurement, -ID, -Genotype, -Dummy, -Rep)
+```
+
+## unpaired
+```{r}
+dabest_obj_multigroup_deltadelta <- load(data = my.data, x = Genotype, y = Measurement, delta2 = TRUE, experiment =Treatment, idx = list(c("W Placebo","M Placebo"),c("W Drug","M Drug")), colour = Genotype)
+dabest_obj_multigroup_deltadelta.mean_diff <- mean_diff(dabest_obj_multigroup_deltadelta)
+
 dabest_plot(dabest_obj_multigroup_deltadelta.mean_diff, TRUE)
+```
+
+
+## paired
+```{r}
+dabest_obj_multigroup_deltadelta_baseline <- load(data = my.data, x = Treatment, y = Measurement, delta2 = TRUE, experiment = Genotype,idx = list(c("Placebo W","Drug W"),c("Placebo M","Drug M")), paired = "baseline", id = ID, colour = Rep)
+
+dabest_obj_multigroup_deltadelta_baseline.mean_diff <- mean_diff(dabest_obj_multigroup_deltadelta_baseline)
+
+dabest_plot(dabest_obj_multigroup_deltadelta_baseline.mean_diff, TRUE)
+```
+
+```{r}
+png(file = "figures/deltadelta/multigroup_deltadelta_unpaired.png",
+    width = 7,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
+dabest_plot(dabest_obj_multigroup_deltadelta.mean_diff, TRUE)
+dev.off()
+
+png(file = "figures/deltadelta/multigroup_deltadelta_paired.png",
+    width = 7,
+    height = 5.5,
+    units = "in",
+    pointsize = 12,
+    res = 1200,
+    bg = "white")
+dabest_plot(dabest_obj_multigroup_deltadelta_baseline.mean_diff, FALSE)
+dev.off()
 ```

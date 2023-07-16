@@ -53,25 +53,26 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   is_tufte_lines <- plot_components$is_tufte_lines
   
   if(main_plot_type == "sankey"){
-    sankey_bar_gap <- 0.02
+    sankey_bar_gap <- 0.025
     sankey_df <- create_dfs_for_sankey(float_contrast = float_contrast, 
                                        raw_data = raw_data,
                                        proportional_data = proportional_data,
                                        enquo_id_col = enquo_id_col,
                                        x_axis_raw = x_axis_raw,
-                                       gap = sankey_bar_gap)
-    flow1 <- sankey_df$flow1
-    flow2 <- sankey_df$flow2
-    rect_top <- sankey_df$rect_top
-    rect_bot <- sankey_df$rect_bot
-    bars <- sankey_df$bars
+                                       gap = sankey_bar_gap,
+                                       idx = idx)
+    flow_success_to_failure <- sankey_df$flow_success_to_failure
+    flow_failure_to_success <- sankey_df$flow_failure_to_success
+    flow_success_to_success <- sankey_df$flow_success_to_success
+    flow_failure_to_failure <- sankey_df$flow_failure_to_failure
+    sankey_bars <- sankey_df$sankey_bars
   }
   
   if(as_label(enquo_colour) == "NULL" && main_plot_type != "slope") {
     enquo_colour <- enquo_x
   }
   
-  bar_width <- ifelse(float_contrast, 0.15, 0.10)
+  bar_width <- ifelse(float_contrast, 0.15, 0.03)
   
   #### Initialise raw_plot & Add main_plot_type component ####
   raw_plot <- switch(
@@ -83,7 +84,10 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                     aes(x = x_axis_raw, 
                         y = !!enquo_y, 
                         colour = !!enquo_colour),
-                    cex = 2),
+                    cex = 2,
+                    method = "swarm",
+                    corral = "wrap",
+                    corral.width = 0.3),
     
     "slope" = 
       plot_slopegraph(dabest_effectsize_obj),
@@ -99,15 +103,15 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     
     "sankey" =
       ggplot() +
-      geom_sankeyflow(data = flow1, 
-                      aes(x = x, y = y, fillcol = "#db6159")) +
-      geom_sankeyflow(data = flow2, 
-                      aes(x = x, y = y, fillcol = "#818181")) +
-      geom_sankeyflow(data = rect_top, 
-                      aes(x = x, y = y, fillcol = "#818181")) +
-      geom_sankeyflow(data = rect_bot, 
-                      aes(x = x, y = y, fillcol = "#db6159")) +
-      geom_sankeybar(data = bars, 
+      geom_sankeyflow(data = flow_success_to_failure, 
+                      aes(x = x, y = y, fillcol = "#db6159", group = tag)) +
+      geom_sankeyflow(data = flow_failure_to_success, 
+                      aes(x = x, y = y, fillcol = "#818181", group = tag)) +
+      geom_sankeyflow(data = flow_success_to_success, 
+                      aes(x = x, y = y, fillcol = "#db6159", group = tag)) +
+      geom_sankeyflow(data = flow_failure_to_failure, 
+                      aes(x = x, y = y, fillcol = "#818181", group = tag)) +
+      geom_sankeybar(data = sankey_bars, 
                      aes(x = x_axis_raw,
                          ysuccess = y_success, 
                          yfailure = y_failure, 
@@ -143,14 +147,14 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   
   #### Add tufte_lines component ####
   if(isTRUE(is_tufte_lines)) {
-    tufte_lines_df <- df_for_tufte(raw_data, enquo_x, enquo_y, proportional)
+    tufte_lines_df <- create_df_for_tufte(raw_data, enquo_x, enquo_y, proportional)
     if(main_plot_type == "sankey"){
       tufte_gap_value <- sankey_bar_gap
     } else {
       tufte_gap_value <- ifelse(proportional, min(tufte_lines_df$mean)/20, min(tufte_lines_df$mean)/50)
-      tufte_gap_value <- ifelse(float_contrast, tufte_gap_value, tufte_gap_value*2)
+      tufte_gap_value <- ifelse(float_contrast, tufte_gap_value, tufte_gap_value)
     }
-    tufte_side_adjust_value <- ifelse(proportional, 0, 0.10)
+    tufte_side_adjust_value <- ifelse(proportional, 0, 0.20)
     
     row_num <- max(x_axis_raw)
     row_ref <- c(seq(1, row_num, 1)) + tufte_side_adjust_value
@@ -211,7 +215,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   if(isTRUE(float_contrast)) {
     raw_plot <- raw_plot +
       float_contrast_theme +
-      geom_segment(linewidth = 0.45, 
+      geom_segment(linewidth = 0.4, 
                    color = "black",
                    aes(x = 0.6, xend = raw_x_max+0.2, y = raw_y_min, yend = raw_y_min))
     
@@ -230,8 +234,8 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                    color = "black",
                    aes(x = x, 
                        xend = xend, 
-                       y = raw_y_min + raw_y_mean/20, 
-                       yend = raw_y_min + raw_y_mean/20))  +
+                       y = raw_y_min + raw_y_mean/40, 
+                       yend = raw_y_min + raw_y_mean/40))  +
       # Redraw xaxis ticks
       geom_segment(data = df_for_ticks,
                    linewidth = 0.5,
@@ -239,7 +243,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                    color = "black",
                    aes(x = x, 
                        xend = x, 
-                       y = raw_y_min + raw_y_mean/20, 
+                       y = raw_y_min + raw_y_mean/40, 
                        yend = raw_y_min))
   }
   
@@ -358,11 +362,6 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     # Extend xaxis for minimeta/deltadelta.
     if (isTRUE(minimeta) || isTRUE(delta2)) {
       delta_x_max <- delta_x_max + 2
-      
-      if (isTRUE(minimeta)) {
-      } else {
-        delta_x_labels <- append(delta_x_labels, "delta-delta")
-      }
     }
     
     delta_plot <- delta_plot +
@@ -424,8 +423,8 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                    color = "black",
                    aes(x = x, 
                        xend = xend, 
-                       y = delta_y_min - delta_y_mean/3.5, 
-                       yend = delta_y_min - delta_y_mean/3.5)) +
+                       y = delta_y_min - delta_y_mean/2.5, 
+                       yend = delta_y_min - delta_y_mean/2.5)) +
       
       # Redraw xaxis ticks
       geom_segment(data = df_for_ticks,
@@ -434,17 +433,21 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                    color = "black",
                    aes(x = x, 
                        xend = x, 
-                       y = delta_y_min - delta_y_mean/3.5, 
+                       y = delta_y_min - delta_y_mean/2.5, 
                        yend = delta_y_min - delta_y_mean/2))
   }
   
   #### Add y = 0 line Component ####
   if (isFALSE(float_contrast)) {
+    zero_line_xend <- delta_x_max + 0.3
+    if (isTRUE(is_deltadelta)) {
+      zero_line_xend <- zero_line_xend + 0.2
+    }
     delta_plot <- delta_plot +
       geom_segment(colour = "black", 
                    linewidth = 0.3, 
                    aes(x = 0.6, 
-                       xend = delta_x_max+0.5, 
+                       xend = zero_line_xend, 
                        y = 0, 
                        yend = 0))
   }
@@ -475,11 +478,11 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     
     delta_plot <- cowplot::plot_grid(
       plotlist = list(delta_plot + theme(legend.position="none",
-                                         plot.margin = ggplot2::unit(c(5.5, 0, 5.5, 0), "pt")), 
+                                         plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt")), 
                       delta_delta_plot + theme(legend.position="none",
-                                               plot.margin = ggplot2::unit(c(5.5, 0, 5.5, 0), "pt"))),
+                                               plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt"))),
       nrow = 1, 
-      rel_widths = c(1, 0.1),
+      rel_widths = c(0.9, 0.1),
       axis = "lr",
       align = "h"
     )

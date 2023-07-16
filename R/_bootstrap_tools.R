@@ -8,7 +8,7 @@ effsize_boot <- function(
     effect_size_func, 
     reps = 5000, 
     paired = FALSE
-){
+    ){
   
   s <- c(rep(1, length(data$control)),
          rep(2, length(data$test)))
@@ -31,13 +31,14 @@ effsize_boot <- function(
   return(b)
 }
 
+# Main bootstrap function
 bootstrap <- function(
     dabest_obj,
     effect_size_func,
     seed = 12345,
     reps = 5000,
     boot_labs
-){
+    ){
   
   boot_result <- tibble()
   
@@ -197,12 +198,16 @@ bootstrap <- function(
     boot_result <- bind_rows(boot_result, boot_last_row)
     delta_x_labels <- append(delta_x_labels, "Weighted Delta")
   }
+  if (isTRUE(delta2)) {
+    boot_last_row <- boot_delta_delta(boot_result = boot_result,ci)
+    boot_result <- bind_rows(boot_result,boot_last_row)
+    delta_x_labels <- append(delta_x_labels, "delta-delta")
+  }
   
   out <- list(raw_data = raw_data,
               idx = idx,
               delta_x_labels = delta_x_labels,
               delta_y_labels = delta_y_labels,
-              raw_data = raw_data,
               is_paired = is_paired,
               is_colour = is_colour,
               paired = paired,
@@ -223,8 +228,9 @@ bootstrap <- function(
   return(out)
 }
 
+# BCA function
 bca <- function(bootstraps, conf.level = .95){
-  
+  # Inverse Variance Method
   if(var(bootstraps)==0){
     lower <- mean(bootstraps)
     upper <- mean(bootstraps)
@@ -251,6 +257,7 @@ bca <- function(bootstraps, conf.level = .95){
   return(c(lower, upper))
 } 
 
+# Creates df of values (bca ci, weighted bootstraps) for minimeta
 boot_weighted_row <- function(boot_result, ci){
   bootstraps <- boot_result$bootstraps
   weights <- boot_result$weight
@@ -258,6 +265,8 @@ boot_weighted_row <- function(boot_result, ci){
   weighted_result <- Map(function(x, w) x * w,
                          boot_result$bootstraps, boot_result$weight)
   weighted_bootstrap <- Reduce("+", weighted_result)
+  weighted_bootstrap <- weighted_bootstrap/sum(weights)
+  
   
   weighted_difference <- calculate_weighted_delta(weight = boot_result$weight,
                                                   differences = boot_result$difference)
@@ -274,6 +283,29 @@ boot_weighted_row <- function(boot_result, ci){
     pct_ci_high = pct_interval[2],
     ci = ci,
     difference = weighted_difference,
-    weight = 1)
+    weight = 1
+    )
   return(boot_last_row)
+}
+
+# Creates df of values (bca ci, weighted bootstraps) for deltadelta
+boot_delta_delta <- function(boot_result,ci) {
+  bootstrap_delta_delta_neg <- Reduce("-",boot_result$bootstraps)
+  bootstrap_delta_delta <- bootstrap_delta_delta_neg *-1
+  difference_delta_delta <- calculate_delta_difference(boot_result$difference)
+  bca_delta_delta <- bca(bootstrap_delta_delta)
+  pct_interval <- confinterval(bootstrap_delta_delta,ci/100)
+  boot_last_row <- list(
+    control_group = 'Delta2 Overall Test',
+    test_group = 'Delta2 Overall Test',
+    bootstraps = list(as.vector(bootstrap_delta_delta)),
+    nboots = length(bootstrap_delta_delta),
+    bca_ci_low = bca_delta_delta[1],
+    bca_ci_high = bca_delta_delta[2],
+    pct_ci_low = pct_interval[1],
+    pct_ci_high = pct_interval[2],
+    ci = ci,
+    difference = difference_delta_delta,
+    weight = 1
+    )
 }

@@ -33,6 +33,11 @@ calculate_weighted_delta <- function(weight, differences) {
   return(num / denom)
 }
 
+calculate_delta_difference <- function(differences) {
+  delta_difference <- differences[2]-differences[1]
+  return(delta_difference)
+}
+
 confinterval <- function(vector, ci_decimal){
   sample_mean <- mean(vector)
   standard_error <- sd(vector) / sqrt(length(vector))
