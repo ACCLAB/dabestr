@@ -26,15 +26,15 @@ library(scales)
 library(ggsci)
 library(colorspace)
 library(roxygen2)
+library(cli)
 ```
 
 # load function
 ```{r}
 load <- function(
     data,
-    x = NULL,
-    y = NULL,
-    experiment = NULL,
+    x,
+    y,
     idx = NULL,
     paired = NULL,
     id_col = NULL,
@@ -42,7 +42,10 @@ load <- function(
     colour = NULL,
     proportional = FALSE,
     minimeta = FALSE,
-    delta2 = FALSE
+    delta2 = FALSE,
+    experiment = NULL,
+    experiment_label = NULL,
+    x1_level = NULL
     ){
   
   # Storing plotting params as quosures
@@ -51,26 +54,121 @@ load <- function(
   enquo_id_col <- enquo(id_col)
   enquo_colour <- enquo(colour)
   
-  is_colour <- isTRUE(as_label(enquo_colour) != "NULL")
+  is_colour <- isFALSE(quo_is_null(enquo_colour))
+  is_id_col <- isFALSE(quo_is_null(enquo_id_col))
   is_paired <- isFALSE(is.null(paired))
-  
-  # to add: if is_paired is TRUE --> id_col cannot be NULl
-  # to add: paired must be either "baseline" or "sequential"
   
   name_x <- as_name(enquo_x)
   name_y <- as_name(enquo_y)
   
+  #### Checking Validity of params ####
+  if (isFALSE(name_x %in% colnames(data))) {
+    cli::cli_abort(c("Column {.field x} is {.emph not} in {.field data}.", 
+                     "x" = "Please enter a valid entry for {.field x} in {.fun load}."))
+  }
+  if (isFALSE(name_y %in% colnames(data))) {
+    cli::cli_abort(c("Column {.field y} is {.strong not} in {.field data}.", 
+                     "x" = "Please enter a valid entry for {.field y} in {.fun load}."))
+  }
+  if (isTRUE(is_id_col)) {
+    if (isFALSE(as_name(enquo_id_col) %in% colnames(data))) {
+      cli::cli_abort(c("Column {.field id_col} is {.strong not} in {.field data}.", 
+                     "x" = "Please enter a valid entry for {.field id_col} in {.fun load}."))
+    }
+  }
+  if (isTRUE(is_colour)) {
+    if (isFALSE(as_name(enquo_colour) %in% colnames(data))) {
+      cli::cli_abort(c("Column {.field colour} is {.strong not} in {.field data}.", 
+                     "x" = "Please enter a valid entry for {.field colour} in {.fun load}."))
+    }
+  }
+  
+  if (isFALSE(delta2)) {
+    if (is.list(idx)) {
+        general_idx_lengths <- sapply(idx,length)
+      if (any(general_idx_lengths<2)==TRUE) {
+        cli::cli_abort(c("Some {.field idx} does not consist of at least 2 groups",
+                    "x" = "Make sure each nested group in {.field idx} has length >=2."))
+        }
+      } else {
+      general_idx_lengths <- length(idx)
+      if (any(general_idx_lengths<2)==TRUE) {
+        cli::cli_abort(c("Some {.field idx} does not consist of at least 2 groups",
+                    "x" = "Make sure each nested group in {.field idx} has length >=2."))
+      }
+    }
+  }  
+
+  
+  ## Check that data is proportional
+  if (isTRUE(proportional)) {
+    values <- unique(data[[name_y]])
+    if (isFALSE(setequal(c(0,1), values))) {
+      cli::cli_abort(c("{.field proportional} is {.strong TRUE} but {.field data} is not proportional.", 
+               "x" = "{.field y} Column of {.field data} should only contain 1 and 0."))
+    }
+  }
+  
+  ## Check that id_col is not NULL if is_paired is TRUE
+  if (isTRUE(is_paired) & isFALSE(is_id_col)) {
+    cli::cli_abort(c("{.field paired} is {.strong TRUE} but no {.field id_col} was supplied.", 
+                     "x" = "Please enter an entry for {.field id_col} in {.fun load}."))
+  }
+  
+  ## Check that paired must be either "baseline" or "sequential"
+  if (isTRUE(is_paired)) {
+    if (isFALSE(paired %in% c("baseline","sequential"))) {
+      cli::cli_abort(c("{.field paired} is not 'baseline' or 'sequential'.", 
+                    "x" = "{.field paired} can only be 'baseline' or 'sequential'."))
+    }
+  }
+  
+  ## Check for valid mini-meta 
+  if (isTRUE(minimeta)) {
+    if (isTRUE(proportional)) {
+      cli::cli_abort(c("{.field proportional} is {.strong TRUE} but {.field minimeta} is also {.strong TRUE}.", 
+                    "x" = "{.field proportional} and {.field minimeta} cannot be {.strong TRUE} at the same time."))
+    } else if (isTRUE(delta2)) {
+      cli::cli_abort(c("{.field delta2} is {.strong TRUE} but {.field minimeta} is also {.strong TRUE}.", 
+                    "x" = "{.field delta2} and {.field minimeta} cannot be {.strong TRUE} at the same time."))
+    }
+    
+    minimeta_idx_lengths <- sapply(idx,length)
+    if (any(minimeta_idx_lengths!=2)==TRUE) {
+      cli::cli_abort(c("{.field minimeta} is {.strong TRUE}, but some {.field idx} does not consist of exactly 2 groups",
+                  "x" = "You can only put in exactly 2 groups in {.field idx} when {.field minimeta} is {.strong TRUE}."))
+    }
+  }
+  
   if (isTRUE(delta2)) {
+    if (isTRUE(proportional)) {
+      cli::cli_abort(c("{.field delta2} is {.strong TRUE} but {.field proportional} is also {.strong TRUE}.", 
+                    "x" = "{.field delta2} and {.field proportional} cannot be {.strong TRUE} at the same time."))
+    }
+    
     enquo_experiment <- enquo(experiment)
     name_experiment <- as_name(enquo_experiment)
 
     # Make sure that data is a 2x2 ANOVA case
     if (length(unique(data[[name_experiment]]))!=2) {
-      stop("`experiment` does not have a length of 2")
-    } 
+      cli::cli_abort(c("{.field experiment} does not have a length of 2.", 
+                    "x" = "There can only be 2 groups in {.field experiment} when {.field delta2} is {.strong TRUE}."))
+    } else if (length(unique(data[[name_x]]))!=2) {
+      cli::cli_abort(c("{.field x} does not have a length of 2.", 
+                    "x" = "There can only be 2 groups in {.field x} when {.field delta2} is {.strong TRUE}."))
+    }
     
-    if (length(unique(data[[name_x]]))!=2) {
-      stop("`x` does not have a length of 2")
+    # Check for idx, experiment_label and x1_level
+    if (isTRUE(is.null(idx))) {
+      # Set levels for experiment and x if they are present
+      if (isFALSE(is.null(experiment_label))) {
+        data[[name_experiment]] = factor(x = data[[name_experiment]], levels = experiment_label)
+      }
+      if (isFALSE(is.null(x1_level))) {
+        data[[name_x]] = factor(x = data[[name_x]], levels = x1_level)
+      }
+      data <- data %>%
+        arrange(!!enquo_experiment, !!enquo_x)
     }
     
     data <- data %>%
@@ -82,6 +180,25 @@ load <- function(
     enquo_x <- enquo_experiment
     name_x <- as_name(enquo_x)
     is_colour <- TRUE
+    
+    # Obtain idx if is null
+    if (isTRUE(is.null(idx))) {
+      spread_idx <- unique(data[[name_experiment]])
+      idx <- list()
+      delta_group_size <- 2
+      curr_group_size <- 0
+      curr_group_vector <- c()
+      for (group_name in spread_idx) {
+        if (curr_group_size == delta_group_size) {
+          curr_group_size <- 0
+          idx <- c(idx, list(curr_group_vector))
+          curr_group_vector <- c()
+        }
+        curr_group_vector <- append(curr_group_vector, group_name)
+        curr_group_size <- curr_group_size + 1
+      }
+      idx <- c(idx, list(curr_group_vector))
+    }
   }
   
   unlist_idx <- unlist(idx)
@@ -109,9 +226,9 @@ load <- function(
       dplyr::count()
     Ns$swarmticklabs <- do.call(paste, c(Ns[c(name_x, "n")], sep = "\nN = "))
     
-    # (Don't need the below code anymore due to change in implementation)
-    # buffer_Ns <- data.frame(Group = "", n = 0, swarmticklabs = "") 
-    # Ns <- rbind(Ns)
+    # Extending ylim for plotting
+    ylim[1] <- ylim[1] - (ylim[2]-ylim[1])/25
+    ylim[2] <- ylim[2] + (ylim[2]-ylim[1])/25
     
     if(isTRUE(proportional)){
       ## include checks here for data to see if it is proportional data
@@ -126,11 +243,6 @@ load <- function(
       test_summary <- proportional_data$proportion_success[2]
         
     } else {
-      
-      # Extending ylim for plotting
-      ylim[1] <- ylim[1] - (ylim[2]-ylim[1])/25
-      ylim[2] <- ylim[2] + (ylim[2]-ylim[1])/25
-      
       # Calculation of summary lines
       summaries <- raw_data %>%
         group_by(!!enquo_x) %>%
@@ -357,6 +469,8 @@ bootstrap <- function(
   is_paired <- dabest_obj$is_paired
   is_colour <- dabest_obj$is_colour
   
+  proportional <- dabest_obj$proportional
+  
   quoname_x <- as_name(enquo_x)
   quoname_y <- as_name(enquo_y)
   delta_x_labels <- list()
@@ -364,6 +478,14 @@ bootstrap <- function(
   
   minimeta <- dabest_obj$minimeta
   delta2 <- dabest_obj$delta2
+  
+  ## Validity Checks
+  if (isTRUE(is_paired) && boot_labs == "Cliffs' delta") {
+    cli::cli_abort(c("{.var Cliffs delta} cannot be found when {.field paired} is not NULL.",
+                     "x" = "Please change {.var effect_size_func}."))
+  } else if (isTRUE(proportional) && !(boot_labs %in% c("Mean difference","Cohen's h","Paired\nmean difference"))) {
+    cli::cli_abort(c("Other effect sizes besides {.var Cohens h} and {.var Mean difference} cannot be found when {.field                         paired} is not NULL.","x" = "Please change {.var effect_size_func}."))
+  }
   
   if (isFALSE(is_paired) || isTRUE(paired == "baseline")) {
     for (group in idx) {
@@ -410,8 +532,8 @@ bootstrap <- function(
                               paired = is_paired)
         
         if (ci < 0 | ci > 100) {
-          err_string <- str_interp("`ci` must be between 0 and 100, not ${ci}")
-          stop(err_string)
+          cli::cli_abort(c("{.field ci} is not between 0 and 100.",
+                           "x" = "{.field ci} must be between 0 and 100, not {ci}."))
         }
         
         bootci <- boot.ci(boots, conf=ci/100, type = c("perc","bca"))
@@ -472,8 +594,8 @@ bootstrap <- function(
                               paired = is_paired)
         
         if (ci < 0 | ci > 100) {
-          err_string <- str_interp("`ci` must be between 0 and 100, not ${ci}")
-          stop(err_string)
+          cli::cli_abort(c("{.field ci} is not between 0 and 100.",
+                           "x" = "{.field ci} must be between 0 and 100, not {ci}."))
         }
         
         bootci <- boot.ci(boots, conf=ci/100, type = c("perc","bca"))
@@ -498,18 +620,19 @@ bootstrap <- function(
   if (isTRUE(minimeta)){
     boot_last_row <- boot_weighted_row(boot_result = boot_result, ci)
     boot_result <- bind_rows(boot_result, boot_last_row)
-    delta_x_labels <- append(delta_x_labels, "Weighted Delta")
   }
   if (isTRUE(delta2)) {
     boot_last_row <- boot_delta_delta(boot_result = boot_result,ci)
     boot_result <- bind_rows(boot_result,boot_last_row)
-    delta_x_labels <- append(delta_x_labels, "delta-delta")
   }
+  
+  raw_y_labels <- ifelse(proportional, "proportion of success", "value")
   
   out <- list(raw_data = raw_data,
               idx = idx,
               delta_x_labels = delta_x_labels,
               delta_y_labels = delta_y_labels,
+              raw_y_labels = raw_y_labels,
               is_paired = is_paired,
               is_colour = is_colour,
               paired = paired,
@@ -521,11 +644,13 @@ bootstrap <- function(
               enquo_y = dabest_obj$enquo_y,
               enquo_id_col = dabest_obj$enquo_id_col,
               enquo_colour = dabest_obj$enquo_colour,
-              proportional = dabest_obj$proportional,
+              proportional = proportional,
               minimeta = minimeta,
               delta2 = dabest_obj$delta2,
               proportional_data = dabest_obj$proportional_data,
               boot_result = boot_result)
+  
+  class(out) <- c("dabest_effectsize")
   
   return(out)
 }
@@ -534,6 +659,11 @@ bootstrap <- function(
 # effect_size functions
 ```{r}
 mean_diff <- function(dabest_obj) {
+  
+  if (class(dabest_obj)!="dabest") {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object.")
+  }
   
   effect_size_func <- function(control, test, paired) {
     if (identical(paired, FALSE)) {
@@ -552,6 +682,11 @@ mean_diff <- function(dabest_obj) {
 
 median_diff <- function(dabest_obj) {
   
+  if (class(dabest_obj)!="dabest") {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object.")
+  }
+  
   effect_size_func <- function(control, test, paired) {
     if (identical(paired, FALSE)) {
       return(median(test) - median(control))
@@ -569,6 +704,11 @@ median_diff <- function(dabest_obj) {
 
 cohens_d <- function(dabest_obj) {
   
+  if (class(dabest_obj)!="dabest") {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object.")
+  }
+  
   effect_size_func <- function(control, test, paired) {
     return(effsize::cohen.d(test, control, paired=paired)$estimate)
   }
@@ -577,6 +717,11 @@ cohens_d <- function(dabest_obj) {
 }
 
 hedges_g <- function(dabest_obj) {
+  
+  if (class(dabest_obj)!="dabest") {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object.")
+  }
   
   cohens_d_ <- function(control, test, paired) {
     return(effsize::cohen.d(test, control, paired=paired)$estimate)
@@ -593,6 +738,11 @@ hedges_g <- function(dabest_obj) {
 
 cliffs_delta <- function(dabest_obj) {
   
+  if (class(dabest_obj)!="dabest") {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object.")
+  }
+  
   effect_size_func <- function(control, test, paired=NA) {
     return(effsize::cliff.delta(test, control)$estimate)
   }
@@ -601,6 +751,11 @@ cliffs_delta <- function(dabest_obj) {
 }
 
 cohens_h <- function(dabest_obj){
+  
+  if (class(dabest_obj)!="dabest") {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object.")
+  }
   
   effect_size_func <- function(control, test, paired) {
     #remove nas and nulls later on
@@ -641,23 +796,29 @@ hedges_correction <- function(x1, x2) {
 
 ## float_contrast/non_float_contrast themes
 ```{r}
-# Theme for left-right graph
-float_contrast_theme <- 
-  theme(plot.margin = ggplot2::unit(c(5.5, 0, 5.5, 0), "pt"),
-        axis.line.x = ggplot2::element_blank(), 
-        axis.title.x = ggplot2::element_blank(), 
-        axis.ticks.x = ggplot2::element_blank(),
-        axis.title.x.bottom = ggplot2::element_blank(),
-        legend.title=element_blank())
+#' Theme for left-right graph
+float_contrast_theme <- theme(plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt"),
+                              axis.line.x = ggplot2::element_blank(), 
+                              axis.title.x = ggplot2::element_blank(), 
+                              axis.ticks.x = ggplot2::element_blank(),
+                              axis.title.x.bottom = ggplot2::element_blank(),
+                              legend.title = ggplot2::element_blank())
 
-# Theme for top-down graph
-non_float_contrast_theme <- 
-  theme(axis.line.x = ggplot2::element_blank(), 
-        axis.title.x = ggplot2::element_blank(), 
-        axis.ticks.x = ggplot2::element_blank(),
-        axis.title.x.bottom = ggplot2::element_blank(),
-        axis.title.y = element_text(size = 10),
-        legend.title=element_blank())
+#' Theme for top-down graph
+non_float_contrast_theme <- theme(plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt"),
+                                  axis.line.x = ggplot2::element_blank(), 
+                                  axis.title.x = ggplot2::element_blank(), 
+                                  axis.ticks.x = ggplot2::element_blank(),
+                                  axis.title.x.bottom = ggplot2::element_blank(),
+                                  axis.title.y = ggplot2::element_text(size = 10),
+                                  legend.title = ggplot2::element_blank())
+
+#' Theme for removal of all axes and labels
+remove_all_axes_theme <- theme(axis.line = ggplot2::element_blank(),
+                         axis.title = ggplot2::element_blank(),
+                         axis.ticks = ggplot2::element_blank(),
+                         legend.title = ggplot2::element_blank(),
+                         plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt"))
 
 ```
 
@@ -707,7 +868,9 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
                                    x_axis_raw,
                                    idx,
                                    scale_factor_sig = 0.8,
-                                   gap) {
+                                   bar_width = 0.15,
+                                   gap,
+                                   sankey = TRUE) {
   
   type <- ifelse(length(unlist(idx)) <= 2, 
                  "single sankey", 
@@ -717,6 +880,7 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
   flow_success_to_success = tibble()
   flow_failure_to_success = tibble()
   flow_failure_to_failure = tibble()
+  
   bar_width <- ifelse(float_contrast, 0.15, 0.03)
   
   if(type == "single sankey" && float_contrast){
@@ -730,127 +894,134 @@ create_dfs_for_sankey <-  function(float_contrast = FALSE,
   }
   means_c_t <- proportional_data$proportion_success
   x_padding <- ifelse(float_contrast, 0.008, 0.006)
-   
   
   prop <- proportional_data
   ind <- 1
   x_start <- 1
-  
-  for (group in idx) {
-    group_length <- length(group)
-    
-    for (i in 1: (group_length - 1)) {
-      #redraw_x_axis <- append(redraw_x_axis, x_start)
-      success_success <- raw_data %>%
-        group_by(!!enquo_id_col) %>%
-        summarise(success_change =
-                    any(Success == 1 & Group == group[i]) &
-                    any(Success == 1 &
-                          Group == group[i + 1])) %>%
-        filter(success_change) %>%
-        summarise(SS = n() / N)
+
+  if (isTRUE(sankey)){
+    for (group in idx) {
+      group_length <- length(group)
       
-      success_failure <- raw_data %>%
-        group_by(!!enquo_id_col) %>%
-        summarise(sf_change =
-                    any(Success == 1 & Group == group[i]) &
-                    any(Success == 0 &
-                          Group == group[i + 1])) %>%
-        filter(sf_change) %>%
-        summarise(SF = n() / N)
-      
-      failure_failire <- raw_data %>%
-        group_by(!!enquo_id_col) %>%
-        summarise(failure_change =
-                    any(Success == 0 & Group == group[i]) &
-                    any(Success == 0 &
-                          Group == group[i + 1])) %>%
-        filter(failure_change) %>%
-        summarise(FF = n() / N)
-      
-      failure_success <- raw_data %>%
-        group_by(!!enquo_id_col) %>%
-        summarise(failure_change =
-                    any(Success == 0 & Group == group[i]) &
-                    any(Success == 1 &
-                          Group == group[i + 1])) %>%
-        filter(failure_change) %>%
-        summarise(FS = n() / N)
-      # find values for lower flow success to failure flow
-      ss <- success_success$SS[1]
-      ff <- failure_failire$FF[1]
-      sf <- success_failure$SF[1]
-      fs <- failure_success$FS[1]
-      sf_start1 <- ss 
-      sf_start2 <- means_c_t[ind] - gap/2 
-      sf_end1 <- means_c_t[ind + 1] + gap/2 
-      sf_end2 <- 1 - ff 
-      
-      
-      # find values for upper flppied flow success to failure flow
-      fs_start1 <- 1 - ff
-      fs_start2 <- means_c_t[ind] + gap/2 
-      fs_end1 <- means_c_t[ind + 1] - gap/2 
-      fs_end2 <- ss
-      
-      # form dataframes from sigmoid / flippedSig functions and the rectangles, later fit into sankeyflow
-      sig_success_failure_bot <- sigmoid(x_start + bar_width - x_padding,
-                                         scale_factor_sig,
-                                         sf_start1 - 0.002,
-                                         sf_end1 + 0.002)
-      sig_success_failure_top <- sigmoid(x_start + bar_width - x_padding,
-                                         scale_factor_sig,
-                                         sf_start2 - 0.002,
-                                         sf_end2 + 0.002)
-      sig_success_failure_bot <- arrange(sig_success_failure_bot, desc(x))
-      sig_failure_success_top <- flipped_sig(x_start + bar_width - x_padding,
-                                             scale_factor_sig,
-                                             fs_start1 + 0.002,
-                                             fs_end1 - 0.002)
-      sig_failure_success_bot <- flipped_sig(x_start + bar_width - x_padding,
-                                             scale_factor_sig,
-                                             fs_start2 + 0.002,
-                                             fs_end2 - 0.002)
-      sig_failure_success_bot <- arrange(sig_failure_success_bot, desc(x))
-      
-      #number of points of data points
-      N_points <- length(sig_success_failure_bot)
-      # generate the tag column for all of these
-      tag <- rep(ind, N_points)
-      sankey_success_failure <- rbind(sig_success_failure_top,
-                                      sig_success_failure_bot)
-      sankey_success_failure <- cbind(sankey_success_failure, tag)
-      
-      sankey_failure_success <- rbind(sig_failure_success_top,
-                                      sig_failure_success_bot)
-      sankey_failure_success <- cbind(sankey_failure_success, tag)
-      
-      rect_flow_x <- c(x_start, x_start + 1)
-      
-      sankey_failure_failure <- data.frame(x = c(rect_flow_x, rev(rect_flow_x)),
-                                           y = c(1, 1, rep(fs_start1, 2)),
-                                           tag = c(rep(ind, 4)))
-      sankey_success_success <- data.frame(x = c(rect_flow_x, rev(rect_flow_x)),
-                                           y = c(rep(ss, 2), 0, 0),
-                                           tag = c(rep(ind, 4)))
+      for (i in 1: (group_length - 1)) {
+        #redraw_x_axis <- append(redraw_x_axis, x_start)
+        success_success <- raw_data %>%
+          group_by(!!enquo_id_col) %>%
+          summarise(success_change =
+                      any(Success == 1 & Group == group[i]) &
+                      any(Success == 1 &
+                            Group == group[i + 1])) %>%
+          filter(success_change) %>%
+          summarise(SS = n() / N)
+        
+        success_failure <- raw_data %>%
+          group_by(!!enquo_id_col) %>%
+          summarise(sf_change =
+                      any(Success == 1 & Group == group[i]) &
+                      any(Success == 0 &
+                            Group == group[i + 1])) %>%
+          filter(sf_change) %>%
+          summarise(SF = n() / N)
+        
+        failure_failire <- raw_data %>%
+          group_by(!!enquo_id_col) %>%
+          summarise(failure_change =
+                      any(Success == 0 & Group == group[i]) &
+                      any(Success == 0 &
+                            Group == group[i + 1])) %>%
+          filter(failure_change) %>%
+          summarise(FF = n() / N)
+        
+        failure_success <- raw_data %>%
+          group_by(!!enquo_id_col) %>%
+          summarise(failure_change =
+                      any(Success == 0 & Group == group[i]) &
+                      any(Success == 1 &
+                            Group == group[i + 1])) %>%
+          filter(failure_change) %>%
+          summarise(FS = n() / N)
+        # find values for lower flow success to failure flow
+        ss <- success_success$SS[1]
+        ff <- failure_failire$FF[1]
+        sf <- success_failure$SF[1]
+        fs <- failure_success$FS[1]
+        sf_start1 <- ss 
+        sf_start2 <- means_c_t[ind] - gap/2 
+        sf_end1 <- means_c_t[ind + 1] + gap/2 
+        sf_end2 <- 1 - ff 
+        
+        
+        # find values for upper flppied flow success to failure flow
+        fs_start1 <- 1 - ff
+        fs_start2 <- means_c_t[ind] + gap/2 
+        fs_end1 <- means_c_t[ind + 1] - gap/2 
+        fs_end2 <- ss
+        
+        # form dataframes from sigmoid / flippedSig functions and the rectangles, later fit into sankeyflow
+        sig_success_failure_bot <- sigmoid(x_start + bar_width - x_padding,
+                                           scale_factor_sig,
+                                           sf_start1 - 0.002,
+                                           sf_end1 + 0.002)
+        sig_success_failure_top <- sigmoid(x_start + bar_width - x_padding,
+                                           scale_factor_sig,
+                                           sf_start2 - 0.002,
+                                           sf_end2 + 0.002)
+        sig_success_failure_bot <- arrange(sig_success_failure_bot, desc(x))
+        sig_failure_success_top <- flipped_sig(x_start + bar_width - x_padding,
+                                               scale_factor_sig,
+                                               fs_start1 + 0.002,
+                                               fs_end1 - 0.002)
+        sig_failure_success_bot <- flipped_sig(x_start + bar_width - x_padding,
+                                               scale_factor_sig,
+                                               fs_start2 + 0.002,
+                                               fs_end2 - 0.002)
+        sig_failure_success_bot <- arrange(sig_failure_success_bot, desc(x))
+        
+        #number of points of data points
+        N_points <- length(sig_success_failure_bot)
+        # generate the tag column for all of these
+        tag <- rep(ind, N_points)
+        sankey_success_failure <- rbind(sig_success_failure_top,
+                                        sig_success_failure_bot)
+        sankey_success_failure <- cbind(sankey_success_failure, tag)
+        
+        sankey_failure_success <- rbind(sig_failure_success_top,
+                                        sig_failure_success_bot)
+        sankey_failure_success <- cbind(sankey_failure_success, tag)
+        
+        rect_flow_x <- c(x_start, x_start + 1)
+        
+        sankey_failure_failure <- data.frame(x = c(rect_flow_x, rev(rect_flow_x)),
+                                             y = c(1, 1, rep(fs_start1, 2)),
+                                             tag = c(rep(ind, 4)))
+        sankey_success_success <- data.frame(x = c(rect_flow_x, rev(rect_flow_x)),
+                                             y = c(rep(ss, 2), 0, 0),
+                                             tag = c(rep(ind, 4)))
+        
+        x_start <- x_start + 1
+        
+        ind <- ind + 1
+        #` update the 4 sankey flow dfs for plotting
+        flow_success_to_failure <- bind_rows(flow_success_to_failure,
+                                             sankey_success_failure)
+        flow_success_to_success <- bind_rows(flow_success_to_success,
+                                             sankey_success_success)
+        flow_failure_to_success <- bind_rows(flow_failure_to_success,
+                                             sankey_failure_success)
+        flow_failure_to_failure <- bind_rows(flow_failure_to_failure,
+                                             sankey_failure_failure)
+      }
       
       x_start <- x_start + 1
-      
       ind <- ind + 1
-      #` update the 4 sankey flow dfs for plotting
-      flow_success_to_failure <- bind_rows(flow_success_to_failure,
-                                           sankey_success_failure)
-      flow_success_to_success <- bind_rows(flow_success_to_success,
-                                           sankey_success_success)
-      flow_failure_to_success <- bind_rows(flow_failure_to_success,
-                                           sankey_failure_success)
-      flow_failure_to_failure <- bind_rows(flow_failure_to_failure,
-                                           sankey_failure_failure)
     }
-    
-    x_start <- x_start + 1
-    ind <- ind + 1
+  } else {
+    flow_success_to_failure = data.frame(x = NaN, y = NaN, tag = NaN)
+    flow_failure_to_success = data.frame(x = NaN, y = NaN, tag = NaN)
+    flow_success_to_success = data.frame(x = NaN, y = NaN, tag = NaN)
+    flow_failure_to_failure = data.frame(x = NaN, y = NaN, tag = NaN)
   }
+  
   redraw_x_axis <- c(1 : length(unlist(idx)))
   sankey_bars <- proportional_data
   dfs_for_sankeys <- list(flow_success_to_failure = flow_success_to_failure,
@@ -938,23 +1109,64 @@ create_rawplot_components <- function(proportional,
   )
   return(plot_component)
 }
+
+create_dfs_for_proportion_bar <- function(proportion_success, bar_width = 0.3, gap = 0) {
+  df_for_proportion_bar <- data.frame(
+    x_failure = NA,
+    y_failure = NA,
+    x_success = NA,
+    y_success = NA,
+    tag = NA
+  )
+    
+  for (x in 1:length(proportion_success)) {
+    y <- proportion_success[x]
+    
+    x_failure_success <- c(x-bar_width/2, x+bar_width/2, x+bar_width/2, x-bar_width/2)
+    y_success <- c(y-gap/2, y-gap/2, 0, 0)
+    y_failure <- c(1, 1, y+gap/2, y+gap/2)
+    temp_df_proportion_bar <- data.frame(
+      x_failure = x_failure_success,
+      y_failure = y_failure,
+      x_success = x_failure_success,
+      y_success = y_success,
+      tag = rep(toString(x), 4)
+    )
+    
+    df_for_proportion_bar <- rbind(df_for_proportion_bar, temp_df_proportion_bar)
+  }
+  df_for_proportion_bar <- df_for_proportion_bar %>%na.omit()
+  
+  return(df_for_proportion_bar)
+}
 ```
 
 ## assign plot kwargs
 ```{r}
-assign_plot_kwargs <- function(plot_kwargs) {
-  colour_col <- NULL
-  swarm_label <- NULL
-  contrast_label <- NULL
+assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   custom_palette <- "d3"
+  
+  swarm_label <- dabest_effectsize_obj$raw_y_labels
+  contrast_label <- dabest_effectsize_obj$delta_y_labels
+  delta2_label <- NULL
+  
   swarm_ylim <- NULL
   contrast_ylim <- NULL
   delta2_ylim <- NULL
-  delta2_label <- NULL
   
-  if(isFALSE(is.null(plot_kwargs$colour_col))) {
-    colour_col <- plot_kwargs$colour_col
-  }
+  show_delta2 <- dabest_effectsize_obj$delta2
+  show_mini_meta <- dabest_effectsize_obj$minimeta
+  
+  raw_marker_size <- 1.5
+  raw_marker_alpha <- 1
+  raw_marker_spread <- 2
+  raw_bar_width <- 0.3
+  tufte_size <- 0.8
+  es_marker_size <- 0.5
+  es_line_size <- 0.8
+  
+  sankey <- TRUE
+  
   if(isFALSE(is.null(plot_kwargs$swarm_label))) {
     swarm_label <- plot_kwargs$swarm_label
   }
@@ -976,15 +1188,55 @@ assign_plot_kwargs <- function(plot_kwargs) {
   if(isFALSE(is.null(plot_kwargs$delta2_label))) {
     delta2_label <- plot_kwargs$delta2_label
   }
+  if(isFALSE(is.null(plot_kwargs$show_delta2))) {
+    show_delta2 <- plot_kwargs$show_delta2
+  }
+  if(isFALSE(is.null(plot_kwargs$show_mini_meta))) {
+    show_mini_meta <- plot_kwargs$show_mini_meta
+  }
+  if(isFALSE(is.null(plot_kwargs$raw_marker_size))) {
+    raw_marker_size <- plot_kwargs$raw_marker_size
+  }
+  if(isFALSE(is.null(plot_kwargs$raw_marker_alpha))) {
+    raw_marker_alpha <- plot_kwargs$raw_marker_alpha
+  }
+  if(isFALSE(is.null(plot_kwargs$tufte_size))) {
+    tufte_size <- plot_kwargs$tufte_size
+  }
+  if(isFALSE(is.null(plot_kwargs$es_marker_size))) {
+    es_marker_size <- plot_kwargs$es_marker_size
+  }
+  if(isFALSE(is.null(plot_kwargs$es_line_size))) {
+    es_line_size <- plot_kwargs$es_line_size
+  }
+  if(isFALSE(is.null(plot_kwargs$raw_bar_width))) {
+    raw_bar_width <- plot_kwargs$raw_bar_width
+  }
+  if(isFALSE(is.null(plot_kwargs$raw_marker_spread))) {
+    raw_marker_spread <- plot_kwargs$raw_marker_spread
+  }
+  if(isFALSE(is.null(plot_kwargs$sankey))) {
+    sankey <- plot_kwargs$sankey
+  }
+  
   return(list(
-    colour_col = colour_col,
     swarm_label = swarm_label,
     contrast_label = contrast_label,
     custom_palette = custom_palette,
     swarm_ylim = swarm_ylim,
     contrast_ylim = contrast_ylim,
     delta2_ylim = delta2_ylim,
-    delta2_label = delta2_label
+    delta2_label = delta2_label,
+    show_delta2 = show_delta2,
+    show_mini_meta = show_mini_meta,
+    raw_marker_size = raw_marker_size,
+    raw_marker_alpha = raw_marker_alpha,
+    raw_marker_spread = raw_marker_spread,
+    raw_bar_width = raw_bar_width,
+    tufte_size = tufte_size,
+    es_marker_size = es_marker_size,
+    es_line_size = es_line_size,
+    sankey = sankey
   ))
 }
 ```
@@ -995,57 +1247,27 @@ assign_plot_kwargs <- function(plot_kwargs) {
   if (!is.null(a)) a else b
 }
 
-draw_panel_proportion_bar <- function(data, panel_scales, coord) {
+draw_group_proportion_bar <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales) 
   
-  failure_bar <- rectGrob(x = coords$x,
-                          y = 1,
-                          width = coords$width,
-                          height = 1 - coords$y,
-                          default.units = "native",
-                          just = c("center", "top"),
-                          gp = gpar(col = coords$colour,
-                                    fill = "white",
-                                    lwd = coords$size * .pt))
-  
-  success_bar <- rectGrob(x = coords$x,
-                          y = 0,
-                          width = coords$width,
-                          height = coords$y,
-                          default.units = "native",
-                          just = c("center", "bottom"),
-                          gp = gpar(col = coords$colour,
-                                    fill = alpha(coords$fill, coords$alpha),
-                                    lwd = coords$size * .pt))
-  
-  gTree(children = gList(failure_bar, success_bar))
-  
+  first_row <- coords[1, , drop = FALSE]
+
+  failure_bar <- polygonGrob(x = coords$x,
+                             y = coords$y,
+                             gp = gpar(col = first_row$colour,
+                                       fill = alpha(first_row$fill, first_row$alpha)))
 }
 
-GeomProportionBar <- ggproto("GeomProportionBar", GeomRect,
-                      required_aes = c("x", "y"),
-                      non_missing_aes = c("xmin", "xmax", "ymin", "ymax"),
-                      default_aes = aes(colour = NA,
-                                        width = 0.2,
-                                        fill = "grey35",
-                                        alpha = NA,
-                                        lwd = 2,
-                                        size = 0.7),
-                      
-                      set_up_data = function(data, params) {
-                        data$width <- data$width %||% params$width
-                        data <- transform(data,
-                          ymin = pmin(y, 0), ymax = pmax(y, 1),
-                          xmin = x - width, xmax = x + width,
-                          width = width)
-                        data
-                      },
-                      
-                      draw_key = draw_key_polygon,
-                      draw_panel = draw_panel_proportion_bar)
+GeomProportionBar <- ggproto("GeomProportionBar", Geom,
+                             required_aes = c("x", "y"),
+                             default_aes = aes(colour = "black",
+                                               fill = "white",
+                                               alpha = NA),
+                             draw_key = draw_key_polygon,
+                             draw_group = draw_group_proportion_bar)
 
 geom_proportionbar <- function(mapping = NULL, data = NULL, 
-                               stat = "identity", position = "stack", 
+                               stat = "identity", position = "identity", 
                                ...,
                                show.legend = NA, 
                                na.rm = FALSE, 
@@ -1066,58 +1288,6 @@ geom_proportionbar <- function(mapping = NULL, data = NULL,
 
 # sankey geoms
 ```{r}
-# sankey bars
-draw_panel_sankey_bar <- function(data, panel_scales, coord) {
-  coords <- coord$transform(data, panel_scales) 
-  
-  failure_bar <- rectGrob(x = coords$x,
-                          y = coords$yfailure + coords$gap/4,
-                          width = coords$width,
-                          height = 1 - coords$proportionsuccess - coords$gap/2,
-                          gp = gpar(col = coords$col_failure,
-                                    fill = alpha(coords$fill_failure, coords$alpha),
-                                    lwd = coords$size * .pt))
-  
-  success_bar <- rectGrob(x = coords$x,
-                          y = coords$ysuccess - coords$gap/4,
-                          width = coords$width,
-                          height = coords$proportionsuccess - coords$gap/2,
-                          gp = gpar(col = coords$col_success,
-                                    fill = alpha(coords$fill_success, coords$alpha),
-                                    lwd = coords$size * .pt))
-  
-  gTree(children = gList(failure_bar, success_bar))
-  
-}
-
-GeomSankeyBar <- ggproto("GeomSankeyBar", Geom,
-                      required_aes = c("x", "yfailure", "ysuccess", "proportionsuccess"),
-                      default_aes = aes(col = NA,
-                                        width = 0.2,
-                                        col_failure = NA,
-                                        col_success = NA,
-                                        fill_failure = "#818181",
-                                        fill_success = "#db6159",
-                                        alpha = 1,
-                                        lwd = 2,
-                                        size = 0.7,
-                                        gap = 0.05),
-                      draw_key = draw_key_rect,
-                      draw_panel = draw_panel_sankey_bar)
-
-geom_sankeybar <- function(mapping = NULL, data = NULL, stat = "identity", 
-                        position = "identity", show.legend = NA, 
-                        na.rm = FALSE, inherit.aes = TRUE, ...) {
-  layer(data = data, 
-        mapping = mapping,
-        stat = stat,
-        geom = GeomSankeyBar,
-        position = position,
-        show.legend = show.legend,
-        inherit.aes = inherit.aes,
-        params = list(na.rm = na.rm, ...))
-}
-
 # sankey flows
 draw_group_sankey_flow <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales) 
@@ -1153,8 +1323,11 @@ geom_sankeyflow <- function(mapping = NULL, data = NULL, stat = "identity",
 
 ## plot slopegraph
 ```{r}
-plot_slopegraph <- function(dabest_effectsize_obj) {
+plot_slopegraph <- function(dabest_effectsize_obj, plot_kwargs) {
   raw_data <- dabest_effectsize_obj$raw_data
+  
+  raw_marker_size <- plot_kwargs$raw_marker_size
+  raw_marker_alpha <- plot_kwargs$raw_marker_alpha
   
   enquo_x = dabest_effectsize_obj$enquo_x
   enquo_y = dabest_effectsize_obj$enquo_y
@@ -1167,7 +1340,7 @@ plot_slopegraph <- function(dabest_effectsize_obj) {
   idx = dabest_effectsize_obj$idx
   
   raw_plot <- ggplot()
-  slopegraph_params <- list(linewidth = 0.3, alpha = 0.5)
+  slopegraph_params <- list(linewidth = raw_marker_size, alpha = raw_marker_alpha)
   
   for(subplot_groups in idx) {
     # Assign subplot.
@@ -1204,25 +1377,22 @@ plot_slopegraph <- function(dabest_effectsize_obj) {
 # raw_plot function
 ```{r}
 plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
-  enquo_x = dabest_effectsize_obj$enquo_x
-  enquo_y = dabest_effectsize_obj$enquo_y
-  enquo_id_col = dabest_effectsize_obj$enquo_id_col
-  enquo_colour = dabest_effectsize_obj$enquo_colour
-  proportional = dabest_effectsize_obj$proportional
-  minimeta = dabest_effectsize_obj$minimeta
-  delta2 = dabest_effectsize_obj$delta2
-  proportional_data = dabest_effectsize_obj$proportional_data
+  enquo_x <- dabest_effectsize_obj$enquo_x
+  enquo_y <- dabest_effectsize_obj$enquo_y
+  enquo_id_col <- dabest_effectsize_obj$enquo_id_col
+  enquo_colour <- dabest_effectsize_obj$enquo_colour
+  proportional <- dabest_effectsize_obj$proportional
+  
+  proportional_data <- dabest_effectsize_obj$proportional_data
+  proportion_success <- proportional_data$proportion_success
+  
+  raw_y_labels <- plot_kwargs$swarm_label
+  minimeta <- plot_kwargs$show_mini_meta
+  delta2 <- plot_kwargs$show_delta2
   
   raw_data <- dabest_effectsize_obj$raw_data
   Ns <- dabest_effectsize_obj$Ns
   raw_y_range_vector <- dabest_effectsize_obj$ylim
-  
-  raw_y_max <- raw_y_range_vector[2]
-  raw_y_min <- raw_y_range_vector[1]
-  if(isFALSE(float_contrast) && isFALSE(proportional)) {
-    raw_y_min <- raw_y_min - (raw_y_max - raw_y_min)/15
-  }
-  raw_y_mean <- raw_y_max - raw_y_min
   
   test_summary <- dabest_effectsize_obj$test_summary
   control_summary <- dabest_effectsize_obj$control_summary
@@ -1245,13 +1415,24 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     float_contrast = FALSE
   }
   
+  #### Load in sizes of plot elements ####
+  raw_marker_size <- plot_kwargs$raw_marker_size
+  raw_marker_alpha <- plot_kwargs$raw_marker_alpha
+  raw_marker_spread <- plot_kwargs$raw_marker_spread
+  raw_bar_width <- plot_kwargs$raw_bar_width
+  tufte_size <- plot_kwargs$tufte_size
+  es_marker_size <- plot_kwargs$es_marker_size
+  es_line_size <- plot_kwargs$es_line_size
+  sankey <- plot_kwargs$sankey
+  
   #### Rawplot Building ####
   plot_components <- create_rawplot_components(proportional, is_paired, float_contrast)
   main_plot_type <- plot_components$main_plot_type
   is_summary_lines <- plot_components$is_summary_lines
   is_tufte_lines <- plot_components$is_tufte_lines
   
-  if(main_plot_type == "sankey"){
+  ## Creation of dfs for specific main_plot_types ##
+  if(main_plot_type == "sankey") {
     sankey_bar_gap <- 0.025
     sankey_df <- create_dfs_for_sankey(float_contrast = float_contrast, 
                                        raw_data = raw_data,
@@ -1259,19 +1440,30 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                                        enquo_id_col = enquo_id_col,
                                        x_axis_raw = x_axis_raw,
                                        gap = sankey_bar_gap,
+                                       sankey = sankey,
                                        idx = idx)
     flow_success_to_failure <- sankey_df$flow_success_to_failure
     flow_failure_to_success <- sankey_df$flow_failure_to_success
     flow_success_to_success <- sankey_df$flow_success_to_success
     flow_failure_to_failure <- sankey_df$flow_failure_to_failure
     sankey_bars <- sankey_df$sankey_bars
+    sankey_bars <- create_dfs_for_proportion_bar(sankey_bars$proportion_success, 
+                                                 bar_width = raw_bar_width, 
+                                                 gap = sankey_bar_gap)
   }
   
+  if(main_plot_type == "unpaired proportions") {
+    if(isTRUE(float_contrast)) {
+      raw_y_max <- 1
+      raw_y_min <- 0
+    }
+    df_for_proportion_bar <- create_dfs_for_proportion_bar(proportion_success, bar_width = raw_bar_width)
+  }
+  
+  ## Adjustment of labels ##
   if(as_label(enquo_colour) == "NULL" && main_plot_type != "slope") {
     enquo_colour <- enquo_x
   }
-  
-  bar_width <- ifelse(float_contrast, 0.15, 0.03)
   
   #### Initialise raw_plot & Add main_plot_type component ####
   raw_plot <- switch(
@@ -1283,47 +1475,61 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                     aes(x = x_axis_raw, 
                         y = !!enquo_y, 
                         colour = !!enquo_colour),
-                    cex = 2,
+                    cex = raw_marker_spread,
                     method = "swarm",
+                    side = -1L,
+                    size = raw_marker_size,
+                    alpha = raw_marker_alpha,
                     corral = "wrap",
-                    corral.width = 0.3),
+                    corral.width = 0.35),
     
     "slope" = 
-      plot_slopegraph(dabest_effectsize_obj),
+      plot_slopegraph(dabest_effectsize_obj, plot_kwargs),
     
     "unpaired proportions" = 
       ggplot() +
-      geom_proportionbar(data = proportional_data,
-                         aes(x = x_axis_raw,
-                             y = proportion_success,
-                             colour = !!enquo_x, 
-                             fill = !!enquo_x,
-                             width = bar_width)),
+      # failure bar
+      geom_proportionbar(data = df_for_proportion_bar,
+                         aes(x = x_failure, y = y_failure, colour = tag)) +
+      # success bar
+      geom_proportionbar(data = df_for_proportion_bar,
+                         aes(x = x_success, y = y_success, colour = tag, fill = tag)),
     
     "sankey" =
       ggplot() +
-      geom_sankeyflow(data = flow_success_to_failure, 
+      geom_sankeyflow(data = flow_success_to_failure, na.rm = TRUE,
                       aes(x = x, y = y, fillcol = "#db6159", group = tag)) +
-      geom_sankeyflow(data = flow_failure_to_success, 
+      geom_sankeyflow(data = flow_failure_to_success, na.rm = TRUE, 
                       aes(x = x, y = y, fillcol = "#818181", group = tag)) +
-      geom_sankeyflow(data = flow_success_to_success, 
+      geom_sankeyflow(data = flow_success_to_success, na.rm = TRUE, 
                       aes(x = x, y = y, fillcol = "#db6159", group = tag)) +
-      geom_sankeyflow(data = flow_failure_to_failure, 
+      geom_sankeyflow(data = flow_failure_to_failure, na.rm = TRUE, 
                       aes(x = x, y = y, fillcol = "#818181", group = tag)) +
-      geom_sankeybar(data = sankey_bars, 
-                     aes(x = x_axis_raw,
-                         ysuccess = y_success, 
-                         yfailure = y_failure, 
-                         proportionsuccess = proportion_success, 
-                         width = bar_width,
-                         gap = sankey_bar_gap))
+      geom_proportionbar(data = sankey_bars, 
+                         aes(x = x_failure, y = y_failure, group = tag, colour = NA), fill = "#818181") +
+      geom_proportionbar(data = sankey_bars, 
+                         aes(x = x_success, y = y_success, group = tag, colour = NA), fill = "#db6159")
+      
   )
   
   #### Add scaling Component ####
+  raw_ylim <- plot_kwargs$swarm_ylim
+  raw_ylim <- if (is.null(raw_ylim)){raw_y_range_vector} else {raw_ylim}
+  
+  raw_y_max <- raw_ylim[2]
+  raw_y_min <- raw_ylim[1]
+  if(isFALSE(float_contrast) && isFALSE(proportional)) {
+    raw_y_min <- raw_y_min - (raw_y_max - raw_y_min)/15
+  }
+  raw_y_mean <- raw_y_max - raw_y_min
+  
+  raw_x_min <- ifelse(float_contrast, 0.6, 0.6)
+  raw_x_scalar <- ifelse(float_contrast, 0.5, 0.3)
+  
   raw_plot <- raw_plot +
     theme_classic() +
     coord_cartesian(ylim = c(raw_y_min, raw_y_max),
-                    xlim = c(0.6,raw_x_max+0.5),
+                    xlim = c(raw_x_min, raw_x_max+raw_x_scalar),
                     expand = FALSE,
                     clip = "off") +
     scale_x_continuous(breaks = c(x_axis_raw),
@@ -1334,12 +1540,12 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     raw_plot <- raw_plot +
       geom_segment(colour = "black",linewidth = 0.3,
                    aes(x = 1, 
-                       xend = raw_x_max+0.5,
+                       xend = raw_x_max+raw_x_scalar,
                        y = control_summary, 
                        yend = control_summary)) +
       geom_segment(colour = "black", linewidth = 0.3,
                    aes(x = 2, 
-                       xend = raw_x_max+0.5, 
+                       xend = raw_x_max+raw_x_scalar, 
                        y = test_summary, 
                        yend = test_summary))
   }
@@ -1353,7 +1559,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       tufte_gap_value <- ifelse(proportional, min(tufte_lines_df$mean)/20, min(tufte_lines_df$mean)/50)
       tufte_gap_value <- ifelse(float_contrast, tufte_gap_value, tufte_gap_value)
     }
-    tufte_side_adjust_value <- ifelse(proportional, 0, 0.20)
+    tufte_side_adjust_value <- ifelse(proportional, 0, 0.05)
     
     row_num <- max(x_axis_raw)
     row_ref <- c(seq(1, row_num, 1)) + tufte_side_adjust_value
@@ -1374,7 +1580,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     if(isTRUE(proportional) | isTRUE(is_colour)) {
       raw_plot <- raw_plot +
         geom_segment(data = tufte_lines_df, 
-                     linewidth = 0.8,
+                     linewidth = tufte_size,
                      colour = "black",
                      aes(x = row_ref, 
                          xend = row_ref, 
@@ -1383,7 +1589,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                          colour = !!enquo_x),
                      lineend = "square") +
         geom_segment(data = tufte_lines_df, 
-                     linewidth = 0.8,
+                     linewidth = tufte_size,
                      colour = "black",
                      aes(x = row_ref, 
                          xend = row_ref, 
@@ -1393,14 +1599,14 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                      lineend = "square")
     } else {
       raw_plot <- raw_plot +
-        geom_segment(data = tufte_lines_df, linewidth = 0.8,
+        geom_segment(data = tufte_lines_df, linewidth = tufte_size,
                      aes(x = row_ref, 
                          xend = row_ref, 
                          y = y_bot_t$y, 
                          yend = y_bot_t$yend,
                          colour = !!enquo_x),
                      lineend = "square") +
-        geom_segment(data = tufte_lines_df, linewidth = 0.8,
+        geom_segment(data = tufte_lines_df, linewidth = tufte_size,
                      aes(x = row_ref, 
                          xend = row_ref, 
                          y = y_top_t$y, 
@@ -1416,7 +1622,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       float_contrast_theme +
       geom_segment(linewidth = 0.4, 
                    color = "black",
-                   aes(x = 0.6, xend = raw_x_max+0.2, y = raw_y_min, yend = raw_y_min))
+                   aes(x = raw_x_min, xend = raw_x_max+0.2, y = raw_y_min, yend = raw_y_min))
     
   } else {
     # Obtain dfs for xaxis redraw
@@ -1447,13 +1653,8 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
   
   #### Add y_labels component ####
-  if(isTRUE(proportional)){
-    raw_plot <- raw_plot +
-      labs(y = "proportion of success")
-  } else {
-    raw_plot <- raw_plot +
-      labs(y = "value")
-  }
+  raw_plot <- raw_plot +
+    labs(y = raw_y_labels)
   
   return(raw_plot)
 }
@@ -1626,7 +1827,7 @@ create_violinplot_components <- function(boots,
       
       temp_df_violin <- data.frame(x = x_coords_ci,
                                    y = y_coords_ci,
-                                   tag = rep(toString(curr_x_idx),512))
+                                   tag = rep(toString(curr_x_idx), 512))
       
       df_for_violin <- rbind(df_for_violin, temp_df_violin)
       
@@ -1652,16 +1853,21 @@ create_violinplot_components <- function(boots,
 plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   idx = dabest_effectsize_obj$idx
   bootstraps = dabest_effectsize_obj$bootstraps
+  proportional <- dabest_effectsize_obj$proportional
   
   delta_x_labels = unlist(dabest_effectsize_obj$delta_x_labels)
-  delta_y_labels = dabest_effectsize_obj$delta_y_labels
+  delta_y_labels = plot_kwargs$contrast_label
   
-  minimeta = dabest_effectsize_obj$minimeta
-  delta2 = dabest_effectsize_obj$delta2
+  minimeta <- plot_kwargs$show_mini_meta
+  delta2 <- plot_kwargs$show_delta2
+  
   is_colour <- dabest_effectsize_obj$is_colour
   is_paired <- dabest_effectsize_obj$is_paired
   
   raw_y_range_vector <- dabest_effectsize_obj$ylim
+  raw_y_max <- raw_y_range_vector[2]
+  raw_y_min <- raw_y_range_vector[1]
+  
   control_summary <- dabest_effectsize_obj$control_summary
   test_summary <- dabest_effectsize_obj$test_summary
   
@@ -1674,15 +1880,18 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   boot_result <- dabest_effectsize_obj$boot_result
   boots <- boot_result$bootstraps
   
-  # Extracting geom_bootci params
-  ci_low = boot_result$bca_ci_low
-  ci_high = boot_result$bca_ci_high
-  difference = boot_result$difference
-  
   # Check if multiplot
   if(length(unlist(idx)) >= 3) {
     float_contrast <- FALSE
   }
+  
+  #### Load in sizes of plot elements ####
+  raw_marker_size <- plot_kwargs$raw_marker_size
+  raw_marker_alpha <- plot_kwargs$raw_marker_alpha
+  raw_bar_width <- plot_kwargs$raw_bar_width
+  tufte_size <- plot_kwargs$tufte_size
+  es_marker_size <- plot_kwargs$es_marker_size
+  es_line_size <- plot_kwargs$es_line_size
   
   #### Deltaplot Building ####
   delta_plot_components <- create_deltaplot_components(proportional, 
@@ -1696,7 +1905,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   is_deltadelta <- delta_plot_components$is_deltadelta
   
   #### initialise delta_plot & Add main_violin_type component ####
-  # Extend idx if minimeta or deltadelta
+  # Extend idx and labels if minimeta or deltadelta
   if (isTRUE(minimeta) || isTRUE(delta2)) {
     idx <- c(idx, list(c("minimeta", "deltadelta")))
   }
@@ -1730,10 +1939,29 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   )
   
   #### Add scaling Component ####
-  if (isTRUE(float_contrast)) {
+  raw_ylim <- plot_kwargs$swarm_ylim
+  raw_ylim <- if (is.null(raw_ylim)){c(raw_y_min, raw_y_max)} else {raw_ylim}
+  
+  ## Add labels ##
+  if (isTRUE(minimeta)) {
+    delta_x_labels <- append(delta_x_labels, "Weighted Delta")
+  } 
+  if (isTRUE(delta2)) {
+    delta_x_labels <- append(delta_x_labels, "delta-delta")
+  }
+  
+  if(isTRUE(float_contrast)) {
+    difference = boot_result$difference
+    
+    raw_plot_components <- create_rawplot_components(proportional, is_paired, float_contrast)
+    main_plot_type <- raw_plot_components$main_plot_type
+    
+    if(main_plot_type == "unpaired proportions") {
+      raw_y_range_vector <- c(0, 1)
+    }
     # Calculate new ylims to align summary lines
-    min_raw_y <- raw_y_range_vector[1]
-    max_raw_y <- raw_y_range_vector[2]
+    min_raw_y <- raw_ylim[1]
+    max_raw_y <- raw_ylim[2]
     raw_y_range <- max_raw_y - min_raw_y
     min_y_coords <- difference/(1 - (test_summary - min_raw_y)/(control_summary - min_raw_y))
     delta_y_range <- raw_y_range * -min_y_coords/(control_summary - min_raw_y)
@@ -1741,36 +1969,54 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     delta_plot <- delta_plot +
       theme_classic() +
       coord_cartesian(ylim = c(min_y_coords, min_y_coords + delta_y_range),
-                      xlim = c(1.8,delta_x_max+0.25),
+                      xlim = c(1.8, delta_x_max+0.25),
                       expand = FALSE) +
       scale_x_continuous(breaks = c(2),
                          labels = delta_x_labels) +
       scale_y_continuous(position = "right") 
     
   } else {
+    delta_x_min <- 0.6
+    delta_x_scalar <- 0.3
     # Extend xaxis for minimeta/deltadelta.
     if (isTRUE(minimeta) || isTRUE(delta2)) {
       delta_x_max <- delta_x_max + 2
     }
+    ## Custom contrast_ylim
+    delta_ylim <- plot_kwargs$contrast_ylim
+    if (isFALSE(is.null(delta_ylim))) {
+      delta_y_min <- delta_ylim[1]
+      delta_y_max <- delta_ylim[2]
+      delta_y_mean <- (delta_y_max - delta_y_min)/2
+    }
     
     delta_plot <- delta_plot +
       theme_classic() +
-      coord_cartesian(ylim = c(delta_y_min - delta_y_mean/2, 
-                               delta_y_max + delta_y_mean/2),
-                      xlim = c(0.6, delta_x_max+0.5),
+      coord_cartesian(ylim = c(delta_y_min - delta_y_mean/10, 
+                               delta_y_max),
+                      xlim = c(delta_x_min, delta_x_max+delta_x_scalar),
                       expand = FALSE) +
       scale_x_continuous(breaks = x_axis_breaks,
                          labels = delta_x_labels)
   }
   
   #### Add bootci Component ####
+  # Extracting geom_bootci params
+  if (delta2 != dabest_effectsize_obj$delta2 || minimeta != dabest_effectsize_obj$minimeta) {
+    boot_result <- boot_result[-nrow(boot_result),]
+  }
+  ci_low = boot_result$bca_ci_low
+  ci_high = boot_result$bca_ci_high
+  difference = boot_result$difference
+  
   if (isTRUE(is_bootci)) {
     delta_plot <- delta_plot +
-      geom_bootci(
-        aes(x = x_axis_breaks,
-            ymin = ci_low,
-            ymax = ci_high,
-            middle = difference))
+      geom_bootci(aes(x = x_axis_breaks,
+                  ymin = ci_low,
+                  ymax = ci_high,
+                  middle = difference,
+                  dotsize = es_marker_size,
+                  linesize = es_line_size))
   }
   
   #### Add summary lines Component ####
@@ -1812,8 +2058,8 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                    color = "black",
                    aes(x = x, 
                        xend = xend, 
-                       y = delta_y_min - delta_y_mean/2.5, 
-                       yend = delta_y_min - delta_y_mean/2.5)) +
+                       y = delta_y_min - delta_y_mean/22, 
+                       yend = delta_y_min - delta_y_mean/22)) +
       
       # Redraw xaxis ticks
       geom_segment(data = df_for_ticks,
@@ -1822,8 +2068,8 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                    color = "black",
                    aes(x = x, 
                        xend = x, 
-                       y = delta_y_min - delta_y_mean/2.5, 
-                       yend = delta_y_min - delta_y_mean/2))
+                       y = delta_y_min - delta_y_mean/22, 
+                       yend = delta_y_min - delta_y_mean/10))
   }
   
   #### Add y = 0 line Component ####
@@ -1845,39 +2091,62 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   delta_plot <- delta_plot +
     labs(y = delta_y_labels)
   
-  #### Add deltadelta yaxis Component
-  if (isTRUE(is_deltadelta)) {
-    delta_delta_plot <- ggplot() +
-      theme_classic() +
-      non_float_contrast_theme +
-      
-      # Setting scaling and limits
-      coord_cartesian(ylim = c(delta_y_min - delta_y_mean/2, 
-                               delta_y_max + delta_y_mean/2),
-                      xlim = c(0, 1),
-                      expand = FALSE) +
-      scale_x_continuous(breaks = c(0.5),
-                         labels = "") +
-      labs(y = "delta-delta") +
-      scale_y_continuous(position = "right") +
-      
-      # Drawing y = 0 line
-      geom_hline(linewidth = 0.3,
-                 yintercept = 0)
-    
-    delta_plot <- cowplot::plot_grid(
-      plotlist = list(delta_plot + theme(legend.position="none",
-                                         plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt")), 
-                      delta_delta_plot + theme(legend.position="none",
-                                               plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt"))),
-      nrow = 1, 
-      rel_widths = c(0.9, 0.1),
-      axis = "lr",
-      align = "h"
-      )
-  }
+  # if (isTRUE(is_deltadelta)) {
+  #   delta_delta_plot <- ggplot() +
+  #     theme_classic() +
+  #     non_float_contrast_theme +
+  # 
+  #     # Setting scaling and limits
+  #     coord_cartesian(ylim = c(delta_y_min - delta_y_mean/10,
+  #                              delta_y_max),
+  #                     xlim = c(0, 1),
+  #                     expand = FALSE) +
+  #     scale_x_continuous(breaks = c(0.5),
+  #                        labels = "") +
+  #     labs(y = "delta-delta") +
+  #     scale_y_continuous(position = "right") +
+  # 
+  #     # Drawing y = 0 line
+  #     geom_hline(linewidth = 0.3,
+  #                yintercept = 0)
+  # 
+  #   delta_plot <- cowplot::plot_grid(
+  #     plotlist = list(delta_plot + theme(legend.position="none",
+  #                                        plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt")),
+  #                     delta_delta_plot + theme(legend.position="none",
+  #                                              plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt"))),
+  #     nrow = 1,
+  #     rel_widths = c(0.9, 0.1),
+  #     axis = "lr",
+  #     align = "h"
+  #     )
+  # }
+
+  return(list(delta_plot = delta_plot, delta_range = c(delta_y_min - delta_y_mean/10, delta_y_max)))
+}
+```
+
+# extra y_axis plotter
+```{r}
+plot_extra_yaxis <- function(range, position, hline_yintercept = NULL, label) {
+  extra_yaxis_plot <- ggplot() +
+    theme_classic() +
+    non_float_contrast_theme +
+
+    # Setting scaling and limits
+    coord_cartesian(ylim = range,
+                    xlim = c(0, 1),
+                    expand = FALSE) +
+    scale_x_continuous(breaks = c(0.5),
+                       labels = "") +
+    labs(y = label) +
+    scale_y_continuous(position = position)
   
-  return(delta_plot)
+  if (isFALSE(is.null(hline_yintercept))) {
+    extra_yaxis_plot <- extra_yaxis_plot +
+      geom_hline(linewidth = 0.3, yintercept = hline_yintercept)
+  }
+  return(extra_yaxis_plot)
 }
 ```
 
@@ -1939,15 +2208,21 @@ apply_palette <- function(ggplot_object, palette_name) {
 
 # dabest_plot functin
 ```{r}
-dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
+dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
+  
+  if (class(dabest_effectsize_obj)!="dabest_effectsize") {
+    cli::cli_abort(c("{.field dabest_effectsize_obj} must be a {.cls dabest_effectsize} object."),
+                   "x" = "Please supply a {.cls dabest_effectsize} object.")
+  }
+  
   plot_kwargs <- list(...)
-  plot_kwargs <- assign_plot_kwargs(plot_kwargs)
+  plot_kwargs <- assign_plot_kwargs(dabest_effectsize_obj, plot_kwargs)
   
   custom_palette <- plot_kwargs$custom_palette
   
-  is_colour <- dabest_obj.mean_diff$is_colour
-  is_deltadelta <- dabest_obj.mean_diff$delta2
-  idx <- dabest_obj.mean_diff$idx
+  is_colour <- dabest_effectsize_obj$is_colour
+  is_deltadelta <- plot_kwargs$show_delta2
+  idx <- dabest_effectsize_obj$idx
   raw_legend <- NULL
   
   if(length(unlist(idx)) >= 3) {
@@ -1955,32 +2230,45 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
   }
   
   if(isFALSE(float_contrast)) {
-    raw_plot <- apply_palette(plot_raw(dabest_obj.mean_diff, float_contrast=FALSE, plot_kwargs), custom_palette)
-    delta_plot <- apply_palette(plot_delta(dabest_obj.mean_diff, float_contrast=FALSE, plot_kwargs), custom_palette)
+    raw_plot <- plot_raw(dabest_effectsize_obj, float_contrast=FALSE, plot_kwargs)
+    delta_plot <- plot_delta(dabest_effectsize_obj, float_contrast=FALSE, plot_kwargs)
+    
+    delta_range <- delta_plot$delta_range
+    delta_plot <- delta_plot$delta_plot
+    
+    raw_plot <- apply_palette(raw_plot, custom_palette)
+    delta_plot <- apply_palette(delta_plot, custom_palette)
     
     raw_legend <- get_legend(raw_plot + 
                          guides(alpha = "none") +
                          theme(legend.box.margin = margin(0, 0, 0, 0)))
     
-    if(isTRUE(is_deltadelta)) {
-      raw_plot <- cowplot::plot_grid(
-        plotlist = list(raw_plot + theme(legend.position="none"), 
-                        NULL), 
-        nrow = 1, 
-        ncol = 2, 
-        rel_widths = c(0.9, 0.1)
-        )
-    }
+    # if (isTRUE(is_deltadelta)) {
+    #   raw_plot <- plot_grid(raw_plot, ggplot(), nrow = 1, rel_widths = c(0.9, 0.1))
+    # }
     
     final_plot <- cowplot::plot_grid(
       plotlist   = list(raw_plot + theme(legend.position="none"), 
-                      delta_plot + theme(legend.position="none")),
+                        delta_plot + theme(legend.position="none")),
       nrow       = 2,
       ncol       = 1,
       axis       = "tblr",
       align      = "vh"
       )
     
+    if(isTRUE(is_deltadelta)) {
+      extra_yaxis_plot <- plot_extra_yaxis(delta_range, "right", 0, "delta-delta")
+
+      extra_yaxis_plot <- cowplot::plot_grid(NULL, extra_yaxis_plot, NULL, ncol = 1, rel_heights = c(0.51, 0.42, 0.07))
+
+      final_plot <- cowplot::plot_grid(
+        plotlist = list(final_plot, extra_yaxis_plot),
+        nrow = 1,
+        ncol = 2,
+        rel_widths = c(0.9, 0.1)
+      )
+    }
+
     if(isTRUE(is_colour)) {
       legend_plot <- cowplot::plot_grid(
         plotlist = list(raw_legend, NULL),
@@ -1996,8 +2284,14 @@ dabest_plot <- function(dabest_obj.mean_diff, float_contrast = TRUE, ...) {
 
   } else {
     #isTRUE(float_contrast)
-    raw_plot <-  apply_palette(plot_raw(dabest_obj.mean_diff, float_contrast=TRUE, plot_kwargs), custom_palette)
-    delta_plot <- apply_palette(plot_delta(dabest_obj.mean_diff, float_contrast=TRUE, plot_kwargs), custom_palette)
+    raw_plot <- plot_raw(dabest_effectsize_obj, float_contrast=TRUE, plot_kwargs)
+    delta_plot <- plot_delta(dabest_effectsize_obj, float_contrast=TRUE, plot_kwargs)
+    
+    delta_plot_range <- delta_plot$delta_range
+    delta_plot <- delta_plot$delta_plot
+    
+    raw_plot <- apply_palette(raw_plot, custom_palette)
+    delta_plot <- apply_palette(delta_plot, custom_palette)
     
     final_plot <- cowplot::plot_grid(
       plotlist   = list(raw_plot + theme(legend.position="none"), 
@@ -2043,12 +2337,12 @@ wide.data <- tibble::tibble(
   Dummy = dummy,
   Gender = gender, ID = id)
 
-my.data <- wide.data %>%
+twogroup_data <- wide.data %>%
   tidyr::gather(key = Group, value = Measurement, -ID, -Gender, -Dummy)
 ```
 
 ```{r}
-dabest_obj <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1"))
+dabest_obj <- load(data = twogroup_data, x = Group, y = Measurement, idx = c("Control1", "Group1"))
 dabest_obj.mean_diff <- mean_diff(dabest_obj)
 # dabest_obj.hedges_g <- hedges_g(dabest_obj)
 
@@ -2062,17 +2356,22 @@ dabest_obj.mean_diff <- mean_diff(dabest_obj)
 
 ## unpaired
 ```{r}
-dabest_plot(dabest_obj.mean_diff, TRUE)
-dabest_plot(dabest_obj.mean_diff, FALSE, custom_palette = "nejm")
+dabest_plot(dabest_obj.mean_diff, TRUE, swarm_label = "This is my\nrawdata", contrast_label="The bootstrap\ndistribtions!")
+dabest_plot(dabest_obj.mean_diff, TRUE, swarm_ylim = c(50, 120), custom_palette = "jama")
+dabest_plot(dabest_obj.mean_diff, FALSE, swarm_ylim = c(50, 120), custom_palette = "lancet")
+```
+
+```{r}
+dabest_plot(dabest_obj.mean_diff, FALSE, custom_palette = "nejm", raw_marker_size = 1, tufte_size = 1, es_marker_size = 1, es_line_size = 1.5, raw_marker_spread = 1.8)
 ```
 
 ## unpaired colour
 ```{r}
-dabest_obj.colour_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1"), colour = Gender) %>%
+dabest_obj.colour_mean_diff <- load(data = twogroup_data, x = Group, y = Measurement, idx = c("Control1", "Group1"), colour = Gender) %>%
   mean_diff()
 
 dabest_plot(dabest_obj.colour_mean_diff, TRUE, custom_palette = "jama")
-dabest_plot(dabest_obj.colour_mean_diff, FALSE, custom_palette = "jco")
+dabest_plot(dabest_obj.colour_mean_diff, FALSE, custom_palette = "jco", raw_marker_size = 1)
 ```
 
 
@@ -2087,9 +2386,9 @@ dabest_plot(dabest_obj.colour_mean_diff, TRUE)
 dev.off()
 
 pdf(file = "figures/2group/2group_float_false.pdf",
-    width = 5.5,
+    width = 4.5,
     height = 7,
-    pointsize = 12)
+    pointsize = 10)
 dabest_plot(dabest_obj.mean_diff, FALSE)
 dabest_plot(dabest_obj.colour_mean_diff, FALSE)
 dev.off()
@@ -2107,7 +2406,7 @@ dabest_plot(dabest_obj.mean_diff, TRUE)
 dev.off()
 
 jpeg(file = "figures/2group/2group_float_false.jpeg",
-    width = 5.5,
+    width = 4.5,
     height = 7,
     units = "in",
     pointsize = 12,
@@ -2141,7 +2440,7 @@ wide.data <- tibble::tibble(
   Dummy = dummy,
   Gender = gender, ID = id)
 
-my.data <- wide.data %>%
+multigroup_data <- wide.data %>%
   tidyr::gather(key = Group, value = Measurement, -ID, -Gender, -Dummy)
 # multigroup
 ## multigroup unpaired
@@ -2149,7 +2448,7 @@ my.data <- wide.data %>%
 
 ## unpaired
 ```{r}
-dabest_obj_multigroup <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control1", "Group1"), c("Control2", "Group2", "Group3")))
+dabest_obj_multigroup <- load(data = multigroup_data, x = Group, y = Measurement, idx = list(c("Control1", "Group1"), c("Control2", "Group2", "Group3")))
 dabest_obj_multigroup.mean_diff <- mean_diff(dabest_obj_multigroup)
 ```
 
@@ -2160,7 +2459,7 @@ dabest_plot(dabest_obj_multigroup.mean_diff, FALSE, custom_palette = "jama")
 
 ## unpaired colour
 ```{r}
-dabest_obj.colour_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = c("Control1", "Group1", "Group2", "Group3"), colour = Gender) %>%
+dabest_obj.colour_mean_diff <- load(data = multigroup_data, x = Group, y = Measurement, idx = c("Control1", "Group1", "Group2", "Group3"), colour = Gender) %>%
   mean_diff()
 
 dabest_plot(dabest_obj.colour_mean_diff, FALSE, custom_palette = "jco")
@@ -2202,30 +2501,30 @@ dev.off()
 
 ## paired
 ```{r}
-dabest_obj_multigroup_sequential <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "sequential", id_col = ID)
+dabest_obj_multigroup_sequential <- load(data = multigroup_data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "sequential", id_col = ID)
 dabest_obj_multigroup_sequential.mean_diff <- mean_diff(dabest_obj_multigroup_sequential)
 
-dabest_obj_multigroup_baseline <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "baseline", id_col = ID)
+dabest_obj_multigroup_baseline <- load(data = multigroup_data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "baseline", id_col = ID)
 dabest_obj_multigroup_baseline.mean_diff <- mean_diff(dabest_obj_multigroup_baseline)
 ```
 
 ```{r}
-dabest_plot(dabest_obj_multigroup_sequential.mean_diff, FALSE)
-dabest_plot(dabest_obj_multigroup_baseline.mean_diff, FALSE)
+dabest_plot(dabest_obj_multigroup_sequential.mean_diff, FALSE, raw_marker_size = 0.3, raw_marker_alpha = 0.5)
+dabest_plot(dabest_obj_multigroup_baseline.mean_diff, FALSE, contrast_ylim = c(2, -2), contrast_label = "More negative is better", raw_marker_size = 0.3, raw_marker_alpha = 0.5)
 ```
 
 ## paired colour
 ```{r}
-dabest_obj.colour_baseline_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "baseline", id_col = ID, colour = Gender) %>%
+dabest_obj.colour_baseline_mean_diff <- load(data = multigroup_data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "baseline", id_col = ID, colour = Gender) %>%
   mean_diff()
 
-dabest_obj.colour_sequential_mean_diff <- load(data = my.data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "sequential", id_col = ID, colour = Gender) %>%
+dabest_obj.colour_sequential_mean_diff <- load(data = multigroup_data, x = Group, y = Measurement, idx = list(c("Control2", "Group2", "Group3"), c("Control1", "Group1")), paired = "sequential", id_col = ID, colour = Gender) %>%
   mean_diff()
 ```
 
 ```{r}
-dabest_plot(dabest_obj.colour_baseline_mean_diff, TRUE, custom_palette = "nejm")
-dabest_plot(dabest_obj.colour_sequential_mean_diff, TRUE, custom_palette = "jco")
+dabest_plot(dabest_obj.colour_baseline_mean_diff, TRUE, custom_palette = "nejm", raw_marker_size = 0.3, raw_marker_alpha = 0.5)
+dabest_plot(dabest_obj.colour_sequential_mean_diff, TRUE, custom_palette = "jco", raw_marker_size = 0.3, raw_marker_alpha = 0.5)
 ```
 
 ```{r}
@@ -2236,7 +2535,7 @@ png(file = "figures/multigroup/multigroup_sequential.png",
     pointsize = 12,
     res = 1200,
     bg = "white")
-dabest_plot(dabest_obj_multigroup_sequential.mean_diff, FALSE)
+dabest_plot(dabest_obj_multigroup_sequential.mean_diff, FALSE, raw_marker_size = 0.3, raw_marker_alpha = 0.5)
 dev.off()
 
 jpeg(file = "figures/multigroup/multigroup_baseline_colour.jpeg",
@@ -2247,7 +2546,7 @@ jpeg(file = "figures/multigroup/multigroup_baseline_colour.jpeg",
     res = 1200,
     quality = 100,
     bg = "white")
-dabest_plot(dabest_obj.colour_baseline_mean_diff, FALSE)
+dabest_plot(dabest_obj.colour_baseline_mean_diff, FALSE, raw_marker_size = 0.3, raw_marker_alpha = 0.5)
 dev.off()
 ```
 
@@ -2310,7 +2609,7 @@ dabest_obj_proportional.mean_diff <- load(data = my.data.proportional,
 ## unpaired
 ```{r}
 dabest_plot(dabest_obj_proportional.mean_diff, TRUE, custom_palette = "igv") 
-dabest_plot(dabest_obj_proportional.mean_diff, FALSE, custom_palette = "uchicago")
+dabest_plot(dabest_obj_proportional.mean_diff, FALSE, custom_palette = "uchicago", raw_bar_width = 0.15)
 ```
 
 ```{r}
@@ -2324,9 +2623,8 @@ dabest_obj_proportional_multigroup.cohens_h <- load(data = my.data.proportional,
 
 ## multi unpaired
 ```{r}
-
 dabest_plot(dabest_obj_proportional_multigroup.cohens_h, TRUE, custom_palette = "brewer")
-dabest_plot(dabest_obj_proportional_multigroup.cohens_h, FALSE)
+dabest_plot(dabest_obj_proportional_multigroup.cohens_h, FALSE, raw_bar_width = 0.20)
 ```
 
 ```{r}
@@ -2337,7 +2635,7 @@ png(file = "figures/proportion/2group_proportion_float_false.png",
     pointsize = 12,
     res = 1200,
     bg = "white")
-dabest_plot(dabest_obj_proportional.mean_diff, FALSE)
+dabest_plot(dabest_obj_proportional.mean_diff, FALSE, raw_bar_width = 0.15)
 dev.off()
 
 png(file = "figures/proportion/2group_proportion_float_true.png",
@@ -2358,7 +2656,7 @@ jpeg(file = "figures/proportion/multigroup_proportion.jpeg",
     res = 1200,
     quality = 100,
     bg = "white")
-dabest_plot(dabest_obj_proportional_multigroup.cohens_h, FALSE)
+dabest_plot(dabest_obj_proportional_multigroup.cohens_h, FALSE, raw_bar_width = 0.15)
 dev.off()
 ```
 
@@ -2401,9 +2699,11 @@ dabest_obj_sequential_sankey.mean_diff <- load(data = my.data.proportional,
 
 ## multi sankey
 ```{r}
-dabest_plot(dabest_obj_baseline_sankey.mean_diff, FALSE)
-dabest_plot(dabest_obj_sequential_sankey.mean_diff, FALSE)
+dabest_plot(dabest_obj_baseline_sankey.mean_diff, FALSE, raw_bar_width = 0.15)
+dabest_plot(dabest_obj_sequential_sankey.mean_diff, FALSE, raw_bar_width = 0.15)
+dabest_plot(dabest_obj_sequential_sankey.mean_diff, FALSE, raw_bar_width = 0.15, sankey = FALSE)
 ```
+
 ```{r}
 png(file = "figures/proportion/2group_sankey_float_true.png",
     width = 5.5,
@@ -2422,7 +2722,7 @@ png(file = "figures/proportion/multigroup_sankey_baseline.png",
     pointsize = 12,
     res = 1200,
     bg = "white")
-dabest_plot(dabest_obj_baseline_sankey.mean_diff, FALSE)
+dabest_plot(dabest_obj_baseline_sankey.mean_diff, FALSE, raw_bar_width = 0.15)
 dev.off()
 
 jpeg(file = "figures/proportion/multigroup_sankey_sequential.png",
@@ -2433,7 +2733,7 @@ jpeg(file = "figures/proportion/multigroup_sankey_sequential.png",
     res = 1200,
     quality = 100,
     bg = "white")
-dabest_plot(dabest_obj_sequential_sankey.mean_diff, FALSE)
+dabest_plot(dabest_obj_sequential_sankey.mean_diff, FALSE, raw_bar_width = 0.15)
 dev.off()
 ```
 
@@ -2458,15 +2758,17 @@ wide.data <- tibble::tibble(
   Dummy = dummy,
   Gender = gender, ID = id)
 
-my.data <- wide.data %>%
+minimeta_data <- wide.data %>%
   tidyr::gather(key = Group, value = Measurement, -ID, -Gender, -Dummy)
 ```
 
 ## unpaired
 ```{r}
-dabest_obj_multigroup_minimeta <- load(data = my.data, x = Group, y = Measurement, minimeta = TRUE, idx = list(c("Control1", "Group1"), c("Control2", "Group2"), c("Control3", "Group3")))
+dabest_obj_multigroup_minimeta <- load(data = minimeta_data, x = Group, y = Measurement, minimeta = TRUE, idx = list(c("Control1", "Group1"), c("Control2", "Group2"), c("Control3", "Group3")))
 dabest_obj_multigroup_minimeta.mean_diff <- mean_diff(dabest_obj_multigroup_minimeta)
+
 dabest_plot(dabest_obj_multigroup_minimeta.mean_diff, TRUE)
+dabest_plot(dabest_obj_multigroup_minimeta.mean_diff, TRUE, show_mini_meta = FALSE)
 ```
 
 ```{r}
@@ -2501,26 +2803,43 @@ wide.data <- tibble::tibble(
   ID = id,
   Rep = Rep)
 
-my.data <- wide.data %>%
+deltadelta_data <- wide.data %>%
   tidyr::gather(key = Treatment, value = Measurement, -ID, -Genotype, -Dummy, -Rep)
 ```
 
 ## unpaired
 ```{r}
-dabest_obj_multigroup_deltadelta <- load(data = my.data, x = Genotype, y = Measurement, delta2 = TRUE, experiment =Treatment, idx = list(c("W Placebo","M Placebo"),c("W Drug","M Drug")), colour = Genotype)
+dabest_obj_multigroup_deltadelta <- load(data = deltadelta_data, x = Genotype, y = Measurement, delta2 = TRUE, experiment = Treatment, idx = list(c("W Placebo","M Placebo"),c("W Drug","M Drug")), colour = Genotype)
 dabest_obj_multigroup_deltadelta.mean_diff <- mean_diff(dabest_obj_multigroup_deltadelta)
 
 dabest_plot(dabest_obj_multigroup_deltadelta.mean_diff, TRUE)
+dabest_plot(dabest_obj_multigroup_deltadelta.mean_diff, TRUE, show_delta2 = FALSE)
 ```
 
 
 ## paired
 ```{r}
-dabest_obj_multigroup_deltadelta_baseline <- load(data = my.data, x = Treatment, y = Measurement, delta2 = TRUE, experiment = Genotype,idx = list(c("Placebo W","Drug W"),c("Placebo M","Drug M")), paired = "baseline", id = ID, colour = Rep)
+dabest_obj_multigroup_deltadelta_baseline <- load(data = deltadelta_data, x = Treatment, y = Measurement, delta2 = TRUE, experiment = Genotype,idx = list(c("Placebo W","Drug W"),c("Placebo M","Drug M")), paired = "baseline", id = ID, colour = Rep)
 
 dabest_obj_multigroup_deltadelta_baseline.mean_diff <- mean_diff(dabest_obj_multigroup_deltadelta_baseline)
 
-dabest_plot(dabest_obj_multigroup_deltadelta_baseline.mean_diff, TRUE)
+dabest_plot(dabest_obj_multigroup_deltadelta_baseline.mean_diff, TRUE, raw_marker_size = 0.3, raw_marker_alpha = 0.5)
+dabest_plot(dabest_obj_multigroup_deltadelta_baseline.mean_diff, TRUE, show_delta2 = FALSE, raw_marker_size = 0.3, raw_marker_alpha = 0.5)
+```
+
+## no idx
+```{r}
+dabest_obj_multigroup_deltadelta_no_idx <- load(data = deltadelta_data, x = Genotype, y = Measurement, delta2 = TRUE, experiment = Treatment, colour = Genotype)
+dabest_obj_multigroup_deltadelta_no_idx.mean_diff <- mean_diff(dabest_obj_multigroup_deltadelta_no_idx)
+
+dabest_plot(dabest_obj_multigroup_deltadelta_no_idx.mean_diff, TRUE)
+```
+## setting levels
+```{r}
+dabest_obj_multigroup_deltadelta_levels <- load(data = deltadelta_data, x = Genotype, y = Measurement, delta2 = TRUE, experiment = Treatment, colour = Genotype, experiment_label = c("Placebo", "Drug"), x1_level = c("W", "M"))
+dabest_obj_multigroup_deltadelta_levels.mean_diff <- mean_diff(dabest_obj_multigroup_deltadelta_levels)
+
+dabest_plot(dabest_obj_multigroup_deltadelta_levels.mean_diff, TRUE)
 ```
 
 ```{r}
@@ -2541,6 +2860,17 @@ png(file = "figures/deltadelta/multigroup_deltadelta_paired.png",
     pointsize = 12,
     res = 1200,
     bg = "white")
-dabest_plot(dabest_obj_multigroup_deltadelta_baseline.mean_diff, FALSE)
+dabest_plot(dabest_obj_multigroup_deltadelta_baseline.mean_diff, FALSE, raw_marker_size = 0.3, raw_marker_alpha = 0.5)
 dev.off()
+```
+
+# capturing errors
+## non proportional data given
+```{r}
+dabest_obj_proportional.mean_diff <- load(data = multigroup_data, 
+                                  x = Group, 
+                                  y = Measurement, 
+                                  idx = c("Control1", "Test1"),
+                                  proportional = TRUE) %>%
+  mean_diff()
 ```

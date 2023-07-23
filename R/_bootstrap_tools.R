@@ -38,7 +38,7 @@ bootstrap <- function(
     seed = 12345,
     reps = 5000,
     boot_labs
-    ){
+){
   
   boot_result <- tibble()
   
@@ -55,6 +55,8 @@ bootstrap <- function(
   is_paired <- dabest_obj$is_paired
   is_colour <- dabest_obj$is_colour
   
+  proportional <- dabest_obj$proportional
+  
   quoname_x <- as_name(enquo_x)
   quoname_y <- as_name(enquo_y)
   delta_x_labels <- list()
@@ -62,6 +64,14 @@ bootstrap <- function(
   
   minimeta <- dabest_obj$minimeta
   delta2 <- dabest_obj$delta2
+  
+  ## Validity Checks
+  if (isTRUE(is_paired) && boot_labs == "Cliffs' delta") {
+    cli::cli_abort(c("{.var Cliffs delta} cannot be found when {.field paired} is not NULL.",
+                     "x" = "Please change {.var effect_size_func}."))
+  } else if (isTRUE(proportional) && !(boot_labs %in% c("Mean difference","Cohen's h","Paired\nmean difference"))) {
+    cli::cli_abort(c("Other effect sizes besides {.var Cohens h} and {.var Mean difference} cannot be found when {.field                         paired} is not NULL.","x" = "Please change {.var effect_size_func}."))
+  }
   
   if (isFALSE(is_paired) || isTRUE(paired == "baseline")) {
     for (group in idx) {
@@ -108,8 +118,8 @@ bootstrap <- function(
                               paired = is_paired)
         
         if (ci < 0 | ci > 100) {
-          err_string <- str_interp("`ci` must be between 0 and 100, not ${ci}")
-          stop(err_string)
+          cli::cli_abort(c("{.field ci} is not between 0 and 100.",
+                           "x" = "{.field ci} must be between 0 and 100, not {ci}."))
         }
         
         bootci <- boot.ci(boots, conf=ci/100, type = c("perc","bca"))
@@ -170,8 +180,8 @@ bootstrap <- function(
                               paired = is_paired)
         
         if (ci < 0 | ci > 100) {
-          err_string <- str_interp("`ci` must be between 0 and 100, not ${ci}")
-          stop(err_string)
+          cli::cli_abort(c("{.field ci} is not between 0 and 100.",
+                           "x" = "{.field ci} must be between 0 and 100, not {ci}."))
         }
         
         bootci <- boot.ci(boots, conf=ci/100, type = c("perc","bca"))
@@ -196,18 +206,19 @@ bootstrap <- function(
   if (isTRUE(minimeta)){
     boot_last_row <- boot_weighted_row(boot_result = boot_result, ci)
     boot_result <- bind_rows(boot_result, boot_last_row)
-    delta_x_labels <- append(delta_x_labels, "Weighted Delta")
   }
   if (isTRUE(delta2)) {
     boot_last_row <- boot_delta_delta(boot_result = boot_result,ci)
     boot_result <- bind_rows(boot_result,boot_last_row)
-    delta_x_labels <- append(delta_x_labels, "delta-delta")
   }
+  
+  raw_y_labels <- ifelse(proportional, "proportion of success", "value")
   
   out <- list(raw_data = raw_data,
               idx = idx,
               delta_x_labels = delta_x_labels,
               delta_y_labels = delta_y_labels,
+              raw_y_labels = raw_y_labels,
               is_paired = is_paired,
               is_colour = is_colour,
               paired = paired,
@@ -219,11 +230,13 @@ bootstrap <- function(
               enquo_y = dabest_obj$enquo_y,
               enquo_id_col = dabest_obj$enquo_id_col,
               enquo_colour = dabest_obj$enquo_colour,
-              proportional = dabest_obj$proportional,
+              proportional = proportional,
               minimeta = minimeta,
               delta2 = dabest_obj$delta2,
               proportional_data = dabest_obj$proportional_data,
               boot_result = boot_result)
+  
+  class(out) <- c("dabest_effectsize")
   
   return(out)
 }

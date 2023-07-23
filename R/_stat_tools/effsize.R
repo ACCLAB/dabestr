@@ -8,6 +8,11 @@
 
 mean_diff <- function(dabest_obj) {
   
+  if (class(dabest_obj)!="dabest") {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object.")
+  }
+  
   effect_size_func <- function(control, test, paired) {
     if (identical(paired, FALSE)) {
       return(mean(test) - mean(control))
@@ -18,12 +23,17 @@ mean_diff <- function(dabest_obj) {
   is_paired <- dabest_obj$is_paired
   
   if(is_paired){
-    return(bootstrap(dabest_obj, effect_size_func, boot_labs = "Paired mean difference"))
+    return(bootstrap(dabest_obj, effect_size_func, boot_labs = "Paired\nmean difference"))
   }
   return(bootstrap(dabest_obj, effect_size_func, boot_labs = "Mean difference"))
 }
 
 median_diff <- function(dabest_obj) {
+  
+  if (class(dabest_obj)!="dabest") {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object.")
+  }
   
   effect_size_func <- function(control, test, paired) {
     if (identical(paired, FALSE)) {
@@ -35,12 +45,17 @@ median_diff <- function(dabest_obj) {
   is_paired <- dabest_obj$is_paired
   
   if(is_paired){
-    return(bootstrap(dabest_obj, effect_size_func, boot_labs = "Paired median difference"))
+    return(bootstrap(dabest_obj, effect_size_func, boot_labs = "Paired\nmedian difference"))
   }
   return(bootstrap(dabest_obj, effect_size_func, boot_labs = "Median difference"))
 }
 
 cohens_d <- function(dabest_obj) {
+  
+  if (class(dabest_obj)!="dabest") {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object.")
+  }
   
   effect_size_func <- function(control, test, paired) {
     return(effsize::cohen.d(test, control, paired=paired)$estimate)
@@ -50,6 +65,15 @@ cohens_d <- function(dabest_obj) {
 }
 
 hedges_g <- function(dabest_obj) {
+  
+  if (class(dabest_obj)!="dabest") {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object.")
+  }
+  
+  cohens_d_ <- function(control, test, paired) {
+    return(effsize::cohen.d(test, control, paired=paired)$estimate)
+  }
   
   effect_size_func <- function(control, test, paired) {
     cd <- cohens_d_(test, control, paired=paired)
@@ -62,6 +86,11 @@ hedges_g <- function(dabest_obj) {
 
 cliffs_delta <- function(dabest_obj) {
   
+  if (class(dabest_obj)!="dabest") {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object.")
+  }
+  
   effect_size_func <- function(control, test, paired=NA) {
     return(effsize::cliff.delta(test, control)$estimate)
   }
@@ -70,6 +99,11 @@ cliffs_delta <- function(dabest_obj) {
 }
 
 cohens_h <- function(dabest_obj){
+  
+  if (class(dabest_obj)!="dabest") {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object.")
+  }
   
   effect_size_func <- function(control, test, paired) {
     #remove nas and nulls later on

@@ -5,8 +5,11 @@
 
 
 #' Function that plots slopegraph
-plot_slopegraph <- function(dabest_effectsize_obj) {
+plot_slopegraph <- function(dabest_effectsize_obj, plot_kwargs) {
   raw_data <- dabest_effectsize_obj$raw_data
+  
+  raw_marker_size <- plot_kwargs$raw_marker_size
+  raw_marker_alpha <- plot_kwargs$raw_marker_alpha
   
   enquo_x = dabest_effectsize_obj$enquo_x
   enquo_y = dabest_effectsize_obj$enquo_y
@@ -19,7 +22,7 @@ plot_slopegraph <- function(dabest_effectsize_obj) {
   idx = dabest_effectsize_obj$idx
   
   raw_plot <- ggplot()
-  slopegraph_params <- list(linewidth = 0.3, alpha = 0.5)
+  slopegraph_params <- list(linewidth = raw_marker_size, alpha = raw_marker_alpha)
   
   for(subplot_groups in idx) {
     # Assign subplot.
