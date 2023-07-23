@@ -28,14 +28,14 @@ An estimation plot has two key features.
 2.  It presents the **effect size** as a **bootstrap 95% confidence interval** on a **separate but aligned axes**.
 
 <p float ="left">  
-  <img src="Rmd/figures/2group/2group_float_true.png" width="500" height="500">
-  <img src="Rmd/figures/multigroup/multigroup_unpaired.png" width="500" height="500">
-  <img src="Rmd/figures/proportion/multigroup_sankey_baseline.png" width="500" height="500">
-  <img src="Rmd/figures/proportion/multigroup_proportion.jpeg" width="500" height="500">
+  <img src="Rmd/figures/2group/2group_float_true.png?" width="500" height="500">
+  <img src="Rmd/figures/multigroup/multigroup_unpaired.png?" width="500" height="500">
+  <img src="Rmd/figures/proportion/multigroup_sankey_baseline.png?" width="500" height="500">
+  <img src="Rmd/figures/proportion/multigroup_proportion.jpeg?" width="500" height="500">
 </p>
-<img src="Rmd/figures/multigroup/multigroup_baseline_colour.jpeg" width="636" height="500">
-<img src="Rmd/figures/minimeta/multigroup_minimeta.png" width="636" height="500">
-<img src="Rmd/figures/deltadelta/multigroup_deltadelta_unpaired.png" width="636" height="500">
+<img src="Rmd/figures/multigroup/multigroup_baseline_colour.jpeg?" width="636" height="500">
+<img src="Rmd/figures/minimeta/multigroup_minimeta.png?" width="636" height="500">
+<img src="Rmd/figures/deltadelta/multigroup_deltadelta_unpaired.png?" width="636" height="500">
 
 ## Requirements
 
