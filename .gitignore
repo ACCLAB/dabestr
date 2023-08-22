@@ -1,16 +1,16 @@
-Meta
-doc
+# Byte-compiled / optimized / DLL files
+
+# Knitted html file
+dabestr.html
+
+# Mac
+**/.DS_Store
+
+# RProj
 .Rproj.user
-.Rhistory
 .RData
+.Rhistory
 .Ruserdata
-.Rprofile
-.DS_Store
-*.DS_Store
+.RProfile
+docs
 inst/doc
-# revdevcheck temp folder
-revdep
-# test figures
-tests/testthat/Rplots.pdf
-packrat/lib*/
-packrat/src/

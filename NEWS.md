@@ -1,3 +1,6 @@
+# dabestr v0.9.9.9
+* This is the current pre-official, teaser release version of dabestr.
+
 # dabestr v0.3.0
 * This is a breaking release that includes standardised effect sizes, and a bunch of bugfixes.
 
