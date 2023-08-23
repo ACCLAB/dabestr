@@ -71,7 +71,7 @@
 #' 
 #' # Creating a dabest object
 #' dabest_obj <- load(data = non_proportional_data, x = Group, y = Measurement, 
-#' idx = c("Control1 ", "Test 1"))
+#' idx = c("Control 1", "Test 1"))
 #' 
 #' @export load
 #'
@@ -255,6 +255,15 @@ load <- function(
   }
   
   unlist_idx <- unlist(idx)
+  
+  ## Check to ensure that each treatment group in idx is present in the x column
+  unique_x <- unique(data[[name_x]])
+  for (i in 1:length(unlist_idx)) {
+    if (isFALSE(unlist_idx[i] %in% unique_x)) {
+      cli::cli_abort(c("{.field idx} contains treatment groups not present in {.field x}.", 
+                       "x" = "Ensure that idx does not have any treatment groups not present in dataset."))
+    }
+  }
   
   raw_data <- data %>%
     dplyr::filter(!!enquo_x %in% unlist_idx) %>%
