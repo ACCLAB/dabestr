@@ -1,0 +1,16 @@
+pandoc: 2.19.2
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  datasets: datasets.html
+  plot_aesthetics: plot_aesthetics.html
+  tutorial_basics: tutorial_basics.html
+  tutorial_deltadelta: tutorial_deltadelta.html
+  tutorial_minimeta: tutorial_minimeta.html
+  tutorial_proportion_plots: tutorial_proportion_plots.html
+  tutorial_repeated_measures: tutorial_repeated_measures.html
+last_built: 2023-08-23T06:50Z
+urls:
+  reference: https://acclab.github.io/dabestr/reference
+  article: https://acclab.github.io/dabestr/articles
+
