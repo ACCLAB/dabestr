@@ -36,7 +36,7 @@ If False, the resulting graph would be identical to a multiple two-groups plot.
 the zero line of the effect size for the control-control group.
 \item \code{show_baseline_ec} Default FALSE. Boolean value determining whether the baseline curve is shown.
 \item \code{sankey} Default TRUE. Boolean value determining if the flows between the bar charts will be plotted.
-\item \code{sankey_alpha} Default 0.5. Numeric value determining the transparency of the sankey flows in a
+\item \code{raw_flow_alpha} Default 0.5. Numeric value determining the transparency of the sankey flows in a
 paired proportion plot.
 \item \code{flow} Default TRUE. Boolean value determining whether the bars will be plotted in pairs.
 \item \code{custom_palette} Default "d3". String. The following palettes are available for use:
