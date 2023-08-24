@@ -1,9 +1,32 @@
-# Helper functions that generate dfs for plot
-# 
-# Contains functions `df_for_tufte`, `create_dfs_for_sankey`, `create_dfs_for_xaxis_redraw`, `create_dfs_for_proportion_bar` for generation of dfs.
-# 
-
-# Function for creation of df for tuftelines plot
+#' Helper functions that generate dfs for tuftelines plot
+#' 
+#' @noRd
+#' 
+#' @param raw_data The tidy dataset passed to [load()] that was cleaned and altered for plotting.
+#' @param enquo_x Quosure of x as initially passed to [load()].
+#' @param enquo_y Quosure of y as initially passed to [load()].
+#' @param proportional Boolean value as initially passed to [load()].
+#' @param float_contrast Default TRUE. If TRUE, a Gardner-Altman plot will be produced. 
+#' If FALSE, a Cumming estimation plot will be produced.
+#' @param enquo_id_col Quosure of id_col as initially passed to [load()].
+#' @param idx The list of control-test groupings as initially passed to [load()].
+#' @param tufte_lines_df Dataset for the creation of tufte lines.
+#' @param proportional_data List of calculations related to the plotting of proportion plots.
+#' @param scale_factor_sig Decimal value ranging from 0 to 1 which determines the significance of the scale factor.
+#' @param bar_width Numeric value determining the width of the bar in the sankey diagram or proportion plots.
+#' @param gap Numeric value determining the space between the bars in the sankey diagram or proportion plots.
+#' @param sankey Boolean value determining if the flows between the bar charts will be plotted.
+#' @param flow Boolean value determining whether the bars will be plotted in pairs.
+#' @param N The number of rows in the proportional dataset.
+#' @param proportion_success The proportion or ratio of values that are 1.
+#' @param boots Boot result obtained from boot.ci
+#' @param x_idx_position Numeric value determining the position of the plots on the x-axis.
+#' 
+#' @details 
+#' Contains functions `df_for_tufte`, `create_dfs_for_sankey`, `create_dfs_for_xaxis_redraw`, `create_dfs_for_proportion_bar` for generation of dfs.
+#' 
+#' @return
+#' Various dfs which is required for the plotting functions to obtain a complete dabest plot.
 create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
   tufte_lines_df <- raw_data %>%
     dplyr::group_by(!!enquo_x) %>%
