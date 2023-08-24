@@ -56,7 +56,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   es_line_size <- plot_kwargs$es_line_size
   sankey <- plot_kwargs$sankey
   flow <- plot_kwargs$flow
-  sankey_alpha <- plot_kwargs$sankey_alpha
+  raw_flow_alpha <- plot_kwargs$raw_flow_alpha
   swarm_x_text <- plot_kwargs$swarm_x_text
   swarm_y_text <- plot_kwargs$swarm_y_text
   asymmetric_side <- plot_kwargs$asymmetric_side
@@ -144,23 +144,23 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     "sankey" =
       ggplot2::ggplot() +
       geom_sankeyflow(data = flow_success_to_failure, na.rm = TRUE,
-                      ggplot2::aes(x = x, y = y, fillcol = "#db6159", group = tag),
-                      alpha = sankey_alpha) +
+                      ggplot2::aes(x = x, y = y, group = tag),
+                      fill = "#db6159", alpha = raw_flow_alpha) +
       geom_sankeyflow(data = flow_failure_to_success, na.rm = TRUE, 
-                      ggplot2::aes(x = x, y = y, fillcol = "#818181", group = tag),
-                      alpha = sankey_alpha) +
+                      ggplot2::aes(x = x, y = y, group = tag),
+                      fill = "#818181", alpha = raw_flow_alpha) +
       geom_sankeyflow(data = flow_success_to_success, na.rm = TRUE, 
-                      ggplot2::aes(x = x, y = y, fillcol = "#db6159", group = tag),
-                      alpha = sankey_alpha) +
+                      ggplot2::aes(x = x, y = y, group = tag),
+                      fill = "#db6159", alpha = raw_flow_alpha) +
       geom_sankeyflow(data = flow_failure_to_failure, na.rm = TRUE, 
-                      ggplot2::aes(x = x, y = y, fillcol = "#818181", group = tag),
-                      alpha = sankey_alpha) +
+                      ggplot2::aes(x = x, y = y, group = tag),
+                      fill = "#818181", alpha = raw_flow_alpha) +
       geom_proportionbar(data = sankey_bars, 
-                         ggplot2::aes(x = x_failure, y = y_failure, group = tag, colour = NULL), fill = "#818181",
-                         alpha = raw_marker_alpha) +
+                         ggplot2::aes(x = x_failure, y = y_failure, group = tag, colour = NULL), 
+                         fill = "#818181", alpha = raw_marker_alpha) +
       geom_proportionbar(data = sankey_bars, 
-                         ggplot2::aes(x = x_success, y = y_success, group = tag, colour = NULL), fill = "#db6159",
-                         alpha = raw_marker_alpha)
+                         ggplot2::aes(x = x_success, y = y_success, group = tag, colour = NULL), 
+                         fill = "#db6159", alpha = raw_marker_alpha)
     
   )
   

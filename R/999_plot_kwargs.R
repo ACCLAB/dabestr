@@ -38,7 +38,7 @@
 #' the zero line of the effect size for the control-control group.
 #' - `show_baseline_ec` Default FALSE. Boolean value determining whether the baseline curve is shown.
 #' - `sankey` Default TRUE. Boolean value determining if the flows between the bar charts will be plotted.
-#' - `sankey_alpha` Default 0.5. Numeric value determining the transparency of the sankey flows in a
+#' - `raw_flow_alpha` Default 0.5. Numeric value determining the transparency of the sankey flows in a
 #' paired proportion plot.
 #' - `flow` Default TRUE. Boolean value determining whether the bars will be plotted in pairs.
 #' - `custom_palette` Default "d3". String. The following palettes are available for use:
@@ -66,6 +66,7 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   raw_marker_alpha <- 1
   raw_marker_spread <- 2
   raw_marker_side_shift <- 0
+  raw_flow_alpha <- 0.5
   raw_bar_width <- 0.3
   tufte_size <- 0.8
   es_marker_size <- 0.5
@@ -81,7 +82,6 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   
   sankey <- TRUE
   flow <- TRUE
-  sankey_alpha <- 0.5
   
   if(isFALSE(is.null(plot_kwargs$swarm_label))) {
     swarm_label <- plot_kwargs$swarm_label
@@ -140,8 +140,8 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   if(isFALSE(is.null(plot_kwargs$flow))) {
     flow <- plot_kwargs$flow
   }
-  if(isFALSE(is.null(plot_kwargs$sankey_alpha))) {
-    sankey_alpha <- plot_kwargs$sankey_alpha
+  if(isFALSE(is.null(plot_kwargs$raw_flow_alpha))) {
+    raw_flow_alpha <- plot_kwargs$raw_flow_alpha
   }
   if(isFALSE(is.null(plot_kwargs$swarm_y_text))) {
     swarm_y_text <- plot_kwargs$swarm_y_text
@@ -185,7 +185,7 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     es_line_size = es_line_size,
     sankey = sankey,
     flow = flow, 
-    sankey_alpha = sankey_alpha,
+    raw_flow_alpha = raw_flow_alpha,
     swarm_y_text = swarm_y_text, 
     swarm_x_text = swarm_x_text,
     contrast_y_text = contrast_y_text,
