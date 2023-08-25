@@ -35,12 +35,12 @@
 <polygon points='104.19,199.76 179.60,199.76 179.60,240.10 104.19,240.10 ' style='stroke-width: 0.75; stroke: #1F77B4; fill: #1F77B4;' />
 <polygon points='355.54,119.08 430.95,119.08 430.95,240.10 355.54,240.10 ' style='stroke-width: 0.75; stroke: #FF7F0E; fill: #FF7F0E;' />
 <polygon points='606.89,170.95 682.30,170.95 682.30,240.10 606.89,240.10 ' style='stroke-width: 0.75; stroke: #2CA02C; fill: #2CA02C;' />
-<line x1='141.89' y1='201.78' x2='141.89' y2='212.43' style='stroke-width: 1.71; stroke-linecap: square;' />
-<line x1='393.24' y1='121.10' x2='393.24' y2='135.73' style='stroke-width: 1.71; stroke-linecap: square;' />
-<line x1='644.59' y1='172.96' x2='644.59' y2='186.23' style='stroke-width: 1.71; stroke-linecap: square;' />
 <line x1='141.89' y1='197.74' x2='141.89' y2='187.09' style='stroke-width: 1.71; stroke-linecap: square;' />
 <line x1='393.24' y1='117.06' x2='393.24' y2='102.43' style='stroke-width: 1.71; stroke-linecap: square;' />
 <line x1='644.59' y1='168.93' x2='644.59' y2='155.66' style='stroke-width: 1.71; stroke-linecap: square;' />
+<line x1='141.89' y1='201.78' x2='141.89' y2='212.43' style='stroke-width: 1.71; stroke-linecap: square;' />
+<line x1='393.24' y1='121.10' x2='393.24' y2='135.73' style='stroke-width: 1.71; stroke-linecap: square;' />
+<line x1='644.59' y1='172.96' x2='644.59' y2='186.23' style='stroke-width: 1.71; stroke-linecap: square;' />
 <line x1='141.89' y1='243.09' x2='644.59' y2='243.09' style='stroke-width: 1.07; stroke-linecap: square;' />
 <line x1='141.89' y1='243.09' x2='141.89' y2='249.32' style='stroke-width: 1.07; stroke-linecap: square;' />
 <line x1='393.24' y1='243.09' x2='393.24' y2='249.32' style='stroke-width: 1.07; stroke-linecap: square;' />

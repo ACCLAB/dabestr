@@ -165,16 +165,16 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     "sankey" =
       ggplot2::ggplot() +
       geom_sankeyflow(data = flow_success_to_failure, na.rm = TRUE,
-                      ggplot2::aes(x = x, y = y, group = tag),
+                      ggplot2::aes(x = x, y = y, group = tag, colour = NULL),
                       fill = "#db6159", alpha = raw_flow_alpha) +
       geom_sankeyflow(data = flow_failure_to_success, na.rm = TRUE, 
-                      ggplot2::aes(x = x, y = y, group = tag),
+                      ggplot2::aes(x = x, y = y, group = tag, colour = NULL),
                       fill = "#818181", alpha = raw_flow_alpha) +
       geom_sankeyflow(data = flow_success_to_success, na.rm = TRUE, 
-                      ggplot2::aes(x = x, y = y, group = tag),
+                      ggplot2::aes(x = x, y = y, group = tag, colour = NULL),
                       fill = "#db6159", alpha = raw_flow_alpha) +
       geom_sankeyflow(data = flow_failure_to_failure, na.rm = TRUE, 
-                      ggplot2::aes(x = x, y = y, group = tag),
+                      ggplot2::aes(x = x, y = y, group = tag, colour = NULL),
                       fill = "#818181", alpha = raw_flow_alpha) +
       geom_proportionbar(data = sankey_bars, 
                          ggplot2::aes(x = x_failure, y = y_failure, group = tag, colour = NULL), 
@@ -227,76 +227,72 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
                        yend = test_summary))
   }
   
-  #### Add tufte_lines component ####
+  #### Add tufte lines component ####
   if(isTRUE(is_tufte_lines)) {
-    tufte_lines_df <- create_df_for_tufte(raw_data, enquo_x, enquo_y, proportional)
     if(main_plot_type == "sankey"){
       tufte_gap_value <- sankey_bar_gap
+      tufte_lines_df <- create_df_for_tufte(raw_data, enquo_x, enquo_y, proportional, tufte_gap_value, effsize_type)
       if(isFALSE(flow)){
         tufte_lines_df <- create_dfs_for_nonflow_tufte_lines(tufte_lines_df, 
                                                              idx = separated_idx,
                                                              enquo_x =enquo_x)
       }
     } else {
+      # if (main_plot_type != "sankey") 
+      tufte_lines_df <- create_df_for_tufte(raw_data, enquo_x, enquo_y, proportional, 0, effsize_type)
       tufte_gap_value <- ifelse(proportional, min(tufte_lines_df$mean)/20, min(tufte_lines_df$mean)/50)
-      tufte_gap_value <- ifelse(float_contrast, tufte_gap_value, tufte_gap_value)
+      tufte_lines_df <- create_df_for_tufte(raw_data, enquo_x, enquo_y, proportional, tufte_gap_value, effsize_type)
     }
-    tufte_side_adjust_value <- ifelse(proportional, 0, 0.05)
     
+    ## Adjusting side shifting of tufte lines
+    tufte_side_adjust_value <- ifelse(proportional, 0, 0.05)
     row_num <- max(x_axis_raw)
     row_ref <- c(seq(1, row_num, 1)) + asymmetric_side*tufte_side_adjust_value + asymmetric_side*raw_marker_side_shift
     if (isFALSE(flow)){
       row_ref <- c(seq(1, raw_x_max, 1)) + asymmetric_side*tufte_side_adjust_value + asymmetric_side*raw_marker_side_shift
     }
     
-    y_top_t <-list(y = tufte_lines_df$mean + tufte_gap_value,  
-                   yend = tufte_lines_df$upper_sd)
-    y_bot_t <-list(y = tufte_lines_df$mean - tufte_gap_value, 
-                   yend = tufte_lines_df$lower_sd) 
-    if (isTRUE(stringr::str_detect(effsize_type, "edian"))) {
-      y_top_t <-list(y = tufte_lines_df$median + tufte_gap_value,  
-                     yend = tufte_lines_df$upper_quartile)
-      y_bot_t <-list(y = tufte_lines_df$mean - tufte_gap_value, 
-                     yend = tufte_lines_df$lower_quartile) 
-    }
-    
     # to change: temporary fix for tufte lines black for proportional graphs
     if(isTRUE(proportional) | isTRUE(is_colour)) {
       raw_plot <- raw_plot +
         ggplot2::geom_segment(data = tufte_lines_df, 
-                     linewidth = tufte_size,
-                     colour = "black",
-                     ggplot2::aes(x = row_ref, 
-                         xend = row_ref, 
-                         y = y_bot_t$y, 
-                         yend = y_bot_t$yend,
-                         colour = !!enquo_x),
-                     lineend = "square") +
+                              na.rm = TRUE,
+                              linewidth = tufte_size,
+                              colour = "black",
+                              ggplot2::aes(x = row_ref, 
+                                           xend = row_ref, 
+                                           y = y_top_start, 
+                                           yend = y_top_end,
+                                           colour = !!enquo_x),
+                              lineend = "square") +
         ggplot2::geom_segment(data = tufte_lines_df, 
-                     linewidth = tufte_size,
-                     colour = "black",
-                     ggplot2::aes(x = row_ref, 
-                         xend = row_ref, 
-                         y = y_top_t$y, 
-                         yend = y_top_t$yend,
-                         colour = !!enquo_x),
-                     lineend = "square")
+                              na.rm = TRUE,
+                              linewidth = tufte_size,
+                              colour = "black",
+                              ggplot2::aes(x = row_ref, 
+                                           xend = row_ref, 
+                                           y = y_bot_start, 
+                                           yend = y_bot_end,
+                                           colour = !!enquo_x),
+                              lineend = "square")
     } else {
       raw_plot <- raw_plot +
-        ggplot2::geom_segment(data = tufte_lines_df, linewidth = tufte_size,
+        ggplot2::geom_segment(data = tufte_lines_df, 
+                              linewidth = tufte_size,
                               ggplot2::aes(x = row_ref, 
-                         xend = row_ref, 
-                         y = y_bot_t$y, 
-                         yend = y_bot_t$yend,
-                         colour = !!enquo_x),
-                     lineend = "square") +
-        ggplot2::geom_segment(data = tufte_lines_df, linewidth = tufte_size,
+                                           xend = row_ref, 
+                                           y = y_top_start, 
+                                           yend = y_top_end,
+                                           colour = !!enquo_x),
+                              lineend = "square") +
+        ggplot2::geom_segment(data = tufte_lines_df, 
+                              linewidth = tufte_size,
                               ggplot2::aes(x = row_ref, 
-                         xend = row_ref, 
-                         y = y_top_t$y, 
-                         yend = y_top_t$yend,
-                         colour = !!enquo_x),
-                     lineend = "square")
+                                           xend = row_ref, 
+                                           y = y_bot_start, 
+                                           yend = y_bot_end,
+                                           colour = !!enquo_x),
+                              lineend = "square")
     }
   }
   

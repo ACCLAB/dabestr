@@ -78,14 +78,14 @@
 <circle cx='387.19' cy='97.27' r='1.95' style='stroke-width: 0.71; stroke: #1F77B4; fill: #1F77B4;' />
 <circle cx='380.91' cy='97.74' r='1.95' style='stroke-width: 0.71; stroke: #1F77B4; fill: #1F77B4;' />
 <circle cx='380.91' cy='141.10' r='1.95' style='stroke-width: 0.71; stroke: #1F77B4; fill: #1F77B4;' />
-<line x1='65.33' y1='165.21' x2='65.33' y2='185.95' style='stroke-width: 1.71; stroke-linecap: square;' />
-<line x1='168.80' y1='177.72' x2='168.80' y2='197.62' style='stroke-width: 1.71; stroke-linecap: square;' />
-<line x1='272.27' y1='95.85' x2='272.27' y2='159.79' style='stroke-width: 1.71; stroke-linecap: square;' />
-<line x1='375.73' y1='131.75' x2='375.73' y2='192.85' style='stroke-width: 1.71; stroke-linecap: square;' />
 <line x1='65.33' y1='156.41' x2='65.33' y2='135.67' style='stroke-width: 1.71; stroke-linecap: square;' />
 <line x1='168.80' y1='168.92' x2='168.80' y2='149.02' style='stroke-width: 1.71; stroke-linecap: square;' />
 <line x1='272.27' y1='87.05' x2='272.27' y2='23.12' style='stroke-width: 1.71; stroke-linecap: square;' />
 <line x1='375.73' y1='122.94' x2='375.73' y2='61.84' style='stroke-width: 1.71; stroke-linecap: square;' />
+<line x1='65.33' y1='165.21' x2='65.33' y2='185.95' style='stroke-width: 1.71; stroke-linecap: square;' />
+<line x1='168.80' y1='177.72' x2='168.80' y2='197.62' style='stroke-width: 1.71; stroke-linecap: square;' />
+<line x1='272.27' y1='95.85' x2='272.27' y2='159.79' style='stroke-width: 1.71; stroke-linecap: square;' />
+<line x1='375.73' y1='131.75' x2='375.73' y2='192.85' style='stroke-width: 1.71; stroke-linecap: square;' />
 <line x1='70.51' y1='243.09' x2='173.97' y2='243.09' style='stroke-width: 1.07; stroke-linecap: square;' />
 <line x1='277.44' y1='243.09' x2='380.91' y2='243.09' style='stroke-width: 1.07; stroke-linecap: square;' />
 <line x1='70.51' y1='243.09' x2='70.51' y2='249.32' style='stroke-width: 1.07; stroke-linecap: square;' />

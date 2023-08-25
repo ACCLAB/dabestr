@@ -27,7 +27,7 @@
 #' 
 #' @return
 #' Various dfs which is required for the plotting functions to obtain a complete dabest plot.
-create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
+create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional, gap, effsize_type){
   tufte_lines_df <- raw_data %>%
     dplyr::group_by(!!enquo_x) %>%
     dplyr::summarize(mean = mean(!!enquo_y),
@@ -42,6 +42,22 @@ create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional){
   }
   tufte_lines_df <- tufte_lines_df %>%
     dplyr::mutate(lower_sd = mean - sd, upper_sd = mean + sd)
+  
+  if (isTRUE(stringr::str_detect(effsize_type, "edian"))) {
+    tufte_lines_df <- tufte_lines_df %>%
+      dplyr::mutate(no_diff = (sd == 0)) %>%
+      dplyr::mutate(y_top_start = dplyr::case_when(no_diff ~ NA, !no_diff ~ median+gap),
+                    y_top_end = dplyr::case_when(no_diff ~ NA, !no_diff ~ upper_quartile),
+                    y_bot_start = dplyr::case_when(no_diff ~ NA, !no_diff ~ median-gap),
+                    y_bot_end = dplyr::case_when(no_diff ~ NA, !no_diff ~ lower_quartile)) 
+  } else {
+    tufte_lines_df <- tufte_lines_df %>%
+      dplyr::mutate(no_diff = (sd == 0)) %>%
+      dplyr::mutate(y_top_start = dplyr::case_when(no_diff ~ NA, !no_diff ~ mean+gap),
+                    y_top_end = dplyr::case_when(no_diff ~ NA, !no_diff ~ upper_sd),
+                    y_bot_start = dplyr::case_when(no_diff ~ NA, !no_diff ~ mean-gap),
+                    y_bot_end = dplyr::case_when(no_diff ~ NA, !no_diff ~ lower_sd)) 
+  }
   
   return(tufte_lines_df)
 }
@@ -70,7 +86,6 @@ create_dfs_for_sankey <-  function(
     enquo_x,
     enquo_y,
     enquo_id_col,
-    x_axis_raw,
     idx,
     scale_factor_sig = 0.8,
     bar_width = 0.15,
@@ -155,7 +170,7 @@ create_dfs_for_sankey <-  function(
           dplyr::filter(sf_change) %>%
           dplyr::summarise(SF = dplyr::n() / N)
         
-        failure_failire <- raw_data %>%
+        failure_failure <- raw_data %>%
           dplyr::group_by(!!enquo_id_col) %>%
           dplyr::summarise(failure_change =
                       any(!!enquo_y == 0 & !!enquo_x == group[i]) &
@@ -174,7 +189,7 @@ create_dfs_for_sankey <-  function(
           dplyr::summarise(FS = dplyr::n() / N)
         # find values for lower flow success to failure flow
         ss <- success_success$SS[1]
-        ff <- failure_failire$FF[1]
+        ff <- failure_failure$FF[1]
         sf <- success_failure$SF[1]
         fs <- failure_success$FS[1]
         sf_start1 <- ss 
@@ -209,14 +224,26 @@ create_dfs_for_sankey <-  function(
                                                fs_end2 - 0.002)
         sig_failure_success_bot <- dplyr::arrange(sig_failure_success_bot, dplyr::desc(x))
         
-        #number of points of data points
+        
+        # For datasets with purely 1s or 0s
+        if (sf == 0) {
+          sig_success_failure_top <- data.frame(x = NaN, y = NaN)
+          sig_success_failure_bot <- sig_success_failure_top
+        } 
+        if (fs == 0) {
+          sig_failure_success_top <- data.frame(x = NaN, y = NaN)
+          sig_failure_success_bot <- sig_failure_success_top
+        }
+        
+        # number of points of data points
         N_points <- length(sig_success_failure_bot)
+        
         # generate the tag column for all of these
         tag <- rep(ind, N_points)
         sankey_success_failure <- rbind(sig_success_failure_top,
                                         sig_success_failure_bot)
         sankey_success_failure <- cbind(sankey_success_failure, tag)
-        
+      
         sankey_failure_success <- rbind(sig_failure_success_top,
                                         sig_failure_success_bot)
         sankey_failure_success <- cbind(sankey_failure_success, tag)
@@ -233,7 +260,8 @@ create_dfs_for_sankey <-  function(
         x_start <- x_start + 1
         
         ind <- ind + 1
-        #` update the 4 sankey flow dfs for plotting
+        
+        # update the 4 sankey flow dfs for plotting
         flow_success_to_failure <- dplyr::bind_rows(flow_success_to_failure,
                                              sankey_success_failure)
         flow_success_to_success <- dplyr::bind_rows(flow_success_to_success,
@@ -311,6 +339,18 @@ create_dfs_for_proportion_bar <- function(proportion_success, bar_width = 0.3, g
     x_failure_success <- c(x-bar_width/2, x+bar_width/2, x+bar_width/2, x-bar_width/2)
     y_success <- c(y-gap/2, y-gap/2, 0, 0)
     y_failure <- c(1, 1, y+gap/2, y+gap/2)
+    
+    # For treatment groups with all 1s/all 0s
+    if (y == 0) {
+      y_failure <- c(1, 1, 0, 0)
+      y_success <- c(0, 0, 0, 0)
+    }
+    
+    if (y == 1) {
+      y_success <- c(1, 1, 0, 0)
+      y_failure <- c(0, 0, 0, 0)
+    }
+    
     temp_df_proportion_bar <- data.frame(
       x_failure = x_failure_success,
       y_failure = y_failure,
