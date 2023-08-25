@@ -1,8 +1,29 @@
-# Contains functions responsible for generation of raw_plot and delta_plot.
-# 
-# Contains main plotting functions `plot_raw` and `plot_delta` for plotting of the rawdata and effectsize parts.
-
-# Raw plot function
+#' Functions responsible for generation of raw_plot and delta_plot.
+#' 
+#' @noRd
+#' 
+#' @param dabest_effectsize_obj A dabest_effectsize_obj created by loading in a 
+#' dabest_obj along with other specified parameters with the [effect_size()] function.
+#' @param float_contrast Boolean value determining if a Gardner-Altman plot or Cumming estimation plot will be produced.
+#' @param plot_kwargs Adjustment parameters to control and adjust the appearance of the plot. 
+#' (list of all possible adjustment parameters can be found under [plot_kwargs])
+#'
+#' @details
+#' Contains main plotting functions `plot_raw` and `plot_delta` for plotting of the rawdata and effectsize parts.
+#'
+#' @examples
+#' # Loading of the dataset
+#' data(twogroup_data)
+#' 
+#' # Preparing the data to be plotted
+#' dabest_obj <- load(non_proportional_data, x = Group, y = Measurement, idx = c("Control 1", "Test 1"))
+#' dabest_obj.mean_diff <- mean_diff(dabest_obj)
+#' 
+#' # Plotting of dabest_obj.mean_diff (rawplot only)
+#' plot_raw(dabest_obj.mean_diff, TRUE)
+#' 
+#' # Plotting of dabest_obj.mean_diff (deltaplot only)
+#' plot_delta(dabest_obj.mean_diff,True) 
 plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   enquo_x <- dabest_effectsize_obj$enquo_x
   enquo_y <- dabest_effectsize_obj$enquo_y
