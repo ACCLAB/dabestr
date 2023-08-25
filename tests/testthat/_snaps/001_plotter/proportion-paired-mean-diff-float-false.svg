@@ -37,10 +37,10 @@
 <polygon points='542.58,9.59 660.86,9.59 660.86,116.20 542.58,116.20 ' style='stroke-width: 0.75; stroke: none; fill: #818181;' />
 <polygon points='148.30,202.64 266.58,202.64 266.58,240.10 148.30,240.10 ' style='stroke-width: 0.75; stroke: none; fill: #DB6159;' />
 <polygon points='542.58,121.96 660.86,121.96 660.86,240.10 542.58,240.10 ' style='stroke-width: 0.75; stroke: none; fill: #DB6159;' />
-<line x1='207.44' y1='205.52' x2='207.44' y2='212.43' style='stroke-width: 1.71; stroke-linecap: square;' />
-<line x1='601.72' y1='124.84' x2='601.72' y2='135.73' style='stroke-width: 1.71; stroke-linecap: square;' />
 <line x1='207.44' y1='194.00' x2='207.44' y2='187.09' style='stroke-width: 1.71; stroke-linecap: square;' />
 <line x1='601.72' y1='113.32' x2='601.72' y2='102.43' style='stroke-width: 1.71; stroke-linecap: square;' />
+<line x1='207.44' y1='205.52' x2='207.44' y2='212.43' style='stroke-width: 1.71; stroke-linecap: square;' />
+<line x1='601.72' y1='124.84' x2='601.72' y2='135.73' style='stroke-width: 1.71; stroke-linecap: square;' />
 <line x1='207.44' y1='243.09' x2='601.72' y2='243.09' style='stroke-width: 1.07; stroke-linecap: square;' />
 <line x1='207.44' y1='243.09' x2='207.44' y2='249.32' style='stroke-width: 1.07; stroke-linecap: square;' />
 <line x1='601.72' y1='243.09' x2='601.72' y2='249.32' style='stroke-width: 1.07; stroke-linecap: square;' />
