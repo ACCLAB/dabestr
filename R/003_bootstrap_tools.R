@@ -1,24 +1,24 @@
 # Obtains bootstraps as well as bca intervals
-# 
-# Contains functions `effsize_boot`, `bootstrap`, `bca` and `boot_weighted_row`. 
+#
+# Contains functions `effsize_boot`, `bootstrap`, `bca` and `boot_weighted_row`.
 
 effsize_boot <- function(
-    data, 
-    effect_size_func, 
-    reps = 5000, 
-    paired = FALSE
-    ){
-  
-  s <- c(rep(1, length(data$control)),
-         rep(2, length(data$test)))
-  
+    data,
+    effect_size_func,
+    reps = 5000,
+    paired = FALSE) {
+  s <- c(
+    rep(1, length(data$control)),
+    rep(2, length(data$test))
+  )
+
   bootboot <- function(d, indices, paired) {
     c <- d[indices[s == 1]]
     t <- d[indices[s == 2]]
-    
+
     return(effect_size_func(c, t, paired))
   }
-  
+
   b <- boot::boot(
     c(data$control, data$test),
     statistic = bootboot,
@@ -26,7 +26,7 @@ effsize_boot <- function(
     strata = s,
     paired = paired
   )
-  
+
   return(b)
 }
 
@@ -36,16 +36,14 @@ bootstrap <- function(
     effect_size_func,
     seed = 12345,
     reps = 5000,
-    boot_labs
-    ){
-  
+    boot_labs) {
   boot_result <- tibble::tibble()
   baseline_ec_boot_result <- tibble::tibble()
-  
+
   raw_data <- dabest_obj$raw_data
   idx <- dabest_obj$idx
   resamples <- dabest_obj$resamples
-  
+
   if (isFALSE(is.list(idx))) {
     idx <- list(idx)
   }
@@ -55,84 +53,94 @@ bootstrap <- function(
   paired <- dabest_obj$paired
   is_paired <- dabest_obj$is_paired
   is_colour <- dabest_obj$is_colour
-  
+
   proportional <- dabest_obj$proportional
-  
+
   quoname_x <- rlang::as_name(enquo_x)
   quoname_y <- rlang::as_name(enquo_y)
   delta_x_labels <- list()
   delta_y_labels <- boot_labs
-  
+
   minimeta <- dabest_obj$minimeta
   delta2 <- dabest_obj$delta2
-  
+
   ## Validity Checks
   if (isTRUE(is_paired) && boot_labs == "Cliffs' delta") {
     cli::cli_abort(c("{.var Cliffs' delta} cannot be used when {.field paired} is not NULL.",
-                     "x" = "Please change {.var effect_size_func}."))
-  } else if (isTRUE(proportional) && !(boot_labs %in% c("Mean difference","Cohen's h","Paired\nmean difference"))) {
+      "x" = "Please change {.var effect_size_func}."
+    ))
+  } else if (isTRUE(proportional) && !(boot_labs %in% c("Mean difference", "Cohen's h", "Paired\nmean difference"))) {
     cli::cli_abort(c("Other effect sizes besides {.var Cohens h} and {.var Mean difference} cannot be used when {.field proportional} is TRUE.",
-                     "x" = "Please change {.var effect_size_func}."))
+      "x" = "Please change {.var effect_size_func}."
+    ))
   }
 
   ## Check that if delta2 is true, only mean difference can be computed
-  if (isTRUE(delta2) && !(boot_labs %in% c("Paired\nmean difference","Mean difference")))  {
+  if (isTRUE(delta2) && !(boot_labs %in% c("Paired\nmean difference", "Mean difference"))) {
     cli::cli_abort(c("Other effect sizes besides {.var Mean difference} cannot be used when {.field delta2} is TRUE.",
-                     "x" = "Please change {.var effect_size_func}."))
+      "x" = "Please change {.var effect_size_func}."
+    ))
   }
-  
+
   ## Getting boot_results
   if (isFALSE(is_paired) || isTRUE(paired == "baseline")) {
     for (group in idx) {
       group_length <- length(group)
-      
-      ctrl_tibble <- raw_data %>% 
+
+      ctrl_tibble <- raw_data %>%
         dplyr::filter(!!enquo_x == !!group[1])
       ctrl_measurement <- ctrl_tibble[[quoname_y]]
-      
+
       tests <- group[2:group_length]
-      
+
       ctrl_size <- length(ctrl_measurement)
       ctrl_var <- var_w_df(ctrl_measurement, ctrl_size)
-      
-      
+
+
       for (test_group in tests) {
         test_tibble <- raw_data %>%
           dplyr::filter(!!enquo_x == !!test_group)
-        
+
         test_measurement <- test_tibble[[quoname_y]]
-        
-        xlabels <- paste(test_group, group[1], sep="\nminus\n")
+
+        xlabels <- paste(test_group, group[1], sep = "\nminus\n")
         delta_x_labels <- append(delta_x_labels, xlabels)
-        
-        control_test_measurement <- list(control = ctrl_measurement,
-                                         test = test_measurement)
-        
-        
+
+        control_test_measurement <- list(
+          control = ctrl_measurement,
+          test = test_measurement
+        )
+
+
         test_size <- length(test_measurement)
         test_var <- var_w_df(test_measurement, test_size)
-        
-        grp_var <- calculate_group_variance(ctrl_var = ctrl_var,
-                                            ctrl_N = ctrl_size,
-                                            test_var = test_var,
-                                            test_N = test_size)
-        
-        weight <- 1/grp_var
-        
+
+        grp_var <- calculate_group_variance(
+          ctrl_var = ctrl_var,
+          ctrl_N = ctrl_size,
+          test_var = test_var,
+          test_N = test_size
+        )
+
+        weight <- 1 / grp_var
+
         set.seed(seed)
-        
-        boots <- effsize_boot(data = control_test_measurement,
-                              effect_size_func = effect_size_func,
-                              reps = reps,
-                              paired = is_paired)
-        
+
+        boots <- effsize_boot(
+          data = control_test_measurement,
+          effect_size_func = effect_size_func,
+          reps = reps,
+          paired = is_paired
+        )
+
         if (ci < 0 | ci > 100) {
           cli::cli_abort(c("{.field ci} is not between 0 and 100.",
-                           "x" = "{.field ci} must be between 0 and 100, not {ci}."))
+            "x" = "{.field ci} must be between 0 and 100, not {ci}."
+          ))
         }
-        
-        bootci <- boot::boot.ci(boots, conf=ci/100, type = c("perc","bca"))
-        
+
+        bootci <- boot::boot.ci(boots, conf = ci / 100, type = c("perc", "bca"))
+
         boot_row <- list(
           control_group = group[1],
           test_group = test_group,
@@ -152,49 +160,56 @@ bootstrap <- function(
   } else {
     for (group in idx) {
       group_length <- length(group)
-      for (i in 1:(group_length-1)) {
+      for (i in 1:(group_length - 1)) {
         control_group <- group[i]
-        test_group <- group[i+1]
-        
-        ctrl_tibble <- raw_data %>% 
+        test_group <- group[i + 1]
+
+        ctrl_tibble <- raw_data %>%
           dplyr::filter(!!enquo_x == !!control_group)
         ctrl_measurement <- ctrl_tibble[[quoname_y]]
-        
-        test_tibble <- raw_data %>% 
+
+        test_tibble <- raw_data %>%
           dplyr::filter(!!enquo_x == !!test_group)
         test_measurement <- test_tibble[[quoname_y]]
-        
-        xlabels <- paste(test_group, control_group, sep="\nminus\n")
+
+        xlabels <- paste(test_group, control_group, sep = "\nminus\n")
         delta_x_labels <- append(delta_x_labels, xlabels)
-        
-        control_test_measurement <- list(control = ctrl_measurement,
-                                         test = test_measurement)
-        #add weights column
+
+        control_test_measurement <- list(
+          control = ctrl_measurement,
+          test = test_measurement
+        )
+        # add weights column
         ctrl_size <- length(ctrl_measurement)
         ctrl_var <- var_w_df(ctrl_measurement, ctrl_size)
         test_size <- length(test_measurement)
         test_var <- var_w_df(test_measurement, test_size)
-        grp_var <- calculate_group_variance(ctrl_var = ctrl_var,
-                                            ctrl_N = ctrl_size,
-                                            test_var = test_var,
-                                            test_N = test_size)
-        
-        weight <- 1/grp_var
-        
+        grp_var <- calculate_group_variance(
+          ctrl_var = ctrl_var,
+          ctrl_N = ctrl_size,
+          test_var = test_var,
+          test_N = test_size
+        )
+
+        weight <- 1 / grp_var
+
         set.seed(seed)
-        
-        boots <- effsize_boot(data = control_test_measurement,
-                              effect_size_func = effect_size_func,
-                              reps = reps,
-                              paired = is_paired)
-        
+
+        boots <- effsize_boot(
+          data = control_test_measurement,
+          effect_size_func = effect_size_func,
+          reps = reps,
+          paired = is_paired
+        )
+
         if (ci < 0 | ci > 100) {
           cli::cli_abort(c("{.field ci} is not between 0 and 100.",
-                           "x" = "{.field ci} must be between 0 and 100, not {ci}."))
+            "x" = "{.field ci} must be between 0 and 100, not {ci}."
+          ))
         }
-        
-        bootci <- boot::boot.ci(boots, conf=ci/100, type = c("perc","bca"))
-        
+
+        bootci <- boot::boot.ci(boots, conf = ci / 100, type = c("perc", "bca"))
+
         boot_row <- list(
           control_group = group[1],
           test_group = test_group,
@@ -212,55 +227,62 @@ bootstrap <- function(
       }
     }
   }
-  if (isTRUE(minimeta)){
+  if (isTRUE(minimeta)) {
     boot_last_row <- boot_weighted_row(boot_result = boot_result, ci)
     boot_result <- dplyr::bind_rows(boot_result, boot_last_row)
   }
   if (isTRUE(delta2)) {
-    boot_last_row <- boot_delta_delta(boot_result = boot_result,ci)
-    boot_result <- dplyr::bind_rows(boot_result,boot_last_row)
+    boot_last_row <- boot_delta_delta(boot_result = boot_result, ci)
+    boot_result <- dplyr::bind_rows(boot_result, boot_last_row)
   }
-  
+
   ## Getting boot_results for baseline_error_curve
   for (group in idx) {
     control_group <- group[1]
     test_group <- control_group
-    
-    ctrl_tibble <- raw_data %>% 
+
+    ctrl_tibble <- raw_data %>%
       dplyr::filter(!!enquo_x == !!control_group)
     ctrl_measurement <- ctrl_tibble[[quoname_y]]
     test_measurement <- ctrl_measurement
-    
-    xlabels <- paste(test_group, control_group, sep="\nminus\n")
-    
-    control_test_measurement <- list(control = ctrl_measurement,
-                                     test = test_measurement)
-    #add weights column
+
+    xlabels <- paste(test_group, control_group, sep = "\nminus\n")
+
+    control_test_measurement <- list(
+      control = ctrl_measurement,
+      test = test_measurement
+    )
+    # add weights column
     ctrl_size <- length(ctrl_measurement)
     ctrl_var <- var_w_df(ctrl_measurement, ctrl_size)
     test_size <- length(test_measurement)
     test_var <- var_w_df(test_measurement, test_size)
-    grp_var <- calculate_group_variance(ctrl_var = ctrl_var,
-                                        ctrl_N = ctrl_size,
-                                        test_var = test_var,
-                                        test_N = test_size)
-    
-    weight <- 1/grp_var
-    
+    grp_var <- calculate_group_variance(
+      ctrl_var = ctrl_var,
+      ctrl_N = ctrl_size,
+      test_var = test_var,
+      test_N = test_size
+    )
+
+    weight <- 1 / grp_var
+
     set.seed(seed)
-    
-    boots <- effsize_boot(data = control_test_measurement,
-                          effect_size_func = effect_size_func,
-                          reps = reps,
-                          paired = is_paired)
-    
+
+    boots <- effsize_boot(
+      data = control_test_measurement,
+      effect_size_func = effect_size_func,
+      reps = reps,
+      paired = is_paired
+    )
+
     if (ci < 0 | ci > 100) {
       cli::cli_abort(c("{.field ci} is not between 0 and 100.",
-                       "x" = "{.field ci} must be between 0 and 100, not {ci}."))
+        "x" = "{.field ci} must be between 0 and 100, not {ci}."
+      ))
     }
-    
-    bootci <- boot::boot.ci(boots, conf=ci/100, type = c("perc","bca"))
-    
+
+    bootci <- boot::boot.ci(boots, conf = ci / 100, type = c("perc", "bca"))
+
     boot_row <- list(
       control_group = group[1],
       test_group = test_group,
@@ -276,85 +298,93 @@ bootstrap <- function(
     )
     baseline_ec_boot_result <- dplyr::bind_rows(baseline_ec_boot_result, boot_row)
   }
-  
+
   raw_y_labels <- ifelse(proportional, "proportion of success", "value")
-  
-  out <- list(raw_data = raw_data,
-              idx = idx,
-              delta_x_labels = delta_x_labels,
-              delta_y_labels = delta_y_labels,
-              raw_y_labels = raw_y_labels,
-              is_paired = is_paired,
-              is_colour = is_colour,
-              paired = paired,
-              resamples = resamples,
-              Ns = dabest_obj$Ns,
-              control_summary = dabest_obj$control_summary,
-              test_summary = dabest_obj$test_summary,
-              ylim = dabest_obj$ylim,
-              enquo_x = dabest_obj$enquo_x,
-              enquo_y = dabest_obj$enquo_y,
-              enquo_id_col = dabest_obj$enquo_id_col,
-              enquo_colour = dabest_obj$enquo_colour,
-              proportional = proportional,
-              minimeta = minimeta,
-              delta2 = dabest_obj$delta2,
-              proportional_data = dabest_obj$proportional_data,
-              boot_result = boot_result,
-              baseline_ec_boot_result = baseline_ec_boot_result)
-  
+
+  out <- list(
+    raw_data = raw_data,
+    idx = idx,
+    delta_x_labels = delta_x_labels,
+    delta_y_labels = delta_y_labels,
+    raw_y_labels = raw_y_labels,
+    is_paired = is_paired,
+    is_colour = is_colour,
+    paired = paired,
+    resamples = resamples,
+    Ns = dabest_obj$Ns,
+    control_summary = dabest_obj$control_summary,
+    test_summary = dabest_obj$test_summary,
+    ylim = dabest_obj$ylim,
+    enquo_x = dabest_obj$enquo_x,
+    enquo_y = dabest_obj$enquo_y,
+    enquo_id_col = dabest_obj$enquo_id_col,
+    enquo_colour = dabest_obj$enquo_colour,
+    proportional = proportional,
+    minimeta = minimeta,
+    delta2 = dabest_obj$delta2,
+    proportional_data = dabest_obj$proportional_data,
+    boot_result = boot_result,
+    baseline_ec_boot_result = baseline_ec_boot_result
+  )
+
   class(out) <- c("dabest_effectsize")
-  
+
   return(out)
 }
 
 # BCA function
-bca <- function(bootstraps, conf.level = .95){
+bca <- function(bootstraps, conf.level = .95) {
   # Inverse Variance Method
-  if(stats::var(bootstraps)==0){
+  if (stats::var(bootstraps) == 0) {
     lower <- mean(bootstraps)
     upper <- mean(bootstraps)
     return(c(lower, upper))
   }
-  
-  if(max(bootstraps)==Inf | min(bootstraps)==-Inf){
+
+  if (max(bootstraps) == Inf | min(bootstraps) == -Inf) {
     stop("bca() function does not work when some values are infinite")
   }
-  
-  low <- (1 - conf.level)/2
+
+  low <- (1 - conf.level) / 2
   high <- 1 - low
   sims <- length(bootstraps)
-  z.inv <- length(bootstraps[bootstraps < mean(bootstraps)])/sims
+  z.inv <- length(bootstraps[bootstraps < mean(bootstraps)]) / sims
   z <- stats::qnorm(z.inv)
-  U <- (sims - 1) * (mean(bootstraps, na.rm=TRUE) - bootstraps)
+  U <- (sims - 1) * (mean(bootstraps, na.rm = TRUE) - bootstraps)
   top <- sum(U^3)
-  under <- 6 * (sum(U^2))^{3/2}
+  under <- 6 * (sum(U^2))^{
+    3 / 2
+  }
   a <- top / under
-  lower.inv <-  stats::pnorm(z + (z + stats::qnorm(low))/(1 - a * (z + stats::qnorm(low))))
-  lower <- stats::quantile(bootstraps, lower.inv, names=FALSE)
-  upper.inv <-  stats::pnorm(z + (z + stats::qnorm(high))/(1 - a * (z + stats::qnorm(high))))
-  upper <- stats::quantile(bootstraps, upper.inv, names=FALSE)
+  lower.inv <- stats::pnorm(z + (z + stats::qnorm(low)) / (1 - a * (z + stats::qnorm(low))))
+  lower <- stats::quantile(bootstraps, lower.inv, names = FALSE)
+  upper.inv <- stats::pnorm(z + (z + stats::qnorm(high)) / (1 - a * (z + stats::qnorm(high))))
+  upper <- stats::quantile(bootstraps, upper.inv, names = FALSE)
   return(c(lower, upper))
-} 
+}
 
 # Creates df of values (bca ci, weighted bootstraps) for minimeta
-boot_weighted_row <- function(boot_result, ci){
+boot_weighted_row <- function(boot_result, ci) {
   bootstraps <- boot_result$bootstraps
   weights <- boot_result$weight
-  
-  weighted_result <- Map(function(x, w) x * w,
-                         boot_result$bootstraps, boot_result$weight)
+
+  weighted_result <- Map(
+    function(x, w) x * w,
+    boot_result$bootstraps, boot_result$weight
+  )
   weighted_bootstrap <- Reduce("+", weighted_result)
-  weighted_bootstrap <- weighted_bootstrap/sum(weights)
-  
-  
-  weighted_difference <- calculate_weighted_delta(weight = boot_result$weight,
-                                                  differences = boot_result$difference)
+  weighted_bootstrap <- weighted_bootstrap / sum(weights)
+
+
+  weighted_difference <- calculate_weighted_delta(
+    weight = boot_result$weight,
+    differences = boot_result$difference
+  )
   bca_weighted <- bca(bootstraps = weighted_bootstrap)
-  pct_interval <- confinterval(weighted_bootstrap, ci/100)
+  pct_interval <- confinterval(weighted_bootstrap, ci / 100)
   boot_last_row <- list(
-    control_group = 'Minimeta Overall Test',
-    test_group = 'Minimeta Overall Test',
+    control_group = "Minimeta Overall Test",
+    test_group = "Minimeta Overall Test",
     bootstraps = list(as.vector(weighted_bootstrap)),
     nboots = length(weighted_bootstrap),
     bca_ci_low = bca_weighted[1],
@@ -364,20 +394,20 @@ boot_weighted_row <- function(boot_result, ci){
     ci = ci,
     difference = weighted_difference,
     weight = 1
-    )
+  )
   return(boot_last_row)
 }
 
 # Creates df of values (bca ci, weighted bootstraps) for deltadelta
-boot_delta_delta <- function(boot_result,ci) {
-  bootstrap_delta_delta_neg <- Reduce("-",boot_result$bootstraps)
-  bootstrap_delta_delta <- bootstrap_delta_delta_neg *-1
+boot_delta_delta <- function(boot_result, ci) {
+  bootstrap_delta_delta_neg <- Reduce("-", boot_result$bootstraps)
+  bootstrap_delta_delta <- bootstrap_delta_delta_neg * -1
   difference_delta_delta <- calculate_delta_difference(boot_result$difference)
   bca_delta_delta <- bca(bootstrap_delta_delta)
-  pct_interval <- confinterval(bootstrap_delta_delta,ci/100)
+  pct_interval <- confinterval(bootstrap_delta_delta, ci / 100)
   boot_last_row <- list(
-    control_group = 'Delta2 Overall Test',
-    test_group = 'Delta2 Overall Test',
+    control_group = "Delta2 Overall Test",
+    test_group = "Delta2 Overall Test",
     bootstraps = list(as.vector(bootstrap_delta_delta)),
     nboots = length(bootstrap_delta_delta),
     bca_ci_low = bca_delta_delta[1],
@@ -387,5 +417,5 @@ boot_delta_delta <- function(boot_result,ci) {
     ci = ci,
     difference = difference_delta_delta,
     weight = 1
-    )
+  )
 }
