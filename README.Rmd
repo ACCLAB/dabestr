@@ -31,16 +31,17 @@ An estimation plot has two key features.
 2.  It presents the **effect size** as a **bootstrap 95% confidence interval** on a **separate but aligned axes**.
 
 ```{r, echo = FALSE, out.width = "47%", out.height = "20%", fig.cap = " ", fig.show = 'hold', fig.align = 'center', out.extra = 'style="background-colour: #FFFFFF;padding:10px; display: inline-block;"'}
-knitr::include_graphics(c("man/figures/2group_float_true.png","man/figures/multigroup_unpaired_proportion.png"))
-knitr::include_graphics(c("man/figures/multigroup_unpaired_alpha=0.8.png","man/figures/multigroup_paired_proportion_sequential.png"))
-knitr::include_graphics(c("man/figures/multigroup_minimeta.png","man/figures/multigroup_deltadelta_unpaired.png"))
+knitr::include_graphics(c("man/figures/2group_float_true.png", "man/figures/multigroup_unpaired_proportion.png"))
+knitr::include_graphics(c("man/figures/multigroup_unpaired_alpha=0.8.png", "man/figures/multigroup_paired_proportion_sequential.png"))
+knitr::include_graphics(c("man/figures/multigroup_minimeta.png", "man/figures/multigroup_deltadelta_unpaired.png"))
 ```
 
 
 ## Installation
 
-```{bash, eval = FALSE}
-git clone https://github.com/ACCLAB/dabestr
+```{r, eval = FALSE}
+# install.packages("pak")
+pak::pak("ACCLAB/dabestr")
 ```
 
 ## Usage
@@ -52,10 +53,12 @@ library(dabestr)
 ```{r, dpi = 500}
 data("non_proportional_data")
 
-dabest_obj.mean_diff <- dabestr::load(data = non_proportional_data, 
-                                      x = Group, 
-                                      y = Measurement, 
-                                      idx = c("Control 1", "Test 1")) %>%
+dabest_obj.mean_diff <- dabestr::load(
+  data = non_proportional_data,
+  x = Group,
+  y = Measurement,
+  idx = c("Control 1", "Test 1")
+) %>%
   dabestr::mean_diff()
 
 dabest_plot(dabest_obj.mean_diff, TRUE)

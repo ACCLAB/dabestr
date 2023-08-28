@@ -51,8 +51,9 @@ An estimation plot has two key features.
 
 ## Installation
 
-``` bash
-git clone https://github.com/ACCLAB/dabestr
+``` r
+# install.packages("pak")
+pak::pak("ACCLAB/dabestr")
 ```
 
 ## Usage

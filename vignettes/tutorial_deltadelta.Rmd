@@ -44,30 +44,31 @@ library(dabestr)
 ```{r}
 set.seed(12345) # Fix the seed so the results are replicable.
 # pop_size = 10000 # Size of each population.
-N = 20 # The number of samples taken from each population
+N <- 20 # The number of samples taken from each population
 
 # Create samples
-placebo <- rnorm(N/2, mean = 4, sd = 0.4)
-placebo <- c(placebo, rnorm(N/2, mean = 2.8, sd = 0.4))
-drug <- rnorm(N/2, mean = 3, sd = 0.4)
-drug <- c(drug, rnorm(N/2, mean = 2.5, sd = 0.4))
+placebo <- rnorm(N / 2, mean = 4, sd = 0.4)
+placebo <- c(placebo, rnorm(N / 2, mean = 2.8, sd = 0.4))
+drug <- rnorm(N / 2, mean = 3, sd = 0.4)
+drug <- c(drug, rnorm(N / 2, mean = 2.5, sd = 0.4))
 
 # Add a `Genotype` column as the second variable
-genotype <- c(rep('M', N/2), rep('W', N/2))
+genotype <- c(rep("M", N / 2), rep("W", N / 2))
 
 # Add an `id` column for paired data plotting.
 id <- 1:N
 
 # Add a `Rep` column as the first variable for the 2 replicates of experiments done
-Rep <- rep(c("Rep1", "Rep2"), N/2)
+Rep <- rep(c("Rep1", "Rep2"), N / 2)
 
 # Combine all columns into a DataFrame.
 df <- tibble::tibble(
   Placebo = placebo,
   Drug = drug,
-  Genotype = genotype, 
+  Genotype = genotype,
   ID = id,
-  Rep = Rep)
+  Rep = Rep
+)
 
 df <- df %>%
   tidyr::gather(key = Treatment, value = Measurement, -ID, -Genotype, -Rep)
@@ -86,17 +87,21 @@ For delta-delta plots, the `idx` is a non-compulsory input.
 ## Unpaired Data
 
 ```{r, eval = FALSE}
-unpaired_delta2 <- load(df, x = Genotype, y = Measurement,
-                        experiment = Treatment, colour = Genotype,
-                        delta2 = TRUE)
+unpaired_delta2 <- load(df,
+  x = Genotype, y = Measurement,
+  experiment = Treatment, colour = Genotype,
+  delta2 = TRUE
+)
 ```
 
 ```{r, echo = TRUE}
-unpaired_delta2 <- load(df, x = Genotype, y = Measurement,
-                        experiment = Treatment, colour = Genotype,
-                        delta2 = TRUE,
-                        experiment_label = c("Placebo", "Drug"),
-                        x1_level = c("W", "M"))
+unpaired_delta2 <- load(df,
+  x = Genotype, y = Measurement,
+  experiment = Treatment, colour = Genotype,
+  delta2 = TRUE,
+  experiment_label = c("Placebo", "Drug"),
+  x1_level = c("W", "M")
+)
 ```
 
 The above function creates the following `dabest` object:
@@ -135,11 +140,13 @@ where $\bar{X}$ is the sample mean, $\Delta$ is the mean difference.
 In the example above, we used the convention of "test - control' but you can manipulate the orders of experiment groups as well as the horizontal axis variable by setting `experiment_label` and `x1_level`.
 
 ```{r}
-unpaired_delta2_specified.mean_diff <- load(df, x = Genotype, y = Measurement,
-                                            experiment = Treatment, colour = Genotype,
-                                            delta2 = TRUE,
-                                            experiment_label = c("Drug", "Placebo"),
-                                            x1_level = c("M", "W")) %>%
+unpaired_delta2_specified.mean_diff <- load(df,
+  x = Genotype, y = Measurement,
+  experiment = Treatment, colour = Genotype,
+  delta2 = TRUE,
+  experiment_label = c("Drug", "Placebo"),
+  x1_level = c("M", "W")
+) %>%
   mean_diff()
 
 dabest_plot(unpaired_delta2_specified.mean_diff)
@@ -151,16 +158,21 @@ The delta - delta function also supports paired data, which is useful for us to 
 Although the `idx` is a non-compulsory parameter, it is still possible to have it as an input to adjust the order as opposed to using `experiment_label` and `x1_level`.
 
 ```{r}
-paired_delta2.mean_diff <- load(df, x = Treatment, y = Measurement,
-                                experiment = Genotype, colour = Rep,
-                                delta2 = TRUE,
-                                idx = list(c("Placebo W","Drug W"),
-                                           c("Placebo M","Drug M")),
-                                paired = "baseline", id_col = ID) %>%
+paired_delta2.mean_diff <- load(df,
+  x = Treatment, y = Measurement,
+  experiment = Genotype, colour = Rep,
+  delta2 = TRUE,
+  idx = list(
+    c("Placebo W", "Drug W"),
+    c("Placebo M", "Drug M")
+  ),
+  paired = "baseline", id_col = ID
+) %>%
   mean_diff()
 
 dabest_plot(paired_delta2.mean_diff,
-            raw_marker_size = 0.5, raw_marker_alpha = 0.3)
+  raw_marker_size = 0.5, raw_marker_alpha = 0.3
+)
 ```
 
 We see that the drug had a non-specific effect of `r format(paired_delta2.mean_diff[["boot_result"]][["difference"]][[1]], digits=3)` [95%CI `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_low"]][[1]], digits=3)` , `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_high"]][[1]], digits=3)`] on wild type subjects even when they were not sick, and it had a bigger effect of `r format(paired_delta2.mean_diff[["boot_result"]][["difference"]][[2]], digits=3)` [95%CI `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_low"]][[2]], digits=3)` , `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_high"]][[2]], digits=3)`] in mutant subjects. In this visualisation, we can see the delta-delta value of `r format(paired_delta2.mean_diff[["boot_result"]][["difference"]][[3]], digits=3)` [95%CI `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_low"]][[3]], digits=3)` , `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_high"]][[3]], digits=3)`] as the net effect of the drug accounting for non-specific actions in healthy individuals
@@ -205,7 +217,7 @@ If you want to extract the permutations, permutation test’s p values, the stat
 
 P values for permutation tests `pval_permtest` (and the permutation calculations and results accessed by running the commented out session).
 ```{r}
-#print(unpaired_delta2.mean_diff$permtest_pvals$permutation_test_results)
+# print(unpaired_delta2.mean_diff$permtest_pvals$permutation_test_results)
 print(unpaired_delta2.mean_diff$permtest_pvals$pval_permtest)
 ```
 

@@ -32,6 +32,6 @@ dabest_obj <- load(non_proportional_data, x = Group, y = Measurement, idx = c("C
 dabest_obj.mean_diff <- mean_diff(dabest_obj)
 
 # Plotting of dabest_obj.mean_diff
-dabest_plot(dabest_obj.mean_diff, TRUE) 
+dabest_plot(dabest_obj.mean_diff, TRUE)
 
 }

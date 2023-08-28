@@ -107,7 +107,9 @@ functions within dabestr to create estimation plots.
 data(non_proportional_data)
 
 # Creating a dabest object
-dabest_obj <- load(data = non_proportional_data, x = Group, y = Measurement, 
-idx = c("Control 1", "Test 1"))
+dabest_obj <- load(
+  data = non_proportional_data, x = Group, y = Measurement,
+  idx = c("Control 1", "Test 1")
+)
 
 }
