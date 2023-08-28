@@ -235,6 +235,6 @@ print(multi_groups.mean_diff)
 ```{r}
 dabest_plot(multi_groups.mean_diff)
 ```
-
+ 
 ## Using wide datasets
 `dabestr` does not currently support the use of 'wide' data. To convert datasets from 'wide' to 'long'/'tidy', consider taking a look at [gather()](https://tidyr.tidyverse.org/reference/gather.html) as part of the [tidyr](https://tidyr.tidyverse.org) package.

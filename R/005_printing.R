@@ -133,7 +133,7 @@ print_each_comparism_effectsize <- function(dabest_object, effectsize) {
 
     for (current_test_group in test_groups) {
       cat(stringr::str_interp("The ${paired_status} ${es} between ${current_test_group} and ${control_group} is ${difference} [${ci}%CI ${bca_low}, ${bca_high}].\n"))
-      cat(stringr::str_interp("The p-value of the two-sided permutation t-test is ${format(current_pval, nsmall = 3)}, calculated for legacy purposes only.\n"))
+      cat(stringr::str_interp("The p-value of the two-sided permutation t-test is ${sprintf(current_pval, fmt = '%#.4f')}, calculated for legacy purposes only.\n"))
     }
   }
 }
