@@ -239,6 +239,9 @@ load <- function(
       data <- data %>%
         dplyr::arrange(!!enquo_experiment, !!enquo_x)
     }
+    if (is.null(experiment_label)) {
+      experiment_label <- unique(data[[name_experiment]])
+    }
 
     data <- data %>%
       dplyr::mutate(grouping = !!enquo_x) %>%
@@ -341,6 +344,7 @@ load <- function(
     enquo_id_col = enquo_id_col,
     enquo_colour = enquo_colour,
     proportional = proportional,
+    experiment_label = experiment_label,
     minimeta = minimeta,
     delta2 = delta2,
     idx = idx,

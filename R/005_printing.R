@@ -47,8 +47,8 @@ print_each_comparism <- function(dabest_object) {
     }
 
     if (isTRUE(dabest_object$delta2)) {
-      experiment1 <- dabest_object$experiment[1]
-      experiment2 <- dabest_object$experiment[2]
+      experiment1 <- dabest_object$experiment_label[2]
+      experiment2 <- dabest_object$experiment_label[1]
 
       cat(stringr::str_interp("${i}. ${experiment1} minus ${experiment2} (only for mean difference)\n"))
     }
@@ -80,6 +80,7 @@ print_each_comparism_effectsize <- function(dabest_object, effectsize) {
   }
 
   i <- 1
+  pvalue_index <- 1
   paired <- dabest_object$paired
   difference <- round(dabest_object$boot_result$difference, 3)
   bca_low <- round(dabest_object$boot_result$bca_ci_low, 3)
@@ -118,7 +119,7 @@ print_each_comparism_effectsize <- function(dabest_object, effectsize) {
         current_bca_low <- bca_low[i]
         current_bca_high <- bca_high[i]
         current_ci <- ci[i]
-        current_pval <- pvalue[[i]][1]
+        current_pval <- pvalue[[i]][pvalue_index]
 
         cat(stringr::str_interp("The ${paired_status} ${es} between ${current_test_group} and ${control_group} is ${current_difference} [${current_ci}%CI ${current_bca_low}, ${current_bca_high}].\n"))
         cat(stringr::str_interp("The p-value of the two-sided permutation t-test is ${sprintf(current_pval, fmt = '%#.4f')}, calculated for legacy purposes only."))
@@ -149,6 +150,5 @@ print_ending <- function(dabest_object) {
     cat("assuming the null hypothesis of zero difference is true.\n")
     cat(stringr::str_interp("For each p-value, ${nreshuffles} reshuffles of the control and test labels were performed.\n"))
     cat("\n")
-    cat("To get the results of all valid statistical tests, use $")
   }
 }
