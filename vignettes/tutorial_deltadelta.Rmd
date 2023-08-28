@@ -47,8 +47,10 @@ set.seed(12345) # Fix the seed so the results are replicable.
 N = 20 # The number of samples taken from each population
 
 # Create samples
-placebo <- rnorm(N, mean = 3, sd = 0.4)
-drug <- rnorm(N, mean = 3.5, sd = 0.75)
+placebo <- rnorm(N/2, mean = 4, sd = 0.4)
+placebo <- c(placebo, rnorm(N/2, mean = 2.8, sd = 0.4))
+drug <- rnorm(N/2, mean = 3, sd = 0.4)
+drug <- c(drug, rnorm(N/2, mean = 2.5, sd = 0.4))
 
 # Add a `Genotype` column as the second variable
 genotype <- c(rep('M', N/2), rep('W', N/2))
@@ -161,7 +163,7 @@ dabest_plot(paired_delta2.mean_diff,
             raw_marker_size = 0.5, raw_marker_alpha = 0.3)
 ```
 
-We see that the drug had a non-specific effect of -0.321 [95%CI -0.498, -0.131] on wild type subjects even when they were not sick, and it had a bigger effect of -1.22 [95%CI -1.52, -0.906] in mutant subjects. In this visualisation, we can see the delta-delta value of -0.903 [95%CI -1.21, -0.587] as the net effect of the drug accounting for non-specific actions in healthy individuals
+We see that the drug had a non-specific effect of `r format(paired_delta2.mean_diff[["boot_result"]][["difference"]][[1]], digits=3)` [95%CI `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_low"]][[1]], digits=3)` , `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_high"]][[1]], digits=3)`] on wild type subjects even when they were not sick, and it had a bigger effect of `r format(paired_delta2.mean_diff[["boot_result"]][["difference"]][[2]], digits=3)` [95%CI `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_low"]][[2]], digits=3)` , `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_high"]][[2]], digits=3)`] in mutant subjects. In this visualisation, we can see the delta-delta value of `r format(paired_delta2.mean_diff[["boot_result"]][["difference"]][[3]], digits=3)` [95%CI `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_low"]][[3]], digits=3)` , `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_high"]][[3]], digits=3)`] as the net effect of the drug accounting for non-specific actions in healthy individuals
 
 Mean difference between drug and placebo treatments in wild type subjects is:
 
@@ -197,4 +199,23 @@ You can find all outputs of the delta - delta calculation by assessing the colum
 
 ```{r}
 print(unpaired_delta2.mean_diff$boot_result)
+```
+
+If you want to extract the permutations, permutation test’s p values, the statistical tests and the p value results, you can access it with the columns `permutation_test_results`, `pval_permtest`, `pval_for_tests` and `pvalues` respectively.
+
+P values for permutation tests `pval_permtest` (and the permutation calculations and results accessed by running the commented out session).
+```{r}
+#print(unpaired_delta2.mean_diff$permtest_pvals$permutation_test_results)
+print(unpaired_delta2.mean_diff$permtest_pvals$pval_permtest)
+```
+
+An representative p value for statistical tests (`pval_for_tests`)
+
+```{r}
+print(unpaired_delta2.mean_diff$permtest_pvals$pval_for_tests)
+```
+
+Statistical test results and `pvalues`.
+```{r}
+print(unpaired_delta2.mean_diff$permtest_pvals$pvalues)
 ```
