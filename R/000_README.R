@@ -19,4 +19,5 @@
 #' 002 - Plotting Tools
 #' 003 - Stats Tools
 #' 004 - Main Plots
+#' 005 - Printing Tools
 #' 999 - Plot Kwargs
