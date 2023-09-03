@@ -80,13 +80,12 @@ print_each_comparism_effectsize <- function(dabest_object, effectsize) {
   }
 
   i <- 1
-  pvalue_index <- 1
   paired <- dabest_object$paired
   difference <- round(dabest_object$boot_result$difference, 3)
   bca_low <- round(dabest_object$boot_result$bca_ci_low, 3)
   bca_high <- round(dabest_object$boot_result$bca_ci_high, 3)
   ci <- dabest_object$boot_result$ci
-  pvalue <- dabest_object$permtest_pvals$pvalues
+  pvalue <- dabest_object$permtest_pvals$pval_for_tests
 
   if (is.null(paired)) {
     rm_status <- ""
@@ -119,7 +118,7 @@ print_each_comparism_effectsize <- function(dabest_object, effectsize) {
         current_bca_low <- bca_low[i]
         current_bca_high <- bca_high[i]
         current_ci <- ci[i]
-        current_pval <- pvalue[[i]][pvalue_index]
+        current_pval <- pvalue[i]
 
         cat(stringr::str_interp("The ${paired_status} ${es} between ${current_test_group} and ${control_group} is ${current_difference} [${current_ci}%CI ${current_bca_low}, ${current_bca_high}].\n"))
         cat(stringr::str_interp("The p-value of the two-sided permutation t-test is ${sprintf(current_pval, fmt = '%#.4f')}, calculated for legacy purposes only."))
