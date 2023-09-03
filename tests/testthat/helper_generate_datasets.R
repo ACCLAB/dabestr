@@ -51,6 +51,7 @@ generate_proportional_dataset <- function(N = 40, seed = 12345) {
   t5 <- rbinom(N, size, prob = 0.5)
   t6 <- rbinom(N, size, prob = 0.6)
   t7 <- c(rep(1, N))
+  t8 <- c(rep(0, N))
 
   # Add a `gender` column for coloring the data.
   gender <- c(rep("Male", N / 2), rep("Female", N / 2))
@@ -62,7 +63,7 @@ generate_proportional_dataset <- function(N = 40, seed = 12345) {
   df <- tibble::tibble(
     `Control 1` = c1, `Control 2` = c2, `Control 3` = c3,
     `Test 1` = t1, `Test 2` = t2, `Test 3` = t3, `Test 4` = t4, `Test 5` = t5,
-    `Test 6` = t6, `Test 7` = t7,
+    `Test 6` = t6, `Test 7` = t7, `Test 8` = t8,
     Gender = gender, ID = id
   )
 
