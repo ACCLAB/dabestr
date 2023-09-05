@@ -4,11 +4,11 @@ Title: Data Analysis using Bootstrap-Coupled Estimation
 Version: 0.9.9.9
 Authors@R: c(
   person("Kah Seng", "Lian", email = "kahseng@u.nus.edu", role = c("cre", "aut")),
-  person("Zhuoyu", "Wang", email = "wzhuoyu21@u.nus,edu", role = c("aut")),
-  person("Jun Yang", "Liao", email = "name@example.com", role = c("aut")),
-  person("Joses W.", "Ho", email = "joseshowh@gmail.com", role = c("aut")),
+  person("Zhuoyu", "Wang", email = "wzhuoyu21@u.nus,edu", role = "aut"),
+  person("Jun Yang", "Liao", email = "name@example.com", role = "aut"),
+  person("Joses W.", "Ho", email = "joseshowh@gmail.com", role = "aut"),
   person("ACCLAB", role = c("cph", "fnd")),
-  person("Tayfun", "Tumkaya", role = c("ctb")))
+  person("Tayfun", "Tumkaya", role = "aut"))
 Description: Data Analysis using Bootstrap-Coupled ESTimation.
   Estimation statistics is a simple framework that avoids the pitfalls of
   significance testing. It uses familiar statistical concepts: means,
