@@ -24,55 +24,6 @@ print_greeting_header <- function() {
   cat("\n")
 }
 
-print_each_comparism <- function(dabest_object) {
-  i <- 1
-  if (is.list(dabest_object$idx)) {
-    for (group in dabest_object$idx) {
-      # Get test groups (everything else in group), loop through them and compute
-      # the difference between group[1] and each group.
-      # Test groups are the 2nd element of group onwards.
-      control_group <- group[1]
-      test_groups <- group[2:length(group)]
-
-      if (is.null(dabest_object$paired) || dabest_object$paired == "baseline") {
-        control_group <- group[1]
-        test_groups <- group[2:length(group)]
-        for (current_test_group in test_groups) {
-          cat(stringr::str_interp("${i}. ${current_test_group} minus ${control_group}\n"))
-          i <- i + 1
-        }
-      } else {
-        for (n in 1:(length(group) - 1)) {
-          current_group <- group[n + 1]
-          previous_group <- group[n]
-          cat(stringr::str_interp("${i}. ${current_group} minus ${previous_group}\n"))
-          i <- i + 1
-        }
-      }
-    }
-
-    if (isTRUE(dabest_object$minimeta)) {
-      cat(stringr::str_interp("${i}. weighted delta (only for mean difference)\n"))
-      i <- i + 1
-    }
-
-    if (isTRUE(dabest_object$delta2)) {
-      experiment1 <- dabest_object$experiment_label[2]
-      experiment2 <- dabest_object$experiment_label[1]
-
-      cat(stringr::str_interp("${i}. ${experiment1} minus ${experiment2} (only for mean difference)\n"))
-    }
-  } else {
-    control_group <- dabest_object$idx[1]
-    test_groups <- dabest_object$idx[2:length(dabest_object$idx)]
-
-    for (current_test_group in test_groups) {
-      cat(stringr::str_interp("  ${i}. ${current_test_group} minus ${control_group}\n"))
-      i <- i + 1
-    }
-  }
-  cat("\n")
-}
 print_each_comparism_effectsize <- function(dabest_object, effectsize) {
   if (effectsize == "mean_diff") {
     es <- "mean difference"
@@ -117,22 +68,42 @@ print_each_comparism_effectsize <- function(dabest_object, effectsize) {
       # Get test groups (everything else in group), loop through them and compute
       # the difference between group[1] and each group.
       # Test groups are the 2nd element of group onwards.
-
+      
       control_group <- group[1]
       test_groups <- group[2:length(group)]
-
-      for (current_test_group in test_groups) {
-        current_paired <- paired[i]
-        current_difference <- difference[i]
-        current_bca_low <- bca_low[i]
-        current_bca_high <- bca_high[i]
-        current_ci <- ci[i]
-        current_pval <- pvalue[i]
-
-        cat(stringr::str_interp("The ${paired_status} ${es} between ${current_test_group} and ${control_group} is ${current_difference} [${current_ci}%CI ${current_bca_low}, ${current_bca_high}].\n"))
-        cat(stringr::str_interp("The p-value of the two-sided permutation t-test is ${sprintf(current_pval, fmt = '%#.4f')}, calculated for legacy purposes only."))
-        cat("\n\n")
-        i <- i + 1
+      
+      if (is.null(dabest_object$paired) || dabest_object$paired=="baseline") {
+        control_group <- group[1]
+        test_groups <- group[2:length(group)]
+        for (current_test_group in test_groups) {
+          current_paired <- paired[i]
+          current_difference <- difference[i]
+          current_bca_low <- bca_low[i]
+          current_bca_high <- bca_high[i]
+          current_ci <- ci[i]
+          current_pval <- pvalue[i]
+          
+          cat(stringr::str_interp("The ${paired_status} ${es} between ${current_test_group} and ${control_group} is ${current_difference} [${current_ci}%CI ${current_bca_low}, ${current_bca_high}].\n"))
+          cat(stringr::str_interp("The p-value of the two-sided permutation t-test is ${sprintf(current_pval, fmt = '%#.4f')}, calculated for legacy purposes only."))
+          cat("\n\n")
+          i <- i + 1
+        }
+      } else {
+        for (n in 1:(length(group)-1)) {
+          current_group <- group[n+1]
+          previous_group <- group[n]
+          current_paired <- paired[i]
+          current_difference <- difference[i]
+          current_bca_low <- bca_low[i]
+          current_bca_high <- bca_high[i]
+          current_ci <- ci[i]
+          current_pval <- pvalue[i]
+          
+          cat(stringr::str_interp("The ${paired_status} ${es} between ${current_group} and ${previous_group} is ${current_difference} [${current_ci}%CI ${current_bca_low}, ${current_bca_high}].\n"))
+          cat(stringr::str_interp("The p-value of the two-sided permutation t-test is ${sprintf(current_pval, fmt = '%#.4f')}, calculated for legacy purposes only."))
+          cat("\n\n")
+          i <- i + 1
+        } 
       }
     }
   } else {
