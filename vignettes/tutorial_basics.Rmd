@@ -120,21 +120,8 @@ For each comparison, the type of effect size is reported (here, it’s the “un
 
 This confidence interval is generated through bootstrap resampling. See Bootstrap Confidence Intervals for more details.
 
-### Statistical tests
-Since v0.3.0, dabestr will report the p-value of the non-parametric two-sided approximate permutation t-test. This is also known as the Monte Carlo permutation test.
-
-For unpaired comparisons, the p-values and test statistics of Welch’s t test, Student’s t test, and Mann-Whitney U test can be found in addition. For paired comparisons, the p-values and test statistics of the paired Student’s t and Wilcoxon tests are presented.
-
-```{r}
-print(two_groups_unpaired.mean_diff$permtest_pvals$pvalues)
-```
-
-Let’s compute the Hedges’ g for our comparison.
-
-```{r, eval = FALSE}
-two_groups_unpaired.hedges_g <- hedges_g(two_groups_unpaired)
-print(two_groups_unpaired.hedges_g$permtest_pvals$pvalues)
-```
+### P-values and statistical tests
+Permutation P values are only provided to allow analysts to satisfy a customary requirement of scientific journals. DABEST's provision of P values does not constitute an endorsement of P values or null-hypothesis significance testing (NHST). If users need to include these in a study, we recommend that they (1) avoid performing NHST, i.e. do not compare P to an alpha, (2) never refer to the P values in the Results text, and (3) state in their Methods section that "No null-hypothesis significance testing was performed; P values are provided for legacy purposes only."
 
 ## Producing estimation plots (Step 3)
 To produce a **Gardner-Altman estimation plot**, simply use the `dabest_plot()`. You can read more about its genesis and design inspiration at Robust and Beautiful Statistical Visualization. 
