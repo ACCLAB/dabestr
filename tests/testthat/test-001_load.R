@@ -169,7 +169,7 @@ testthat::test_that("Prints correct output for dabestr object", {
   ) 
   expect_output(print(dabest_obj), regexp = "Test 1 minus Control 1")
   expect_output(print(dabest_obj), regexp = "Test 2 minus Control 2")
-  # expect_output(print(dabest_obj), regexp = "Test 3 minus Test 2")
+  expect_output(print(dabest_obj), regexp = "Test 3 minus Test 2")
 
   #### 2GROUP PROPORTION ####
   p_dataset <- generate_proportional_dataset()
