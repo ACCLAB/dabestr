@@ -150,23 +150,23 @@ testthat::test_that("Prints correct output for dabestr object", {
   expect_output(print(dabest_obj), regexp = "95% confidence intervals")
   expect_output(print(dabest_obj), regexp = "Test 1 minus Control 1")
   expect_output(print(dabest_obj), regexp = "5000 resamples")
-  
+
   #### MULTIGROUP BASELINE ####
   dabest_obj <- dabestr::load(np_dataset,
-                                  x = Group, y = Measurement,
-                                  idx = list(c("Control 1", "Test 1"), c("Control 2", "Test 2", "Test 3")),
-                                  paired = "baseline", id_col = ID
-  ) 
+    x = Group, y = Measurement,
+    idx = list(c("Control 1", "Test 1"), c("Control 2", "Test 2", "Test 3")),
+    paired = "baseline", id_col = ID
+  )
   expect_output(print(dabest_obj), regexp = "Test 1 minus Control 1")
   expect_output(print(dabest_obj), regexp = "Test 2 minus Control 2")
   expect_output(print(dabest_obj), regexp = "Test 3 minus Control 2")
-  
+
   #### MULTIGROUP SEQUENTIAL ####
   dabest_obj <- dabestr::load(np_dataset,
-                              x = Group, y = Measurement,
-                              idx = list(c("Control 1", "Test 1"), c("Control 2", "Test 2", "Test 3")),
-                              paired = "sequential", id_col = ID
-  ) 
+    x = Group, y = Measurement,
+    idx = list(c("Control 1", "Test 1"), c("Control 2", "Test 2", "Test 3")),
+    paired = "sequential", id_col = ID
+  )
   expect_output(print(dabest_obj), regexp = "Test 1 minus Control 1")
   expect_output(print(dabest_obj), regexp = "Test 2 minus Control 2")
   expect_output(print(dabest_obj), regexp = "Test 3 minus Test 2")
@@ -174,10 +174,26 @@ testthat::test_that("Prints correct output for dabestr object", {
   #### 2GROUP PROPORTION ####
   p_dataset <- generate_proportional_dataset()
   dabest_obj <- dabestr::load(
-    data = p_dataset, x = Group, y = Success, idx = c("Control 2", "Test 2")
+    data = p_dataset, x = Group, y = Success, idx = c("Control 2", "Test 2"),
+    proportional = TRUE
   )
   expect_output(print(dabest_obj), regexp = "95% confidence intervals")
   expect_output(print(dabest_obj), regexp = "Test 2 minus Control 2")
+  expect_output(print(dabest_obj), regexp = "5000 resamples")
+
+  #### MINIMETA ####
+  np_dataset <- generate_non_proportional_dataset()
+  dabest_obj <- dabestr::load(
+    data = np_dataset, x = Group, y = Measurement, idx = list(
+      c("Control 1", "Test 1"),
+      c("Control 2", "Test 2")
+    ),
+    minimeta = TRUE
+  )
+  expect_output(print(dabest_obj), regexp = "95% confidence intervals")
+  expect_output(print(dabest_obj), regexp = "Test 1 minus Control 1")
+  expect_output(print(dabest_obj), regexp = "Test 2 minus Control 2")
+  expect_output(print(dabest_obj), regexp = "weighted delta")
   expect_output(print(dabest_obj), regexp = "5000 resamples")
 
   #### DELTADELTA ####
@@ -189,7 +205,7 @@ testthat::test_that("Prints correct output for dabestr object", {
   expect_output(print(dabest_obj), regexp = "M Placebo minus W Placebo")
   expect_output(print(dabest_obj), regexp = "M Drug minus W Drug")
   expect_output(print(dabest_obj), regexp = "Drug minus Placebo")
-  
+
   #### ADJUSTING CI ####
   dabest_obj <- dabestr::load(
     data = np_dataset, x = Group, y = Measurement, idx = c("Control 1", "Test 1"), ci = 85
@@ -197,7 +213,7 @@ testthat::test_that("Prints correct output for dabestr object", {
   expect_output(print(dabest_obj), regexp = "85% confidence intervals")
   expect_output(print(dabest_obj), regexp = "Test 1 minus Control 1")
   expect_output(print(dabest_obj), regexp = "5000 resamples")
-  
+
   #### ADJUSTING RESAMPLES ####
   dabest_obj <- dabestr::load(
     data = np_dataset, x = Group, y = Measurement, idx = c("Control 1", "Test 1"), resamples = 3000
