@@ -31,8 +31,10 @@ print_each_comparism <- function(dabest_object) {
       # Get test groups (everything else in group), loop through them and compute
       # the difference between group[1] and each group.
       # Test groups are the 2nd element of group onwards.
+      control_group <- group[1]
+      test_groups <- group[2:length(group)]
       
-      if (dabest_object$paired=="baseline") {
+      if (is.null(dabest_object$paired) || dabest_object$paired=="baseline") {
         control_group <- group[1]
         test_groups <- group[2:length(group)]
         for (current_test_group in test_groups) {
