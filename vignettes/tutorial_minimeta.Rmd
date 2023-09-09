@@ -72,8 +72,7 @@ We now have 3 Control and 3 Test groups, simulating 3 replicates of the same exp
 This is known as a ‘long’ dataset. See this [writeup](https://sejdemyr.github.io/r-tutorials/basics/wide-and-long/) for more details.
 
 ```{r}
-df_head <- head(df)
-knitr::kable(df_head)
+knitr::kable(head(df))
 ```
 
 ## Loading Data

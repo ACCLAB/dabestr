@@ -27,7 +27,7 @@
 #' dabest_obj <- load(non_proportional_data, x = Group, y = Measurement, idx = c("Control 1", "Test 1"))
 #' dabest_obj.mean_diff <- mean_diff(dabest_obj)
 #'
-#' # Plotting of dabest_obj.mean_diff
+#' # Plotting an estimation plot 
 #' dabest_plot(dabest_obj.mean_diff, TRUE)
 #'
 #' @export

@@ -14,6 +14,10 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r, include = FALSE, warning = FALSE, message = FALSE}
+library(dabestr)
+```
+
 This vignette documents how `dabestr` is able to compute the calculation of delta-delta, an experimental function that allows the comparison between two bootstrapped effect sizes computed from two independent categorical variables.
 
 Many experimental designs investigate the effects of two interacting independent variables on a dependent variable. The delta-delta effect size lets us distill the net effect of the two variables. To illustrate this, let’s delve into the following problem.
@@ -22,21 +26,21 @@ Consider an experiment where we test the efficacy of a drug named `Drug` on a di
 
 Effectively, we have 4 groups of subjects for comparison.
 
-```{=latex}
-\begin{tabular}{|l|c|c|}
-  \hline
-          & Wild Type & Mutant \\
-  \hline
-  Drug    & X_D, W    & X_D, M \\
-  \hline
-  Placebo & X_P, W     & X_P, M \\
-  \hline
-\end{tabular}
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+df <- data.frame(
+  `s` = c("Drug", "Placebo"),
+  `Wild type` = c("$X_D, W$", "$X_P, W$"),
+  `Mutant` = c("$X_D, M$", "$X_P, M$")
+)
+colnames(df) <- c(" ", "Wild type", "Mutant")
+knitr::kable(df, escape = FALSE) %>%
+  kableExtra::column_spec(1, bold = TRUE) %>%
+  kableExtra::column_spec(1:2, border_right = TRUE)
 ```
 
 There are 2 `Treatment` conditions, `Placebo` (control group) and `Drug` (test group). There are 2 `Genotypes`: `W` (wild type population) and `M` (mutant population). In addition, each experiment was done twice (`Rep1` and `Rep2`). We shall do a few analyses to visualise these differences in a simulated dataset.
 
-```{r setup, warning = FALSE, message = FALSE}
+```{r setup, eval = FALSE}
 library(dabestr)
 ```
 
@@ -75,8 +79,7 @@ df <- df %>%
 ```
 
 ```{r}
-df_head <- head(df)
-knitr::kable(df_head)
+knitr::kable(head(df))
 ```
 
 ## Loading Data

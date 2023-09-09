@@ -3,24 +3,11 @@ Type: Package
 Title: Data Analysis using Bootstrap-Coupled Estimation
 Version: 2023.9.12
 Authors@R: c(
-<<<<<<< Updated upstream
-  person("Kah Seng", "Lian", email = "kahseng@u.nus.edu", role = c("cre", "aut")),
-<<<<<<< Updated upstream
-  person("Zhuoyu", "Wang", email = "wzhuoyu21@u.nus,edu", role = "aut"),
-  person("Jun Yang", "Liao", email = "name@example.com", role = "aut"),
-  person("Joses W.", "Ho", email = "joseshowh@gmail.com", role = "aut"),
-=======
-  person("Zhuoyu", "Wang", email = "wzhuoyu21@u.nus,edu", role = c("aut")),
-  person("Jun Yang", "Liao", email = "name@example.com", role = c("aut")),
-  person("Joses W.", "Ho", email = "joseshowh@gmail.com", role = c("aut")),
-=======
   person("Yishan", "Mai", email = "maiyishan@u.duke.nus.edu", role = c("cre", "aut")),
   person("Kah Seng", "Lian", email = "kahseng@u.nus.edu", role = c("aut")),
   person("Zhuoyu", "Wang", email = "wzhuoyu21@u.nus,edu", role = "aut"),
   person("Jun Yang", "Liao", email = "name@example.com", role = "aut"),
   person("Joses W.", "Ho", email = "joseshowh@gmail.com", role = "aut"),
->>>>>>> Stashed changes
->>>>>>> Stashed changes
   person("ACCLAB", role = c("cph", "fnd")),
   person("Tayfun", "Tumkaya", role = "aut"))
 Description: Data Analysis using Bootstrap-Coupled ESTimation.
