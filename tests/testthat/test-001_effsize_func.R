@@ -87,7 +87,7 @@ testthat::test_that("Prints correct output for dabest_effectsize_obj object", {
   ) %>% mean_diff()
   expect_output(print(dabest_effectsize_obj), regexp = "Test 1 and Control 1")
   expect_output(print(dabest_effectsize_obj), regexp = "Test 2 and Control 2")
-  # expect_output(print(dabest_effectsize_obj), regexp = "Test 3 and Test 2")
+  expect_output(print(dabest_effectsize_obj), regexp = "Test 3 and Test 2")
 
   #### 2GROUP PROPORTION ####
   p_dataset <- generate_proportional_dataset()
