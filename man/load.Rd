@@ -112,4 +112,7 @@ dabest_obj <- load(
   idx = c("Control 1", "Test 1")
 )
 
+# Printing dabest object
+print(dabest_obj)
+
 }

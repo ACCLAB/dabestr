@@ -74,6 +74,9 @@
 #'   data = non_proportional_data, x = Group, y = Measurement,
 #'   idx = c("Control 1", "Test 1")
 #' )
+#' 
+#' # Printing dabest object
+#' print(dabest_obj)
 #'
 #' @export load
 #'

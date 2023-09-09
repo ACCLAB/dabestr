@@ -83,8 +83,10 @@ The other plots are able to use all given basic effect sizes as listed in the De
 # Loading of the dataset
 data(non_proportional_data)
 
-# Preparing the data to be plotted
+# Applying effect size to the dabest object 
 dabest_obj <- load(non_proportional_data, x = Group, y = Measurement, idx = c("Control 1", "Test 1"))
 dabest_obj.mean_diff <- mean_diff(dabest_obj)
 
+# Printing dabest effectsize object
+print(dabest_obj.mean_diff)
 }

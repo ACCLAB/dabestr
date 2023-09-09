@@ -57,8 +57,10 @@ df <- tibble::tibble(
 
 df <- df %>%
   tidyr::gather(key = Group, value = Success, -ID, -Gender)
+```
 
-head(df)
+```{r}
+knitr::kable(head(df))
 ```
 
 ## Loading Data
