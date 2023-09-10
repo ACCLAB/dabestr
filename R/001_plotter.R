@@ -24,16 +24,19 @@
 #' data(twogroup_data)
 #'
 #' # Preparing the data to be plotted
-#' dabest_obj <- load(non_proportional_data, x = Group, y = Measurement, idx = c("Control 1", "Test 1"))
+#' dabest_obj <- load(non_proportional_data,
+#'   x = Group, y = Measurement,
+#'   idx = c("Control 1", "Test 1")
+#' )
 #' dabest_obj.mean_diff <- mean_diff(dabest_obj)
 #'
-#' # Plotting an estimation plot 
+#' # Plotting an estimation plot
 #' dabest_plot(dabest_obj.mean_diff, TRUE)
 #'
 #' @export
 
 dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
-  if (class(dabest_effectsize_obj) != "dabest_effectsize") {
+  if (!methods::is(dabest_effectsize_obj, "dabest_effectsize")) {
     cli::cli_abort(c("{.field dabest_effectsize_obj} must be a {.cls dabest_effectsize} object."),
       "x" = "Please supply a {.cls dabest_effectsize} object."
     )

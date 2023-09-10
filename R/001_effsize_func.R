@@ -58,16 +58,19 @@
 #' # Loading of the dataset
 #' data(non_proportional_data)
 #'
-#' # Applying effect size to the dabest object 
-#' dabest_obj <- load(non_proportional_data, x = Group, y = Measurement, idx = c("Control 1", "Test 1"))
+#' # Applying effect size to the dabest object
+#' dabest_obj <- load(non_proportional_data,
+#'   x = Group, y = Measurement,
+#'   idx = c("Control 1", "Test 1")
+#' )
 #' dabest_obj.mean_diff <- mean_diff(dabest_obj)
-#' 
+#'
 #' # Printing dabest effectsize object
 #' print(dabest_obj.mean_diff)
 #' @export
 mean_diff <- function(dabest_obj, perm_count = 5000) {
   effect_size_type <- "mean_diff"
-  if (class(dabest_obj) != "dabest") {
+  if (!methods::is(dabest_obj, "dabest")) {
     cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
       "x" = "Please supply a {.cls dabest} object."
     )
@@ -104,7 +107,7 @@ mean_diff <- function(dabest_obj, perm_count = 5000) {
 #' @export
 median_diff <- function(dabest_obj, perm_count = 5000) {
   effect_size_type <- "median_diff"
-  if (class(dabest_obj) != "dabest") {
+  if (!methods::is(dabest_obj, "dabest")) {
     cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
       "x" = "Please supply a {.cls dabest} object."
     )
@@ -143,7 +146,7 @@ median_diff <- function(dabest_obj, perm_count = 5000) {
 #' @export
 cohens_d <- function(dabest_obj, perm_count = 5000) {
   effect_size_type <- "cohens_d"
-  if (class(dabest_obj) != "dabest") {
+  if (!methods::is(dabest_obj, "dabest")) {
     cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
       "x" = "Please supply a {.cls dabest} object."
     )
@@ -176,7 +179,7 @@ cohens_d <- function(dabest_obj, perm_count = 5000) {
 #' @export
 hedges_g <- function(dabest_obj, perm_count = 5000) {
   effect_size_type <- "hedges_g"
-  if (class(dabest_obj) != "dabest") {
+  if (!methods::is(dabest_obj, "dabest")) {
     cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
       "x" = "Please supply a {.cls dabest} object."
     )
@@ -215,7 +218,7 @@ hedges_g <- function(dabest_obj, perm_count = 5000) {
 #' @export
 cliffs_delta <- function(dabest_obj, perm_count = 5000) {
   effect_size_type <- "cliffs_delta"
-  if (class(dabest_obj) != "dabest") {
+  if (!methods::is(dabest_obj, "dabest")) {
     cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
       "x" = "Please supply a {.cls dabest} object."
     )
@@ -248,7 +251,7 @@ cliffs_delta <- function(dabest_obj, perm_count = 5000) {
 #' @export
 cohens_h <- function(dabest_obj, perm_count = 5000) {
   effect_size_type <- "cohens_h"
-  if (class(dabest_obj) != "dabest") {
+  if (!methods::is(dabest_obj, "dabest")) {
     cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
       "x" = "Please supply a {.cls dabest} object."
     )
@@ -333,7 +336,7 @@ hedges_correction <- function(x1, x2) {
 #'
 #' @export
 print.dabest_effectsize <- function(x, ...) {
-  if (class(x) != "dabest_effectsize") {
+  if (!methods::is(x, "dabest_effectsize")) {
     cli::cli_abort(c("Only dabest_effectsize objects can be used.",
       "x" = "Please enter a valid entry into the function."
     ))
