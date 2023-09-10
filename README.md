@@ -5,14 +5,12 @@
 
 <!-- badges: start -->
 
-[![Travis CI build
-status](https://img.shields.io/travis/com/ACCLAB/dabestr/master.svg)](https://travis-ci.com/ACCLAB/dabestr/)
 [![minimal R
 version](https://img.shields.io/badge/R%3E%3D-2.10-6666ff.svg)](https://cran.r-project.org/)
 [![CRAN Download
 Count](https://cranlogs.r-pkg.org/badges/grand-total/dabestr?color=brightgreen)](https://cran.r-project.org/package=dabestr)
 [![Free-to-view
-citation](https://zenodo.org/badge/DOI/10.1038/s41592-019-0470-3.svg)](https://rdcu.be/bHhJ4)
+citation](https://zenodo.org/badge/DOI/10.1038/s41592-019-0470-3.svg)](https://www.nature.com/articles/s41592-019-0470-3.epdf?author_access_token=Euy6APITxsYA3huBKOFBvNRgN0jAjWel9jnR3ZoTv0Pr6zJiJ3AA5aH4989gOJS_dajtNr1Wt17D0fh-t4GFcvqwMYN03qb8C33na_UrCUcGrt-Z0J9aPL6TPSbOxIC-pbHWKUDo2XsUOr3hQmlRew%3D%3D)
 [![License](https://img.shields.io/badge/License-Apache_2.0-orange.svg)](https://spdx.org/licenses/BSD-3-Clause-Clear.html)
 [![R-CMD-check](https://github.com/sunroofgod/dabestr-prototype/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sunroofgod/dabestr-prototype/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
@@ -41,17 +39,13 @@ An estimation plot has two key features.
 2.  It presents the **effect size** as a **bootstrap 95% confidence
     interval** on a **separate but aligned axes**.
 
-<div class="figure" style="text-align: center">
-
-<img src="man/figures/2group_float_true.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;" /><img src="man/figures/multigroup_unpaired_proportion.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;" /><img src="man/figures/multigroup_unpaired_alpha=0.8.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;" /><img src="man/figures/multigroup_paired_proportion_sequential.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;" /><img src="man/figures/multigroup_minimeta.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;" /><img src="man/figures/multigroup_deltadelta_unpaired.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;" />
-<p class="caption">
-</p>
-
-</div>
-
 ## Installation
 
 ``` r
+# Install it from CRAN
+install.packages("dabestr")
+
+# Or the development version from GitHub:
 # install.packages("pak")
 pak::pak("ACCLAB/dabestr")
 ```
@@ -65,16 +59,18 @@ library(dabestr)
 ``` r
 data("non_proportional_data")
 
-dabest_obj.mean_diff <- dabestr::load(data = non_proportional_data, 
-                                      x = Group, 
-                                      y = Measurement, 
-                                      idx = c("Control 1", "Test 1")) %>%
+dabest_obj.mean_diff <- dabestr::load(
+  data = non_proportional_data,
+  x = Group,
+  y = Measurement,
+  idx = c("Control 1", "Test 1")
+) %>%
   dabestr::mean_diff()
 
 dabest_plot(dabest_obj.mean_diff, TRUE)
 ```
 
-![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
 ## Citation
 
@@ -88,7 +84,7 @@ Nature Methods 2019, 1548-7105.
 
 [Paywalled publisher
 site](https://www.nature.com/articles/s41592-019-0470-3); [Free-to-view
-PDF](https://rdcu.be/bHhJ4)
+PDF](https://www.nature.com/articles/s41592-019-0470-3.epdf?author_access_token=Euy6APITxsYA3huBKOFBvNRgN0jAjWel9jnR3ZoTv0Pr6zJiJ3AA5aH4989gOJS_dajtNr1Wt17D0fh-t4GFcvqwMYN03qb8C33na_UrCUcGrt-Z0J9aPL6TPSbOxIC-pbHWKUDo2XsUOr3hQmlRew%3D%3D)
 
 ## Contributing
 
