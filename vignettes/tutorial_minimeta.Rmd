@@ -69,7 +69,7 @@ df <- df %>%
 
 We now have 3 Control and 3 Test groups, simulating 3 replicates of the same experiment. Our dataset also has a non-numerical column indicating gender, and another column indicating the identity of each observation.
 
-This is known as a ‘long’ dataset. See this [writeup](https://sejdemyr.github.io/r-tutorials/basics/wide-and-long/) for more details.
+This is known as a ‘long’ dataset. See this [writeup](https://simonejdemyr.com/r-tutorials/basics/wide-and-long/) for more details.
 
 ```{r}
 knitr::kable(head(df))
