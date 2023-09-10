@@ -97,7 +97,7 @@ unpaired_delta2 <- load(df,
 )
 ```
 
-```{r, echo = TRUE}
+```{r, echo = FALSE}
 unpaired_delta2 <- load(df,
   x = Genotype, y = Measurement,
   experiment = Treatment, colour = Genotype,
