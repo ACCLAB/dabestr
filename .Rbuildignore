@@ -11,3 +11,4 @@
 ^figures$
 ^dabestr.Rmd$
 ^cran-comments\.md$
+^revdep$
