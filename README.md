@@ -59,13 +59,13 @@ library(dabestr)
 ``` r
 data("non_proportional_data")
 
-dabest_obj.mean_diff <- dabestr::load(
+dabest_obj.mean_diff <- load(
   data = non_proportional_data,
   x = Group,
   y = Measurement,
   idx = c("Control 1", "Test 1")
 ) %>%
-  dabestr::mean_diff()
+  mean_diff()
 
 dabest_plot(dabest_obj.mean_diff, TRUE)
 ```
