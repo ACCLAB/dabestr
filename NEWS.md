@@ -1,5 +1,25 @@
-# dabestr v0.9.9.9
-* This is the current pre-official, teaser release version of dabestr.
+# dabestr v2023.9.12
+This release is a complete rebuild of dabestr. 
+
+Previous functions from v0.3.0 and before are now depreciated.
+
+#### Main API
+This version of dabestr features a new Main API. The following functions have been sequentially organised for their intended procedural utilisation.
+
+* `load()` 
+processes and converts a tidy dataset into the dabestr format.
+
+* `mean_diff()`, `median_diff()`, `cohens_d()`, `hedges_g()`, `cliffs_delta()`, `cohens_h()` 
+Computes the effect size for each control-test group pairing in `idx`.
+
+* `dabest_plot()` produces a Gardner-Altman estimation plot or a Cumming estimation plot depending on whether float_contrast is TRUE.
+
+#### New features
+* Plotting of shared control and repeated measures
+* Proportion plots (unpaired and paired)
+* Mini-Meta Delta plots
+* Delta-Delta plots
+
 
 # dabestr v0.3.0
 * This is a breaking release that includes standardised effect sizes, and a bunch of bugfixes.
