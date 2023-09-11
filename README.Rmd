@@ -37,8 +37,8 @@ An estimation plot has two key features.
 install.packages("dabestr")
 
 # Or the development version from GitHub:
-# install.packages("pak")
-pak::pak("ACCLAB/dabestr")
+# install.packages("devtools")
+devtools::install_github(repo = "ACCLAB/dabestr", ref = "dev")
 ```
 
 ## Usage
