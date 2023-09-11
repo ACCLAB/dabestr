@@ -1,6 +1,6 @@
-#####################################################' 
+#####################################################'
 #'
-#' The files in this package are all labelled by numbers. 
+#' The files in this package are all labelled by numbers.
 #'
 #' e.g.
 #' 000_README.R
@@ -10,13 +10,14 @@
 #'
 #' This file serves to give an overview of what each number means in the dabestr package.
 #'
-#####################################################' 
+#####################################################'
 #' FILE STRUCTURE
-#####################################################' 
+#####################################################'
 #'
 #' 000 - Info
 #' 001 - Main Api
 #' 002 - Plotting Tools
 #' 003 - Stats Tools
 #' 004 - Main Plots
+#' 005 - Printing Tools
 #' 999 - Plot Kwargs

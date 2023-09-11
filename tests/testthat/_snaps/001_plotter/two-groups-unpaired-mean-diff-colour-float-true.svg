@@ -80,10 +80,10 @@
 <circle cx='404.79' cy='139.81' r='1.95' style='stroke-width: 0.71; stroke: #1F77B4; fill: #1F77B4;' />
 <line x1='134.36' y1='321.49' x2='540.00' y2='321.49' style='stroke-width: 0.64; stroke-linecap: butt;' />
 <line x1='404.79' y1='212.96' x2='540.00' y2='212.96' style='stroke-width: 0.64; stroke-linecap: butt;' />
-<line x1='120.84' y1='332.73' x2='120.84' y2='383.33' style='stroke-width: 1.71; stroke-linecap: square;' />
-<line x1='391.27' y1='224.19' x2='391.27' y2='319.66' style='stroke-width: 1.71; stroke-linecap: square;' />
 <line x1='120.84' y1='310.26' x2='120.84' y2='259.65' style='stroke-width: 1.71; stroke-linecap: square;' />
 <line x1='391.27' y1='201.72' x2='391.27' y2='106.26' style='stroke-width: 1.71; stroke-linecap: square;' />
+<line x1='120.84' y1='332.73' x2='120.84' y2='383.33' style='stroke-width: 1.71; stroke-linecap: square;' />
+<line x1='391.27' y1='224.19' x2='391.27' y2='319.66' style='stroke-width: 1.71; stroke-linecap: square;' />
 <line x1='26.19' y1='479.72' x2='458.87' y2='479.72' style='stroke-width: 0.85; stroke-linecap: butt;' />
 <polyline points='26.19,479.72 26.19,0.00 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
 <text x='21.26' y='330.20' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>3</text>

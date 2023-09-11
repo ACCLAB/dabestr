@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 # dabestr 
 
 <!-- badges: start -->
-[![Travis CI build status](https://img.shields.io/travis/com/ACCLAB/dabestr/master.svg)](https://travis-ci.com/ACCLAB/dabestr/) [![minimal R version](https://img.shields.io/badge/R%3E%3D-2.10-6666ff.svg)](https://cran.r-project.org/) [![CRAN Download Count](https://cranlogs.r-pkg.org/badges/grand-total/dabestr?color=brightgreen)](https://cran.r-project.org/package=dabestr) [![Free-to-view citation](https://zenodo.org/badge/DOI/10.1038/s41592-019-0470-3.svg)](https://rdcu.be/bHhJ4) [![License](https://img.shields.io/badge/License-Apache_2.0-orange.svg)](https://spdx.org/licenses/BSD-3-Clause-Clear.html)
+[![minimal R version](https://img.shields.io/badge/R%3E%3D-2.10-6666ff.svg)](https://cran.r-project.org/) [![CRAN Download Count](https://cranlogs.r-pkg.org/badges/grand-total/dabestr?color=brightgreen)](https://cran.r-project.org/package=dabestr) [![Free-to-view citation](https://zenodo.org/badge/DOI/10.1038/s41592-019-0470-3.svg)](https://www.nature.com/articles/s41592-019-0470-3.epdf?author_access_token=Euy6APITxsYA3huBKOFBvNRgN0jAjWel9jnR3ZoTv0Pr6zJiJ3AA5aH4989gOJS_dajtNr1Wt17D0fh-t4GFcvqwMYN03qb8C33na_UrCUcGrt-Z0J9aPL6TPSbOxIC-pbHWKUDo2XsUOr3hQmlRew%3D%3D) [![License](https://img.shields.io/badge/License-Apache_2.0-orange.svg)](https://spdx.org/licenses/BSD-3-Clause-Clear.html)
 [![R-CMD-check](https://github.com/sunroofgod/dabestr-prototype/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sunroofgod/dabestr-prototype/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
@@ -30,17 +30,15 @@ An estimation plot has two key features.
 
 2.  It presents the **effect size** as a **bootstrap 95% confidence interval** on a **separate but aligned axes**.
 
-```{r, echo = FALSE, out.width = "47%", out.height = "20%", fig.cap = " ", fig.show = 'hold', fig.align = 'center', out.extra = 'style="background-colour: #FFFFFF;padding:10px; display: inline-block;"'}
-knitr::include_graphics(c("man/figures/2group_float_true.png","man/figures/multigroup_unpaired_proportion.png"))
-knitr::include_graphics(c("man/figures/multigroup_unpaired_alpha=0.8.png","man/figures/multigroup_paired_proportion_sequential.png"))
-knitr::include_graphics(c("man/figures/multigroup_minimeta.png","man/figures/multigroup_deltadelta_unpaired.png"))
-```
-
-
 ## Installation
 
-```{bash, eval = FALSE}
-git clone https://github.com/ACCLAB/dabestr
+```{r, eval = FALSE}
+# Install it from CRAN
+install.packages("dabestr")
+
+# Or the development version from GitHub:
+# install.packages("devtools")
+devtools::install_github(repo = "ACCLAB/dabestr", ref = "dev")
 ```
 
 ## Usage
@@ -52,11 +50,13 @@ library(dabestr)
 ```{r, dpi = 500}
 data("non_proportional_data")
 
-dabest_obj.mean_diff <- dabestr::load(data = non_proportional_data, 
-                                      x = Group, 
-                                      y = Measurement, 
-                                      idx = c("Control 1", "Test 1")) %>%
-  dabestr::mean_diff()
+dabest_obj.mean_diff <- load(
+  data = non_proportional_data,
+  x = Group,
+  y = Measurement,
+  idx = c("Control 1", "Test 1")
+) %>%
+  mean_diff()
 
 dabest_plot(dabest_obj.mean_diff, TRUE)
 ```
@@ -69,7 +69,7 @@ dabest_plot(dabest_obj.mean_diff, TRUE)
 
 Nature Methods 2019, 1548-7105. [10.1038/s41592-019-0470-3](http://dx.doi.org/10.1038/s41592-019-0470-3)
 
-[Paywalled publisher site](https://www.nature.com/articles/s41592-019-0470-3); [Free-to-view PDF](https://rdcu.be/bHhJ4)
+[Paywalled publisher site](https://www.nature.com/articles/s41592-019-0470-3); [Free-to-view PDF](https://www.nature.com/articles/s41592-019-0470-3.epdf?author_access_token=Euy6APITxsYA3huBKOFBvNRgN0jAjWel9jnR3ZoTv0Pr6zJiJ3AA5aH4989gOJS_dajtNr1Wt17D0fh-t4GFcvqwMYN03qb8C33na_UrCUcGrt-Z0J9aPL6TPSbOxIC-pbHWKUDo2XsUOr3hQmlRew%3D%3D)
 
 ## Contributing
 

@@ -31,7 +31,7 @@ each column corresponds to a group of observations.
 ```{r}
 set.seed(12345) # Fix the seed so the results are replicable.
 # pop_size = 10000 # Size of each population.
-N = 20
+N <- 20
 
 # Create samples
 c1 <- rnorm(N, mean = 3, sd = 0.4)
@@ -46,7 +46,7 @@ t5 <- rnorm(N, mean = 3.25, sd = 0.4)
 t6 <- rnorm(N, mean = 3.25, sd = 0.4)
 
 # Add a `gender` column for coloring the data.
-gender <- c(rep('Male', N/2), rep('Female', N/2))
+gender <- c(rep("Male", N / 2), rep("Female", N / 2))
 
 # Add an `id` column for paired data plotting.
 id <- 1:N
@@ -55,7 +55,8 @@ id <- 1:N
 df <- tibble::tibble(
   `Control 1` = c1, `Control 2` = c2, `Control 3` = c3,
   `Test 1` = t1, `Test 2` = t2, `Test 3` = t3, `Test 4` = t4, `Test 5` = t5, `Test 6` = t6,
-  Gender = gender, ID = id)
+  Gender = gender, ID = id
+)
 
 df <- df %>%
   tidyr::gather(key = Group, value = Measurement, -ID, -Gender)
@@ -65,7 +66,7 @@ Note that we have 9 groups (3 Control samples and 6 Test samples). Our dataset a
 
 This is known as a ‘long’ dataset. See this [writeup](https://simonejdemyr.com/r-tutorials/basics/wide-and-long/) for more details.
 ```{r}
-head(df)
+knitr::kable(head(df))
 ```
 
 ## Loading Data (Step 1)
@@ -73,8 +74,10 @@ Before we create estimation plots and obtain confidence intervals for our effect
 
 We simply supply the DataFrame to `load()` along with x and y - the columns in the DataFrame that contains the treatment groups and measurement values respectively. We also must supply the two groups you want to compare in the `idx` argument as a vector or list.
 ```{r}
-two_groups_unpaired <- load(df, x = Group, y = Measurement,
-                            idx = c("Control 1", "Test 1"))
+two_groups_unpaired <- load(df,
+  x = Group, y = Measurement,
+  idx = c("Control 1", "Test 1")
+)
 ```
 
 Printing this `dabestr` object gives you a gentle greeting, as well as the comparisons that can be computed.
@@ -85,8 +88,10 @@ print(two_groups_unpaired)
 ### Changing statistical parameters
 You can change the width of the confidence interval that will be produced by manipulating the `ci` argument.
 ```{r}
-two_groups_unpaired_ci90 = load(df, x = Group, y = Measurement,
-                                idx = c("Control 1", "Test 1"), ci=90)
+two_groups_unpaired_ci90 <- load(df,
+  x = Group, y = Measurement,
+  idx = c("Control 1", "Test 1"), ci = 90
+)
 ```
 
 ```{r}
@@ -115,21 +120,8 @@ For each comparison, the type of effect size is reported (here, it’s the “un
 
 This confidence interval is generated through bootstrap resampling. See Bootstrap Confidence Intervals for more details.
 
-### Statistical tests
-Since v0.3.0, dabestr will report the p-value of the non-parametric two-sided approximate permutation t-test. This is also known as the Monte Carlo permutation test.
-
-For unpaired comparisons, the p-values and test statistics of Welch’s t test, Student’s t test, and Mann-Whitney U test can be found in addition. For paired comparisons, the p-values and test statistics of the paired Student’s t and Wilcoxon tests are presented.
-
-```{r}
-print(two_groups_unpaired.mean_diff$permtest_pvals$pvalues)
-```
-
-Let’s compute the Hedges’ g for our comparison.
-
-```{r, eval = FALSE}
-two_groups_unpaired.hedges_g <- hedges_g(two_groups_unpaired)
-print(two_groups_unpaired.hedges_g$permtest_pvals$pvalues)
-```
+### P-values and statistical tests
+Permutation P values are only provided to allow analysts to satisfy a customary requirement of scientific journals. DABEST's provision of P values does not constitute an endorsement of P values or null-hypothesis significance testing (NHST). If users need to include these in a study, we recommend that they (1) avoid performing NHST, i.e. do not compare P to an alpha, (2) never refer to the P values in the Results text, and (3) state in their Methods section that "No null-hypothesis significance testing was performed; P values are provided for legacy purposes only."
 
 ## Producing estimation plots (Step 3)
 To produce a **Gardner-Altman estimation plot**, simply use the `dabest_plot()`. You can read more about its genesis and design inspiration at Robust and Beautiful Statistical Visualization. 
@@ -143,13 +135,17 @@ dabest_plot(two_groups_unpaired.mean_diff)
 Instead of a Gardner-Altman plot, you can produce a **Cumming estimation plot** by setting `float_contrast = FALSE` in the `dabest_plot()` function This will plot the bootstrap effect sizes below the raw data, and also displays the the mean (gap) and ± standard deviation of each group (vertical ends) as gapped lines. This design was inspired by Edward Tufte’s dictum to maximise the data-ink ratio.
 
 ```{r, eval = FALSE}
-dabest_plot(two_groups_unpaired.mean_diff, float_contrast = FALSE,
-            contrast_ylim = c(-0.3, 1.3))
+dabest_plot(two_groups_unpaired.mean_diff,
+  float_contrast = FALSE,
+  contrast_ylim = c(-0.3, 1.3)
+)
 ```
 
 ```{r, echo = FALSE}
-pp_plot <- dabest_plot(two_groups_unpaired.mean_diff, float_contrast = FALSE,
-            contrast_ylim = c(-0.3, 1.3))
+pp_plot <- dabest_plot(two_groups_unpaired.mean_diff,
+  float_contrast = FALSE,
+  contrast_ylim = c(-0.3, 1.3)
+)
 
 cowplot::plot_grid(
   plotlist = list(NULL, pp_plot, NULL),
@@ -157,7 +153,6 @@ cowplot::plot_grid(
   ncol = 3,
   rel_widths = c(2.5, 5, 2.5)
 )
-
 ```
 
 The `dabestr` package also implements a range of estimation plot designs aimed at depicting common experimental designs.
@@ -167,20 +162,29 @@ The **multi-two-group estimation plot** tiles two or more Cumming plots horizont
 Thus, the lower axes in the Cumming plot is effectively a [forest plot](https://en.wikipedia.org/wiki/Forest_plot), used in meta-analyses to aggregate and compare data from different experiments.
 
 ```{r}
-multi_2group <- load(df, x = Group, y = Measurement,
-                     idx = list(c("Control 1", "Test 1"), 
-                                c("Control 2", "Test 2"))
-                     )
-multi_2group %>% mean_diff() %>% dabest_plot()
+multi_2group <- load(df,
+  x = Group, y = Measurement,
+  idx = list(
+    c("Control 1", "Test 1"),
+    c("Control 2", "Test 2")
+  )
+)
+multi_2group %>%
+  mean_diff() %>%
+  dabest_plot()
 ```
 
 The **shared control plot** displays another common experimental paradigm, where several test samples are compared against a common reference sample.
 
 This type of Cumming plot is automatically generated if the vector passed to `idx` has more than two data columns.
 ```{r}
-shared_control <- load(df, x = Group, y = Measurement,
-                       idx = c("Control 1", "Test 1", "Test 2", "Test 3",
-                               "Test 4", "Test 5", "Test 6"))
+shared_control <- load(df,
+  x = Group, y = Measurement,
+  idx = c(
+    "Control 1", "Test 1", "Test 2", "Test 3",
+    "Test 4", "Test 5", "Test 6"
+  )
+)
 
 print(shared_control)
 ```
@@ -197,11 +201,14 @@ dabest_plot(shared_control.mean_diff)
 
 `dabestr` thus empowers you to robustly perform and elegantly present complex visualizations and statistics.
 ```{r}
-multi_groups <- load(df, x = Group, y = Measurement,
-                     idx = list(c("Control 1", "Test 1"), 
-                                c("Control 2", "Test 2", "Test 3"),
-                                c("Control 3", "Test 4", "Test 5", "Test 6"))
-                     )
+multi_groups <- load(df,
+  x = Group, y = Measurement,
+  idx = list(
+    c("Control 1", "Test 1"),
+    c("Control 2", "Test 2", "Test 3"),
+    c("Control 3", "Test 4", "Test 5", "Test 6")
+  )
+)
 
 print(multi_groups)
 ```
@@ -215,6 +222,6 @@ print(multi_groups.mean_diff)
 ```{r}
 dabest_plot(multi_groups.mean_diff)
 ```
-
+ 
 ## Using wide datasets
 `dabestr` does not currently support the use of 'wide' data. To convert datasets from 'wide' to 'long'/'tidy', consider taking a look at [gather()](https://tidyr.tidyverse.org/reference/gather.html) as part of the [tidyr](https://tidyr.tidyverse.org) package.

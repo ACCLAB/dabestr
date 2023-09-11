@@ -1,15 +1,14 @@
-citHeader("To cite dabestr in publications, please use:")
-
-citEntry(entry       = "Misc",
-         title       = "Moving beyond P values: Everyday data analysis with estimation plots.",
-         author      = personList(as.person("Joses Ho"),
-                        as.person("Tayfun Tumkaya"),
-                        as.person("Sameer Aryal"),
-                        as.person("Hyungwon Choi"),
-                        as.person("Adam Claridge-Chang")
-                        ),
+bibentry(bibtype = "Misc",
+         title = "Moving beyond P values: Everyday data analysis with estimation plots.",
+         author = c(
+          person("Joses Ho"),
+          person("Tayfun Tumkaya"),
+          person("Sameer Aryal"),
+          person("Hyungwon Choi"),
+          person("Adam Claridge-Chang")
+         ),
          year        = "2019",
          doi         = "10.1038/s41592-019-0470-3",
-         url         = "https://rdcu.be/bHhJ4",
+         url         = "https://www.nature.com/articles/s41592-019-0470-3.epdf?author_access_token=Euy6APITxsYA3huBKOFBvNRgN0jAjWel9jnR3ZoTv0Pr6zJiJ3AA5aH4989gOJS_dajtNr1Wt17D0fh-t4GFcvqwMYN03qb8C33na_UrCUcGrt-Z0J9aPL6TPSbOxIC-pbHWKUDo2XsUOr3hQmlRew%3D%3D",
          textVersion = "Moving beyond P values: Everyday data analysis with estimation plots. (2019) Joses Ho, Tayfun Tumkaya, Sameer Aryal, Hyungwon Choi, Adam Claridge-Chang. Nature Methods 2019, 1548-710. doi: https://doi.org/10.1038/s41592-019-0470-3"
          )

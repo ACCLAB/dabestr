@@ -1,7 +1,7 @@
 # Byte-compiled / optimized / DLL files
 
-# Knitted html file
-dabestr.html
+# Testing Files
+dabestr.Rmd
 
 # Mac
 **/.DS_Store
@@ -14,3 +14,4 @@ dabestr.html
 .RProfile
 docs
 inst/doc
+figures

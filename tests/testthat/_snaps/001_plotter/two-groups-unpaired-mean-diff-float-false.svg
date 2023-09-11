@@ -69,10 +69,10 @@
 <circle cx='598.86' cy='150.90' r='1.95' style='stroke-width: 0.71; stroke: #FF7F0E; fill: #FF7F0E;' />
 <circle cx='598.86' cy='92.73' r='1.95' style='stroke-width: 0.71; stroke: #FF7F0E; fill: #FF7F0E;' />
 <circle cx='598.86' cy='68.12' r='1.95' style='stroke-width: 0.71; stroke: #FF7F0E; fill: #FF7F0E;' />
-<line x1='174.86' y1='162.12' x2='174.86' y2='186.77' style='stroke-width: 1.71; stroke: #1F77B4; stroke-linecap: square;' />
-<line x1='578.67' y1='109.24' x2='578.67' y2='155.75' style='stroke-width: 1.71; stroke: #FF7F0E; stroke-linecap: square;' />
 <line x1='174.86' y1='151.17' x2='174.86' y2='126.51' style='stroke-width: 1.71; stroke: #1F77B4; stroke-linecap: square;' />
 <line x1='578.67' y1='98.29' x2='578.67' y2='51.77' style='stroke-width: 1.71; stroke: #FF7F0E; stroke-linecap: square;' />
+<line x1='174.86' y1='162.12' x2='174.86' y2='186.77' style='stroke-width: 1.71; stroke: #1F77B4; stroke-linecap: square;' />
+<line x1='578.67' y1='109.24' x2='578.67' y2='155.75' style='stroke-width: 1.71; stroke: #FF7F0E; stroke-linecap: square;' />
 <line x1='195.05' y1='243.09' x2='598.86' y2='243.09' style='stroke-width: 1.07; stroke-linecap: square;' />
 <line x1='195.05' y1='243.09' x2='195.05' y2='249.32' style='stroke-width: 1.07; stroke-linecap: square;' />
 <line x1='598.86' y1='243.09' x2='598.86' y2='249.32' style='stroke-width: 1.07; stroke-linecap: square;' />

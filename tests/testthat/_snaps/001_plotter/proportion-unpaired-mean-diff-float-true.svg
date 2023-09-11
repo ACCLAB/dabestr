@@ -35,10 +35,10 @@
 <polygon points='368.41,256.64 447.60,256.64 447.60,517.45 368.41,517.45 ' style='stroke-width: 0.75; stroke: #FF7F0E; fill: #FF7F0E;' />
 <line x1='144.02' y1='430.51' x2='540.00' y2='430.51' style='stroke-width: 0.64; stroke-linecap: butt;' />
 <line x1='408.01' y1='256.64' x2='540.00' y2='256.64' style='stroke-width: 0.64; stroke-linecap: butt;' />
-<line x1='144.02' y1='434.86' x2='144.02' y2='457.82' style='stroke-width: 1.71; stroke-linecap: square;' />
-<line x1='408.01' y1='260.98' x2='408.01' y2='292.53' style='stroke-width: 1.71; stroke-linecap: square;' />
 <line x1='144.02' y1='426.16' x2='144.02' y2='403.20' style='stroke-width: 1.71; stroke-linecap: square;' />
 <line x1='408.01' y1='252.29' x2='408.01' y2='220.75' style='stroke-width: 1.71; stroke-linecap: square;' />
+<line x1='144.02' y1='434.86' x2='144.02' y2='457.82' style='stroke-width: 1.71; stroke-linecap: square;' />
+<line x1='408.01' y1='260.98' x2='408.01' y2='292.53' style='stroke-width: 1.71; stroke-linecap: square;' />
 <line x1='38.42' y1='537.32' x2='460.80' y2='537.32' style='stroke-width: 0.85; stroke-linecap: butt;' />
 <polyline points='38.42,537.32 38.42,0.00 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
 <text x='33.49' y='520.48' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='17.13px' lengthAdjust='spacingAndGlyphs'>0.00</text>
