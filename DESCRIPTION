@@ -1,60 +1,72 @@
 Package: dabestr
 Type: Package
 Title: Data Analysis using Bootstrap-Coupled Estimation
-Version: 0.3.0
+Version: 2023.9.12
 Authors@R: c(
-    person("Joses W.", "Ho",
-          email = "joseshowh@gmail.com", role = c("cre", "aut")),
-    person("Tayfun", "Tumkaya",
-          role = c("aut"))
-          )
-Maintainer: Joses W. Ho <joseshowh@gmail.com>
+  person("Yishan", "Mai", email = "maiyishan@u.duke.nus.edu", role = c("cre", "ctb"),
+         comment = c(ORCID = "0000-0002-7199-380X")),
+  person("Kah Seng", "Lian", email = "kahseng@u.nus.edu", role = c("aut")),
+  person("Zhuoyu", "Wang", email = "wzhuoyu21@u.nus,edu", role = "aut"),
+  person("Jun Yang", "Liao", email = "name@example.com", role = "aut"),
+  person("Joses W.", "Ho", email = "joseshowh@gmail.com", role = "aut",
+         comment = c(ORCID = "0000-0002-9186-6322")),
+  person("Tayfun", "Tumkaya", role = "aut",
+         comment = c(ORCID = "0000-0001-8425-3360")),
+  person("Felicia", "Low", role = "aut", email = "lowminhuifelicia@gmail.com"),
+  person("Adam", "Claridge-Chang", role = "ctb",
+         comment = c(ORCID = "0000-0002-4583-3650")),
+  person("Hyungwon", "Choi", role = "ctb",
+         comment = c(ORCID = "0000-0002-6687-3088")),
+  person("Sangyu", "Xu", role = "ctb",
+         comment = c(ORCID = "0000-0002-4927-9204")),
+  person("ACCLAB", role = c("cph", "fnd")))
 Description: Data Analysis using Bootstrap-Coupled ESTimation.
-    Estimation statistics is a simple framework that avoids the pitfalls of
-    significance testing. It uses familiar statistical concepts: means,
-    mean differences, and error bars. More importantly, it focuses on the
-    effect size of one's experiment/intervention, as opposed to a false
-    dichotomy engendered by P values.
-    An estimation plot has two key features:
-    1. It presents all datapoints as a swarmplot, which orders each point to
-    display the underlying distribution.
-    2. It presents the effect size as a bootstrap 95% confidence interval on a
-    separate but aligned axes.
-    Estimation plots are introduced in Ho et al., Nature Methods 2019, 1548-7105.
-    <doi:10.1038/s41592-019-0470-3>.
-    The free-to-view PDF is located at <https://rdcu.be/bHhJ4>.
-License: file LICENSE
-URL: https://github.com/ACCLAB/dabestr
-BugReports: https://github.com/ACCLAB/dabestr/issues
+  Estimation statistics is a simple framework that avoids the pitfalls of
+  significance testing. It uses familiar statistical concepts: means,
+  mean differences, and error bars. More importantly, it focuses on the
+  effect size of one's experiment/intervention, as opposed to a false
+  dichotomy engendered by P values.
+  An estimation plot has two key features:
+  1. It presents all datapoints as a swarmplot, which orders each point to
+  display the underlying distribution.
+  2. It presents the effect size as a bootstrap 95% confidence interval on a
+  separate but aligned axes.
+  Estimation plots are introduced in Ho et al., Nature Methods 2019, 1548-7105.
+  <doi:10.1038/s41592-019-0470-3>.
+  The free-to-view PDF is located at <https://www.nature.com/articles/s41592-019-0470-3.epdf?author_access_token=Euy6APITxsYA3huBKOFBvNRgN0jAjWel9jnR3ZoTv0Pr6zJiJ3AA5aH4989gOJS_dajtNr1Wt17D0fh-t4GFcvqwMYN03qb8C33na_UrCUcGrt-Z0J9aPL6TPSbOxIC-pbHWKUDo2XsUOr3hQmlRew%3D%3D>.
+License: Apache License (>= 2)
 Encoding: UTF-8
-LazyData: true
+URL: https://github.com/ACCLAB/dabestr,
+    https://acclab.github.io/dabestr/
 Depends:
-    R (>= 3.5.0),
-    magrittr,
-    stats,
-    utils
-Imports:
-    boot,
-    cowplot,
-    dplyr,
-    effsize,
-    ellipsis,
-    ggplot2 (>= 3.2),
-    forcats,
-    ggforce,
-    ggbeeswarm,
-    plyr,
-    RColorBrewer,
-    rlang,
-    simpleboot,
-    stringr,
-    tibble,
-    tidyr,
-RoxygenNote: 7.1.0
-Suggests:
+  R (>= 2.10)
+Imports: 
+  ggplot2, 
+  cowplot, 
+  tidyr, 
+  dplyr, 
+  tibble,
+  rlang, 
+  magrittr, 
+  ggbeeswarm,
+  effsize,
+  grid,
+  scales,
+  ggsci,
+  cli,
+  boot,
+  stats,
+  stringr,
+  brunnermunzel,
+  methods
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Suggests: 
+    testthat (>= 3.0.0),
+    vdiffr,
     knitr,
     rmarkdown,
-    tufte,
-    testthat,
-    vdiffr
-VignetteBuilder: knitr
+    kableExtra
+Config/testthat/edition: 3
+LazyData: true
+VignetteBuilder: knitr, kableExtra

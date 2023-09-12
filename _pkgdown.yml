@@ -1,0 +1,72 @@
+url: https://acclab.github.io/dabestr/
+template:
+  bootstrap: 5
+  bslib:
+    primary: '#0054AD'
+    border-radius: 0.5rem
+    btn-border-radius: 0.25rem
+home:
+  sidebar:
+    structure:
+    - links
+    - license
+    - community
+    - citation
+    - authors
+navbar:
+  structure:
+    left:
+    - intro
+    - reference
+    - articles
+    - tutorials
+    - news
+    right:
+    - search
+    - github
+articles:
+- title: Misc
+  navbar: ~
+  contents: plot_aesthetics
+- title: Tutorials
+  navbar: Tutorials
+  contents:
+  - tutorial_basics
+  - tutorial_repeated_measures
+  - tutorial_proportion_plots
+  - tutorial_minimeta
+  - tutorial_deltadelta
+  - datasets
+news:
+  cran_dates: true 
+reference:
+- subtitle: Main API
+  desc: "Functions responsible for producing an estimation plot. They have been  sequentially
+    organised for their intended procedural utilisation. \n"
+- contents:
+  - load
+  - effect_size
+  - dabest_plot
+- subtitle: Adjusting plot aesthetics
+- contents: plot_kwargs
+authors:
+  Kah Seng Lian:
+    href: https://github.com/sunroofgod
+  Zhuoyu Wang:
+    href: ~
+  Jun Yang Liao:
+    href: https://github.com/junyangliao
+  ACCLAB:
+    href: https://www.claridgechang.net
+  footer:
+    roles:
+    - aut
+    - cre
+    - ctb
+  sidebars:
+    roles:
+    - aut
+    - cre
+    - fnd
+    - ctb
+

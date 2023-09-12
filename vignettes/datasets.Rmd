@@ -1,0 +1,36 @@
+---
+title: "Sample Datasets"
+output: rmarkdown::html_vignette
+description: |
+  Loading in of sample datasets for dabestr.
+vignette: >
+  %\VignetteIndexEntry{Sample Datasets}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Dabestr comes inbuilt with datasets for each type of estimation plot. To load in
+the datasets, simple call: `data("name_of_dataset")`. If you wish to generate 
+more specific datasets for testing, you may refer to the tutorial vignettes.
+
+```{r, warning = FALSE, message = FALSE}
+library(dabestr)
+```
+
+## Usage
+```{r, eval = FALSE}
+data("non_proportional_data")
+
+data("proportional_data")
+
+data("minimeta_data")
+
+data("deltadelta_data")
+```
