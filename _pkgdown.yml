@@ -60,12 +60,13 @@ authors:
     href: https://www.claridgechang.net
   footer:
     roles:
-    - cre
     - aut
+    - cre
     - ctb
   sidebars:
     roles:
     - aut
     - cre
     - fnd
+    - ctb
 
