@@ -14,7 +14,7 @@ functions within dabestr to create estimation plots."><!-- mathjax --><script sr
     
     <a class="navbar-brand me-2" href="../index.html">dabestr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.9.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2023.9.12</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -201,8 +201,24 @@ and bootstrap calculations. Only accepts values between 0 to 100 (inclusive).</p
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">non_proportional_data</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Creating a dabest object</span></span></span>
-<span class="r-in"><span><span class="va">dabest_obj</span> <span class="op">&lt;-</span> <span class="fu">load</span><span class="op">(</span>data <span class="op">=</span> <span class="va">non_proportional_data</span>, x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Measurement</span>, </span></span>
-<span class="r-in"><span>idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control1 "</span>, <span class="st">"Test 1"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dabest_obj</span> <span class="op">&lt;-</span> <span class="fu">load</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  data <span class="op">=</span> <span class="va">non_proportional_data</span>, x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span></span>
+<span class="r-in"><span>  idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control 1"</span>, <span class="st">"Test 1"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Printing dabest object</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">dabest_obj</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> DABESTR v2023.9.12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ==================</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Good afternoon!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> The current time is 15:51 PM on Tuesday September 12, 2023.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Effect size(s) with 95% confidence intervals will be computed for:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1. Test 1 minus Control 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5000 resamples will be used to generate the effect size bootstraps.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -211,7 +227,7 @@ and bootstrap calculations. Only accepts values between 0 to 100 (inclusive).</p
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by <a href="https://github.com/sunroofgod" class="external-link">Kah Seng Lian</a>, Zhuoyu Wang, <a href="https://github.com/junyangliao" class="external-link">Jun Yang Liao</a>, Joses W. Ho, Tayfun Tumkaya.</p>
+  <p></p><p>Developed by Yishan Mai, <a href="https://github.com/sunroofgod" class="external-link">Kah Seng Lian</a>, Zhuoyu Wang, <a href="https://github.com/junyangliao" class="external-link">Jun Yang Liao</a>, Joses W. Ho, Tayfun Tumkaya, Felicia Low, Adam Claridge-Chang, Hyungwon Choi, Sangyu Xu.</p>
 </div>
 
 <div class="pkgdown-footer-right">

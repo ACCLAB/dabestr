@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">dabestr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.9.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2023.9.12</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -114,7 +114,7 @@ using the <code>id_col</code> keyword.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12345</span><span class="op">)</span> <span class="co"># Fix the seed so the results are replicable.</span></span>
 <span><span class="co"># pop_size = 10000 # Size of each population.</span></span>
-<span><span class="va">N</span> <span class="op">=</span> <span class="fl">20</span> <span class="co"># The number of samples taken from each population</span></span>
+<span><span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">20</span> <span class="co"># The number of samples taken from each population</span></span>
 <span></span>
 <span><span class="co"># Create samples</span></span>
 <span><span class="va">c1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">N</span>, mean <span class="op">=</span> <span class="fl">3</span>, sd <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span></span>
@@ -129,7 +129,7 @@ using the <code>id_col</code> keyword.</p>
 <span><span class="va">t6</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">N</span>, mean <span class="op">=</span> <span class="fl">3.25</span>, sd <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Add a `gender` column for coloring the data.</span></span>
-<span><span class="va">gender</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">'Male'</span>, <span class="va">N</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">'Female'</span>, <span class="va">N</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">gender</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Male"</span>, <span class="va">N</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Female"</span>, <span class="va">N</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Add an `id` column for paired data plotting.</span></span>
 <span><span class="va">id</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="va">N</span></span>
@@ -138,7 +138,8 @@ using the <code>id_col</code> keyword.</p>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>  `Control 1` <span class="op">=</span> <span class="va">c1</span>, `Control 2` <span class="op">=</span> <span class="va">c2</span>, `Control 3` <span class="op">=</span> <span class="va">c3</span>,</span>
 <span>  `Test 1` <span class="op">=</span> <span class="va">t1</span>, `Test 2` <span class="op">=</span> <span class="va">t2</span>, `Test 3` <span class="op">=</span> <span class="va">t3</span>, `Test 4` <span class="op">=</span> <span class="va">t4</span>, `Test 5` <span class="op">=</span> <span class="va">t5</span>, `Test 6` <span class="op">=</span> <span class="va">t6</span>,</span>
-<span>  Gender <span class="op">=</span> <span class="va">gender</span>, ID <span class="op">=</span> <span class="va">id</span><span class="op">)</span></span>
+<span>  Gender <span class="op">=</span> <span class="va">gender</span>, ID <span class="op">=</span> <span class="va">id</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html" class="external-link">gather</a></span><span class="op">(</span>key <span class="op">=</span> <span class="va">Group</span>, value <span class="op">=</span> <span class="va">Measurement</span>, <span class="op">-</span><span class="va">ID</span>, <span class="op">-</span><span class="va">Gender</span><span class="op">)</span></span></code></pre></div>
@@ -147,16 +148,18 @@ using the <code>id_col</code> keyword.</p>
 <h2 id="loading-data">Loading Data<a class="anchor" aria-label="anchor" href="#loading-data"></a>
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">two_groups_paired_sequential</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>, x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
-<span>                                     idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control 1"</span>, <span class="st">"Test 1"</span><span class="op">)</span>,</span>
-<span>                                     paired <span class="op">=</span> <span class="st">"sequential"</span>, id_col <span class="op">=</span> <span class="va">ID</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">two_groups_paired_sequential</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>,</span>
+<span>  x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
+<span>  idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control 1"</span>, <span class="st">"Test 1"</span><span class="op">)</span>,</span>
+<span>  paired <span class="op">=</span> <span class="st">"sequential"</span>, id_col <span class="op">=</span> <span class="va">ID</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">two_groups_paired_sequential</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DABESTR v0.9.9.9</span></span>
-<span><span class="co">#&gt; ================</span></span>
+<span><span class="co">#&gt; DABESTR v2023.9.12</span></span>
+<span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 06:52 AM on Wednesday August 23, 2023.</span></span>
+<span><span class="co">#&gt; Good afternoon!</span></span>
+<span><span class="co">#&gt; The current time is 15:53 PM on Tuesday September 12, 2023.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Paired effect size(s) for the sequential design of repeated-measures experiment </span></span>
 <span><span class="co">#&gt; with 95% confidence intervals will be computed for:</span></span>
@@ -164,16 +167,18 @@ using the <code>id_col</code> keyword.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 5000 resamples will be used to generate the effect size bootstraps.</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">two_groups_paired_baseline</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>, x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
-<span>                                   idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control 1"</span>, <span class="st">"Test 1"</span><span class="op">)</span>,</span>
-<span>                                   paired <span class="op">=</span> <span class="st">"baseline"</span>, id_col <span class="op">=</span> <span class="va">ID</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">two_groups_paired_baseline</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>,</span>
+<span>  x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
+<span>  idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control 1"</span>, <span class="st">"Test 1"</span><span class="op">)</span>,</span>
+<span>  paired <span class="op">=</span> <span class="st">"baseline"</span>, id_col <span class="op">=</span> <span class="va">ID</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">two_groups_paired_baseline</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DABESTR v0.9.9.9</span></span>
-<span><span class="co">#&gt; ================</span></span>
+<span><span class="co">#&gt; DABESTR v2023.9.12</span></span>
+<span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 06:52 AM on Wednesday August 23, 2023.</span></span>
+<span><span class="co">#&gt; Good afternoon!</span></span>
+<span><span class="co">#&gt; The current time is 15:53 PM on Tuesday September 12, 2023.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Paired effect size(s) for repeated measures against baseline </span></span>
 <span><span class="co">#&gt; with 95% confidence intervals will be computed for:</span></span>
@@ -188,58 +193,60 @@ numerical results.</p>
 <span><span class="va">two_groups_paired_baseline.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="va">two_groups_paired_baseline</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">two_groups_paired_sequential.mean_diff</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DABESTR v0.9.9.9</span></span>
-<span><span class="co">#&gt; ================</span></span>
+<span><span class="co">#&gt; DABESTR v2023.9.12</span></span>
+<span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 06:52 AM on Wednesday August 23, 2023.</span></span>
+<span><span class="co">#&gt; Good afternoon!</span></span>
+<span><span class="co">#&gt; The current time is 15:53 PM on Tuesday September 12, 2023.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The paired mean difference between Test 1 and Control 1 is 0.585 [95%CI 0.307, 0.869].</span></span>
-<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 4e-04, calculated for legacy purposes only.</span></span>
+<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 0.0022, calculated for legacy purposes only.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 5000 bootstrap samples were taken; the confidence interval is bias-corrected and accelerated.</span></span>
 <span><span class="co">#&gt; Any p-value reported is the probability of observing the effect size (or greater),</span></span>
 <span><span class="co">#&gt; assuming the null hypothesis of zero difference is true.</span></span>
-<span><span class="co">#&gt; For each p-value, 5000 reshuffles of the control and test labels were performed.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; To get the results of all valid statistical tests, use .mean_diff.statistical_tests</span></span></code></pre></div>
+<span><span class="co">#&gt; For each p-value, 5000 reshuffles of the control and test labels were performed.</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">two_groups_paired_baseline.mean_diff</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DABESTR v0.9.9.9</span></span>
-<span><span class="co">#&gt; ================</span></span>
+<span><span class="co">#&gt; DABESTR v2023.9.12</span></span>
+<span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 06:52 AM on Wednesday August 23, 2023.</span></span>
+<span><span class="co">#&gt; Good afternoon!</span></span>
+<span><span class="co">#&gt; The current time is 15:53 PM on Tuesday September 12, 2023.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The paired mean difference between Test 1 and Control 1 is 0.585 [95%CI 0.307, 0.869].</span></span>
-<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 4e-04, calculated for legacy purposes only.</span></span>
+<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 0.0022, calculated for legacy purposes only.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 5000 bootstrap samples were taken; the confidence interval is bias-corrected and accelerated.</span></span>
 <span><span class="co">#&gt; Any p-value reported is the probability of observing the effect size (or greater),</span></span>
 <span><span class="co">#&gt; assuming the null hypothesis of zero difference is true.</span></span>
-<span><span class="co">#&gt; For each p-value, 5000 reshuffles of the control and test labels were performed.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; To get the results of all valid statistical tests, use .mean_diff.statistical_tests</span></span></code></pre></div>
+<span><span class="co">#&gt; For each p-value, 5000 reshuffles of the control and test labels were performed.</span></span></code></pre></div>
 <p>For paired data, we use <a href="https://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0003nk" class="external-link">slopegraphs</a>
 (another innovation from Edward Tufte) to connect paired observations.
 Both Gardner-Altman and Cumming plots support this.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">two_groups_paired_sequential.mean_diff</span>,</span>
-<span>            raw_marker_size <span class="op">=</span> <span class="fl">0.5</span>, raw_marker_alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
+<span>  raw_marker_size <span class="op">=</span> <span class="fl">0.5</span>, raw_marker_alpha <span class="op">=</span> <span class="fl">0.3</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="tutorial_repeated_measures_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">two_groups_paired_sequential.mean_diff</span>, float_contrast <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>            raw_marker_size <span class="op">=</span> <span class="fl">0.5</span>, raw_marker_alpha <span class="op">=</span> <span class="fl">0.3</span>,</span>
-<span>            contrast_ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.3</span>, <span class="fl">1.3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">two_groups_paired_sequential.mean_diff</span>,</span>
+<span>  float_contrast <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  raw_marker_size <span class="op">=</span> <span class="fl">0.5</span>, raw_marker_alpha <span class="op">=</span> <span class="fl">0.3</span>,</span>
+<span>  contrast_ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.3</span>, <span class="fl">1.3</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="tutorial_repeated_measures_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">two_groups_paired_baseline.mean_diff</span>,</span>
-<span>            raw_marker_size <span class="op">=</span> <span class="fl">0.5</span>, raw_marker_alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
+<span>  raw_marker_size <span class="op">=</span> <span class="fl">0.5</span>, raw_marker_alpha <span class="op">=</span> <span class="fl">0.3</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="tutorial_repeated_measures_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">two_groups_paired_baseline.mean_diff</span>, float_contrast <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>            raw_marker_size <span class="op">=</span> <span class="fl">0.5</span>, raw_marker_alpha <span class="op">=</span> <span class="fl">0.3</span>,</span>
-<span>            contrast_ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.3</span>, <span class="fl">1.3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">two_groups_paired_baseline.mean_diff</span>,</span>
+<span>  float_contrast <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  raw_marker_size <span class="op">=</span> <span class="fl">0.5</span>, raw_marker_alpha <span class="op">=</span> <span class="fl">0.3</span>,</span>
+<span>  contrast_ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.3</span>, <span class="fl">1.3</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="tutorial_repeated_measures_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 <p>You can also create repeated-measures plots with multiple test
 groups. In this case, declaring <code>paired</code> to be “sequential”
@@ -247,84 +254,99 @@ or “baseline” will generate the same slopegraph, reflecting the
 repeated-measures experimental design, but different contrast plots, to
 show the “sequential” or “baseline” comparison:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sequential_repeated_measures.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>, x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
-<span>                                     idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control 1"</span>, <span class="st">"Test 1"</span>,</span>
-<span>                                             <span class="st">"Test 2"</span>, <span class="st">"Test 3"</span><span class="op">)</span>,</span>
-<span>                                     paired <span class="op">=</span> <span class="st">"sequential"</span>, id_col <span class="op">=</span> <span class="va">ID</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">sequential_repeated_measures.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>,</span>
+<span>  x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
+<span>  idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"Control 1"</span>, <span class="st">"Test 1"</span>,</span>
+<span>    <span class="st">"Test 2"</span>, <span class="st">"Test 3"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  paired <span class="op">=</span> <span class="st">"sequential"</span>, id_col <span class="op">=</span> <span class="va">ID</span></span>
+<span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sequential_repeated_measures.mean_diff</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DABESTR v0.9.9.9</span></span>
-<span><span class="co">#&gt; ================</span></span>
+<span><span class="co">#&gt; DABESTR v2023.9.12</span></span>
+<span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 06:52 AM on Wednesday August 23, 2023.</span></span>
+<span><span class="co">#&gt; Good afternoon!</span></span>
+<span><span class="co">#&gt; The current time is 15:53 PM on Tuesday September 12, 2023.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The paired mean difference between Test 1 and Control 1 is 0.585 [95%CI 0.307, 0.869].</span></span>
-<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is c("4e-04", "0.0032", "0.2276"), calculated for legacy purposes only.</span></span>
+<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 0.0022, calculated for legacy purposes only.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; The paired mean difference between Test 2 and Control 1 is -0.871 [95%CI -1.244, -0.489].</span></span>
-<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is c("4e-04", "0.0032", "0.2276"), calculated for legacy purposes only.</span></span>
+<span><span class="co">#&gt; The paired mean difference between Test 2 and Test 1 is -0.871 [95%CI -1.244, -0.489].</span></span>
+<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 0.0002, calculated for legacy purposes only.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; The paired mean difference between Test 3 and Control 1 is 0.293 [95%CI -0.136, 0.713].</span></span>
-<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is c("4e-04", "0.0032", "0.2276"), calculated for legacy purposes only.</span></span>
+<span><span class="co">#&gt; The paired mean difference between Test 3 and Test 2 is 0.293 [95%CI -0.136, 0.713].</span></span>
+<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 0.2211, calculated for legacy purposes only.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 5000 bootstrap samples were taken; the confidence interval is bias-corrected and accelerated.</span></span>
 <span><span class="co">#&gt; Any p-value reported is the probability of observing the effect size (or greater),</span></span>
 <span><span class="co">#&gt; assuming the null hypothesis of zero difference is true.</span></span>
-<span><span class="co">#&gt; For each p-value, 5000 reshuffles of the control and test labels were performed.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; To get the results of all valid statistical tests, use .mean_diff.statistical_tests</span></span></code></pre></div>
+<span><span class="co">#&gt; For each p-value, 5000 reshuffles of the control and test labels were performed.</span></span></code></pre></div>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">sequential_repeated_measures.mean_diff</span>,</span>
-<span>            raw_marker_size <span class="op">=</span> <span class="fl">0.5</span>, raw_marker_alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
+<span>  raw_marker_size <span class="op">=</span> <span class="fl">0.5</span>, raw_marker_alpha <span class="op">=</span> <span class="fl">0.3</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="tutorial_repeated_measures_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">baseline_repeated_measures.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>, x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
-<span>                                             idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control 1"</span>, <span class="st">"Test 1"</span>,</span>
-<span>                                                     <span class="st">"Test 2"</span>, <span class="st">"Test 3"</span><span class="op">)</span>,</span>
-<span>                                             paired <span class="op">=</span> <span class="st">"baseline"</span>, id_col <span class="op">=</span> <span class="va">ID</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">baseline_repeated_measures.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>,</span>
+<span>  x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
+<span>  idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"Control 1"</span>, <span class="st">"Test 1"</span>,</span>
+<span>    <span class="st">"Test 2"</span>, <span class="st">"Test 3"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  paired <span class="op">=</span> <span class="st">"baseline"</span>, id_col <span class="op">=</span> <span class="va">ID</span></span>
+<span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">baseline_repeated_measures.mean_diff</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DABESTR v0.9.9.9</span></span>
-<span><span class="co">#&gt; ================</span></span>
+<span><span class="co">#&gt; DABESTR v2023.9.12</span></span>
+<span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 06:52 AM on Wednesday August 23, 2023.</span></span>
+<span><span class="co">#&gt; Good afternoon!</span></span>
+<span><span class="co">#&gt; The current time is 15:53 PM on Tuesday September 12, 2023.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The paired mean difference between Test 1 and Control 1 is 0.585 [95%CI 0.307, 0.869].</span></span>
-<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is c("4e-04", "0.1312", "0.97"), calculated for legacy purposes only.</span></span>
+<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 0.0022, calculated for legacy purposes only.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The paired mean difference between Test 2 and Control 1 is -0.286 [95%CI -0.585, 0.046].</span></span>
-<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is c("4e-04", "0.1312", "0.97"), calculated for legacy purposes only.</span></span>
+<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 0.1022, calculated for legacy purposes only.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The paired mean difference between Test 3 and Control 1 is 0.007 [95%CI -0.323, 0.383].</span></span>
-<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is c("4e-04", "0.1312", "0.97"), calculated for legacy purposes only.</span></span>
+<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 0.7381, calculated for legacy purposes only.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 5000 bootstrap samples were taken; the confidence interval is bias-corrected and accelerated.</span></span>
 <span><span class="co">#&gt; Any p-value reported is the probability of observing the effect size (or greater),</span></span>
 <span><span class="co">#&gt; assuming the null hypothesis of zero difference is true.</span></span>
-<span><span class="co">#&gt; For each p-value, 5000 reshuffles of the control and test labels were performed.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; To get the results of all valid statistical tests, use .mean_diff.statistical_tests</span></span></code></pre></div>
+<span><span class="co">#&gt; For each p-value, 5000 reshuffles of the control and test labels were performed.</span></span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">baseline_repeated_measures.mean_diff</span>,</span>
-<span>            raw_marker_size <span class="op">=</span> <span class="fl">0.5</span>, raw_marker_alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
+<span>  raw_marker_size <span class="op">=</span> <span class="fl">0.5</span>, raw_marker_alpha <span class="op">=</span> <span class="fl">0.3</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="tutorial_repeated_measures_files/figure-html/unnamed-chunk-17-1.png" width="700"></p>
 <p>As with unpaired data, <code>dabestr</code> empowers you to perform
 complex visualizations and statistics for paired data as well.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">multi_baseline_repeated_measures.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>, x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
-<span>                                                   idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control 1"</span>, <span class="st">"Test 1"</span>,</span>
-<span>                                                                <span class="st">"Test 2"</span>, <span class="st">"Test 3"</span><span class="op">)</span>,</span>
-<span>                                                              <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control 2"</span>, <span class="st">"Test 4"</span>, </span>
-<span>                                                                <span class="st">"Test 5"</span>, <span class="st">"Test 6"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                                                   paired <span class="op">=</span> <span class="st">"baseline"</span>, id_col <span class="op">=</span> <span class="va">ID</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">multi_baseline_repeated_measures.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>,</span>
+<span>  x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
+<span>  idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Control 1"</span>, <span class="st">"Test 1"</span>,</span>
+<span>      <span class="st">"Test 2"</span>, <span class="st">"Test 3"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Control 2"</span>, <span class="st">"Test 4"</span>,</span>
+<span>      <span class="st">"Test 5"</span>, <span class="st">"Test 6"</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  paired <span class="op">=</span> <span class="st">"baseline"</span>, id_col <span class="op">=</span> <span class="va">ID</span></span>
+<span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">multi_baseline_repeated_measures.mean_diff</span>,</span>
-<span>            raw_marker_size <span class="op">=</span> <span class="fl">0.5</span>, raw_marker_alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
+<span>  raw_marker_size <span class="op">=</span> <span class="fl">0.5</span>, raw_marker_alpha <span class="op">=</span> <span class="fl">0.3</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="tutorial_repeated_measures_files/figure-html/unnamed-chunk-18-1.png" width="700"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -335,7 +357,7 @@ complex visualizations and statistics for paired data as well.</p>
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by <a href="https://github.com/sunroofgod" class="external-link">Kah Seng Lian</a>, Zhuoyu Wang, <a href="https://github.com/junyangliao" class="external-link">Jun Yang Liao</a>, Joses W. Ho, Tayfun Tumkaya.</p>
+<p>Developed by Yishan Mai, <a href="https://github.com/sunroofgod" class="external-link">Kah Seng Lian</a>, Zhuoyu Wang, <a href="https://github.com/junyangliao" class="external-link">Jun Yang Liao</a>, Joses W. Ho, Tayfun Tumkaya, Felicia Low, Adam Claridge-Chang, Hyungwon Choi, Sangyu Xu.</p>
 </div>
 
 <div class="pkgdown-footer-right">

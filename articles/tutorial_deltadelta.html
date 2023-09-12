@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">dabestr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.9.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2023.9.12</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,7 +76,7 @@
 
 
 
-
+<script src="tutorial_deltadelta_files/kePrint-0.0.1/kePrint.js"></script><link href="tutorial_deltadelta_files/lightable-0.0.1/lightable.css" rel="stylesheet">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Tutorial: Delta-Delta</h1>
@@ -109,6 +109,42 @@ expect <code>Drug</code> to have an effect on the <code>M</code> group,
 although in practice many drugs have non-specific effects on healthy
 populations too.</p>
 <p>Effectively, we have 4 groups of subjects for comparison.</p>
+<table class="table">
+<thead><tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+Wild type
+</th>
+<th style="text-align:left;">
+Mutant
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;font-weight: bold;border-right:1px solid;">
+Drug
+</td>
+<td style="text-align:left;border-right:1px solid;">
+<span class="math inline">\(X_D, W\)</span>
+</td>
+<td style="text-align:left;">
+<span class="math inline">\(X_D, M\)</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;border-right:1px solid;">
+Placebo
+</td>
+<td style="text-align:left;border-right:1px solid;">
+<span class="math inline">\(X_P, W\)</span>
+</td>
+<td style="text-align:left;">
+<span class="math inline">\(X_P, M\)</span>
+</td>
+</tr>
+</tbody>
+</table>
 <p>There are 2 <code>Treatment</code> conditions, <code>Placebo</code>
 (control group) and <code>Drug</code> (test group). There are 2
 <code>Genotypes</code>: <code>W</code> (wild type population) and
@@ -123,84 +159,156 @@ analyses to visualise these differences in a simulated dataset.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12345</span><span class="op">)</span> <span class="co"># Fix the seed so the results are replicable.</span></span>
 <span><span class="co"># pop_size = 10000 # Size of each population.</span></span>
-<span><span class="va">N</span> <span class="op">=</span> <span class="fl">20</span> <span class="co"># The number of samples taken from each population</span></span>
+<span><span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">20</span> <span class="co"># The number of samples taken from each population</span></span>
 <span></span>
 <span><span class="co"># Create samples</span></span>
-<span><span class="va">placebo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">N</span>, mean <span class="op">=</span> <span class="fl">3</span>, sd <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span></span>
-<span><span class="va">drug</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">N</span>, mean <span class="op">=</span> <span class="fl">3.5</span>, sd <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span></span>
+<span><span class="va">placebo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">N</span> <span class="op">/</span> <span class="fl">2</span>, mean <span class="op">=</span> <span class="fl">4</span>, sd <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span></span>
+<span><span class="va">placebo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">placebo</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">N</span> <span class="op">/</span> <span class="fl">2</span>, mean <span class="op">=</span> <span class="fl">2.8</span>, sd <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">drug</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">N</span> <span class="op">/</span> <span class="fl">2</span>, mean <span class="op">=</span> <span class="fl">3</span>, sd <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span></span>
+<span><span class="va">drug</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">drug</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">N</span> <span class="op">/</span> <span class="fl">2</span>, mean <span class="op">=</span> <span class="fl">2.5</span>, sd <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Add a `Genotype` column as the second variable</span></span>
-<span><span class="va">genotype</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">'M'</span>, <span class="va">N</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">'W'</span>, <span class="va">N</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">genotype</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"M"</span>, <span class="va">N</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"W"</span>, <span class="va">N</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Add an `id` column for paired data plotting.</span></span>
 <span><span class="va">id</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="va">N</span></span>
 <span></span>
 <span><span class="co"># Add a `Rep` column as the first variable for the 2 replicates of experiments done</span></span>
-<span><span class="va">Rep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Rep1"</span>, <span class="st">"Rep2"</span><span class="op">)</span>, <span class="va">N</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">Rep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Rep1"</span>, <span class="st">"Rep2"</span><span class="op">)</span>, <span class="va">N</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Combine all columns into a DataFrame.</span></span>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>  Placebo <span class="op">=</span> <span class="va">placebo</span>,</span>
 <span>  Drug <span class="op">=</span> <span class="va">drug</span>,</span>
-<span>  Genotype <span class="op">=</span> <span class="va">genotype</span>, </span>
+<span>  Genotype <span class="op">=</span> <span class="va">genotype</span>,</span>
 <span>  ID <span class="op">=</span> <span class="va">id</span>,</span>
-<span>  Rep <span class="op">=</span> <span class="va">Rep</span><span class="op">)</span></span>
+<span>  Rep <span class="op">=</span> <span class="va">Rep</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html" class="external-link">gather</a></span><span class="op">(</span>key <span class="op">=</span> <span class="va">Treatment</span>, value <span class="op">=</span> <span class="va">Measurement</span>, <span class="op">-</span><span class="va">ID</span>, <span class="op">-</span><span class="va">Genotype</span>, <span class="op">-</span><span class="va">Rep</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">df_head</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">df_head</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
-<thead><tr class="header">
-<th align="left">Genotype</th>
-<th align="right">ID</th>
-<th align="left">Rep</th>
-<th align="left">Treatment</th>
-<th align="right">Measurement</th>
+<thead><tr>
+<th style="text-align:left;">
+Genotype
+</th>
+<th style="text-align:right;">
+ID
+</th>
+<th style="text-align:left;">
+Rep
+</th>
+<th style="text-align:left;">
+Treatment
+</th>
+<th style="text-align:right;">
+Measurement
+</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
-<td align="left">M</td>
-<td align="right">1</td>
-<td align="left">Rep1</td>
-<td align="left">Placebo</td>
-<td align="right">3.234211</td>
+<tr>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Rep1
+</td>
+<td style="text-align:left;">
+Placebo
+</td>
+<td style="text-align:right;">
+4.234211
+</td>
 </tr>
-<tr class="even">
-<td align="left">M</td>
-<td align="right">2</td>
-<td align="left">Rep2</td>
-<td align="left">Placebo</td>
-<td align="right">3.283786</td>
+<tr>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Rep2
+</td>
+<td style="text-align:left;">
+Placebo
+</td>
+<td style="text-align:right;">
+4.283786
+</td>
 </tr>
-<tr class="odd">
-<td align="left">M</td>
-<td align="right">3</td>
-<td align="left">Rep1</td>
-<td align="left">Placebo</td>
-<td align="right">2.956279</td>
+<tr>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+Rep1
+</td>
+<td style="text-align:left;">
+Placebo
+</td>
+<td style="text-align:right;">
+3.956279
+</td>
 </tr>
-<tr class="even">
-<td align="left">M</td>
-<td align="right">4</td>
-<td align="left">Rep2</td>
-<td align="left">Placebo</td>
-<td align="right">2.818601</td>
+<tr>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+Rep2
+</td>
+<td style="text-align:left;">
+Placebo
+</td>
+<td style="text-align:right;">
+3.818601
+</td>
 </tr>
-<tr class="odd">
-<td align="left">M</td>
-<td align="right">5</td>
-<td align="left">Rep1</td>
-<td align="left">Placebo</td>
-<td align="right">3.242355</td>
+<tr>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+Rep1
+</td>
+<td style="text-align:left;">
+Placebo
+</td>
+<td style="text-align:right;">
+4.242355
+</td>
 </tr>
-<tr class="even">
-<td align="left">M</td>
-<td align="right">6</td>
-<td align="left">Rep2</td>
-<td align="left">Placebo</td>
-<td align="right">2.272818</td>
+<tr>
+<td style="text-align:left;">
+M
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:left;">
+Rep2
+</td>
+<td style="text-align:left;">
+Placebo
+</td>
+<td style="text-align:right;">
+3.272818
+</td>
 </tr>
 </tbody>
 </table>
@@ -221,57 +329,51 @@ input.</p>
 <h2 id="unpaired-data">Unpaired Data<a class="anchor" aria-label="anchor" href="#unpaired-data"></a>
 </h2>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">unpaired_delta2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>, x <span class="op">=</span> <span class="va">Genotype</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
-<span>                        experiment <span class="op">=</span> <span class="va">Treatment</span>, colour <span class="op">=</span> <span class="va">Genotype</span>,</span>
-<span>                        delta2 <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">unpaired_delta2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>, x <span class="op">=</span> <span class="va">Genotype</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
-<span>                        experiment <span class="op">=</span> <span class="va">Treatment</span>, colour <span class="op">=</span> <span class="va">Genotype</span>,</span>
-<span>                        delta2 <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                        experiment_label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Placebo"</span>, <span class="st">"Drug"</span><span class="op">)</span>,</span>
-<span>                        x1_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"W"</span>, <span class="st">"M"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">unpaired_delta2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>,</span>
+<span>  x <span class="op">=</span> <span class="va">Genotype</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
+<span>  experiment <span class="op">=</span> <span class="va">Treatment</span>, colour <span class="op">=</span> <span class="va">Genotype</span>,</span>
+<span>  delta2 <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>The above function creates the following <code>dabest</code>
 object:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unpaired_delta2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DABESTR v0.9.9.9</span></span>
-<span><span class="co">#&gt; ================</span></span>
+<span><span class="co">#&gt; DABESTR v2023.9.12</span></span>
+<span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 06:51 AM on Wednesday August 23, 2023.</span></span>
+<span><span class="co">#&gt; Good afternoon!</span></span>
+<span><span class="co">#&gt; The current time is 15:51 PM on Tuesday September 12, 2023.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Effect size(s) with 95% confidence intervals will be computed for:</span></span>
 <span><span class="co">#&gt; 1. M Placebo minus W Placebo</span></span>
 <span><span class="co">#&gt; 2. M Drug minus W Drug</span></span>
-<span><span class="co">#&gt; 3. character(0) minus character(0) (only for mean difference)</span></span>
+<span><span class="co">#&gt; 3. Drug minus Placebo (only for mean difference)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 5000 resamples will be used to generate the effect size bootstraps.</span></span></code></pre></div>
 <p>We can quickly check out the effect sizes:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">unpaired_delta2.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="va">unpaired_delta2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unpaired_delta2.mean_diff</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DABESTR v0.9.9.9</span></span>
-<span><span class="co">#&gt; ================</span></span>
+<span><span class="co">#&gt; DABESTR v2023.9.12</span></span>
+<span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 06:51 AM on Wednesday August 23, 2023.</span></span>
+<span><span class="co">#&gt; Good afternoon!</span></span>
+<span><span class="co">#&gt; The current time is 15:51 PM on Tuesday September 12, 2023.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; The unpaired mean difference between M Placebo and W Placebo is -0.168 [95%CI -0.469, 0.079].</span></span>
-<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is c("0.3502", "0.246"), calculated for legacy purposes only.</span></span>
+<span><span class="co">#&gt; The unpaired mean difference between M Placebo and W Placebo is 1.032 [95%CI 0.731, 1.279].</span></span>
+<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 0.0000, calculated for legacy purposes only.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; The unpaired mean difference between M Drug and W Drug is -0.481 [95%CI -1.193, 0.311].</span></span>
-<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is c("0.3502", "0.246"), calculated for legacy purposes only.</span></span>
+<span><span class="co">#&gt; The unpaired mean difference between M Drug and W Drug is 0.244 [95%CI -0.136, 0.666].</span></span>
+<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 0.3527, calculated for legacy purposes only.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 5000 bootstrap samples were taken; the confidence interval is bias-corrected and accelerated.</span></span>
 <span><span class="co">#&gt; Any p-value reported is the probability of observing the effect size (or greater),</span></span>
 <span><span class="co">#&gt; assuming the null hypothesis of zero difference is true.</span></span>
-<span><span class="co">#&gt; For each p-value, 5000 reshuffles of the control and test labels were performed.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; To get the results of all valid statistical tests, use .mean_diff.statistical_tests</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt; For each p-value, 5000 reshuffles of the control and test labels were performed.</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">unpaired_delta2.mean_diff</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_deltadelta_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<p><img src="tutorial_deltadelta_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 <p>In the above plot, the horizontal axis represents the
 <code>Genotype</code> condition and the dot colour is also specified by
 <code>Genotype</code>. The left pair of scattered plots is based on the
@@ -314,16 +416,18 @@ difference.</p>
 you can manipulate the orders of experiment groups as well as the
 horizontal axis variable by setting <code>experiment_label</code> and
 <code>x1_level</code>.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">unpaired_delta2_specified.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>, x <span class="op">=</span> <span class="va">Genotype</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
-<span>                                            experiment <span class="op">=</span> <span class="va">Treatment</span>, colour <span class="op">=</span> <span class="va">Genotype</span>,</span>
-<span>                                            delta2 <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                            experiment_label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Drug"</span>, <span class="st">"Placebo"</span><span class="op">)</span>,</span>
-<span>                                            x1_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M"</span>, <span class="st">"W"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">unpaired_delta2_specified.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>,</span>
+<span>  x <span class="op">=</span> <span class="va">Genotype</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
+<span>  experiment <span class="op">=</span> <span class="va">Treatment</span>, colour <span class="op">=</span> <span class="va">Genotype</span>,</span>
+<span>  delta2 <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  experiment_label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Drug"</span>, <span class="st">"Placebo"</span><span class="op">)</span>,</span>
+<span>  x1_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M"</span>, <span class="st">"W"</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">unpaired_delta2_specified.mean_diff</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_deltadelta_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+<p><img src="tutorial_deltadelta_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="paired-data">Paired Data<a class="anchor" aria-label="anchor" href="#paired-data"></a>
@@ -340,23 +444,28 @@ the slope lines according to <code>Rep</code>.</p>
 <p>Although the <code>idx</code> is a non-compulsory parameter, it is
 still possible to have it as an input to adjust the order as opposed to
 using <code>experiment_label</code> and <code>x1_level</code>.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">paired_delta2.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>, x <span class="op">=</span> <span class="va">Treatment</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
-<span>                                experiment <span class="op">=</span> <span class="va">Genotype</span>, colour <span class="op">=</span> <span class="va">Rep</span>,</span>
-<span>                                delta2 <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                                idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Placebo W"</span>,<span class="st">"Drug W"</span><span class="op">)</span>,</span>
-<span>                                           <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Placebo M"</span>,<span class="st">"Drug M"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                                paired <span class="op">=</span> <span class="st">"baseline"</span>, id_col <span class="op">=</span> <span class="va">ID</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">paired_delta2.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>,</span>
+<span>  x <span class="op">=</span> <span class="va">Treatment</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
+<span>  experiment <span class="op">=</span> <span class="va">Genotype</span>, colour <span class="op">=</span> <span class="va">Rep</span>,</span>
+<span>  delta2 <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Placebo W"</span>, <span class="st">"Drug W"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Placebo M"</span>, <span class="st">"Drug M"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  paired <span class="op">=</span> <span class="st">"baseline"</span>, id_col <span class="op">=</span> <span class="va">ID</span></span>
+<span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">paired_delta2.mean_diff</span>,</span>
-<span>            raw_marker_size <span class="op">=</span> <span class="fl">0.5</span>, raw_marker_alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_deltadelta_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
-<p>We see that the drug had a non-specific effect of -0.321 [95%CI
--0.498, -0.131] on wild type subjects even when they were not sick, and
-it had a bigger effect of -1.22 [95%CI -1.52, -0.906] in mutant
+<span>  raw_marker_size <span class="op">=</span> <span class="fl">0.5</span>, raw_marker_alpha <span class="op">=</span> <span class="fl">0.3</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="tutorial_deltadelta_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
+<p>We see that the drug had a non-specific effect of -0.125 [95%CI
+-0.486 , 0.214] on wild type subjects even when they were not sick, and
+it had a bigger effect of -0.913 [95%CI -1.24 , -0.577] in mutant
 subjects. In this visualisation, we can see the delta-delta value of
--0.903 [95%CI -1.21, -0.587] as the net effect of the drug accounting
+-0.789 [95%CI -1.3 , -0.317] as the net effect of the drug accounting
 for non-specific actions in healthy individuals</p>
 <p>Mean difference between drug and placebo treatments in wild type
 subjects is:</p>
@@ -387,9 +496,9 @@ univariate contrast plots.</p>
 </h2>
 <p>If for some reason you don’t want to display the delta-delta plot,
 you can easily do so by</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">unpaired_delta2.mean_diff</span>, show_delta2 <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_deltadelta_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<p><img src="tutorial_deltadelta_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="other-effect-sizes">Other Effect Sizes<a class="anchor" aria-label="anchor" href="#other-effect-sizes"></a>
@@ -397,7 +506,7 @@ you can easily do so by</p>
 <p>Since the delta-delta function is only applicable to mean
 differences, plots of other effect sizes will not include a delta-delta
 bootstrap plot.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># cohens_d(unpaired_delta2)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -406,16 +515,116 @@ bootstrap plot.</p>
 <p>You can find all outputs of the delta - delta calculation by
 assessing the column named <code>boot_result</code> of the
 <code>dabest_effectsize_obj</code>.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unpaired_delta2.mean_diff</span><span class="op">$</span><span class="va">boot_result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 11</span></span></span>
 <span><span class="co">#&gt;   control_group   test_group bootstraps nboots bca_ci_low bca_ci_high pct_ci_low</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> W Placebo       M Placebo  <span style="color: #949494;">&lt;dbl&gt;</span>        <span style="text-decoration: underline;">5</span>000     -<span style="color: #BB0000;">0.469</span>      0.078<span style="text-decoration: underline;">7</span>     -<span style="color: #BB0000;">0.452</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> W Drug          M Drug     <span style="color: #949494;">&lt;dbl&gt;</span>        <span style="text-decoration: underline;">5</span>000     -<span style="color: #BB0000;">1.19</span>       0.311      -<span style="color: #BB0000;">1.22</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Delta2 Overall… Delta2 Ov… <span style="color: #949494;">&lt;dbl&gt;</span>        <span style="text-decoration: underline;">5</span>000     -<span style="color: #BB0000;">1.02</span>       0.451      -<span style="color: #BB0000;">0.330</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> W Placebo       M Placebo  <span style="color: #949494;">&lt;dbl&gt;</span>        <span style="text-decoration: underline;">5</span>000      0.731       1.28       0.748</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> W Drug          M Drug     <span style="color: #949494;">&lt;dbl&gt;</span>        <span style="text-decoration: underline;">5</span>000     -<span style="color: #BB0000;">0.136</span>       0.666     -<span style="color: #BB0000;">0.151</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Delta2 Overall… Delta2 Ov… <span style="color: #949494;">&lt;dbl&gt;</span>        <span style="text-decoration: underline;">5</span>000     -<span style="color: #BB0000;">1.20</span>       -<span style="color: #BB0000;">0.337</span>     -<span style="color: #BB0000;">0.799</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: pct_ci_high &lt;dbl&gt;, ci &lt;dbl&gt;, difference &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   weight &lt;dbl&gt;</span></span></span></code></pre></div>
+<p>If you want to extract the permutations, permutation test’s p values,
+the statistical tests and the p value results, you can access it with
+the columns <code>permutation_test_results</code>,
+<code>pval_permtest</code>, <code>pval_for_tests</code> and
+<code>pvalues</code> respectively.</p>
+<p>P values for permutation tests <code>pval_permtest</code> (and the
+permutation calculations and results accessed by running the commented
+out session).</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># print(unpaired_delta2.mean_diff$permtest_pvals$permutation_test_results)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unpaired_delta2.mean_diff</span><span class="op">$</span><span class="va">permtest_pvals</span><span class="op">$</span><span class="va">pval_permtest</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.0000 0.2728</span></span></code></pre></div>
+<p>An representative p value for statistical tests
+(<code>pval_for_tests</code>)</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unpaired_delta2.mean_diff</span><span class="op">$</span><span class="va">permtest_pvals</span><span class="op">$</span><span class="va">pval_for_tests</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $pvalue_wilcoxon</span></span>
+<span><span class="co">#&gt; [1] 2.165018e-05</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $pvalue_wilcoxon</span></span>
+<span><span class="co">#&gt; [1] 0.3526814</span></span></code></pre></div>
+<p>Statistical test results and <code>pvalues</code>.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unpaired_delta2.mean_diff</span><span class="op">$</span><span class="va">permtest_pvals</span><span class="op">$</span><span class="va">pvalues</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [[1]]</span></span>
+<span><span class="co">#&gt; [[1]]$pvalue_wilcoxon</span></span>
+<span><span class="co">#&gt; [1] 2.165018e-05</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[1]]$wilcoxon</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Wilcoxon rank sum exact test</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  control and test</span></span>
+<span><span class="co">#&gt; W = 1, p-value = 2.165e-05</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true location shift is not equal to 0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[1]]$statistic_wilcoxon</span></span>
+<span><span class="co">#&gt; W </span></span>
+<span><span class="co">#&gt; 1 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[1]]$paired_t</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Paired t-test</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  control and test</span></span>
+<span><span class="co">#&gt; t = -6.1826, df = 9, p-value = 0.0001622</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true mean difference is not equal to 0</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval:</span></span>
+<span><span class="co">#&gt;  -1.4101885 -0.6546739</span></span>
+<span><span class="co">#&gt; sample estimates:</span></span>
+<span><span class="co">#&gt; mean difference </span></span>
+<span><span class="co">#&gt;       -1.032431 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[1]]$pvalue_paired_students_t</span></span>
+<span><span class="co">#&gt; [1] 0.0001622227</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[1]]$statistic_paired_students_t</span></span>
+<span><span class="co">#&gt;         t </span></span>
+<span><span class="co">#&gt; -6.182598 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[2]]</span></span>
+<span><span class="co">#&gt; [[2]]$pvalue_wilcoxon</span></span>
+<span><span class="co">#&gt; [1] 0.3526814</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[2]]$wilcoxon</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Wilcoxon rank sum exact test</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  control and test</span></span>
+<span><span class="co">#&gt; W = 37, p-value = 0.3527</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true location shift is not equal to 0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[2]]$statistic_wilcoxon</span></span>
+<span><span class="co">#&gt;  W </span></span>
+<span><span class="co">#&gt; 37 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[2]]$paired_t</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Paired t-test</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  control and test</span></span>
+<span><span class="co">#&gt; t = -1.1419, df = 9, p-value = 0.283</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true mean difference is not equal to 0</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval:</span></span>
+<span><span class="co">#&gt;  -0.7262822  0.2390283</span></span>
+<span><span class="co">#&gt; sample estimates:</span></span>
+<span><span class="co">#&gt; mean difference </span></span>
+<span><span class="co">#&gt;       -0.243627 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[2]]$pvalue_paired_students_t</span></span>
+<span><span class="co">#&gt; [1] 0.2829828</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[2]]$statistic_paired_students_t</span></span>
+<span><span class="co">#&gt;         t </span></span>
+<span><span class="co">#&gt; -1.141855</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
@@ -425,7 +634,7 @@ assessing the column named <code>boot_result</code> of the
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by <a href="https://github.com/sunroofgod" class="external-link">Kah Seng Lian</a>, Zhuoyu Wang, <a href="https://github.com/junyangliao" class="external-link">Jun Yang Liao</a>, Joses W. Ho, Tayfun Tumkaya.</p>
+<p>Developed by Yishan Mai, <a href="https://github.com/sunroofgod" class="external-link">Kah Seng Lian</a>, Zhuoyu Wang, <a href="https://github.com/junyangliao" class="external-link">Jun Yang Liao</a>, Joses W. Ho, Tayfun Tumkaya, Felicia Low, Adam Claridge-Chang, Hyungwon Choi, Sangyu Xu.</p>
 </div>
 
 <div class="pkgdown-footer-right">

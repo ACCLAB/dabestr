@@ -18,7 +18,7 @@ are used for most plot types."><!-- mathjax --><script src="https://cdnjs.cloudf
     
     <a class="navbar-brand me-2" href="../index.html">dabestr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.9.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2023.9.12</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -147,10 +147,29 @@ and different statistical tests.</p></li>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Loading of the dataset</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">non_proportional_data</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Preparing the data to be plotted</span></span></span>
-<span class="r-in"><span><span class="va">dabest_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="load.html">load</a></span><span class="op">(</span><span class="va">non_proportional_data</span>, x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Measurement</span>, idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control 1"</span>, <span class="st">"Test 1"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Applying effect size to the dabest object</span></span></span>
+<span class="r-in"><span><span class="va">dabest_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="load.html">load</a></span><span class="op">(</span><span class="va">non_proportional_data</span>,</span></span>
+<span class="r-in"><span>  x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span></span>
+<span class="r-in"><span>  idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control 1"</span>, <span class="st">"Test 1"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">dabest_obj.mean_diff</span> <span class="op">&lt;-</span> <span class="fu">mean_diff</span><span class="op">(</span><span class="va">dabest_obj</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Printing dabest effectsize object</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">dabest_obj.mean_diff</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> DABESTR v2023.9.12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ==================</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Good afternoon!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> The current time is 15:51 PM on Tuesday September 12, 2023.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> The unpaired mean difference between Test 1 and Control 1 is 0.585 [95%CI 0.307, 0.869].</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> The p-value of the two-sided permutation t-test is 0.0022, calculated for legacy purposes only.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5000 bootstrap samples were taken; the confidence interval is bias-corrected and accelerated.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Any p-value reported is the probability of observing the effect size (or greater),</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> assuming the null hypothesis of zero difference is true.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> For each p-value, 5000 reshuffles of the control and test labels were performed.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -158,7 +177,7 @@ and different statistical tests.</p></li>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by <a href="https://github.com/sunroofgod" class="external-link">Kah Seng Lian</a>, Zhuoyu Wang, <a href="https://github.com/junyangliao" class="external-link">Jun Yang Liao</a>, Joses W. Ho, Tayfun Tumkaya.</p>
+  <p></p><p>Developed by Yishan Mai, <a href="https://github.com/sunroofgod" class="external-link">Kah Seng Lian</a>, Zhuoyu Wang, <a href="https://github.com/junyangliao" class="external-link">Jun Yang Liao</a>, Joses W. Ho, Tayfun Tumkaya, Felicia Low, Adam Claridge-Chang, Hyungwon Choi, Sangyu Xu.</p>
 </div>
 
 <div class="pkgdown-footer-right">

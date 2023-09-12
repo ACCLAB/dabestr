@@ -18,7 +18,7 @@
   separate but aligned axes.
   Estimation plots are introduced in Ho et al., Nature Methods 2019, 1548-7105.
   &lt;doi:10.1038/s41592-019-0470-3&gt;.
-  The free-to-view PDF is located at &lt;https://rdcu.be/bHhJ4&gt;.">
+  The free-to-view PDF is located at &lt;https://www.nature.com/articles/s41592-019-0470-3.epdf?author_access_token=Euy6APITxsYA3huBKOFBvNRgN0jAjWel9jnR3ZoTv0Pr6zJiJ3AA5aH4989gOJS_dajtNr1Wt17D0fh-t4GFcvqwMYN03qb8C33na_UrCUcGrt-Z0J9aPL6TPSbOxIC-pbHWKUDo2XsUOr3hQmlRew%3D%3D&gt;.">
 <title>Data Analysis using Bootstrap-Coupled Estimation • dabestr</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
@@ -38,7 +38,7 @@
   separate but aligned axes.
   Estimation plots are introduced in Ho et al., Nature Methods 2019, 1548-7105.
   &lt;doi:10.1038/s41592-019-0470-3&gt;.
-  The free-to-view PDF is located at &lt;https://rdcu.be/bHhJ4&gt;.">
+  The free-to-view PDF is located at &lt;https://www.nature.com/articles/s41592-019-0470-3.epdf?author_access_token=Euy6APITxsYA3huBKOFBvNRgN0jAjWel9jnR3ZoTv0Pr6zJiJ3AA5aH4989gOJS_dajtNr1Wt17D0fh-t4GFcvqwMYN03qb8C33na_UrCUcGrt-Z0J9aPL6TPSbOxIC-pbHWKUDo2XsUOr3hQmlRew%3D%3D&gt;.">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -52,7 +52,7 @@
     
     <a class="navbar-brand me-2" href="index.html">dabestr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.9.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2023.9.12</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -113,14 +113,16 @@
 <li><p>It <strong>presents all datapoints</strong> as a swarmplot, which orders each point to display the underlying distribution.</p></li>
 <li><p>It presents the <strong>effect size</strong> as a <strong>bootstrap 95% confidence interval</strong> on a <strong>separate but aligned axes</strong>.</p></li>
 </ol>
-<div class="figure" style="text-align: center">
-<img src="reference/figures/2group_float_true.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;"><img src="reference/figures/multigroup_unpaired_proportion.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;"><img src="reference/figures/multigroup_unpaired_alpha=0.8.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;"><img src="reference/figures/multigroup_paired_proportion_sequential.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;"><img src="reference/figures/multigroup_minimeta.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;"><img src="reference/figures/multigroup_deltadelta_unpaired.png" alt=" " width="47%" height="20%" style="background-colour: #FFFFFF;padding:10px; display: inline-block;"><p class="caption">
-</p>
-</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/ACCLAB/dabestr</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Install it from CRAN</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"dabestr"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Or the development version from GitHub:</span></span>
+<span><span class="co"># install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span>repo <span class="op">=</span> <span class="st">"ACCLAB/dabestr"</span>, ref <span class="op">=</span> <span class="st">"dev"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
@@ -130,14 +132,16 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"non_proportional_data"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">dabest_obj.mean_diff</span> <span class="op">&lt;-</span> <span class="fu">dabestr</span><span class="fu">::</span><span class="fu"><a href="reference/load.html">load</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">non_proportional_data</span>, </span>
-<span>                                      x <span class="op">=</span> <span class="va">Group</span>, </span>
-<span>                                      y <span class="op">=</span> <span class="va">Measurement</span>, </span>
-<span>                                      idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control 1"</span>, <span class="st">"Test 1"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">dabestr</span><span class="fu">::</span><span class="fu"><a href="reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">dabest_obj.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load.html">load</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">non_proportional_data</span>,</span>
+<span>  x <span class="op">=</span> <span class="va">Group</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">Measurement</span>,</span>
+<span>  idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control 1"</span>, <span class="st">"Test 1"</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">dabest_obj.mean_diff</span>, <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-5-1.png"><!-- --></p>
+<p><img src="reference/figures/README-unnamed-chunk-4-1.png"><!-- --></p>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
@@ -145,7 +149,7 @@
 <p><strong>Moving beyond P values: Everyday data analysis with estimation plots</strong></p>
 <p><em>Joses Ho, Tayfun Tumkaya, Sameer Aryal, Hyungwon Choi, Adam Claridge-Chang</em></p>
 <p>Nature Methods 2019, 1548-7105. <a href="http://dx.doi.org/10.1038/s41592-019-0470-3" class="external-link">10.1038/s41592-019-0470-3</a></p>
-<p><a href="https://www.nature.com/articles/s41592-019-0470-3" class="external-link">Paywalled publisher site</a>; <a href="https://rdcu.be/bHhJ4" class="external-link">Free-to-view PDF</a></p>
+<p><a href="https://www.nature.com/articles/s41592-019-0470-3" class="external-link">Paywalled publisher site</a>; <a href="https://www.nature.com/articles/s41592-019-0470-3.epdf?author_access_token=Euy6APITxsYA3huBKOFBvNRgN0jAjWel9jnR3ZoTv0Pr6zJiJ3AA5aH4989gOJS_dajtNr1Wt17D0fh-t4GFcvqwMYN03qb8C33na_UrCUcGrt-Z0J9aPL6TPSbOxIC-pbHWKUDo2XsUOr3hQmlRew%3D%3D" class="external-link">Free-to-view PDF</a></p>
 </div>
 <div class="section level2">
 <h2 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
@@ -193,15 +197,20 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
+<li>Yishan Mai <br><small class="roles"> Maintainer, contributor </small> <a href="https://orcid.org/0000-0002-7199-380X" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>
-<a href="https://github.com/sunroofgod" class="external-link">Kah Seng Lian</a> <br><small class="roles"> Maintainer, author </small>  </li>
+<a href="https://github.com/sunroofgod" class="external-link">Kah Seng Lian</a> <br><small class="roles"> Author </small>  </li>
 <li>Zhuoyu Wang <br><small class="roles"> Author </small>  </li>
 <li>
 <a href="https://github.com/junyangliao" class="external-link">Jun Yang Liao</a> <br><small class="roles"> Author </small>  </li>
-<li>Joses W. Ho <br><small class="roles"> Author </small>  </li>
+<li>Joses W. Ho <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-9186-6322" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Tayfun Tumkaya <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-8425-3360" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Felicia Low <br><small class="roles"> Author </small>  </li>
+<li>Adam Claridge-Chang <br><small class="roles"> Contributor </small> <a href="https://orcid.org/0000-0002-4583-3650" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Hyungwon Choi <br><small class="roles"> Contributor </small> <a href="https://orcid.org/0000-0002-6687-3088" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Sangyu Xu <br><small class="roles"> Contributor </small> <a href="https://orcid.org/0000-0002-4927-9204" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>
 <a href="https://www.claridgechang.net" class="external-link">ACCLAB</a> <br><small class="roles"> Copyright holder, funder </small>  </li>
-<li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
 
@@ -211,7 +220,7 @@
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by <a href="https://github.com/sunroofgod" class="external-link">Kah Seng Lian</a>, Zhuoyu Wang, <a href="https://github.com/junyangliao" class="external-link">Jun Yang Liao</a>, Joses W. Ho, Tayfun Tumkaya.</p>
+<p>Developed by Yishan Mai, <a href="https://github.com/sunroofgod" class="external-link">Kah Seng Lian</a>, Zhuoyu Wang, <a href="https://github.com/junyangliao" class="external-link">Jun Yang Liao</a>, Joses W. Ho, Tayfun Tumkaya, Felicia Low, Adam Claridge-Chang, Hyungwon Choi, Sangyu Xu.</p>
 </div>
 
 <div class="pkgdown-footer-right">

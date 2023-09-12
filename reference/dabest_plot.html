@@ -18,7 +18,7 @@ but aligned axes."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aja
     
     <a class="navbar-brand me-2" href="../index.html">dabestr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.9.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2023.9.12</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -105,11 +105,14 @@ If FALSE, a Cumming estimation plot will be produced.</p></dd>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>data set ‘twogroup_data’ not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Preparing the data to be plotted</span></span></span>
-<span class="r-in"><span><span class="va">dabest_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="load.html">load</a></span><span class="op">(</span><span class="va">non_proportional_data</span>, x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Measurement</span>, idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control 1"</span>, <span class="st">"Test 1"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dabest_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="load.html">load</a></span><span class="op">(</span><span class="va">non_proportional_data</span>,</span></span>
+<span class="r-in"><span>  x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span></span>
+<span class="r-in"><span>  idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Control 1"</span>, <span class="st">"Test 1"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">dabest_obj.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="effect_size.html">mean_diff</a></span><span class="op">(</span><span class="va">dabest_obj</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Plotting of dabest_obj.mean_diff</span></span></span>
-<span class="r-in"><span><span class="fu">dabest_plot</span><span class="op">(</span><span class="va">dabest_obj.mean_diff</span>, <span class="cn">TRUE</span><span class="op">)</span> </span></span>
+<span class="r-in"><span><span class="co"># Plotting an estimation plot</span></span></span>
+<span class="r-in"><span><span class="fu">dabest_plot</span><span class="op">(</span><span class="va">dabest_obj.mean_diff</span>, <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="dabest_plot-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -119,7 +122,7 @@ If FALSE, a Cumming estimation plot will be produced.</p></dd>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by <a href="https://github.com/sunroofgod" class="external-link">Kah Seng Lian</a>, Zhuoyu Wang, <a href="https://github.com/junyangliao" class="external-link">Jun Yang Liao</a>, Joses W. Ho, Tayfun Tumkaya.</p>
+  <p></p><p>Developed by Yishan Mai, <a href="https://github.com/sunroofgod" class="external-link">Kah Seng Lian</a>, Zhuoyu Wang, <a href="https://github.com/junyangliao" class="external-link">Jun Yang Liao</a>, Joses W. Ho, Tayfun Tumkaya, Felicia Low, Adam Claridge-Chang, Hyungwon Choi, Sangyu Xu.</p>
 </div>
 
 <div class="pkgdown-footer-right">

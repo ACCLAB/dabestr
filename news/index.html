@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">dabestr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.9.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2023.9.12</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,40 +59,55 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.9.9.9" id="dabestr-v0999">dabestr v0.9.9.9<a class="anchor" aria-label="anchor" href="#dabestr-v0999"></a></h2>
-<ul><li>This is the current pre-official, teaser release version of dabestr.</li>
+<h2 class="pkg-version" data-toc-text="2023.9.12" id="dabestr-v2023912">dabestr v2023.9.12<a class="anchor" aria-label="anchor" href="#dabestr-v2023912"></a></h2>
+<p>This release is a complete rebuild of dabestr.</p>
+<p>Previous functions from v0.3.0 and before are now depreciated.</p>
+<div class="section level5">
+<h5 id="main-api-2023-9-12">Main API<a class="anchor" aria-label="anchor" href="#main-api-2023-9-12"></a></h5>
+<p>This version of dabestr features a new Main API. The following functions have been sequentially organised for their intended procedural utilisation.</p>
+<ul><li><p><code><a href="../reference/load.html">load()</a></code> processes and converts a tidy dataset into the dabestr format.</p></li>
+<li><p><code><a href="../reference/effect_size.html">mean_diff()</a></code>, <code><a href="../reference/effect_size.html">median_diff()</a></code>, <code><a href="../reference/effect_size.html">cohens_d()</a></code>, <code><a href="../reference/effect_size.html">hedges_g()</a></code>, <code><a href="../reference/effect_size.html">cliffs_delta()</a></code>, <code><a href="../reference/effect_size.html">cohens_h()</a></code> Computes the effect size for each control-test group pairing in <code>idx</code>.</p></li>
+<li><p><code><a href="../reference/dabest_plot.html">dabest_plot()</a></code> produces a Gardner-Altman estimation plot or a Cumming estimation plot depending on whether float_contrast is TRUE.</p></li>
 </ul></div>
+<div class="section level5">
+<h5 id="new-features-2023-9-12">New features<a class="anchor" aria-label="anchor" href="#new-features-2023-9-12"></a></h5>
+<ul><li>Plotting of shared control and repeated measures</li>
+<li>Proportion plots (unpaired and paired)</li>
+<li>Mini-Meta Delta plots</li>
+<li>Delta-Delta plots</li>
+</ul></div>
+</div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.3.0" id="dabestr-v030">dabestr v0.3.0<a class="anchor" aria-label="anchor" href="#dabestr-v030"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.3.0" id="dabestr-v030">dabestr v0.3.0<a class="anchor" aria-label="anchor" href="#dabestr-v030"></a></h2><p class="text-muted">CRAN release: 2020-07-13</p>
 <ul><li>This is a breaking release that includes standardised effect sizes, and a bunch of bugfixes.</li>
 </ul></div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.5" id="dabestr-v025">dabestr v0.2.5<a class="anchor" aria-label="anchor" href="#dabestr-v025"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.2.5" id="dabestr-v025">dabestr v0.2.5<a class="anchor" aria-label="anchor" href="#dabestr-v025"></a></h2><p class="text-muted">CRAN release: 2020-04-20</p>
 <ul><li>This release implements the ability to supply a custom vector of colors to <code>palette</code> during plotting. There is also a bugfix that misreported the Ns for the test and control group.</li>
 </ul></div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.4" id="dabestr-v024">dabestr v0.2.4<a class="anchor" aria-label="anchor" href="#dabestr-v024"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.2.4" id="dabestr-v024">dabestr v0.2.4<a class="anchor" aria-label="anchor" href="#dabestr-v024"></a></h2><p class="text-muted">CRAN release: 2020-03-21</p>
 <ul><li>This version represents a resbumission, in response to an automated CRAN check for flavor r-patched-solaris-x86. See <a href="https://cran.r-project.org/web/checks/check_results_dabestr.html" class="external-link uri">https://cran.r-project.org/web/checks/check_results_dabestr.html</a>
 </li>
 </ul></div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.3" id="dabestr-v023">dabestr v0.2.3<a class="anchor" aria-label="anchor" href="#dabestr-v023"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.2.3" id="dabestr-v023">dabestr v0.2.3<a class="anchor" aria-label="anchor" href="#dabestr-v023"></a></h2><p class="text-muted">CRAN release: 2020-02-11</p>
 <ul><li>This patch fixes an issue that prevented Cumming plot generation, due to a ggplot2 new release (v3.3.0).</li>
 </ul></div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.2" id="dabestr-v022">dabestr v0.2.2<a class="anchor" aria-label="anchor" href="#dabestr-v022"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.2.2" id="dabestr-v022">dabestr v0.2.2<a class="anchor" aria-label="anchor" href="#dabestr-v022"></a></h2><p class="text-muted">CRAN release: 2019-07-04</p>
 <ul><li>This patch fixes an issue where local variables were duplicated in column names, requiring proper unquoting.</li>
 </ul></div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.1" id="dabestr-v021">dabestr v0.2.1<a class="anchor" aria-label="anchor" href="#dabestr-v021"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.2.1" id="dabestr-v021">dabestr v0.2.1<a class="anchor" aria-label="anchor" href="#dabestr-v021"></a></h2><p class="text-muted">CRAN release: 2019-06-26</p>
 <ul><li>This release fixes a bug due to the new version of <code>ellipsis</code>. (# 37).</li>
 </ul></div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0" id="dabestr-v020">dabestr v0.2.0<a class="anchor" aria-label="anchor" href="#dabestr-v020"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.2.0" id="dabestr-v020">dabestr v0.2.0<a class="anchor" aria-label="anchor" href="#dabestr-v020"></a></h2><p class="text-muted">CRAN release: 2019-01-07</p>
 <ul><li>This release fixes a bug that plotted the categories alphabetically in Gardner-Altman plots. (# 24).</li>
 </ul></div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.1.0" id="dabestr-v010">dabestr v0.1.0<a class="anchor" aria-label="anchor" href="#dabestr-v010"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.1.0" id="dabestr-v010">dabestr v0.1.0<a class="anchor" aria-label="anchor" href="#dabestr-v010"></a></h2><p class="text-muted">CRAN release: 2018-11-19</p>
 <ul><li>First release of dabestr.</li>
 </ul></div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -100,7 +115,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by <a href="https://github.com/sunroofgod" class="external-link">Kah Seng Lian</a>, Zhuoyu Wang, <a href="https://github.com/junyangliao" class="external-link">Jun Yang Liao</a>, Joses W. Ho, Tayfun Tumkaya.</p>
+  <p></p><p>Developed by Yishan Mai, <a href="https://github.com/sunroofgod" class="external-link">Kah Seng Lian</a>, Zhuoyu Wang, <a href="https://github.com/junyangliao" class="external-link">Jun Yang Liao</a>, Joses W. Ho, Tayfun Tumkaya, Felicia Low, Adam Claridge-Chang, Hyungwon Choi, Sangyu Xu.</p>
 </div>
 
 <div class="pkgdown-footer-right">
