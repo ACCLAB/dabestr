@@ -14,5 +14,5 @@ dabestr.Rmd
 .RProfile
 docs
 inst/doc
-figures
+/figures
 CRAN-SUBMISSION
