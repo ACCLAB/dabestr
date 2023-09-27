@@ -41,3 +41,5 @@ Issues with CRAN packages are summarised below.
 ### Failed to check
 
 * permubiome (NA)
+
+Maintainers of affected package(s) above have been informed for >= 2 weeks. No further changes to be made.
