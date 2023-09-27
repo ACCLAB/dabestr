@@ -3,14 +3,14 @@ Type: Package
 Title: Data Analysis using Bootstrap-Coupled Estimation
 Version: 2023.9.12
 Authors@R: c(
+  person("Joses W.", "Ho", email = "joseshowh@gmail.com", role = "aut",
+         comment = c(ORCID = "0000-0002-9186-6322")),
   person("Kah Seng", "Lian", email = "kahseng@u.nus.edu", role = c("aut")),
   person("Zhuoyu", "Wang", email = "wzhuoyu21@u.nus,edu", role = "aut"),
   person("Jun Yang", "Liao", email = "name@example.com", role = "aut"),
-  person("Joses W.", "Ho", email = "joseshowh@gmail.com", role = "aut",
-         comment = c(ORCID = "0000-0002-9186-6322")),
+  person("Felicia", "Low", role = "aut", email = "lowminhuifelicia@gmail.com"),
   person("Tayfun", "Tumkaya", role = "aut",
          comment = c(ORCID = "0000-0001-8425-3360")),
-  person("Felicia", "Low", role = "aut", email = "lowminhuifelicia@gmail.com"),
   person("Yishan", "Mai", email = "maiyishan@u.duke.nus.edu", role = c("cre", "ctb"),
          comment = c(ORCID = "0000-0002-7199-380X")),
   person("Sangyu", "Xu", role = "ctb",
