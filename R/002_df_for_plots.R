@@ -80,7 +80,29 @@ create_dfs_for_nonflow_tufte_lines <- function(idx,
   return(new_tufte_lines_df)
 }
 
-# Function for creation of df for sankey plot
+#' Generates df for sankey plot component for raw plot WITH flow = TRUE
+#' 
+#' This function generates data frames necessary for generating 
+#' sankey diagrams for visualizing flows and proportions of categorical data. 
+#' 
+#' 
+#' @param float_contrast Boolean value determining if a Gardner-Altman plot or Cumming estimation plot will be produced.
+#' @param raw_data The tidy dataset passed to [load()] that was cleaned and altered for plotting.
+#' @param proportional_data List of calculations related to the plotting of proportion plots.
+#' @param enquo_x Quosure of x as initially passed to [load()].
+#' @param enquo_y Quosure of y as initially passed to [load()].
+#' @param enquo_id_col Quosure of id_col as initially passed to [load()].
+#' @param idx List of vectors of control-test groupings that determines the arrangement
+#' of the final dataframe output.
+#' @param scale_factor_sig Numeric value determining the significance of the scale factor. 
+#' @param bar_width Numeric value determining the width of the bar in the sankey diagram.
+#' @param gap Integer value specifying the amount of gap for each tufte line.
+#' @param sankey Boolean value determining if the flows between the bar charts will be plotted.
+#' @param flow Boolean value determining whether the bars will be plotted in pairs.
+#' @param N Total number of observations or data points in the dataset.
+#'
+#' @returns dataframe
+#' @noRd
 create_dfs_for_sankey <- function(
     float_contrast = FALSE,
     raw_data,
@@ -326,7 +348,17 @@ create_dfs_for_sankey <- function(
   return(dfs_for_sankeys)
 }
 
-# Function for creation of df for xaxis redraw for float_contrast FALSE plot
+#' Generates df for xaxis redraw for float_contrast = FALSE plot
+#' 
+#' This function generates data frames that 
+#' define the positions of lines and ticks on an x-axis for when float_contrast = FALSE
+#' to produce a Cumming estimation plot.
+#' 
+#' @param idx List of vectors of control-test groupings that determines the arrangement
+#' of the final dataframe output.
+#'
+#' @returns dataframe
+#' @noRd
 create_dfs_for_xaxis_redraw <- function(idx) {
   x_axis_pointer <- 0
   xaxis_line_x_vector <- c()
@@ -359,6 +391,16 @@ create_dfs_for_xaxis_redraw <- function(idx) {
   return(dfs_for_xaxis_redraw)
 }
 
+#' Generates df for proportion bar component 
+#' 
+#' This function generates data frames to 
+#' represent bars with proportional data in a graphical display.
+#' 
+#' @param bar_width Numeric value determining the width of the bar in the sankey diagram.
+#' @param gap Integer value specifying the amount of gap for each tufte line.
+#'
+#' @returns dataframe
+#' @noRd
 create_dfs_for_proportion_bar <- function(proportion_success, bar_width = 0.3, gap = 0) {
   df_for_proportion_bar <- data.frame(
     x_failure = NA,
@@ -401,6 +443,18 @@ create_dfs_for_proportion_bar <- function(proportion_success, bar_width = 0.3, g
   return(df_for_proportion_bar)
 }
 
+#' Generates df for baseline violin plot WITH flow = TRUE
+#'
+#' This function generates data frames to represent 
+#' data points for plotting violin plots
+#'
+#' @param boots Boot result obtained from boot.ci
+#' @param x_idx_position Numeric value determining the position of the plots on the x-axis.
+#' @param float_contrast Boolean value determining if a Gardner-Altman plot or Cumming estimation plot will be produced.
+#' @param flow Boolean value determining whether the bars will be plotted in pairs.
+#'
+#' @return dataframe
+#' @noRd
 create_dfs_for_baseline_ec_violin <- function(boots, x_idx_position, float_contrast, flow = TRUE) {
   df_for_violin <- data.frame(
     x = NA,
