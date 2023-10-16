@@ -2,7 +2,18 @@
 #
 # Contains functions `create_rawplot_components`, `create_deltaplot_components` and `create_violinplot_components`.
 
-# Function for creation of list of TRUE/FALSE for raw plot components that will be built
+#' Generates list of TRUE/FALSE for raw plot components that will be built
+#' 
+#' This function generates a list of booleans to be passed into the raw plot function.
+#'
+#' @param proportional Boolean value as initially passed to [load()].
+#' @param is_paired Boolean value determining if it is a paired plot.
+#' @param float_contrast Boolean value determining which plot will be produced. If TRUE, a 
+#' Gardner-Altman plot will be produced.If FALSE, a Cumming estimation plot will be produced.
+#'
+#' @return List of TRUE/FALSE for raw plot components
+#'
+#' @noRd
 create_rawplot_components <- function(proportional,
                                       is_paired,
                                       float_contrast) {
@@ -49,7 +60,24 @@ create_rawplot_components <- function(proportional,
   return(plot_component)
 }
 
-# Function for creation of list of TRUE/FALSE for delta plot components that will be built
+#' Generates list of TRUE/FALSE for delta plot components that will be built
+#' 
+#' This function generates a list of booleans to be passed into the delta plot function.
+#'
+#' @param proportional Boolean value as initially passed to [load()].
+#' @param is_paired Boolean value determining if it is a paired plot.
+#' @param float_contrast Boolean value determining which plot will be produced. If TRUE, a 
+#' Gardner-Altman plot will be produced.If FALSE, a Cumming estimation plot will be produced.
+#' @param is_colour Boolean value determining if there is a colour column for the plot.
+#' @param delta2 Boolean value determining if delta-delta analysis for
+#' 2 by 2 experimental designs is conducted.
+#' @param show_zero_dot Boolean value determining if there is a dot on
+#' the zero line of the effect size for the control-control group.
+#' @param flow Boolean value determining whether the bars will be plotted in pairs.
+#' @param show_baseline_ec Boolean value determining whether the baseline curve is shown.
+#'
+#' @return List of TRUE/FALSE for delta plot components 
+#' @noRd
 create_deltaplot_components <- function(proportional,
                                         is_paired,
                                         float_contrast,
@@ -92,7 +120,23 @@ create_deltaplot_components <- function(proportional,
   return(plot_component)
 }
 
-# Function for creation of list of values of the violin plot components that will be built
+#' Generates list of values for the violin plot components that will be built
+#'
+#' This function generates the data and metadata necessary to create a 
+#' violin plot with specific characteristics
+#'
+#' @param boots Boot result obtained from boot.ci
+#' @param idx List of vectors of control-test groupings that determines the arrangement
+#' of the final dataframe output.
+#' @param float_contrast Boolean value determining if a Gardner-Altman plot or 
+#' Cumming estimation plot will be produced.
+#' @param delta_y_max Max y limits for the delta-delta plot
+#' @param delta_y_min Min y limits for the delta-delta plot
+#' @param flow Boolean value determining whether the bars will be plotted in pairs.
+#' @param zero_dot Boolean value determining if the zero dot will be implemented.
+#'
+#' @return List of components essential for the violinplot.
+#' @noRd
 create_violinplot_components <- function(boots,
                                          idx,
                                          float_contrast,
