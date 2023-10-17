@@ -3,15 +3,13 @@
 # Contains functions `create_rawplot_components`, `create_deltaplot_components` and `create_violinplot_components`.
 
 #' Generates a list of booleans determining whether certain plot components will be constructed for the rawplot.
-#' 
-#' This function generates a list of booleans to be passed into the raw plot function.
 #'
 #' @param proportional Boolean value as initially passed to [load()].
 #' @param is_paired Boolean value determining if it is a paired plot.
 #' @param float_contrast Boolean value determining which plot will be produced. If TRUE, a 
 #' Gardner-Altman plot will be produced.If FALSE, a Cumming estimation plot will be produced.
 #'
-#' @return List of TRUE/FALSE for raw plot components
+#' @return List of booleans for raw plot components
 #'
 #' @noRd
 create_rawplot_components <- function(proportional,
@@ -62,8 +60,6 @@ create_rawplot_components <- function(proportional,
 
 #' Generates a list of booleans determining whether certain plot components will be constructed for the deltaplot.
 #' 
-#' This function generates a list of booleans to be passed into the delta plot function.
-#'
 #' @param proportional Boolean value as initially passed to [load()].
 #' @param is_paired Boolean value determining if it is a paired plot.
 #' @param float_contrast Boolean value determining which plot will be produced. If TRUE, a 
@@ -76,7 +72,7 @@ create_rawplot_components <- function(proportional,
 #' @param flow Boolean value determining whether the bars will be plotted in pairs.
 #' @param show_baseline_ec Boolean value determining whether the baseline curve is shown.
 #'
-#' @return List of TRUE/FALSE for delta plot components 
+#' @return List of booleans for delta plot components 
 #' @noRd
 create_deltaplot_components <- function(proportional,
                                         is_paired,
