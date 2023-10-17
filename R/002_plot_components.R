@@ -60,7 +60,7 @@ create_rawplot_components <- function(proportional,
   return(plot_component)
 }
 
-#' Generates list of TRUE/FALSE for delta plot components that will be built
+#' Generates a list of booleans determining whether certain plot components will be constructed for the deltaplot.
 #' 
 #' This function generates a list of booleans to be passed into the delta plot function.
 #'
