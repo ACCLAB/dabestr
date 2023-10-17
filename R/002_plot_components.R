@@ -133,7 +133,7 @@ create_deltaplot_components <- function(proportional,
 #' @param delta_y_max Max y limits for the delta-delta plot
 #' @param delta_y_min Min y limits for the delta-delta plot
 #' @param flow Boolean value determining whether the bars will be plotted in pairs.
-#' @param zero_dot Boolean value determining if the zero dot will be implemented.
+#' @param zero_dot Boolean value determining if the zero dot will be constructed.
 #'
 #' @return List of components essential for the violinplot.
 #' @noRd
