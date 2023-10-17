@@ -2,7 +2,10 @@
 #
 # Contains functions `create_rawplot_components`, `create_deltaplot_components` and `create_violinplot_components`.
 
-#' Generates a list of booleans determining whether certain plot components will be constructed for the rawplot.
+#' Generates list of TRUE/FALSE for raw plot components that will be built
+#'
+#' This function generates a list of booleans determining whether certain 
+#' plot components will be constructed for the rawplot.
 #'
 #' @param proportional Boolean value as initially passed to [load()].
 #' @param is_paired Boolean value determining if it is a paired plot.
@@ -58,7 +61,10 @@ create_rawplot_components <- function(proportional,
   return(plot_component)
 }
 
-#' Generates a list of booleans determining whether certain plot components will be constructed for the deltaplot.
+#' Generates list of TRUE/FALSE for delta plot components that will be built
+#'
+#' This function generates a list of booleans determining whether certain 
+#' plot components will be constructed for the deltaplot.
 #' 
 #' @param proportional Boolean value as initially passed to [load()].
 #' @param is_paired Boolean value determining if it is a paired plot.
