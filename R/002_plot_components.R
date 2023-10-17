@@ -2,7 +2,7 @@
 #
 # Contains functions `create_rawplot_components`, `create_deltaplot_components` and `create_violinplot_components`.
 
-#' Generates list of TRUE/FALSE for raw plot components that will be built
+#' Generates a list of booleans to be passed into the raw plot function.
 #' 
 #' This function generates a list of booleans to be passed into the raw plot function.
 #'
