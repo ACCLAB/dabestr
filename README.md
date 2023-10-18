@@ -36,7 +36,7 @@ An estimation plot has two key features.
 1.  It **presents all datapoints** as a swarmplot, which orders each
     point to display the underlying distribution.
 
-2.  It presents the **effect size** as a **bootstrap 95% confidence
+2.  It presents the **effect size** with a **bootstrap 95% confidence
     interval** on a **separate but aligned axes**.
 
 ## Installation
