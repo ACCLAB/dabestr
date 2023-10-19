@@ -1,3 +1,8 @@
+## Resubmission
+This is a resubmission. In this version I have:
+
+* Contacted the maintainers of affected package(s) >= 2 weeks ago.
+
 ## R CMD check results
 
 0 errors | 0 warnings | 3 note
@@ -42,4 +47,4 @@ Issues with CRAN packages are summarised below.
 
 * permubiome (NA)
 
-Maintainers of affected package(s) above have been informed for >= 2 weeks. No further changes to be made.
+Maintainers of affected package(s) above have been informed for >= 2 weeks ago. No further changes to be made.
