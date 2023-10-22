@@ -1,5 +1,20 @@
-# Obtain permutation tests, permutations and p values
-
+#' Generates permutation test results.
+#'
+#' This function returns a list that include permutations results:
+#' its corresponding permutations, variance of permutations, p value and effect size
+#' (depending on the effect size).
+#'
+#' @param control Vector, the control group data.
+#' @param test Vector, the test group data.
+#' @param effect_size String. Any one of the following are accepted inputs:
+#' 'mean_diff', 'median_diff', 'cohens_d', 'hedges_g', or 'cliffs_delta'.
+#' @param is_paired Boolean value as initially passed to [load()].
+#' @param permutation_count Integer value specifying the number of permutations being carried out.
+#' @param random_seed Integer value specifying the random seed for permutations to be carried out.
+#' @param ef_size_fn A function that calculates the specific type of effect size.
+#'
+#' @returns a list for permutation test results for a pair of control and test data points.
+#' @noRd
 PermutationTest <- function(control,
                             test,
                             effect_size,
@@ -77,9 +92,21 @@ PermutationTest <- function(control,
 
   return(perm_results)
 }
-
-# p values
-
+#' Generates statistical test results for possible hypothesis testings.
+#'
+#' This function returns a list that include statistical test results:
+#' its corresponding statistics and p values
+#'
+#' @param control Vector, the control group data.
+#' @param test Vector, the test group data.
+#' @param is_paired Boolean value as initially passed to [load()].
+#' @param proportional Boolean value as initially passed to [load()].
+#' @param effect_size String. Any one of the following are accepted inputs:
+#' 'mean_diff', 'median_diff', 'cohens_d', 'hedges_g', or 'cliffs_delta'.
+#'
+#' @returns a list for statistical test results and p values for the
+#' corresponding tests of a pair of control and test data points.
+#' @noRd
 pvals_statistics <- function(control,
                              test,
                              is_paired,
@@ -210,9 +237,26 @@ pvals_statistics <- function(control,
 
   return(pvals_stats)
 }
-
-# collate permtest and p values with function "Pvalues_statistics"
-
+#' Generates collated permutaion test results and statistical test results.
+#'
+#' This function returns a tibble (list) that includes statistical test results:
+#' its corresponding statistics and p values.
+#'
+#' @param dabest_object A "dabest_obj" list created by loading in dataset along with other
+#' specified parameters with the [load()] function.
+#' @param seed Integer specifying random seed that will be passed to the
+#' [PermutationTest()] function.
+#' @param permutation_count Integer value specifying the number of permutations
+#'  being carried out in the [PermutationTest()] function.
+#' @param ef_size_fn The effect size function passed to [PermutationTest()] that
+#'  help calculate the specific type of effect size.
+#' @param effect_size_type String. Any one of the following are accepted inputs:
+#' 'mean_diff', 'median_diff', 'cohens_d', 'hedges_g', or 'cliffs_delta'.
+#'
+#' @returns Tibble for statistical test and permutation test results for
+#' all pairs of control and test datasets based on the experimental design
+#' initially specified when passed to the [load()] function.
+#' @noRd
 Pvalues_statistics <- function(dabest_object,
                                seed = 12345,
                                perm_count = 5000,
