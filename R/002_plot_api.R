@@ -1,29 +1,19 @@
-#' Functions responsible for generation of raw_plot and delta_plot.
+#' Generates a ggplot object containing plot components for the rawplot component 
+#' of an estimation plot.
 #'
-#' @noRd
+#' This function takes in a dabest_effectsize_obj object and applies the [create_rawplot_components()]
+#' function on the object. Plot components for the rawplot are then produced and returned in the
+#' form of a ggplot object.
 #'
 #' @param dabest_effectsize_obj A dabest_effectsize_obj created by loading in a
 #' dabest_obj along with other specified parameters with the [effect_size()] function.
-#' @param float_contrast Boolean value determining if a Gardner-Altman plot or Cumming estimation plot will be produced.
+#' @param float_contrast Boolean. If TRUE, a Gardner-Altman plot will be produced.
+#' If FALSE, a Cumming estimation plot will be produced.
 #' @param plot_kwargs Adjustment parameters to control and adjust the appearance of the plot.
 #' (list of all possible adjustment parameters can be found under [plot_kwargs])
 #'
-#' @details
-#' Contains main plotting functions `plot_raw` and `plot_delta` for plotting of the rawdata and effectsize parts.
-#'
-#' @examples
-#' # Loading of the dataset
-#' data(twogroup_data)
-#'
-#' # Preparing the data to be plotted
-#' dabest_obj <- load(non_proportional_data, x = Group, y = Measurement, idx = c("Control 1", "Test 1"))
-#' dabest_obj.mean_diff <- mean_diff(dabest_obj)
-#'
-#' # Plotting of dabest_obj.mean_diff (rawplot only)
-#' plot_raw(dabest_obj.mean_diff, TRUE)
-#'
-#' # Plotting of dabest_obj.mean_diff (deltaplot only)
-#' plot_delta(dabest_obj.mean_diff, True)
+#' @return ggplot object containing plot components for the rawplot.
+#' @noRd
 plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   enquo_x <- dabest_effectsize_obj$enquo_x
   enquo_y <- dabest_effectsize_obj$enquo_y
@@ -421,8 +411,22 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
 
   return(raw_plot)
 }
-
-# Delta plot function
+#' Generates a ggplot object containing plot components for the deltaplot component
+#' of an estimation plot.
+#'
+#' This function takes in a dabest_effectsize_obj object and applies the [create_deltaplot_components()]
+#' function on the object. Plot components for the deltaplot are then produced and returned in the
+#' form of a ggplot object.
+#'
+#' @param dabest_effectsize_obj A dabest_effectsize_obj created by loading in a
+#' dabest_obj along with other specified parameters with the [effect_size()] function.
+#' @param float_contrast Boolean. If TRUE, a Gardner-Altman plot will be produced.
+#' If FALSE, a Cumming estimation plot will be produced.
+#' @param plot_kwargs Adjustment parameters to control and adjust the appearance of the plot.
+#' (list of all possible adjustment parameters can be found under [plot_kwargs])
+#'
+#' @return ggplot object containing plot components for the deltaplot.
+#' @noRd
 plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   idx <- dabest_effectsize_obj$idx
   separated_idx <- idx
