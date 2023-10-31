@@ -1,4 +1,4 @@
-#' Generates a ggplot object containing plot components for the rawplot component 
+#' Generates a ggplot object containing plot components for the rawplot component
 #' of an estimation plot.
 #'
 #' This function takes in a dabest_effectsize_obj object and applies the [create_rawplot_components()]

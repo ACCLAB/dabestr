@@ -4,12 +4,12 @@
 
 #' Generates list of TRUE/FALSE for raw plot components that will be built
 #'
-#' This function generates a list of booleans determining whether certain 
+#' This function generates a list of booleans determining whether certain
 #' plot components will be constructed for the rawplot.
 #'
 #' @param proportional Boolean value as initially passed to [load()].
 #' @param is_paired Boolean value determining if it is a paired plot.
-#' @param float_contrast Boolean value determining which plot will be produced. If TRUE, a 
+#' @param float_contrast Boolean value determining which plot will be produced. If TRUE, a
 #' Gardner-Altman plot will be produced.If FALSE, a Cumming estimation plot will be produced.
 #'
 #' @return List of booleans for raw plot components
@@ -63,12 +63,12 @@ create_rawplot_components <- function(proportional,
 
 #' Generates list of TRUE/FALSE for delta plot components that will be built
 #'
-#' This function generates a list of booleans determining whether certain 
+#' This function generates a list of booleans determining whether certain
 #' plot components will be constructed for the deltaplot.
-#' 
+#'
 #' @param proportional Boolean value as initially passed to [load()].
 #' @param is_paired Boolean value determining if it is a paired plot.
-#' @param float_contrast Boolean value determining which plot will be produced. If TRUE, a 
+#' @param float_contrast Boolean value determining which plot will be produced. If TRUE, a
 #' Gardner-Altman plot will be produced.If FALSE, a Cumming estimation plot will be produced.
 #' @param is_colour Boolean value determining if there is a colour column for the plot.
 #' @param delta2 Boolean value determining if delta-delta analysis for
@@ -78,7 +78,7 @@ create_rawplot_components <- function(proportional,
 #' @param flow Boolean value determining whether the bars will be plotted in pairs.
 #' @param show_baseline_ec Boolean value determining whether the baseline curve is shown.
 #'
-#' @return List of booleans for delta plot components 
+#' @return List of booleans for delta plot components
 #' @noRd
 create_deltaplot_components <- function(proportional,
                                         is_paired,
@@ -124,13 +124,13 @@ create_deltaplot_components <- function(proportional,
 
 #' Generates list of values for the violin plot components that will be built
 #'
-#' This function generates the data and metadata necessary to create a 
+#' This function generates the data and metadata necessary to create a
 #' violin plot with specific characteristics
 #'
 #' @param boots Boot result obtained from boot.ci
 #' @param idx List of vectors of control-test groupings that determines the arrangement
 #' of the final dataframe output.
-#' @param float_contrast Boolean value determining if a Gardner-Altman plot or 
+#' @param float_contrast Boolean value determining if a Gardner-Altman plot or
 #' Cumming estimation plot will be produced.
 #' @param delta_y_max Max y limits for the delta-delta plot
 #' @param delta_y_min Min y limits for the delta-delta plot
