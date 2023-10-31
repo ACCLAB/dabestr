@@ -66,6 +66,13 @@ testthat::test_that("Able to detect non-valid params", {
     ),
     regexp = "does not consist of at least 2 groups"
   )
+  expect_error(
+    dabestr::load(np_dataset,
+      x = Group, y = Measurement,
+      idx = c("Control 1", "Test1")
+    ),
+    regexp = "Test1 not present in x"
+  )
 })
 
 testthat::test_that("Able to detect non-valid params for proportional = TRUE", {
@@ -95,6 +102,14 @@ testthat::test_that("Able to detect non-valid params for is_paired = TRUE", {
       id_col = ID
     ),
     regexp = "is not 'baseline' or 'sequential'."
+  )
+  expect_error(
+    dabestr::load(np_dataset[-2, ],
+      x = Group, y = Measurement,
+      idx = c("Control 1", "Test 1", "Test 2"), paired = "sequential",
+      id_col = ID
+    ),
+    regexp = "data is paired, as indicated by paired but size of control and treatment groups are not equal."
   )
 })
 
