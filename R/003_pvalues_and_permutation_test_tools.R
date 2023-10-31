@@ -23,7 +23,7 @@ PermutationTest <- function(control,
                             random_seed = 12345,
                             ef_size_fn) {
   # Check if the arrays have the same length for paired test
-  if (!is.null(is_paired) && length(control) != length(test)) {
+  if (isTRUE(is_paired) && length(control) != length(test)) {
     stop("The two arrays do not have the same length.")
   }
 
@@ -113,7 +113,7 @@ pvals_statistics <- function(control,
                              proportional,
                              effect_size) {
   pvals_stats <- list()
-  if (!is.null(is_paired) && !proportional) {
+  if (isTRUE(is_paired) && !proportional) {
     # Wilcoxon test (non-parametric version of the paired T-test)
     wilcoxon <- stats::wilcox.test(control, test)
     pvalue_wilcoxon <- wilcoxon$p.value
@@ -137,7 +137,7 @@ pvals_statistics <- function(control,
       pvalue_paired_students_t = pvalue_paired_students_t,
       statistic_paired_students_t = statistic_paired_students_t
     )
-  } else if (!is.null(is_paired) && proportional) {
+  } else if (isTRUE(is_paired) && proportional) {
     # McNemar's test for binary paired data
     table <- matrix(
       c(
