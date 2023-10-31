@@ -282,8 +282,8 @@ load <- function(
   unique_x <- unique(data[[name_x]])
   for (i in 1:length(unlist_idx)) {
     if (isFALSE(unlist_idx[i] %in% unique_x)) {
-      cli::cli_abort(c("{.field idx} contains treatment groups not present in {.field x}.",
-        "x" = "Ensure that idx does not have any treatment groups not present in dataset."
+      cli::cli_abort(c("{unlist_idx[i]} not present in {.field x}.",
+        "x" = "Ensure that idx does not have any control/treatment groups not present in dataset."
       ))
     }
   }
@@ -309,6 +309,15 @@ load <- function(
     dplyr::group_by(!!enquo_x) %>%
     dplyr::count()
   Ns$swarmticklabs <- do.call(paste, c(Ns[c(name_x, "n")], sep = "\nN = "))
+
+  ## Check to ensure control & treatment groups have the same sample size if is_paired is TRUE
+  if (is_paired) {
+    if (length(unique(Ns$n)) > 1) {
+      cli::cli_abort(c("{.field data} is paired, as indicated by {.field paired} but size of control and treatment groups are not equal.",
+        "x" = "Ensure that the size of control and treatment groups are the same for paired comparisons."
+      ))
+    }
+  }
 
   # Extending ylim for plotting
   ylim[1] <- ylim[1] - (ylim[2] - ylim[1]) / 25
