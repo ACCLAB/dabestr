@@ -18,7 +18,7 @@
 PermutationTest <- function(control,
                             test,
                             effect_size,
-                            is_paired = NULL,
+                            is_paired,
                             permutation_count = 5000,
                             random_seed = 12345,
                             ef_size_fn) {
@@ -45,7 +45,7 @@ PermutationTest <- function(control,
   permutations_var <- vector("numeric", length = permutation_count)
 
   for (i in 1:permutation_count) {
-    if (!is.null(is_paired)) {
+    if (isTRUE(is_paired)) {
       # Select which control-test pairs to swap.
       random_idx <- sample(1:CONTROL_LEN,
         size = sample(1:CONTROL_LEN, 1),
