@@ -6,6 +6,8 @@
 #' dabest_obj along with other specified parameters with the [effect_size()] function.
 #' @param float_contrast Default TRUE. If TRUE, a Gardner-Altman plot will be produced.
 #' If FALSE, a Cumming estimation plot will be produced.
+#' @param show_legend Default TRUE. If TRUE, legend will be shown. If FALSE, legend 
+#' will not be shown.
 #' @param ... Adjustment parameters to control and adjust the appearance of the plot.
 #' (list of all possible adjustment parameters can be found under [plot_kwargs])
 #'
@@ -17,7 +19,7 @@
 #' but aligned axes.
 #'
 #' @usage
-#' dabest_plot(dabest_effectsize_obj, float_contrast = TRUE, ...)
+#' dabest_plot(dabest_effectsize_obj, float_contrast = TRUE, show_legend = TRUE, ...)
 #'
 #' @examples
 #' # Loading of the dataset
@@ -31,11 +33,11 @@
 #' dabest_obj.mean_diff <- mean_diff(dabest_obj)
 #'
 #' # Plotting an estimation plot
-#' dabest_plot(dabest_obj.mean_diff, TRUE)
+#' dabest_plot(dabest_obj.mean_diff, TRUE, TRUE)
 #'
 #' @export
 
-dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
+dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, show_legend = TRUE, ...) {
   if (!methods::is(dabest_effectsize_obj, "dabest_effectsize")) {
     cli::cli_abort(c("{.field dabest_effectsize_obj} must be a {.cls dabest_effectsize} object."),
       "x" = "Please supply a {.cls dabest_effectsize} object."
@@ -67,9 +69,11 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
     raw_plot <- apply_palette(raw_plot, custom_palette)
     delta_plot <- apply_palette(delta_plot, custom_palette)
 
-    raw_legend <- cowplot::get_legend(raw_plot +
-      ggplot2::guides(alpha = "none") +
-      ggplot2::theme(legend.box.margin = ggplot2::margin(0, 0, 0, 0)))
+    if (isTRUE(show_legend)) {
+      raw_legend <- cowplot::get_legend(raw_plot +
+        ggplot2::guides(alpha = "none") +
+        ggplot2::theme(legend.box.margin = ggplot2::margin(0, 0, 0, 0)))
+    }
 
     plot_margin <- ggplot2::unit(c(0, 0, 0, 0), "pt")
 
@@ -94,15 +98,16 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
       align = "vh"
     )
 
-    if (isTRUE(is_colour)) {
-      legend_plot <- cowplot::plot_grid(
-        plotlist = list(raw_legend, NULL),
-        nrow = 2,
-        ncol = 1,
-        rel_heights = c(0.1, 0.9)
-      )
-
-      final_plot <- cowplot::plot_grid(final_plot, legend_plot, ncol = 2, nrow = 1, rel_widths = c(0.9, 0.1))
+    if (isTRUE(show_legend)){
+      if (isTRUE(is_colour)) {
+        legend_plot <- cowplot::plot_grid(
+          plotlist = list(raw_legend, NULL),
+          nrow = 2,
+          ncol = 1,
+          rel_heights = c(0.1, 0.9)
+        )
+        final_plot <- cowplot::plot_grid(final_plot, legend_plot, ncol = 2, nrow = 1, rel_widths = c(0.9, 0.1))
+      }
     }
 
     return(final_plot)
@@ -129,15 +134,17 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
       align = "h"
     )
 
-    if (isTRUE(is_colour)) {
-      raw_legend <- cowplot::get_legend(raw_plot +
-        ggplot2::guides(
-          color = ggplot2::guide_legend(nrow = 1),
-          alpha = "none"
-        ) +
-        ggplot2::theme(legend.position = "bottom"))
-
-      final_plot <- cowplot::plot_grid(final_plot, raw_legend, ncol = 1, rel_heights = c(0.9, 0.1))
+    if (isTRUE(show_legend)) {
+      if (isTRUE(is_colour)) {
+        raw_legend <- cowplot::get_legend(raw_plot +
+          ggplot2::guides(
+            color = ggplot2::guide_legend(nrow = 1),
+            alpha = "none"
+          ) +
+          ggplot2::theme(legend.position = "bottom"))
+  
+        final_plot <- cowplot::plot_grid(final_plot, raw_legend, ncol = 1, rel_heights = c(0.9, 0.1))
+      }
     }
     return(final_plot)
   }
