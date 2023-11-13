@@ -6,8 +6,6 @@
 #' dabest_obj along with other specified parameters with the [effect_size()] function.
 #' @param float_contrast Default TRUE. If TRUE, a Gardner-Altman plot will be produced.
 #' If FALSE, a Cumming estimation plot will be produced.
-#' @param show_legend Default TRUE. If TRUE, legend will be shown. If FALSE, legend 
-#' will not be shown.
 #' @param ... Adjustment parameters to control and adjust the appearance of the plot.
 #' (list of all possible adjustment parameters can be found under [plot_kwargs])
 #'
@@ -19,7 +17,7 @@
 #' but aligned axes.
 #'
 #' @usage
-#' dabest_plot(dabest_effectsize_obj, float_contrast = TRUE, show_legend = TRUE, ...)
+#' dabest_plot(dabest_effectsize_obj, float_contrast = TRUE, ...)
 #'
 #' @examples
 #' # Loading of the dataset
@@ -33,11 +31,11 @@
 #' dabest_obj.mean_diff <- mean_diff(dabest_obj)
 #'
 #' # Plotting an estimation plot
-#' dabest_plot(dabest_obj.mean_diff, TRUE, TRUE)
+#' dabest_plot(dabest_obj.mean_diff, TRUE)
 #'
 #' @export
 
-dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, show_legend = TRUE, ...) {
+dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
   if (!methods::is(dabest_effectsize_obj, "dabest_effectsize")) {
     cli::cli_abort(c("{.field dabest_effectsize_obj} must be a {.cls dabest_effectsize} object."),
       "x" = "Please supply a {.cls dabest_effectsize} object."
@@ -52,6 +50,7 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, show_legen
   is_colour <- dabest_effectsize_obj$is_colour
   is_deltadelta <- plot_kwargs$show_delta2
   is_mini_meta <- plot_kwargs$show_mini_meta
+  show_legend <- plot_kwargs$show_legend
   idx <- dabest_effectsize_obj$idx
   raw_legend <- NULL
 
