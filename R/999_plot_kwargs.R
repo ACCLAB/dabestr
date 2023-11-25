@@ -37,6 +37,7 @@
 #' - `show_zero_dot` Default TRUE. Boolean value determining if there is a dot on
 #' the zero line of the effect size for the control-control group.
 #' - `show_baseline_ec` Default FALSE. Boolean value determining whether the baseline curve is shown.
+#' - `show_legend` Default TRUE. If TRUE, legend will be shown. If FALSE, legend will not be shown.
 #' - `sankey` Default TRUE. Boolean value determining if the flows between the bar charts will be plotted.
 #' - `raw_flow_alpha` Default 0.5. Numeric value determining the transparency of the sankey flows in a
 #' paired proportion plot.
@@ -79,6 +80,7 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
 
   show_zero_dot <- TRUE
   show_baseline_ec <- FALSE
+  show_legend <- TRUE
 
   sankey <- TRUE
   flow <- TRUE
@@ -161,6 +163,9 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   if (isFALSE(is.null(plot_kwargs$show_baseline_ec))) {
     show_baseline_ec <- plot_kwargs$show_baseline_ec
   }
+  if (isFALSE(is.null(plot_kwargs$show_legend))) {
+    show_legend <- plot_kwargs$show_legend
+  }
   if (isFALSE(is.null(plot_kwargs$asymmetric_side))) {
     asymmetric_side <- plot_kwargs$asymmetric_side
   }
@@ -192,6 +197,7 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     contrast_x_text = contrast_x_text,
     show_zero_dot = show_zero_dot,
     show_baseline_ec = show_baseline_ec,
+    show_legend = show_legend,
     asymmetric_side = asymmetric_side
   ))
 }
