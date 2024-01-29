@@ -209,7 +209,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   if (isFALSE(float_contrast) && isFALSE(proportional)) {
     raw_y_min <- raw_y_min - (raw_y_max - raw_y_min) / 15
   }
-  raw_y_mean <- raw_y_max - raw_y_min
+  raw_y_range <- raw_y_max - raw_y_min
 
   raw_x_min <- ifelse(float_contrast, 0.6, 0.6)
   raw_x_scalar <- ifelse(float_contrast, 0.5, 0.3)
@@ -264,7 +264,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     } else {
       # if (main_plot_type != "sankey")
       tufte_lines_df <- create_df_for_tufte(raw_data, enquo_x, enquo_y, proportional, 0, effsize_type)
-      tufte_gap_value <- ifelse(proportional, min(tufte_lines_df$mean) / 20, min(tufte_lines_df$mean) / 50)
+      tufte_gap_value <- ifelse(proportional, min(tufte_lines_df$mean) / 20, raw_y_range / 70)
       tufte_lines_df <- create_df_for_tufte(raw_data, enquo_x, enquo_y, proportional, tufte_gap_value, effsize_type)
     }
 
@@ -379,8 +379,8 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
         ggplot2::aes(
           x = x,
           xend = xend,
-          y = raw_y_min + raw_y_mean / 40,
-          yend = raw_y_min + raw_y_mean / 40
+          y = raw_y_min + raw_y_range / 40,
+          yend = raw_y_min + raw_y_range / 40
         )
       ) +
       # Redraw xaxis ticks
@@ -392,7 +392,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
         ggplot2::aes(
           x = x,
           xend = x,
-          y = raw_y_min + raw_y_mean / 40,
+          y = raw_y_min + raw_y_range / 40,
           yend = raw_y_min
         )
       )

@@ -78,10 +78,10 @@
 <circle cx='539.56' cy='150.90' r='1.95' style='stroke-width: 0.71; stroke: #1F77B4; fill: #1F77B4;' />
 <circle cx='539.56' cy='92.73' r='1.95' style='stroke-width: 0.71; stroke: #1F77B4; fill: #1F77B4;' />
 <circle cx='539.56' cy='68.12' r='1.95' style='stroke-width: 0.71; stroke: #1F77B4; fill: #1F77B4;' />
-<line x1='160.04' y1='151.17' x2='160.04' y2='126.51' style='stroke-width: 1.71; stroke-linecap: square;' />
-<line x1='521.49' y1='98.29' x2='521.49' y2='51.77' style='stroke-width: 1.71; stroke-linecap: square;' />
-<line x1='160.04' y1='162.12' x2='160.04' y2='186.77' style='stroke-width: 1.71; stroke-linecap: square;' />
-<line x1='521.49' y1='109.24' x2='521.49' y2='155.75' style='stroke-width: 1.71; stroke-linecap: square;' />
+<line x1='160.04' y1='153.08' x2='160.04' y2='126.51' style='stroke-width: 1.71; stroke-linecap: square;' />
+<line x1='521.49' y1='100.20' x2='521.49' y2='51.77' style='stroke-width: 1.71; stroke-linecap: square;' />
+<line x1='160.04' y1='160.20' x2='160.04' y2='186.77' style='stroke-width: 1.71; stroke-linecap: square;' />
+<line x1='521.49' y1='107.32' x2='521.49' y2='155.75' style='stroke-width: 1.71; stroke-linecap: square;' />
 <line x1='178.11' y1='243.09' x2='539.56' y2='243.09' style='stroke-width: 1.07; stroke-linecap: square;' />
 <line x1='178.11' y1='243.09' x2='178.11' y2='249.32' style='stroke-width: 1.07; stroke-linecap: square;' />
 <line x1='539.56' y1='243.09' x2='539.56' y2='249.32' style='stroke-width: 1.07; stroke-linecap: square;' />

@@ -200,26 +200,28 @@ pvals_statistics <- function(control,
     standardized_es <- effsize::cohen.d(control, test, is_paired = NULL)
 
     # Cohen's h calculation for binary categorical data
-    tryCatch(
-      {
-        cohens_h_cal <- function(control, test) {
-          # remove nas and nulls later on
-          prop_control <- mean(control)
-          prop_test <- mean(test)
-
-          # Arcsine transformation
-          phi_control <- 2 * asin(sqrt(prop_control))
-          phi_test <- 2 * asin(sqrt(prop_test))
-          result <- phi_test - phi_control
-          return(result)
+    if (isTRUE(proportional)){
+      tryCatch(
+        {
+          cohens_h_cal <- function(control, test) {
+            # remove nas and nulls later on
+            prop_control <- mean(control)
+            prop_test <- mean(test)
+  
+            # Arcsine transformation
+            phi_control <- 2 * asin(sqrt(prop_control))
+            phi_test <- 2 * asin(sqrt(prop_test))
+            result <- phi_test - phi_control
+            return(result)
+          }
+          proportional_difference <- cohens_h_cal(control, test)
+        },
+        error = function(e) {
+          # Occur only when the data consists not only 0's and 1's.
+          proportional_difference <- NA
         }
-        proportional_difference <- cohens_h_cal(control, test)
-      },
-      error = function(e) {
-        # Occur only when the data consists not only 0's and 1's.
-        proportional_difference <- NA
-      }
-    )
+      )
+    }
 
     pvals_stats <- list(
       pvalue_welch = pvalue_welch,
