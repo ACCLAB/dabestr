@@ -200,14 +200,14 @@ pvals_statistics <- function(control,
     standardized_es <- effsize::cohen.d(control, test, is_paired = NULL)
 
     # Cohen's h calculation for binary categorical data
-    if (isTRUE(proportional)){
+    if (isTRUE(proportional)) {
       tryCatch(
         {
           cohens_h_cal <- function(control, test) {
             # remove nas and nulls later on
             prop_control <- mean(control)
             prop_test <- mean(test)
-  
+
             # Arcsine transformation
             phi_control <- 2 * asin(sqrt(prop_control))
             phi_test <- 2 * asin(sqrt(prop_test))
