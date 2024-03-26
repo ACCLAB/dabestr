@@ -113,9 +113,9 @@ load <- function(
   name_y <- rlang::as_name(enquo_y)
 
   #### Checking Validity of params ####
-  validate_load_params(data, name_x, name_y, id_col, enquo_id_col, is_id_col,colour, enquo_colour, is_colour, delta2, idx, paired, proportional)
+  validate_load_params(data, name_x, name_y, id_col, enquo_id_col, is_id_col, colour, enquo_colour, is_colour, delta2, idx, paired, proportional)
 
-  
+
   ## Make idx into a list if it is a vector
   if (typeof(idx) != "list" && !(is.null(idx))) {
     idx <- list(idx)
@@ -262,7 +262,7 @@ load <- function(
   ylim[1] <- ylim[1] - (ylim[2] - ylim[1]) / 25
   ylim[2] <- ylim[2] + (ylim[2] - ylim[1]) / 25
 
-  if (isTRUE(proportional)) {
+  if (proportional) {
     proportional_data <- raw_data %>%
       dplyr::select(!!enquo_x, !!enquo_y, !!enquo_id_col, !!enquo_colour) %>%
       dplyr::group_by(!!enquo_x) %>%
@@ -341,23 +341,23 @@ load <- function(
 print.dabest <- function(x, ...) {
   if (class(x)[1] != "dabest") {
     cli::cli_abort(c("Only dabest class can be used.",
-                     "x" = "Please enter a valid entry into the function."
+      "x" = "Please enter a valid entry into the function."
     ))
   }
-  
+
   dabest_obj <- x
   print_greeting_header()
-  
+
   paired <- dabest_obj$paired
   ci <- dabest_obj$ci
-  
+
   # Use a lookup table for rm_status and paired_status
   rm_status_lookup <- c(NULL = "", "sequential" = "for the sequential design of repeated-measures experiment \\n", "baseline" = "for repeated measures against baseline \\n")
   paired_status_lookup <- c(NULL = "E", "sequential" = "Paired e", "baseline" = "Paired e")
 
   rm_status <- rm_status_lookup[paired]
   paired_status <- paired_status_lookup[paired]
-  
+
   # Create strings
   line1 <- paste0(paired_status, "ffect size(s) ", rm_status)
   line2 <- paste0("with ", ci, "% confidence intervals will be computed for:")

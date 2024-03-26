@@ -12,18 +12,17 @@
 #' @param paired
 #' @param proportional
 #'
-#' @return no error if all parameters are fine 
+#' @return no error if all parameters are fine
 #'
 #'
 #'
-validate_load_params <- function(data, name_x, name_y, 
+validate_load_params <- function(data, name_x, name_y,
                                  id_col, enquo_id_col, is_id_col,
-                                 colour, enquo_colour, is_colour, 
+                                 colour, enquo_colour, is_colour,
                                  delta2, idx, paired,
                                  proportional) {
-
   is_paired <- !(is.null(paired))
-  
+
   if (!name_x %in% colnames(data)) {
     cli::cli_abort(c("Column {.field x} is {.emph not} in {.field data}.",
       "x" = "Please enter a valid entry for {.field x} in {.fun load}."
@@ -74,7 +73,7 @@ validate_load_params <- function(data, name_x, name_y,
       }
     }
   }
-  
+
   ## Check that data is proportional
   if (proportional) {
     values <- unique(data[[name_y]])
@@ -85,7 +84,7 @@ validate_load_params <- function(data, name_x, name_y,
       ))
     }
   }
-  
+
   ## Check that id_col is not NULL if is_paired is TRUE
   if (is_paired & !(is_id_col)) {
     cli::cli_abort(c(
@@ -93,7 +92,7 @@ validate_load_params <- function(data, name_x, name_y,
       "x" = "Please enter an entry for {.field id_col} in {.fun load}."
     ))
   }
-  
+
   ## Check that paired must be either "baseline" or "sequential"
   if (is_paired) {
     if (!paired %in% c("baseline", "sequential")) {

@@ -1,3 +1,13 @@
+# TODO Add documentation
+effect_size_func <- function(control, test, paired) {
+  mean_diff <- mean(test) - mean(control)
+  # paired <- as.logical(paired)
+  if (paired == TRUE) {
+    mean_diff <- mean(test - control)
+  }
+  mean_diff
+}
+
 #' Calculating effect sizes
 #'
 #' @name effect_size
@@ -70,17 +80,10 @@
 #' @export
 mean_diff <- function(dabest_obj, perm_count = 5000) {
   effect_size_type <- "mean_diff"
-  if (!methods::is(dabest_obj, "dabest")) {
+  if (!inherits(dabest_obj, "dabest")) {
     cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
       "x" = "Please supply a {.cls dabest} object."
     )
-  }
-
-  effect_size_func <- function(control, test, paired) {
-    if (identical(paired, FALSE)) {
-      return(mean(test) - mean(control))
-    }
-    return(mean(test - control))
   }
 
   is_paired <- dabest_obj$is_paired
@@ -345,24 +348,6 @@ print.dabest_effectsize <- function(x, ...) {
   dabest_effectsize_obj <- x
   print_greeting_header()
 
-  paired <- dabest_effectsize_obj$paired
-  ci <- dabest_effectsize_obj$ci
-
-  if (is.null(paired)) {
-    rm_status <- ""
-  } else if (paired == "sequential") {
-    rm_status <- "for the sequential design of repeated-measures experiment \n"
-  } else if (paired == "baseline") {
-    rm_status <- "for repeated measures against baseline \n"
-  }
-
-  if (is.null(paired)) {
-    paired_status <- "E"
-  } else if (paired == "sequential") {
-    paired_status <- "Paired e"
-  } else if (paired == "baseline") {
-    paired_status <- "Paired e"
-  }
   es <- dabest_effectsize_obj$effect_size_type
   print_each_comparism_effectsize(dabest_effectsize_obj, es)
   print_ending(dabest_effectsize_obj)
