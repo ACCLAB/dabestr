@@ -341,33 +341,26 @@ load <- function(
 print.dabest <- function(x, ...) {
   if (class(x)[1] != "dabest") {
     cli::cli_abort(c("Only dabest class can be used.",
-      "x" = "Please enter a valid entry into the function."
+                     "x" = "Please enter a valid entry into the function."
     ))
   }
-
+  
   dabest_obj <- x
   print_greeting_header()
-
+  
   paired <- dabest_obj$paired
   ci <- dabest_obj$ci
+  
+  # Use a lookup table for rm_status and paired_status
+  rm_status_lookup <- c(NULL = "", "sequential" = "for the sequential design of repeated-measures experiment \\n", "baseline" = "for repeated measures against baseline \\n")
+  paired_status_lookup <- c(NULL = "E", "sequential" = "Paired e", "baseline" = "Paired e")
 
-  if (is.null(paired)) {
-    rm_status <- ""
-  } else if (paired == "sequential") {
-    rm_status <- "for the sequential design of repeated-measures experiment \n"
-  } else if (paired == "baseline") {
-    rm_status <- "for repeated measures against baseline \n"
-  }
-
-  if (is.null(paired)) {
-    paired_status <- "E"
-  } else if (paired == "sequential") {
-    paired_status <- "Paired e"
-  } else if (paired == "baseline") {
-    paired_status <- "Paired e"
-  }
-  line1 <- paste(paired_status, "ffect size(s) ", rm_status, sep = "")
-  line2 <- paste("with ", ci, "% confidence intervals will be computed for:", sep = "")
+  rm_status <- rm_status_lookup[paired]
+  paired_status <- paired_status_lookup[paired]
+  
+  # Create strings
+  line1 <- paste0(paired_status, "ffect size(s) ", rm_status)
+  line2 <- paste0("with ", ci, "% confidence intervals will be computed for:")
   cat(line1)
   cat(line2)
   cat("\n")
