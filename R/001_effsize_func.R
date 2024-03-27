@@ -1,11 +1,86 @@
 # TODO Add documentation
-effect_size_func <- function(control, test, paired) {
+effect_size_mean_func <- function(control, test, paired) {
   mean_diff <- mean(test) - mean(control)
-  # paired <- as.logical(paired)
   if (paired == TRUE) {
     mean_diff <- mean(test - control)
   }
   mean_diff
+}
+
+# TODO Add documentation
+effect_size_median_func <- function(control, test, paired) {
+  median_diff <- stats::median(test) - stats::median(control)
+  if (paired == TRUE) {
+    median_diff <- stats::median(test - control)
+  }
+  median_diff
+}
+
+# TODO Add documentation
+check_dabest_object <- function(dabest_obj){
+  if (!inherits(dabest_obj, "dabest")) {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object."
+    )
+  }
+}
+
+# TODO Add documentation
+effect_size_cohen_func <- function(control, test, paired) {
+  return(effsize::cohen.d(test, control, paired = paired)$estimate)
+}
+
+# TODO Add documentation
+cohens_d_ <- function(control, test, paired) {
+  return(effsize::cohen.d(test, control, paired = paired)$estimate)
+}
+
+# TODO Add documentation
+hedges_correction <- function(x1, x2) {
+  n1 <- length(x1)
+  n2 <- length(x2)
+  
+  deg.freedom <- n1 + n2 - 2
+  numer <- gamma(deg.freedom / 2)
+  denom0 <- gamma((deg.freedom - 1) / 2)
+  denom <- sqrt((deg.freedom / 2)) * denom0
+  
+  if (is.infinite(numer) | is.infinite(denom)) {
+    # Occurs when df is too large.
+    # Applies Hedges and Olkin's approximation.
+    df.sum <- n1 + n2
+    denom <- (4 * df.sum) - 9
+    out <- 1 - (3 / denom)
+  } else {
+    out <- numer / denom
+  }
+  
+  return(out)
+}
+
+# TODO Add documentation
+effect_size_hedges_func <- function(control, test, paired) {
+  cd <- cohens_d_(test, control, paired = paired)
+  corr.factor <- -hedges_correction(test, control)
+  return(cd * corr.factor)
+}
+
+# TODO Add documentation
+effect_size_cliff_func <- function(control, test, paired = NA) {
+  return(effsize::cliff.delta(test, control)$estimate)
+}
+
+# TODO Add documentation
+effect_size_cohens_h_func <- function(control, test, paired) {
+  # remove nas and nulls later on
+  prop_control <- mean(control)
+  prop_test <- mean(test)
+  
+  # Arcsine transformation
+  phi_control <- 2 * asin(sqrt(prop_control))
+  phi_test <- 2 * asin(sqrt(prop_test))
+  result <- phi_test - phi_control
+  return(result)
 }
 
 #' Calculating effect sizes
@@ -79,23 +154,20 @@ effect_size_func <- function(control, test, paired) {
 #' print(dabest_obj.mean_diff)
 #' @export
 mean_diff <- function(dabest_obj, perm_count = 5000) {
+  
+  check_dabest_object(dabest_obj)
+  
   effect_size_type <- "mean_diff"
-  if (!inherits(dabest_obj, "dabest")) {
-    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
-      "x" = "Please supply a {.cls dabest} object."
-    )
-  }
-
   is_paired <- dabest_obj$is_paired
   reps <- dabest_obj$resamples
 
   if (is_paired) {
-    main_results <- bootstrap(dabest_obj, effect_size_func, boot_labs = "Paired\nmean difference", reps = reps)
+    main_results <- bootstrap(dabest_obj, effect_size_mean_func, boot_labs = "Paired\nmean difference", reps = reps)
   } else {
-    main_results <- bootstrap(dabest_obj, effect_size_func, boot_labs = "Mean difference", reps = reps)
+    main_results <- bootstrap(dabest_obj, effect_size_mean_func, boot_labs = "Mean difference", reps = reps)
   }
   permtest_and_pvalues <- Pvalues_statistics(dabest_obj,
-    ef_size_fn = effect_size_func,
+    ef_size_fn = effect_size_mean_func,
     effect_size_type = effect_size_type,
     perm_count = perm_count
   )
@@ -109,31 +181,21 @@ mean_diff <- function(dabest_obj, perm_count = 5000) {
 #' @rdname effect_size
 #' @export
 median_diff <- function(dabest_obj, perm_count = 5000) {
+  
+  check_dabest_object(dabest_obj)
+
   effect_size_type <- "median_diff"
-  if (!methods::is(dabest_obj, "dabest")) {
-    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
-      "x" = "Please supply a {.cls dabest} object."
-    )
-  }
-
-  effect_size_func <- function(control, test, paired) {
-    if (identical(paired, FALSE)) {
-      return(stats::median(test) - stats::median(control))
-    }
-    return(stats::median(test - control))
-  }
-
   is_paired <- dabest_obj$is_paired
   reps <- dabest_obj$resamples
 
   if (is_paired) {
-    main_results <- bootstrap(dabest_obj, effect_size_func, boot_labs = "Paired\nmedian difference", reps = reps)
+    main_results <- bootstrap(dabest_obj, effect_size_median_func, boot_labs = "Paired\nmedian difference", reps = reps)
   } else {
-    main_results <- bootstrap(dabest_obj, effect_size_func, boot_labs = "Median difference", reps = reps)
+    main_results <- bootstrap(dabest_obj, effect_size_median_func, boot_labs = "Median difference", reps = reps)
   }
 
   permtest_and_pvalues <- Pvalues_statistics(dabest_obj,
-    ef_size_fn = effect_size_func,
+    ef_size_fn = effect_size_median_func,
     effect_size_type = effect_size_type,
     perm_count = perm_count
   )
@@ -148,26 +210,19 @@ median_diff <- function(dabest_obj, perm_count = 5000) {
 #' @rdname effect_size
 #' @export
 cohens_d <- function(dabest_obj, perm_count = 5000) {
+  check_dabest_object(dabest_obj)
+  
   effect_size_type <- "cohens_d"
-  if (!methods::is(dabest_obj, "dabest")) {
-    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
-      "x" = "Please supply a {.cls dabest} object."
-    )
-  }
-
-  effect_size_func <- function(control, test, paired) {
-    return(effsize::cohen.d(test, control, paired = paired)$estimate)
-  }
 
   reps <- dabest_obj$resamples
 
   main_results <- bootstrap(dabest_obj,
-    effect_size_func,
+    effect_size_cohen_func,
     boot_labs = "Cohen's d",
     reps = reps
   )
   permtest_and_pvalues <- Pvalues_statistics(dabest_obj,
-    ef_size_fn = effect_size_func,
+    ef_size_fn = effect_size_cohen_func,
     effect_size_type = effect_size_type,
     perm_count = perm_count
   )
@@ -181,32 +236,19 @@ cohens_d <- function(dabest_obj, perm_count = 5000) {
 #' @rdname effect_size
 #' @export
 hedges_g <- function(dabest_obj, perm_count = 5000) {
+  
+  check_dabest_object(dabest_obj)
+
   effect_size_type <- "hedges_g"
-  if (!methods::is(dabest_obj, "dabest")) {
-    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
-      "x" = "Please supply a {.cls dabest} object."
-    )
-  }
-
-  cohens_d_ <- function(control, test, paired) {
-    return(effsize::cohen.d(test, control, paired = paired)$estimate)
-  }
-
-  effect_size_func <- function(control, test, paired) {
-    cd <- cohens_d_(test, control, paired = paired)
-    corr.factor <- -hedges_correction(test, control)
-    return(cd * corr.factor)
-  }
-
   reps <- dabest_obj$resamples
 
   main_results <- bootstrap(dabest_obj,
-    effect_size_func,
+    effect_size_hedges_func,
     boot_labs = "Hedges' g",
     reps = reps
   )
   permtest_and_pvalues <- Pvalues_statistics(dabest_obj,
-    ef_size_fn = effect_size_func,
+    ef_size_fn = effect_size_hedges_func,
     effect_size_type = effect_size_type,
     perm_count = perm_count
   )
@@ -220,26 +262,19 @@ hedges_g <- function(dabest_obj, perm_count = 5000) {
 #' @rdname effect_size
 #' @export
 cliffs_delta <- function(dabest_obj, perm_count = 5000) {
+  check_dabest_object(dabest_obj)
+  
   effect_size_type <- "cliffs_delta"
-  if (!methods::is(dabest_obj, "dabest")) {
-    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
-      "x" = "Please supply a {.cls dabest} object."
-    )
-  }
-
-  effect_size_func <- function(control, test, paired = NA) {
-    return(effsize::cliff.delta(test, control)$estimate)
-  }
 
   reps <- dabest_obj$resamples
 
   main_results <- bootstrap(dabest_obj,
-    effect_size_func,
+    effect_size_cliff_func,
     boot_labs = "Cliffs' delta",
     reps = reps
   )
   permtest_and_pvalues <- Pvalues_statistics(dabest_obj,
-    ef_size_fn = effect_size_func,
+    ef_size_fn = effect_size_cliff_func,
     effect_size_type = effect_size_type,
     perm_count = perm_count
   )
@@ -253,34 +288,19 @@ cliffs_delta <- function(dabest_obj, perm_count = 5000) {
 #' @rdname effect_size
 #' @export
 cohens_h <- function(dabest_obj, perm_count = 5000) {
+  check_dabest_object(dabest_obj)
+  
   effect_size_type <- "cohens_h"
-  if (!methods::is(dabest_obj, "dabest")) {
-    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
-      "x" = "Please supply a {.cls dabest} object."
-    )
-  }
-
-  effect_size_func <- function(control, test, paired) {
-    # remove nas and nulls later on
-    prop_control <- mean(control)
-    prop_test <- mean(test)
-
-    # Arcsine transformation
-    phi_control <- 2 * asin(sqrt(prop_control))
-    phi_test <- 2 * asin(sqrt(prop_test))
-    result <- phi_test - phi_control
-    return(result)
-  }
 
   reps <- dabest_obj$resamples
 
   main_results <- bootstrap(dabest_obj,
-    effect_size_func,
+    effect_size_cohens_h_func,
     boot_labs = "Cohen's h",
     reps = reps
   )
   permtest_and_pvalues <- Pvalues_statistics(dabest_obj,
-    ef_size_fn = effect_size_func,
+    ef_size_fn = effect_size_cohens_h_func,
     effect_size_type = effect_size_type,
     perm_count = perm_count
   )
@@ -291,27 +311,6 @@ cohens_h <- function(dabest_obj, perm_count = 5000) {
   return(output)
 }
 
-hedges_correction <- function(x1, x2) {
-  n1 <- length(x1)
-  n2 <- length(x2)
-
-  deg.freedom <- n1 + n2 - 2
-  numer <- gamma(deg.freedom / 2)
-  denom0 <- gamma((deg.freedom - 1) / 2)
-  denom <- sqrt((deg.freedom / 2)) * denom0
-
-  if (is.infinite(numer) | is.infinite(denom)) {
-    # Occurs when df is too large.
-    # Applies Hedges and Olkin's approximation.
-    df.sum <- n1 + n2
-    denom <- (4 * df.sum) - 9
-    out <- 1 - (3 / denom)
-  } else {
-    out <- numer / denom
-  }
-
-  return(out)
-}
 
 #' Print a `dabest_effectsize_obj` object
 #'
@@ -339,7 +338,7 @@ hedges_correction <- function(x1, x2) {
 #'
 #' @export
 print.dabest_effectsize <- function(x, ...) {
-  if (!methods::is(x, "dabest_effectsize")) {
+  if (!inherits(x, "dabest_effectsize")) {
     cli::cli_abort(c("Only dabest_effectsize objects can be used.",
       "x" = "Please enter a valid entry into the function."
     ))
