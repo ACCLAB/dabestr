@@ -35,12 +35,12 @@ cohens_d_ <- function(control, test, paired) {
 hedges_correction <- function(x1, x2) {
   n1 <- length(x1)
   n2 <- length(x2)
-  
+
   deg.freedom <- n1 + n2 - 2
   numer <- gamma(deg.freedom / 2)
   denom0 <- gamma((deg.freedom - 1) / 2)
   denom <- sqrt((deg.freedom / 2)) * denom0
-  
+
   if (is.infinite(numer) | is.infinite(denom)) {
     # Occurs when df is too large.
     # Applies Hedges and Olkin's approximation.
@@ -50,7 +50,7 @@ hedges_correction <- function(x1, x2) {
   } else {
     out <- numer / denom
   }
-  
+
   return(out)
 }
 
@@ -71,7 +71,7 @@ effect_size_cohens_h_func <- function(control, test, paired) {
   # remove nas and nulls later on
   prop_control <- mean(control)
   prop_test <- mean(test)
-  
+
   # Arcsine transformation
   phi_control <- 2 * asin(sqrt(prop_control))
   phi_test <- 2 * asin(sqrt(prop_test))
@@ -150,9 +150,8 @@ effect_size_cohens_h_func <- function(control, test, paired) {
 #' print(dabest_obj.mean_diff)
 #' @export
 mean_diff <- function(dabest_obj, perm_count = 5000) {
-  
   check_dabest_object(dabest_obj)
-  
+
   effect_size_type <- "mean_diff"
   is_paired <- dabest_obj$is_paired
   reps <- dabest_obj$resamples
@@ -177,7 +176,6 @@ mean_diff <- function(dabest_obj, perm_count = 5000) {
 #' @rdname effect_size
 #' @export
 median_diff <- function(dabest_obj, perm_count = 5000) {
-  
   check_dabest_object(dabest_obj)
 
   effect_size_type <- "median_diff"
@@ -207,7 +205,7 @@ median_diff <- function(dabest_obj, perm_count = 5000) {
 #' @export
 cohens_d <- function(dabest_obj, perm_count = 5000) {
   check_dabest_object(dabest_obj)
-  
+
   effect_size_type <- "cohens_d"
 
   reps <- dabest_obj$resamples
@@ -232,7 +230,6 @@ cohens_d <- function(dabest_obj, perm_count = 5000) {
 #' @rdname effect_size
 #' @export
 hedges_g <- function(dabest_obj, perm_count = 5000) {
-  
   check_dabest_object(dabest_obj)
 
   effect_size_type <- "hedges_g"
@@ -259,7 +256,7 @@ hedges_g <- function(dabest_obj, perm_count = 5000) {
 #' @export
 cliffs_delta <- function(dabest_obj, perm_count = 5000) {
   check_dabest_object(dabest_obj)
-  
+
   effect_size_type <- "cliffs_delta"
 
   reps <- dabest_obj$resamples
@@ -285,7 +282,7 @@ cliffs_delta <- function(dabest_obj, perm_count = 5000) {
 #' @export
 cohens_h <- function(dabest_obj, perm_count = 5000) {
   check_dabest_object(dabest_obj)
-  
+
   effect_size_type <- "cohens_h"
 
   reps <- dabest_obj$resamples
@@ -335,7 +332,7 @@ cohens_h <- function(dabest_obj, perm_count = 5000) {
 #' @export
 print.dabest_effectsize <- function(dabest_effectsize_obj, ...) {
   check_effectsize_object(dabest_effectsize_obj)
-  
+
   print_greeting_header()
 
   es <- dabest_effectsize_obj$effect_size_type
