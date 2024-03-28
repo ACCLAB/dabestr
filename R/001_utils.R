@@ -103,3 +103,21 @@ validate_load_params <- function(data, name_x, name_y,
     }
   }
 }
+
+# TODO Add documentation
+check_dabest_object <- function(dabest_obj){
+  if (!inherits(dabest_obj, "dabest")) {
+    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
+                   "x" = "Please supply a {.cls dabest} object."
+    )
+  }
+}
+
+# TODO Add documentation
+check_effectsize_object <- function(dabest_effectsize_obj){
+  if (!inherits(dabest_effectsize_obj, "dabest_effectsize")) {
+    cli::cli_abort(c("{.field dabest_effectsize_obj} must be a {.cls dabest_effectsize} object.",
+                     "x" = "Please supply a {.cls dabest_effectsize} object."
+    ))
+  }
+}

@@ -1,3 +1,6 @@
+library(here)
+source(file.path(here::here("R"), "001_utils.R"))
+
 # TODO Add documentation
 effect_size_mean_func <- function(control, test, paired) {
   mean_diff <- mean(test) - mean(control)
@@ -16,14 +19,7 @@ effect_size_median_func <- function(control, test, paired) {
   median_diff
 }
 
-# TODO Add documentation
-check_dabest_object <- function(dabest_obj){
-  if (!inherits(dabest_obj, "dabest")) {
-    cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
-                   "x" = "Please supply a {.cls dabest} object."
-    )
-  }
-}
+
 
 # TODO Add documentation
 effect_size_cohen_func <- function(control, test, paired) {
@@ -337,14 +333,9 @@ cohens_h <- function(dabest_obj, perm_count = 5000) {
 #' print(dabest_obj.mean_diff)
 #'
 #' @export
-print.dabest_effectsize <- function(x, ...) {
-  if (!inherits(x, "dabest_effectsize")) {
-    cli::cli_abort(c("Only dabest_effectsize objects can be used.",
-      "x" = "Please enter a valid entry into the function."
-    ))
-  }
-
-  dabest_effectsize_obj <- x
+print.dabest_effectsize <- function(dabest_effectsize_obj, ...) {
+  check_effectsize_object(dabest_effectsize_obj)
+  
   print_greeting_header()
 
   es <- dabest_effectsize_obj$effect_size_type

@@ -1,3 +1,6 @@
+library(here)
+source(file.path(here::here("R"), "001_utils.R"))
+
 #' Producing an estimation plot
 #'
 #' @name dabest_plot
@@ -36,11 +39,7 @@
 #' @export
 
 dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
-  if (!methods::is(dabest_effectsize_obj, "dabest_effectsize")) {
-    cli::cli_abort(c("{.field dabest_effectsize_obj} must be a {.cls dabest_effectsize} object."),
-      "x" = "Please supply a {.cls dabest_effectsize} object."
-    )
-  }
+  check_effectsize_object(dabest_effectsize_obj)
 
   plot_kwargs <- list(...)
   plot_kwargs <- assign_plot_kwargs(dabest_effectsize_obj, plot_kwargs)
