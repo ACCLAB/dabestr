@@ -1,3 +1,6 @@
+library(here)
+source(file.path(here::here("R"), "001_utils.R"))
+
 #' Generates a ggplot object containing plot components for the rawplot component
 #' of an estimation plot.
 #'
@@ -15,6 +18,8 @@
 #' @return ggplot object containing plot components for the rawplot.
 #' @noRd
 plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
+  check_effectsize_object(dabest_effectsize_obj)
+
   enquo_x <- dabest_effectsize_obj$enquo_x
   enquo_y <- dabest_effectsize_obj$enquo_y
   enquo_id_col <- dabest_effectsize_obj$enquo_id_col
@@ -45,7 +50,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   x_axis_raw <- c(seq(1, raw_x_max, 1))
 
   # Extend x_axis if minimeta/deltadelta is being plotted.
-  if (isTRUE(minimeta) || isTRUE(delta2)) {
+  if (minimeta || delta2) {
     raw_x_max <- raw_x_max + 2
   }
 
@@ -80,8 +85,10 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   is_tufte_lines <- plot_components$is_tufte_lines
 
   ## Creation of dfs for specific main_plot_types ##
+  sankey_df <- NULL
+  sankey_bars <- NULL
   if (main_plot_type == "sankey") {
-    if (isFALSE(flow)) {
+    if (!(flow)) {
       separated_idx <- separate_idx(idx, paired)
       raw_x_max <- length(unlist(separated_idx))
       x_axis_raw <- c(seq(2, raw_x_max, 2)) - 0.5
@@ -101,10 +108,6 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       flow = flow,
       N = Ns$n[1]
     )
-    flow_success_to_failure <- sankey_df$flow_success_to_failure
-    flow_failure_to_success <- sankey_df$flow_failure_to_success
-    flow_success_to_success <- sankey_df$flow_success_to_success
-    flow_failure_to_failure <- sankey_df$flow_failure_to_failure
     sankey_bars <- sankey_df$sankey_bars
     sankey_bars <- create_dfs_for_proportion_bar(sankey_bars$proportion_success,
       bar_width = raw_bar_width,
@@ -113,7 +116,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
 
   if (main_plot_type == "unpaired proportions") {
-    if (isTRUE(float_contrast)) {
+    if (float_contrast) {
       raw_y_max <- 1
       raw_y_min <- 0
     }
@@ -126,143 +129,23 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
 
   #### Initialise raw_plot & Add main_plot_type component ####
-  raw_plot <- switch(main_plot_type,
-    "swarmplot" =
-      ggplot2::ggplot() +
-        ggbeeswarm::geom_beeswarm(
-          data = raw_data,
-          ggplot2::aes(
-            x = x_axis_raw + asymmetric_side * raw_marker_side_shift,
-            y = !!enquo_y,
-            colour = !!enquo_colour
-          ),
-          cex = raw_marker_spread,
-          method = "swarm",
-          side = -asymmetric_side * 1L,
-          size = raw_marker_size,
-          alpha = raw_marker_alpha,
-          corral = "wrap",
-          corral.width = 0.35 + raw_marker_spread
-        ),
-    "slope" =
-      plot_slopegraph(dabest_effectsize_obj, plot_kwargs),
-    "unpaired proportions" =
-      ggplot2::ggplot() +
-        # failure bar
-        geom_proportionbar(
-          data = df_for_proportion_bar,
-          ggplot2::aes(x = x_failure, y = y_failure, colour = tag)
-        ) +
-        # success bar
-        geom_proportionbar(
-          data = df_for_proportion_bar,
-          ggplot2::aes(x = x_success, y = y_success, colour = tag, fill = tag)
-        ),
-    "sankey" =
-      ggplot2::ggplot() +
-        geom_sankeyflow(
-          data = flow_success_to_failure, na.rm = TRUE,
-          ggplot2::aes(x = x, y = y, group = tag, colour = NULL),
-          fill = "#db6159", alpha = raw_flow_alpha
-        ) +
-        geom_sankeyflow(
-          data = flow_failure_to_success, na.rm = TRUE,
-          ggplot2::aes(x = x, y = y, group = tag, colour = NULL),
-          fill = "#818181", alpha = raw_flow_alpha
-        ) +
-        geom_sankeyflow(
-          data = flow_success_to_success, na.rm = TRUE,
-          ggplot2::aes(x = x, y = y, group = tag, colour = NULL),
-          fill = "#db6159", alpha = raw_flow_alpha
-        ) +
-        geom_sankeyflow(
-          data = flow_failure_to_failure, na.rm = TRUE,
-          ggplot2::aes(x = x, y = y, group = tag, colour = NULL),
-          fill = "#818181", alpha = raw_flow_alpha
-        ) +
-        geom_proportionbar(
-          data = sankey_bars,
-          ggplot2::aes(x = x_failure, y = y_failure, group = tag, colour = NULL),
-          fill = "#818181", alpha = raw_marker_alpha
-        ) +
-        geom_proportionbar(
-          data = sankey_bars,
-          ggplot2::aes(x = x_success, y = y_success, group = tag, colour = NULL),
-          fill = "#db6159", alpha = raw_marker_alpha
-        )
-  )
-
-  #### Add scaling Component ####
-  raw_x_labels <- Ns$swarmticklabs
-  if (main_plot_type == "sankey" && isFALSE(flow)) {
-    raw_x_labels <- create_xlabs_for_sankey(idx, Ns, enquo_x)
-  }
-  raw_ylim <- plot_kwargs$swarm_ylim
-  raw_ylim <- if (is.null(raw_ylim)) {
-    raw_y_range_vector
-  } else {
-    raw_ylim
-  }
-
-  raw_y_max <- raw_ylim[2]
-  raw_y_min <- raw_ylim[1]
-  if (isFALSE(float_contrast) && isFALSE(proportional)) {
-    raw_y_min <- raw_y_min - (raw_y_max - raw_y_min) / 15
-  }
-  raw_y_range <- raw_y_max - raw_y_min
-
-  raw_x_min <- ifelse(float_contrast, 0.6, 0.6)
-  raw_x_scalar <- ifelse(float_contrast, 0.5, 0.3)
-
-  raw_plot <- raw_plot +
-    ggplot2::theme_classic() +
-    ggplot2::coord_cartesian(
-      ylim = c(raw_y_min, raw_y_max),
-      xlim = c(raw_x_min, raw_x_max + raw_x_scalar),
-      expand = FALSE,
-      clip = "off"
-    ) +
-    ggplot2::scale_x_continuous(
-      breaks = c(x_axis_raw),
-      labels = raw_x_labels
-    )
-
-  #### Add summary_lines component ####
-  if (isTRUE(is_summary_lines)) {
-    raw_plot <- raw_plot +
-      ggplot2::geom_segment(
-        colour = "black", linewidth = 0.3,
-        ggplot2::aes(
-          x = 1,
-          xend = raw_x_max + raw_x_scalar,
-          y = control_summary,
-          yend = control_summary
-        )
-      ) +
-      ggplot2::geom_segment(
-        colour = "black", linewidth = 0.3,
-        ggplot2::aes(
-          x = 2,
-          xend = raw_x_max + raw_x_scalar,
-          y = test_summary,
-          yend = test_summary
-        )
-      )
-  }
-
+  output <- initialize_raw_plot(plot_kwargs, plot_components, dabest_effectsize_obj, df_for_proportion_bar, sankey_df, sankey_bars, idx, float_contrast)
+  raw_plot <- output[[1]]
+  raw_y_range <- output[[2]]
+  raw_y_min <- output[[3]]
+  
   #### Add tufte lines component ####
-  if (isTRUE(is_tufte_lines)) {
+  if (is_tufte_lines) {
     if (main_plot_type == "sankey") {
       tufte_gap_value <- sankey_bar_gap
       tufte_lines_df <- create_df_for_tufte(raw_data, enquo_x, enquo_y, proportional, tufte_gap_value, effsize_type)
-      if (isFALSE(flow)) {
+      if (!(flow)) {
         tufte_lines_df <- create_dfs_for_nonflow_tufte_lines(tufte_lines_df,
           idx = separated_idx,
           enquo_x = enquo_x
         )
       }
     } else {
-      # if (main_plot_type != "sankey")
       tufte_lines_df <- create_df_for_tufte(raw_data, enquo_x, enquo_y, proportional, 0, effsize_type)
       tufte_gap_value <- ifelse(proportional, min(tufte_lines_df$mean) / 20, raw_y_range / 70)
       tufte_lines_df <- create_df_for_tufte(raw_data, enquo_x, enquo_y, proportional, tufte_gap_value, effsize_type)
@@ -272,12 +155,12 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     tufte_side_adjust_value <- ifelse(proportional, 0, 0.05)
     row_num <- max(x_axis_raw)
     row_ref <- c(seq(1, row_num, 1)) + asymmetric_side * tufte_side_adjust_value + asymmetric_side * raw_marker_side_shift
-    if (isFALSE(flow)) {
+    if (!(flow)) {
       row_ref <- c(seq(1, raw_x_max, 1)) + asymmetric_side * tufte_side_adjust_value + asymmetric_side * raw_marker_side_shift
     }
 
     # to change: temporary fix for tufte lines black for proportional graphs
-    if (isTRUE(proportional) | isTRUE(is_colour)) {
+    if (proportional | is_colour) {
       raw_plot <- raw_plot +
         ggplot2::geom_segment(
           data = tufte_lines_df,
@@ -337,7 +220,8 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
 
   #### Remove x-axis and redraw x_axis component ####
-  if (isTRUE(float_contrast)) {
+  if (float_contrast) {
+    raw_x_min <- 0.6
     raw_plot <- raw_plot +
       float_contrast_theme +
       ggplot2::geom_segment(
@@ -347,7 +231,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       )
   } else {
     # Obtain dfs for xaxis redraw
-    if (main_plot_type == "sankey" && isFALSE(flow)) {
+    if (main_plot_type == "sankey" && !(flow)) {
       idx_for_xaxis_redraw <- remove_last_ele_from_nested_list(idx)
       dfs_for_xaxis_redraw <- create_dfs_for_xaxis_redraw(idx_for_xaxis_redraw)
       df_for_line <- dfs_for_xaxis_redraw$df_for_line
@@ -411,6 +295,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
 
   return(raw_plot)
 }
+
 #' Generates a ggplot object containing plot components for the deltaplot component
 #' of an estimation plot.
 #'
@@ -500,11 +385,11 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
 
   #### initialise delta_plot & Add main_violin_type component ####
   # Extend idx and labels if minimeta or deltadelta
-  if (isTRUE(minimeta) || isTRUE(delta2)) {
+  if (minimeta || delta2) {
     separated_idx <- c(separated_idx, list(c("minimeta", "deltadelta")))
     idx <- separated_idx
   }
-  if (main_plot_type == "sankey" && isFALSE(flow)) {
+  if (main_plot_type == "sankey" && !(flow)) {
     separated_idx <- separate_idx(idx, paired)
     delta_x_max <- length(unlist(separated_idx))
     is_tufte_lines <- FALSE
@@ -527,7 +412,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   x_axis_breaks <- violin_plot_components$x_axis_breaks
   zero_dot_x_breaks <- violin_plot_components$zero_dot_x_breaks
 
-  if (main_plot_type == "sankey" && isFALSE(flow)) {
+  if (main_plot_type == "sankey" && !(flow)) {
     x_axis_breaks <- x_axis_breaks - 0.5
   }
 
@@ -557,14 +442,14 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
 
   ## Add labels ##
-  if (isTRUE(minimeta)) {
+  if (minimeta) {
     delta_x_labels <- append(delta_x_labels, "Weighted\nDelta")
   }
-  if (isTRUE(delta2)) {
+  if (delta2) {
     delta_x_labels <- append(delta_x_labels, "delta-delta")
   }
 
-  if (isTRUE(float_contrast)) {
+  if (float_contrast) {
     difference <- boot_result$difference
 
     if (main_plot_type == "unpaired proportions") {
@@ -593,12 +478,12 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     delta_x_min <- 0.6
     delta_x_scalar <- 0.3
     # Extend xaxis for minimeta/deltadelta.
-    if (isTRUE(minimeta) || isTRUE(delta2)) {
+    if (minimeta || delta2) {
       delta_x_max <- delta_x_max + 2
     }
     ## Custom contrast_ylim
     delta_ylim <- plot_kwargs$contrast_ylim
-    if (isFALSE(is.null(delta_ylim))) {
+    if (!(is.null(delta_ylim))) {
       delta_y_min <- delta_ylim[1]
       delta_y_max <- delta_ylim[2]
       delta_y_mean <- (delta_y_max - delta_y_min) / 2
@@ -621,7 +506,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
 
   #### Add bootci Component ####
-  # if isFALSE(show_delta = FALSE) || isFALSE(show_mini_meta)
+  # if !(show_delta = FALSE) || !(show_mini_meta)
   if (delta2 != dabest_effectsize_obj$delta2 || minimeta != dabest_effectsize_obj$minimeta) {
     boot_result <- boot_result[-nrow(boot_result), ]
   }
@@ -629,7 +514,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   ci_high <- boot_result$bca_ci_high
   difference <- boot_result$difference
 
-  if (isTRUE(is_bootci)) {
+  if (is_bootci) {
     delta_plot <- delta_plot +
       geom_bootci(ggplot2::aes(
         x = x_axis_breaks,
@@ -642,12 +527,12 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
 
   #### Add zero_dot Component ####
-  # removes extra dot if isTRUE(show_delta2) || isTRUE(show_mini_meta)
-  if (isTRUE(delta2) || isTRUE(minimeta)) {
+  # removes extra dot 
+  if (delta2 || minimeta) {
     zero_dot_x_breaks <- zero_dot_x_breaks[-length(zero_dot_x_breaks)]
   }
 
-  if (isTRUE(is_zero_dot)) {
+  if (is_zero_dot) {
     delta_plot <- delta_plot +
       geom_bootci(ggplot2::aes(
         x = zero_dot_x_breaks,
@@ -660,7 +545,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
 
   #### Add baseline_error_curve Component ####
-  if (isTRUE(is_baseline_ec)) {
+  if (is_baseline_ec) {
     # Add violinplot Component
     baseline_ec_boot_result <- dabest_effectsize_obj$baseline_ec_boot_result
 
@@ -703,7 +588,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
 
   #### Add summary lines Component ####
-  if (isTRUE(is_summary_lines)) {
+  if (is_summary_lines) {
     delta_plot <- delta_plot +
       ggplot2::geom_segment(
         colour = "black",
@@ -728,7 +613,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
 
   #### Remove xaxis and redraw xaxis component ####
-  if (isTRUE(float_contrast)) {
+  if (float_contrast) {
     delta_plot <- delta_plot +
       float_contrast_theme +
       ggplot2::geom_hline(
@@ -737,7 +622,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       )
   } else {
     # Obtain xaxis line and ticks elements for xaxis redraw
-    if (main_plot_type == "sankey" && isFALSE(flow)) {
+    if (main_plot_type == "sankey" && !(flow)) {
       idx_for_xaxis_redraw <- remove_last_ele_from_nested_list(idx)
       dfs_for_xaxis_redraw <- create_dfs_for_xaxis_redraw(idx_for_xaxis_redraw)
       df_for_line <- dfs_for_xaxis_redraw$df_for_line
@@ -790,9 +675,9 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
 
   #### Add y = 0 line Component ####
-  if (isFALSE(float_contrast)) {
+  if (!(float_contrast)) {
     zero_line_xend <- delta_x_max + 0.3
-    if (isTRUE(is_deltadelta)) {
+    if (is_deltadelta) {
       zero_line_xend <- zero_line_xend + 0.2
     }
     delta_plot <- delta_plot +
@@ -813,7 +698,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     ggplot2::labs(y = delta_y_labels)
 
   #### Add extra_axis Componenet ####
-  if (isTRUE(is_deltadelta)) {
+  if (is_deltadelta) {
     delta_plot <- delta_plot +
       ggplot2::scale_y_continuous(sec.axis = ggplot2::dup_axis(name = "delta-delta"))
   }

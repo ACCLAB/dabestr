@@ -201,3 +201,172 @@ create_sankey_flows <- function(raw_data, enquo_x, enquo_y, enquo_id_col, idx, N
     flow_failure_to_failure = flow_failure_to_failure
   ))
 }
+
+# TODO Add documentation
+initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_obj, df_for_proportion_bar, sankey_df, sankey_bars, idx, float_contrast) {
+  raw_data <- dabest_effectsize_obj$raw_data
+  enquo_x <- dabest_effectsize_obj$enquo_x
+  enquo_y <- dabest_effectsize_obj$enquo_y
+  enquo_colour <- dabest_effectsize_obj$enquo_colour
+  proportional <- dabest_effectsize_obj$proportional
+  raw_marker_size <- plot_kwargs$raw_marker_size
+  raw_marker_alpha <- plot_kwargs$raw_marker_alpha
+  raw_marker_spread <- plot_kwargs$raw_marker_spread
+  raw_marker_side_shift <- plot_kwargs$raw_marker_side_shift
+  es_marker_size <- plot_kwargs$es_marker_size
+  swarm_x_text <- plot_kwargs$swarm_x_text
+  swarm_y_text <- plot_kwargs$swarm_y_text
+  asymmetric_side <- plot_kwargs$asymmetric_side
+  asymmetric_side <- ifelse(asymmetric_side == "right", -1, 1)
+  raw_x_max <- length(unlist(idx))
+  x_axis_raw <- c(seq(1, raw_x_max, 1))
+  raw_y_range_vector <- dabest_effectsize_obj$ylim
+  Ns <- dabest_effectsize_obj$Ns
+  control_summary <- dabest_effectsize_obj$control_summary
+  test_summary <- dabest_effectsize_obj$test_summary
+  flow <- plot_kwargs$flow
+  paired <- dabest_effectsize_obj$paired
+  raw_flow_alpha <- plot_kwargs$raw_flow_alpha
+  main_plot_type <- plot_components$main_plot_type
+  is_summary_lines <- plot_components$is_summary_lines
+  
+  # sankey params
+  if (!is.null(sankey_df)) {
+    flow_success_to_failure <- sankey_df$flow_success_to_failure
+    flow_failure_to_success <- sankey_df$flow_failure_to_success
+    flow_success_to_success <- sankey_df$flow_success_to_success
+    flow_failure_to_failure <- sankey_df$flow_failure_to_failure
+    
+    # replicate adjustment on the x_axis_raw as in api
+    if (!(flow)) {
+      separated_idx <- separate_idx(idx, paired)
+      raw_x_max <- length(unlist(separated_idx))
+      x_axis_raw <- c(seq(2, raw_x_max, 2)) - 0.5
+    }
+  }
+
+  raw_plot <- switch(main_plot_type,
+    "swarmplot" =
+      ggplot2::ggplot() +
+        ggbeeswarm::geom_beeswarm(
+          data = raw_data,
+          ggplot2::aes(
+            x = x_axis_raw + asymmetric_side * raw_marker_side_shift,
+            y = !!enquo_y,
+            colour = !!enquo_colour
+          ),
+          cex = raw_marker_spread,
+          method = "swarm",
+          side = -asymmetric_side * 1L,
+          size = raw_marker_size,
+          alpha = raw_marker_alpha,
+          corral = "wrap",
+          corral.width = 0.35 + raw_marker_spread
+        ),
+    "slope" =
+      plot_slopegraph(dabest_effectsize_obj, plot_kwargs),
+    "unpaired proportions" =
+      ggplot2::ggplot() +
+        # failure bar
+        geom_proportionbar(
+          data = df_for_proportion_bar,
+          ggplot2::aes(x = x_failure, y = y_failure, colour = tag)
+        ) +
+        # success bar
+        geom_proportionbar(
+          data = df_for_proportion_bar,
+          ggplot2::aes(x = x_success, y = y_success, colour = tag, fill = tag)
+        ),
+    "sankey" =
+      ggplot2::ggplot() +
+        geom_sankeyflow(
+          data = flow_success_to_failure, na.rm = TRUE,
+          ggplot2::aes(x = x, y = y, group = tag, colour = NULL),
+          fill = "#db6159", alpha = raw_flow_alpha
+        ) +
+        geom_sankeyflow(
+          data = flow_failure_to_success, na.rm = TRUE,
+          ggplot2::aes(x = x, y = y, group = tag, colour = NULL),
+          fill = "#818181", alpha = raw_flow_alpha
+        ) +
+        geom_sankeyflow(
+          data = flow_success_to_success, na.rm = TRUE,
+          ggplot2::aes(x = x, y = y, group = tag, colour = NULL),
+          fill = "#db6159", alpha = raw_flow_alpha
+        ) +
+        geom_sankeyflow(
+          data = flow_failure_to_failure, na.rm = TRUE,
+          ggplot2::aes(x = x, y = y, group = tag, colour = NULL),
+          fill = "#818181", alpha = raw_flow_alpha
+        ) +
+        geom_proportionbar(
+          data = sankey_bars,
+          ggplot2::aes(x = x_failure, y = y_failure, group = tag, colour = NULL),
+          fill = "#818181", alpha = raw_marker_alpha
+        ) +
+        geom_proportionbar(
+          data = sankey_bars,
+          ggplot2::aes(x = x_success, y = y_success, group = tag, colour = NULL),
+          fill = "#db6159", alpha = raw_marker_alpha
+        )
+  )
+
+  #### Add scaling Component ####
+  raw_x_labels <- Ns$swarmticklabs
+  if (main_plot_type == "sankey" && !(flow)) {
+    raw_x_labels <- create_xlabs_for_sankey(idx, Ns, enquo_x)
+  }
+  raw_ylim <- plot_kwargs$swarm_ylim
+  raw_ylim <- if (is.null(raw_ylim)) {
+    raw_y_range_vector
+  } else {
+    raw_ylim
+  }
+
+  raw_y_max <- raw_ylim[2]
+  raw_y_min <- raw_ylim[1]
+  if (!(float_contrast) && !(proportional)) {
+    raw_y_min <- raw_y_min - (raw_y_max - raw_y_min) / 15
+  }
+  raw_y_range <- raw_y_max - raw_y_min
+
+  raw_x_min <- ifelse(float_contrast, 0.6, 0.6)
+  raw_x_scalar <- ifelse(float_contrast, 0.5, 0.3)
+
+  raw_plot <- raw_plot +
+    ggplot2::theme_classic() +
+    ggplot2::coord_cartesian(
+      ylim = c(raw_y_min, raw_y_max),
+      xlim = c(raw_x_min, raw_x_max + raw_x_scalar),
+      expand = FALSE,
+      clip = "off"
+    ) +
+    ggplot2::scale_x_continuous(
+      breaks = c(x_axis_raw),
+      labels = raw_x_labels
+    )
+
+  #### Add summary_lines component ####
+  if (is_summary_lines) {
+    raw_plot <- raw_plot +
+      ggplot2::geom_segment(
+        colour = "black", linewidth = 0.3,
+        ggplot2::aes(
+          x = 1,
+          xend = raw_x_max + raw_x_scalar,
+          y = control_summary,
+          yend = control_summary
+        )
+      ) +
+      ggplot2::geom_segment(
+        colour = "black", linewidth = 0.3,
+        ggplot2::aes(
+          x = 2,
+          xend = raw_x_max + raw_x_scalar,
+          y = test_summary,
+          yend = test_summary
+        )
+      )
+  }
+  return(list(raw_plot, raw_y_range, raw_y_min))
+}
