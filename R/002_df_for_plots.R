@@ -169,32 +169,37 @@ create_dfs_for_sankey <- function(
   
   x_padding <- ifelse(float_contrast, 0.008, 0.006)
 
-  prop <- proportional_data
+  #prop <- proportional_data
   ind <- 1
   x_start <- 1
 
-  sankey_bars <- prop
-
-  if (isFALSE(flow)) {
-    sankey_bars <- tibble::tibble()
-
-    for (group in idx) {
-      group_length <- length(group)
-
-      for (i in 1:(group_length - 1)) {
-        ctrl <- group[i]
-        treat <- group[i + 1]
-        temp_row_ctrl <- prop %>%
-          dplyr::group_by(!!enquo_x) %>%
-          dplyr::filter(!!enquo_x == ctrl)
-
-        temp_row_treat <- prop %>%
-          dplyr::group_by(!!enquo_x) %>%
-          dplyr::filter(!!enquo_x == treat)
-        pair_rows <- rbind(temp_row_ctrl, temp_row_treat)
-        sankey_bars <- dplyr::bind_rows(sankey_bars, pair_rows)
-      }
-    }
+  # sankey_bars <- prop
+  # 
+  # if (isFALSE(flow)) {
+  #   sankey_bars <- tibble::tibble()
+  # 
+  #   for (group in idx) {
+  #     group_length <- length(group)
+  # 
+  #     for (i in 1:(group_length - 1)) {
+  #       ctrl <- group[i]
+  #       treat <- group[i + 1]
+  #       temp_row_ctrl <- prop %>%
+  #         dplyr::group_by(!!enquo_x) %>%
+  #         dplyr::filter(!!enquo_x == ctrl)
+  # 
+  #       temp_row_treat <- prop %>%
+  #         dplyr::group_by(!!enquo_x) %>%
+  #         dplyr::filter(!!enquo_x == treat)
+  #       pair_rows <- rbind(temp_row_ctrl, temp_row_treat)
+  #       sankey_bars <- dplyr::bind_rows(sankey_bars, pair_rows)
+  #     }
+  #   }
+  # }
+  sankey_bars <- if (flow) {
+    proportional_data
+  } else {
+    create_sankey_bars(proportional_data, enquo_x, enquo_y, idx)
   }
 
   means_c_t <- sankey_bars$proportion_success
