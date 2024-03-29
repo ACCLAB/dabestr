@@ -20,11 +20,11 @@ create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional, gap, e
   if (!is.logical(proportional)) {
     stop("'proportional' must be a logical value.")
   }
-  
+
   if (!is.numeric(gap)) {
     stop("'gap' must be a numeric value.")
   }
-  
+
   # Compute summary statistics
   tufte_lines_df <- raw_data %>%
     dplyr::group_by(!!enquo_x) %>%
@@ -35,19 +35,19 @@ create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional, gap, e
       lower_quartile = stats::quantile(!!enquo_y)[2],
       upper_quartile = stats::quantile(!!enquo_y)[4]
     )
-  
+
   # Adjust SD if proportional is TRUE
   if (proportional) {
     tufte_lines_df$sd <- tufte_lines_df$sd / 7
   }
-  
+
   # Compute lower and upper SD
   tufte_lines_df <- tufte_lines_df %>%
     dplyr::mutate(
       lower_sd = mean - sd,
       upper_sd = mean + sd
     )
-  
+
   # Compute additional columns based on effsize_type
   if (!is.null(effsize_type) && grepl("edian", effsize_type, ignore.case = TRUE)) {
     tufte_lines_df <- tufte_lines_df %>%
@@ -68,7 +68,7 @@ create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional, gap, e
         y_bot_end = dplyr::case_when(no_diff ~ NA, !no_diff ~ lower_sd)
       )
   }
-  
+
   return(tufte_lines_df)
 }
 
@@ -91,15 +91,15 @@ create_dfs_for_nonflow_tufte_lines <- function(idx,
   # Input validation
   if (is.null(idx)) {
     cli::cli_abort(c("Column {.field idx} is currently NULL.",
-                     "x" = "Please enter a valid entry for {.field idx}"
+      "x" = "Please enter a valid entry for {.field idx}"
     ))
   }
   if (!is.data.frame(tufte_lines_df)) {
     cli::cli_abort(c("Column {.field tufte_lines_df} is not a data frame",
-                     "x" = "Please enter a valid entry for {.field tufte_lines_df}"
+      "x" = "Please enter a valid entry for {.field tufte_lines_df}"
     ))
   }
-  
+
   new_tufte_lines_df <- tibble::tibble()
   total_length <- length(unlist(idx))
   temp_idx <- unlist(idx)
@@ -161,12 +161,11 @@ create_dfs_for_sankey <- function(
 
   bar_width <- ifelse(float_contrast, 0.15, 0.03)
 
-  scale_factor_sig <- switch(
-    type,
+  scale_factor_sig <- switch(type,
     "single sankey" = if (float_contrast) 0.72 else 0.95,
     "multiple sankeys" = 0.92
   )
-  
+
   x_padding <- ifelse(float_contrast, 0.008, 0.006)
 
   ind <- 1
@@ -182,7 +181,7 @@ create_dfs_for_sankey <- function(
   if (sankey) {
     sankey_flows <- create_sankey_flows(
       raw_data,
-      enquo_x, 
+      enquo_x,
       enquo_y,
       enquo_id_col,
       idx,
@@ -193,7 +192,7 @@ create_dfs_for_sankey <- function(
       x_padding,
       scale_factor_sig
     )
-    
+
     flow_success_to_failure <- sankey_flows$flow_success_to_failure
     flow_success_to_success <- sankey_flows$flow_success_to_success
     flow_failure_to_success <- sankey_flows$flow_failure_to_success
@@ -205,7 +204,7 @@ create_dfs_for_sankey <- function(
     flow_failure_to_failure <- data.frame(x = NaN, y = NaN, tag = NaN)
   }
 
-  redraw_x_axis <- c(1:length(unlist(idx)))
+  redraw_x_axis <- seq_along(unlist(idx))
   dfs_for_sankeys <- list(
     flow_success_to_failure = flow_success_to_failure,
     flow_failure_to_success = flow_failure_to_success,
@@ -344,7 +343,7 @@ create_dfs_for_baseline_ec_violin <- function(boots, x_idx_position, float_contr
     y_coords_ci <- (y_coords_ci - min(y_coords_ci)) / (max(y_coords_ci) - min(y_coords_ci))
     y_coords_ci <- y_coords_ci / 6
 
-    if (isFALSE(float_contrast)) {
+    if (!(float_contrast)) {
       y_coords_ci <- y_coords_ci / 1.5
     }
 
