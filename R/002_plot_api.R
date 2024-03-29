@@ -133,7 +133,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   raw_plot <- output[[1]]
   raw_y_range <- output[[2]]
   raw_y_min <- output[[3]]
-  
+
   #### Add tufte lines component ####
   if (is_tufte_lines) {
     if (main_plot_type == "sankey") {
@@ -527,7 +527,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
 
   #### Add zero_dot Component ####
-  # removes extra dot 
+  # removes extra dot
   if (delta2 || minimeta) {
     zero_dot_x_breaks <- zero_dot_x_breaks[-length(zero_dot_x_breaks)]
   }

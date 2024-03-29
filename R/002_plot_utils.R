@@ -229,14 +229,14 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
   raw_flow_alpha <- plot_kwargs$raw_flow_alpha
   main_plot_type <- plot_components$main_plot_type
   is_summary_lines <- plot_components$is_summary_lines
-  
+
   # sankey params
   if (!is.null(sankey_df)) {
     flow_success_to_failure <- sankey_df$flow_success_to_failure
     flow_failure_to_success <- sankey_df$flow_failure_to_success
     flow_success_to_success <- sankey_df$flow_success_to_success
     flow_failure_to_failure <- sankey_df$flow_failure_to_failure
-    
+
     # replicate adjustment on the x_axis_raw as in api
     if (!(flow)) {
       separated_idx <- separate_idx(idx, paired)
