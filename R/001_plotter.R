@@ -97,7 +97,7 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
       align = "vh"
     )
 
-    if (isTRUE(show_legend)){
+    if (isTRUE(show_legend)) {
       if (isTRUE(is_colour)) {
         legend_plot <- cowplot::plot_grid(
           plotlist = list(raw_legend, NULL),
@@ -141,7 +141,7 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
             alpha = "none"
           ) +
           ggplot2::theme(legend.position = "bottom"))
-  
+
         final_plot <- cowplot::plot_grid(final_plot, raw_legend, ncol = 1, rel_heights = c(0.9, 0.1))
       }
     }
