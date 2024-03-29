@@ -103,11 +103,6 @@ geom_bootci <- function(mapping = NULL, data = NULL, stat = "identity",
   )
 }
 
-# Proportion Bar Geom
-"%||%" <- function(a, b) {
-  if (!is.null(a)) a else b
-}
-
 draw_group_proportion_bar <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales)
 
