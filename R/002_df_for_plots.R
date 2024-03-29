@@ -1,3 +1,6 @@
+library(here)
+source(file.path(here::here("R"), "002_plot_utils.R"))
+
 #' Generates the dataframe requires for the tufte lines plot component in raw plots.
 #'
 #' This function returns a dataframe with summary statistics, such as mean, standard
@@ -13,6 +16,16 @@
 #' @returns a dataframe for plotting of the tufte lines plot component.
 #' @noRd
 create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional, gap, effsize_type) {
+  # Input validation
+  if (!is.logical(proportional)) {
+    stop("'proportional' must be a logical value.")
+  }
+  
+  if (!is.numeric(gap)) {
+    stop("'gap' must be a numeric value.")
+  }
+  
+  # Compute summary statistics
   tufte_lines_df <- raw_data %>%
     dplyr::group_by(!!enquo_x) %>%
     dplyr::summarize(
@@ -22,15 +35,21 @@ create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional, gap, e
       lower_quartile = stats::quantile(!!enquo_y)[2],
       upper_quartile = stats::quantile(!!enquo_y)[4]
     )
-
-  if (isTRUE(proportional)) {
-    tufte_lines_df <- tufte_lines_df %>%
-      dplyr::mutate(sd = sd / 7)
+  
+  # Adjust SD if proportional is TRUE
+  if (proportional) {
+    tufte_lines_df$sd <- tufte_lines_df$sd / 7
   }
+  
+  # Compute lower and upper SD
   tufte_lines_df <- tufte_lines_df %>%
-    dplyr::mutate(lower_sd = mean - sd, upper_sd = mean + sd)
-
-  if (isTRUE(stringr::str_detect(effsize_type, "edian"))) {
+    dplyr::mutate(
+      lower_sd = mean - sd,
+      upper_sd = mean + sd
+    )
+  
+  # Compute additional columns based on effsize_type
+  if (!is.null(effsize_type) && grepl("edian", effsize_type, ignore.case = TRUE)) {
     tufte_lines_df <- tufte_lines_df %>%
       dplyr::mutate(no_diff = (sd == 0)) %>%
       dplyr::mutate(
@@ -49,9 +68,10 @@ create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional, gap, e
         y_bot_end = dplyr::case_when(no_diff ~ NA, !no_diff ~ lower_sd)
       )
   }
-
+  
   return(tufte_lines_df)
 }
+
 #' Generates df for tufte lines plot component for raw plot WITH flow = FALSE.
 #'
 #' This function rearranges and duplicates rows in a given dataframe (containing
@@ -68,6 +88,18 @@ create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional, gap, e
 create_dfs_for_nonflow_tufte_lines <- function(idx,
                                                tufte_lines_df,
                                                enquo_x) {
+  # Input validation
+  if (is.null(idx)) {
+    cli::cli_abort(c("Column {.field idx} is currently NULL.",
+                     "x" = "Please enter a valid entry for {.field idx}"
+    ))
+  }
+  if (!is.data.frame(tufte_lines_df)) {
+    cli::cli_abort(c("Column {.field tufte_lines_df} is not a data frame",
+                     "x" = "Please enter a valid entry for {.field tufte_lines_df}"
+    ))
+  }
+  
   new_tufte_lines_df <- tibble::tibble()
   total_length <- length(unlist(idx))
   temp_idx <- unlist(idx)
@@ -129,13 +161,12 @@ create_dfs_for_sankey <- function(
 
   bar_width <- ifelse(float_contrast, 0.15, 0.03)
 
-  if (type == "single sankey" && float_contrast) {
-    scale_factor_sig <- 0.72
-  } else if (type == "multiple sankeys") {
-    scale_factor_sig <- 0.92
-  } else {
-    scale_factor_sig <- 0.95
-  }
+  scale_factor_sig <- switch(
+    type,
+    "single sankey" = if (float_contrast) 0.72 else 0.95,
+    "multiple sankeys" = 0.92
+  )
+  
   x_padding <- ifelse(float_contrast, 0.008, 0.006)
 
   prop <- proportional_data
