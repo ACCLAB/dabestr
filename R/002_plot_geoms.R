@@ -24,6 +24,7 @@ draw_group_halfviolin <- function(data, panel_scales, coord) {
   )
 }
 
+# TODO Add documentation
 GeomHalfViolin <- ggplot2::ggproto("GeomHalfViolin", ggplot2::Geom,
   required_aes = c("x", "y"),
   default_aes = ggplot2::aes(
@@ -75,6 +76,7 @@ draw_panel_boot_ci <- function(data, panel_scales, coord) {
   grid::gTree(children = grid::gList(ci_line, ci_dot))
 }
 
+# TODO Add documentation
 GeomBootCI <- ggplot2::ggproto("GeomBootCI", ggplot2::Geom,
   required_aes = c("x", "ymin", "ymax", "middle"),
   default_aes = ggplot2::aes(
@@ -118,6 +120,7 @@ draw_group_proportion_bar <- function(data, panel_scales, coord) {
   )
 }
 
+# TODO Add documentation
 GeomProportionBar <- ggplot2::ggproto("GeomProportionBar", ggplot2::Geom,
   required_aes = c("x", "y"),
   default_aes = ggplot2::aes(
@@ -162,6 +165,7 @@ draw_group_sankey_flow <- function(data, panel_scales, coord) {
   )
 }
 
+# TODO Add documentation
 GeomSankeyFlow <- ggplot2::ggproto("GeomSankeyFlow", ggplot2::Geom,
   required_aes = c("x", "y"),
   default_aes = ggplot2::aes(
