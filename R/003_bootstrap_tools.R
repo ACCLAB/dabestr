@@ -141,59 +141,36 @@ bootstrap <- function(
   check_params(is_paired, boot_labs, proportional, delta2, ci)
 
   ## Getting boot_results
-  if (!(is_paired) || (paired == "baseline")) {
-    for (group in idx) {
-      group_length <- length(group)
+  for (group in idx) {
+    group_length <- length(group)
+    for (i in 1:(group_length - 1)) {
+      if (!(is_paired) || (paired == "baseline")) {
+        control_group <- group[1]
+      } else {
+        control_group <- group[i]
+      }
+
+      test_group <- group[i + 1]
 
       ctrl_tibble <- raw_data %>%
-        dplyr::filter(!!enquo_x == !!group[1])
+        dplyr::filter(!!enquo_x == !!control_group)
       ctrl_measurement <- ctrl_tibble[[quoname_y]]
 
-      ctrl_size <- length(ctrl_measurement)
-      ctrl_var <- var_w_df(ctrl_measurement, ctrl_size)
+      test_tibble <- raw_data %>%
+        dplyr::filter(!!enquo_x == !!test_group)
+      test_measurement <- test_tibble[[quoname_y]]
 
+      xlabels <- paste(test_group, control_group, sep = "\nminus\n")
+      delta_x_labels <- append(delta_x_labels, xlabels)
 
-      for (test_group in group[2:group_length]) {
-        test_tibble <- raw_data %>%
-          dplyr::filter(!!enquo_x == !!test_group)
+      # add weights column
+      # TODO check if control_group = group[i] for the second use-case
+      boot_row <- get_boot_row(ctrl_measurement, test_measurement, effect_size_func, seed, reps, is_paired, group, test_group, ci)
 
-        test_measurement <- test_tibble[[quoname_y]]
-
-        xlabels <- paste(test_group, group[1], sep = "\nminus\n")
-        delta_x_labels <- append(delta_x_labels, xlabels)
-
-        # add weights column
-        boot_row <- get_boot_row(ctrl_measurement, test_measurement, effect_size_func, seed, reps, is_paired, group, test_group, ci)
-
-        boot_result <- dplyr::bind_rows(boot_result, boot_row)
-      }
-    }
-  } else {
-    for (group in idx) {
-      group_length <- length(group)
-      for (i in 1:(group_length - 1)) {
-        control_group <- group[i]
-        test_group <- group[i + 1]
-
-        ctrl_tibble <- raw_data %>%
-          dplyr::filter(!!enquo_x == !!control_group)
-        ctrl_measurement <- ctrl_tibble[[quoname_y]]
-
-        test_tibble <- raw_data %>%
-          dplyr::filter(!!enquo_x == !!test_group)
-        test_measurement <- test_tibble[[quoname_y]]
-
-        xlabels <- paste(test_group, control_group, sep = "\nminus\n")
-        delta_x_labels <- append(delta_x_labels, xlabels)
-
-        # add weights column
-        # TODO check if control_group = group[i]
-        boot_row <- get_boot_row(ctrl_measurement, test_measurement, effect_size_func, seed, reps, is_paired, group, test_group, ci)
-
-        boot_result <- dplyr::bind_rows(boot_result, boot_row)
-      }
+      boot_result <- dplyr::bind_rows(boot_result, boot_row)
     }
   }
+
   if (minimeta) {
     boot_last_row <- boot_weighted_row(boot_result = boot_result, ci)
     boot_result <- dplyr::bind_rows(boot_result, boot_last_row)
