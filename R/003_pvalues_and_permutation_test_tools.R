@@ -23,7 +23,7 @@ PermutationTest <- function(control,
                             random_seed = 12345,
                             ef_size_fn) {
   # Check if the arrays have the same length for paired test
-  if (isTRUE(is_paired) && length(control) != length(test)) {
+  if (is_paired && (length(control) != length(test))) {
     stop("The two arrays do not have the same length.")
   }
 
@@ -34,6 +34,7 @@ PermutationTest <- function(control,
   control <- as.numeric(control)
   test <- as.numeric(test)
 
+  # TODO do you really need these copies? if not you can manipulate directly control and test.
   control_sample <- control
   test_sample <- test
 
@@ -45,7 +46,7 @@ PermutationTest <- function(control,
   permutations_var <- vector("numeric", length = permutation_count)
 
   for (i in 1:permutation_count) {
-    if (isTRUE(is_paired)) {
+    if (is_paired) {
       # Select which control-test pairs to swap.
       random_idx <- sample(1:CONTROL_LEN,
         size = sample(1:CONTROL_LEN, 1),
@@ -92,6 +93,7 @@ PermutationTest <- function(control,
 
   return(perm_results)
 }
+
 #' Generates statistical test results for possible hypothesis testings.
 #'
 #' This function returns a list that include statistical test results:
@@ -113,7 +115,7 @@ pvals_statistics <- function(control,
                              proportional,
                              effect_size) {
   pvals_stats <- list()
-  if (isTRUE(is_paired) && !proportional) {
+  if (is_paired && !proportional) {
     # Wilcoxon test (non-parametric version of the paired T-test)
     wilcoxon <- stats::wilcox.test(control, test)
     pvalue_wilcoxon <- wilcoxon$p.value
@@ -137,7 +139,7 @@ pvals_statistics <- function(control,
       pvalue_paired_students_t = pvalue_paired_students_t,
       statistic_paired_students_t = statistic_paired_students_t
     )
-  } else if (isTRUE(is_paired) && proportional) {
+  } else if (is_paired && proportional) {
     # McNemar's test for binary paired data
     table <- matrix(
       c(
@@ -200,20 +202,9 @@ pvals_statistics <- function(control,
     standardized_es <- effsize::cohen.d(control, test, is_paired = NULL)
 
     # Cohen's h calculation for binary categorical data
-    if (isTRUE(proportional)) {
+    if (proportional) {
       tryCatch(
         {
-          cohens_h_cal <- function(control, test) {
-            # remove nas and nulls later on
-            prop_control <- mean(control)
-            prop_test <- mean(test)
-
-            # Arcsine transformation
-            phi_control <- 2 * asin(sqrt(prop_control))
-            phi_test <- 2 * asin(sqrt(prop_test))
-            result <- phi_test - phi_control
-            return(result)
-          }
           proportional_difference <- cohens_h_cal(control, test)
         },
         error = function(e) {
@@ -274,12 +265,11 @@ Pvalues_statistics <- function(dabest_object,
   raw_data <- dabest_object$raw_data
   idx <- dabest_object$idx
 
-  if (isFALSE(is.list(idx))) {
+  if (!(is.list(idx))) {
     idx <- list(idx)
   }
   enquo_x <- dabest_object$enquo_x
   enquo_y <- dabest_object$enquo_y
-  ci <- dabest_object$ci
   paired <- dabest_object$paired
   is_paired <- dabest_object$is_paired
 
@@ -288,10 +278,7 @@ Pvalues_statistics <- function(dabest_object,
   quoname_x <- rlang::as_name(enquo_x)
   quoname_y <- rlang::as_name(enquo_y)
 
-  minimeta <- dabest_object$minimeta
-  delta2 <- dabest_object$delta2
-
-  if (isFALSE(is_paired) || isTRUE(paired == "baseline")) {
+  if (!(is_paired) || (paired == "baseline")) {
     for (group in idx) {
       control_group <- group[1]
       group_length <- length(group)
@@ -308,10 +295,6 @@ Pvalues_statistics <- function(dabest_object,
           dplyr::filter(!!enquo_x == !!test_group)
 
         test_measurement <- test_tibble[[quoname_y]]
-
-        xlabels <- paste(test_group, group[1], sep = "\nminus\n")
-
-        test_size <- length(test_measurement)
 
         es <- ef_size_fn(ctrl_measurement, test_measurement, paired = is_paired)
 
@@ -361,24 +344,6 @@ Pvalues_statistics <- function(dabest_object,
           dplyr::filter(!!enquo_x == !!test_group)
         test_measurement <- test_tibble[[quoname_y]]
 
-        xlabels <- paste(test_group, control_group, sep = "\nminus\n")
-
-        control_test_measurement <- list(
-          control = ctrl_measurement,
-          test = test_measurement
-        )
-        # add weights column
-        ctrl_size <- length(ctrl_measurement)
-        ctrl_var <- var_w_df(ctrl_measurement, ctrl_size)
-        test_size <- length(test_measurement)
-        test_var <- var_w_df(test_measurement, test_size)
-        grp_var <- calculate_group_variance(
-          ctrl_var = ctrl_var,
-          ctrl_N = ctrl_size,
-          test_var = test_var,
-          test_N = test_size
-        )
-
         es <- ef_size_fn(ctrl_measurement, test_measurement, paired)
 
         # do permutation tests accordingly
@@ -415,4 +380,17 @@ Pvalues_statistics <- function(dabest_object,
   }
 
   return(list(permtest_pvals = permtest_pvals))
+}
+
+# TODO Add documentation for this auxiliary function
+cohens_h_cal <- function(control, test) {
+  # remove nas and nulls later on
+  prop_control <- mean(control)
+  prop_test <- mean(test)
+
+  # Arcsine transformation
+  phi_control <- 2 * asin(sqrt(prop_control))
+  phi_test <- 2 * asin(sqrt(prop_test))
+  result <- phi_test - phi_control
+  return(result)
 }
