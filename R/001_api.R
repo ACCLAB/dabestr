@@ -161,7 +161,8 @@ load <- function(
         "{.field experiment} does not have a length of 2.",
         "x" = "There can only be 2 groups in {.field experiment} when {.field delta2} is {.strong TRUE}."
       ))
-    } else if (length(unique(data[[name_x]])) != 2) {
+    }
+    if (length(unique(data[[name_x]])) != 2) {
       cli::cli_abort(c(
         "{.field x} does not have a length of 2.",
         "x" = "There can only be 2 groups in {.field x} when {.field delta2} is {.strong TRUE}."
