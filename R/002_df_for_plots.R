@@ -1,8 +1,3 @@
-# TODO
-############## REMOVE THE SOURCE lines, ONLY FOR LOCAL TESTING. AFTER BUILDING IT IS NOT REQUIRED ###################
-library(here)
-source(file.path(here::here("R"), "002_plot_utils.R"))
-
 #' Generates the dataframe requires for the tufte lines plot component in raw plots.
 #'
 #' This function returns a dataframe with summary statistics, such as mean, standard

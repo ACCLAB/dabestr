@@ -1,8 +1,3 @@
-# TODO
-############## REMOVE THE SOURCE lines, ONLY FOR LOCAL TESTING. AFTER BUILDING IT IS NOT REQUIRED ###################
-library(here)
-source(file.path(here::here("R"), "001_utils.R"))
-
 # Functions that generate main_plots based on the main_plot_type of `create_rawplot_components`.
 #
 # Contains function `plot_slopegraph`.

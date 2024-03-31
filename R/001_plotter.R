@@ -1,8 +1,3 @@
-# TODO
-############## REMOVE THE SOURCE lines, ONLY FOR LOCAL TESTING. AFTER BUILDING IT IS NOT REQUIRED ###################
-library(here)
-source(file.path(here::here("R"), "001_utils.R"))
-
 #' Producing an estimation plot
 #'
 #' @name dabest_plot

@@ -1,8 +1,3 @@
-# TODO
-############## REMOVE THE SOURCE lines, ONLY FOR LOCAL TESTING. AFTER BUILDING IT IS NOT REQUIRED ###################
-library(here)
-source(file.path(here::here("R"), "001_utils.R"))
-
 # TODO Add documentation
 effect_size_mean_func <- function(control, test, paired) {
   mean_diff <- mean(test) - mean(control)
