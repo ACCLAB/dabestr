@@ -3,6 +3,7 @@
 # Contains function `apply_palette`.
 
 # Applies palettes to <ggplot> objects
+# TODO add proper documentation.
 apply_palette <- function(ggplot_object, palette_name) {
   ggplot_object <- switch(palette_name,
     "npg" =
