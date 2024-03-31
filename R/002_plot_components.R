@@ -178,11 +178,7 @@ create_violinplot_components <- function(boots,
 # TODO add documentation
 add_violinplot_component_to_delta_plot <- function(delta_plot, dabest_effectsize_obj, main_violin_type, flow, float_contrast, zero_dot_x_breaks) {
   baseline_ec_boot_result <- dabest_effectsize_obj$baseline_ec_boot_result
-
   baseline_boots <- baseline_ec_boot_result$bootstraps
-  baseline_ci_low <- baseline_ec_boot_result$bca_ci_low
-  baseline_ci_high <- baseline_ec_boot_result$bca_ci_high
-  baseline_difference <- baseline_ec_boot_result$difference
 
   df_for_baseline_ec_violin <- create_dfs_for_baseline_ec_violin(
     baseline_boots,

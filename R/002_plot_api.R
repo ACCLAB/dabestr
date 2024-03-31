@@ -484,7 +484,10 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   if (is_baseline_ec) {
     # Add violinplot Component
     delta_plot <- add_violinplot_component_to_delta_plot(delta_plot, dabest_effectsize_obj, main_violin_type, flow, float_contrast, zero_dot_x_breaks)
-
+    baseline_ec_boot_result <- dabest_effectsize_obj$baseline_ec_boot_result
+    baseline_ci_low <- baseline_ec_boot_result$bca_ci_low
+    baseline_ci_high <- baseline_ec_boot_result$bca_ci_high
+    baseline_difference <- baseline_ec_boot_result$difference
     # Add bootci Component
     delta_plot <- add_bootci_component_to_delta_plot(delta_plot, zero_dot_x_breaks, baseline_ci_low, baseline_ci_high, baseline_difference, es_marker_size, es_line_size)
   }
