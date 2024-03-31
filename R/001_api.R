@@ -125,25 +125,8 @@ load <- function(
 
   ## Check for valid mini-meta
   if (minimeta) {
-    if (proportional) {
-      cli::cli_abort(c(
-        "{.field proportional} is {.strong TRUE} but {.field minimeta} is also {.strong TRUE}.",
-        "x" = "{.field proportional} and {.field minimeta} cannot be {.strong TRUE} at the same time."
-      ))
-    } else if (delta2) {
-      cli::cli_abort(c(
-        "{.field delta2} is {.strong TRUE} but {.field minimeta} is also {.strong TRUE}.",
-        "x" = "{.field delta2} and {.field minimeta} cannot be {.strong TRUE} at the same time."
-      ))
-    }
-
     minimeta_idx_lengths <- sapply(idx, length)
-    if (any(minimeta_idx_lengths != 2)) {
-      cli::cli_abort(c(
-        "{.field minimeta} is {.strong TRUE}, but some {.field idx} does not consist of exactly 2 groups",
-        "x" = "You can only put in exactly 2 groups in {.field idx} when {.field minimeta} is {.strong TRUE}."
-      ))
-    }
+    validate_minimeta_params(proportional, delta2, minimeta_idx_lengths)
   }
 
   if (delta2) {
@@ -341,14 +324,9 @@ load <- function(
 #' print(dabest_obj)
 #'
 #' @export
-print.dabest <- function(x, ...) {
-  if (class(x)[1] != "dabest") {
-    cli::cli_abort(c("Only dabest class can be used.",
-      "x" = "Please enter a valid entry into the function."
-    ))
-  }
+print.dabest <- function(dabest_obj, ...) {
+  check_dabest_object(dabest_obj)
 
-  dabest_obj <- x
   print_greeting_header()
 
   paired <- dabest_obj$paired

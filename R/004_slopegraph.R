@@ -1,10 +1,19 @@
+# TODO
+############## REMOVE THE SOURCE lines, ONLY FOR LOCAL TESTING. AFTER BUILDING IT IS NOT REQUIRED ###################
+library(here)
+source(file.path(here::here("R"), "001_utils.R"))
+
 # Functions that generate main_plots based on the main_plot_type of `create_rawplot_components`.
 #
 # Contains function `plot_slopegraph`.
 
 
 # Function that plots slopegraph
+# TODO add proper documentation
+
 plot_slopegraph <- function(dabest_effectsize_obj, plot_kwargs) {
+  check_effectsize_object(dabest_effectsize_obj)
+
   raw_data <- dabest_effectsize_obj$raw_data
 
   raw_marker_size <- plot_kwargs$raw_marker_size

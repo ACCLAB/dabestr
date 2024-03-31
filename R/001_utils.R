@@ -105,6 +105,29 @@ validate_load_params <- function(data, name_x, name_y,
 }
 
 # TODO Add documentation
+validate_minimeta_params <- function(proportional, delta2, minimeta_idx_lengths) {
+  if (proportional) {
+    cli::cli_abort(c(
+      "{.field proportional} is {.strong TRUE} but {.field minimeta} is also {.strong TRUE}.",
+      "x" = "{.field proportional} and {.field minimeta} cannot be {.strong TRUE} at the same time."
+    ))
+  }
+  if (delta2) {
+    cli::cli_abort(c(
+      "{.field delta2} is {.strong TRUE} but {.field minimeta} is also {.strong TRUE}.",
+      "x" = "{.field delta2} and {.field minimeta} cannot be {.strong TRUE} at the same time."
+    ))
+  }
+
+  if (any(minimeta_idx_lengths != 2)) {
+    cli::cli_abort(c(
+      "{.field minimeta} is {.strong TRUE}, but some {.field idx} does not consist of exactly 2 groups",
+      "x" = "You can only put in exactly 2 groups in {.field idx} when {.field minimeta} is {.strong TRUE}."
+    ))
+  }
+}
+
+# TODO Add documentation
 check_dabest_object <- function(dabest_obj) {
   if (!inherits(dabest_obj, "dabest")) {
     cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
