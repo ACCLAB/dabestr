@@ -97,6 +97,7 @@ print_each_comparism_effectsize <- function(dabest_object, effectsize) {
   ci <- dabest_object$boot_result$ci
   pvalue <- dabest_object$permtest_pvals$pval_for_tests
 
+  # TODO switch lookup table
   if (is.null(paired)) {
     rm_status <- ""
   } else if (paired == "sequential") {

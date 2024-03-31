@@ -370,3 +370,57 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
   }
   return(list(raw_plot, raw_y_range, raw_y_min))
 }
+
+adjust_x_axis_in_delta_plot <- function(delta_plot, main_plot_type, flow, idx, x, delta_y_min, delta_y_mean) {
+  if (main_plot_type == "sankey" && !(flow)) {
+    idx_for_xaxis_redraw <- remove_last_ele_from_nested_list(idx)
+    dfs_for_xaxis_redraw <- create_dfs_for_xaxis_redraw(idx_for_xaxis_redraw)
+    df_for_line <- dfs_for_xaxis_redraw$df_for_line
+    df_for_ticks <- dfs_for_xaxis_redraw$df_for_ticks
+
+    df_for_line <- df_for_line %>%
+      dplyr::mutate(
+        x = x + 0.5 + (x - 1),
+        xend = xend + 0.5 + (xend - 1)
+      )
+
+    df_for_ticks <- df_for_ticks %>%
+      dplyr::mutate(x = x + 0.5 + (x - 1))
+  } else {
+    dfs_for_xaxis_redraw <- create_dfs_for_xaxis_redraw(idx)
+    df_for_line <- dfs_for_xaxis_redraw$df_for_line
+    df_for_ticks <- dfs_for_xaxis_redraw$df_for_ticks
+  }
+
+  delta_plot <- delta_plot +
+    non_float_contrast_theme +
+
+    # Redraw xaxis line
+    ggplot2::geom_segment(
+      data = df_for_line,
+      linewidth = 0.5,
+      lineend = "square",
+      color = "black",
+      ggplot2::aes(
+        x = x,
+        xend = xend,
+        y = delta_y_min - delta_y_mean / 22,
+        yend = delta_y_min - delta_y_mean / 22
+      )
+    ) +
+
+    # Redraw xaxis ticks
+    ggplot2::geom_segment(
+      data = df_for_ticks,
+      linewidth = 0.5,
+      lineend = "square",
+      color = "black",
+      ggplot2::aes(
+        x = x,
+        xend = x,
+        y = delta_y_min - delta_y_mean / 22,
+        yend = delta_y_min - delta_y_mean / 10
+      )
+    )
+  return(delta_plot)
+}

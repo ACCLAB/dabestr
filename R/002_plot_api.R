@@ -1,3 +1,5 @@
+# TODO
+############## REMOVE THE SOURCE lines, ONLY FOR LOCAL TESTING. AFTER BUILDING IT IS NOT REQUIRED ###################
 library(here)
 source(file.path(here::here("R"), "001_utils.R"))
 
@@ -433,14 +435,6 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
         )
   )
 
-  #### Add scaling Component ####
-  raw_ylim <- plot_kwargs$swarm_ylim
-  raw_ylim <- if (is.null(raw_ylim)) {
-    c(raw_y_min, raw_y_max)
-  } else {
-    raw_ylim
-  }
-
   ## Add labels ##
   if (minimeta) {
     delta_x_labels <- append(delta_x_labels, "Weighted\nDelta")
@@ -449,64 +443,27 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     delta_x_labels <- append(delta_x_labels, "delta-delta")
   }
 
-  if (float_contrast) {
-    difference <- boot_result$difference
-
-    if (main_plot_type == "unpaired proportions") {
-      raw_y_range_vector <- c(0, 1)
-    }
-    # Calculate new ylims to align summary lines
-    min_raw_y <- raw_ylim[1]
-    max_raw_y <- raw_ylim[2]
-    raw_y_range <- max_raw_y - min_raw_y
-    min_y_coords <- difference / (1 - (test_summary - min_raw_y) / (control_summary - min_raw_y))
-    delta_y_range <- raw_y_range * -min_y_coords / (control_summary - min_raw_y)
-
-    delta_plot <- delta_plot +
-      ggplot2::theme_classic() +
-      ggplot2::coord_cartesian(
-        ylim = c(min_y_coords, min_y_coords + delta_y_range),
-        xlim = c(1.8, delta_x_max + 0.4),
-        expand = FALSE
-      ) +
-      ggplot2::scale_x_continuous(
-        breaks = c(2),
-        labels = delta_x_labels
-      ) +
-      ggplot2::scale_y_continuous(position = "right")
+  #### Add scaling Component ####
+  raw_ylim <- plot_kwargs$swarm_ylim
+  raw_ylim <- if (is.null(raw_ylim)) {
+    c(raw_y_min, raw_y_max)
   } else {
-    delta_x_min <- 0.6
-    delta_x_scalar <- 0.3
-    # Extend xaxis for minimeta/deltadelta.
-    if (minimeta || delta2) {
-      delta_x_max <- delta_x_max + 2
-    }
-    ## Custom contrast_ylim
-    delta_ylim <- plot_kwargs$contrast_ylim
-    if (!(is.null(delta_ylim))) {
-      delta_y_min <- delta_ylim[1]
-      delta_y_max <- delta_ylim[2]
-      delta_y_mean <- (delta_y_max - delta_y_min) / 2
-    }
-
-    delta_plot <- delta_plot +
-      ggplot2::theme_classic() +
-      ggplot2::coord_cartesian(
-        ylim = c(
-          delta_y_min - delta_y_mean / 10,
-          delta_y_max
-        ),
-        xlim = c(delta_x_min, delta_x_max + delta_x_scalar),
-        expand = FALSE
-      ) +
-      ggplot2::scale_x_continuous(
-        breaks = x_axis_breaks,
-        labels = delta_x_labels
-      )
+    raw_ylim
   }
+  summary_data <- list(control_summary, test_summary)
+  delta_x_axis_params <- list(delta_x_max, delta_x_labels, x_axis_breaks)
+  delta_y_axis_params <- list(delta_y_min, delta_y_max, delta_y_mean, raw_ylim)
+
+  output <- add_scaling_component_to_delta_plot(delta_plot, float_contrast, boot_result, delta_x_axis_params, delta_y_axis_params, summary_data, plot_kwargs)
+  delta_plot <- output[[1]]
+  delta_x_max <- output[[2]]
+  delta_y_params <- output[[3]]
+  min_y_coords <- delta_y_params[[1]]
+  delta_y_min <- delta_y_params[[2]]
+  delta_y_max <- delta_y_params[[3]]
+  delta_y_mean <- delta_y_params[[4]]
 
   #### Add bootci Component ####
-  # if !(show_delta = FALSE) || !(show_mini_meta)
   if (delta2 != dabest_effectsize_obj$delta2 || minimeta != dabest_effectsize_obj$minimeta) {
     boot_result <- boot_result[-nrow(boot_result), ]
   }
@@ -515,15 +472,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   difference <- boot_result$difference
 
   if (is_bootci) {
-    delta_plot <- delta_plot +
-      geom_bootci(ggplot2::aes(
-        x = x_axis_breaks,
-        ymin = ci_low,
-        ymax = ci_high,
-        middle = difference,
-        dotsize = es_marker_size,
-        linesize = es_line_size
-      ))
+    delta_plot <- add_bootci_component_to_delta_plot(delta_plot, x_axis_breaks, ci_low, ci_high, difference, es_marker_size, es_line_size)
   }
 
   #### Add zero_dot Component ####
@@ -533,58 +482,16 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
 
   if (is_zero_dot) {
-    delta_plot <- delta_plot +
-      geom_bootci(ggplot2::aes(
-        x = zero_dot_x_breaks,
-        ymin = 0,
-        ymax = 0,
-        middle = 0,
-        dotsize = es_marker_size,
-        linesize = es_line_size
-      ))
+    delta_plot <- add_bootci_component_to_delta_plot(delta_plot, zero_dot_x_breaks, 0, 0, 0, es_marker_size, es_line_size)
   }
 
   #### Add baseline_error_curve Component ####
   if (is_baseline_ec) {
     # Add violinplot Component
-    baseline_ec_boot_result <- dabest_effectsize_obj$baseline_ec_boot_result
+    delta_plot <- add_violinplot_component_to_delta_plot(delta_plot, dabest_effectsize_obj, main_violin_type, flow, float_contrast, zero_dot_x_breaks)
 
-    baseline_boots <- baseline_ec_boot_result$bootstraps
-    baseline_ci_low <- baseline_ec_boot_result$bca_ci_low
-    baseline_ci_high <- baseline_ec_boot_result$bca_ci_high
-    baseline_difference <- baseline_ec_boot_result$difference
-
-    df_for_baseline_ec_violin <- create_dfs_for_baseline_ec_violin(
-      baseline_boots,
-      zero_dot_x_breaks,
-      float_contrast,
-      flow
-    )
-    if (main_violin_type == "multicolour") {
-      delta_plot <- delta_plot +
-        geom_halfviolin(
-          na.rm = TRUE,
-          data = df_for_baseline_ec_violin,
-          ggplot2::aes(x = y, y = x, fill = tag)
-        )
-    } else {
-      delta_plot <- delta_plot +
-        geom_halfviolin(
-          na.rm = TRUE,
-          data = df_for_baseline_ec_violin,
-          ggplot2::aes(x = y, y = x, group = tag)
-        )
-    }
     # Add bootci Component
-    delta_plot <- delta_plot +
-      geom_bootci(ggplot2::aes(
-        x = zero_dot_x_breaks,
-        ymin = baseline_ci_low,
-        ymax = baseline_ci_high,
-        middle = baseline_difference,
-        dotsize = es_marker_size,
-        linesize = es_line_size
-      ))
+    delta_plot <- add_bootci_component_to_delta_plot(delta_plot, zero_dot_x_breaks, baseline_ci_low, baseline_ci_high, baseline_difference, es_marker_size, es_line_size)
   }
 
   #### Add summary lines Component ####
@@ -622,56 +529,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       )
   } else {
     # Obtain xaxis line and ticks elements for xaxis redraw
-    if (main_plot_type == "sankey" && !(flow)) {
-      idx_for_xaxis_redraw <- remove_last_ele_from_nested_list(idx)
-      dfs_for_xaxis_redraw <- create_dfs_for_xaxis_redraw(idx_for_xaxis_redraw)
-      df_for_line <- dfs_for_xaxis_redraw$df_for_line
-      df_for_ticks <- dfs_for_xaxis_redraw$df_for_ticks
-
-      df_for_line <- df_for_line %>%
-        dplyr::mutate(
-          x = x + 0.5 + (x - 1),
-          xend = xend + 0.5 + (xend - 1)
-        )
-
-      df_for_ticks <- df_for_ticks %>%
-        dplyr::mutate(x = x + 0.5 + (x - 1))
-    } else {
-      dfs_for_xaxis_redraw <- create_dfs_for_xaxis_redraw(idx)
-      df_for_line <- dfs_for_xaxis_redraw$df_for_line
-      df_for_ticks <- dfs_for_xaxis_redraw$df_for_ticks
-    }
-
-    delta_plot <- delta_plot +
-      non_float_contrast_theme +
-
-      # Redraw xaxis line
-      ggplot2::geom_segment(
-        data = df_for_line,
-        linewidth = 0.5,
-        lineend = "square",
-        color = "black",
-        ggplot2::aes(
-          x = x,
-          xend = xend,
-          y = delta_y_min - delta_y_mean / 22,
-          yend = delta_y_min - delta_y_mean / 22
-        )
-      ) +
-
-      # Redraw xaxis ticks
-      ggplot2::geom_segment(
-        data = df_for_ticks,
-        linewidth = 0.5,
-        lineend = "square",
-        color = "black",
-        ggplot2::aes(
-          x = x,
-          xend = x,
-          y = delta_y_min - delta_y_mean / 22,
-          yend = delta_y_min - delta_y_mean / 10
-        )
-      )
+    delta_plot <- adjust_x_axis_in_delta_plot(delta_plot, main_plot_type, flow, idx, x, delta_y_min, delta_y_mean)
   }
 
   #### Add y = 0 line Component ####
