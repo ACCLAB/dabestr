@@ -56,7 +56,7 @@ check_params <- function(is_paired, boot_labs, proportional, delta2, ci) {
   }
 }
 
-get_boot_row <- function(ctrl_measurement, test_measurement, effect_size_func, seed, reps, is_paired, group, test_group, ci) {
+get_boot_row <- function(ctrl_measurement, test_measurement, effect_size_func, seed, reps, is_paired, control_group, test_group, ci) {
   control_test_measurement <- list(
     control = ctrl_measurement,
     test = test_measurement
@@ -89,7 +89,7 @@ get_boot_row <- function(ctrl_measurement, test_measurement, effect_size_func, s
   bootci <- boot::boot.ci(boots, conf = ci / 100, type = c("perc", "bca"))
 
   boot_row <- list(
-    control_group = group[1],
+    control_group = control_group,
     test_group = test_group,
     bootstraps = list(as.vector(boots$t)),
     nboots = length(boots$t),
@@ -164,8 +164,7 @@ bootstrap <- function(
       delta_x_labels <- append(delta_x_labels, xlabels)
 
       # add weights column
-      # TODO check if control_group = group[i] for the second use-case
-      boot_row <- get_boot_row(ctrl_measurement, test_measurement, effect_size_func, seed, reps, is_paired, group, test_group, ci)
+      boot_row <- get_boot_row(ctrl_measurement, test_measurement, effect_size_func, seed, reps, is_paired, control_group, test_group, ci)
 
       boot_result <- dplyr::bind_rows(boot_result, boot_row)
     }
@@ -193,7 +192,7 @@ bootstrap <- function(
     xlabels <- paste(test_group, control_group, sep = "\nminus\n")
 
     # add weights column
-    boot_row <- get_boot_row(ctrl_measurement, test_measurement, effect_size_func, seed, reps, is_paired, group, test_group, ci)
+    boot_row <- get_boot_row(ctrl_measurement, test_measurement, effect_size_func, seed, reps, is_paired, control_group, test_group, ci)
 
     baseline_ec_boot_result <- dplyr::bind_rows(baseline_ec_boot_result, boot_row)
   }
