@@ -40,26 +40,28 @@ test_that("Throws an error for invalid inputs", {
                message = "argument 'boots' is missing, with no default")
 })
 
-test_that("Returns a list of data frames with correct dimensions and values for valid inputs", {
-  # Test case: Valid inputs
-  idx <- list(1:5, 6:10, 11:15)
-  result <- create_dfs_for_xaxis_redraw(idx)
-  expect_is(result, "list")
-  expect_equal(length(result), 2) # 2 data frames returned
-  # Check df_for_line
-  expect_is(result$df_for_line, "data.frame")
-  expect_equal(nrow(result$df_for_line), length(idx))
-  expect_equal(ncol(result$df_for_line), 2)
-  expect_equal(sum(is.na(result$df_for_line)), 0)
-  # Check df_for_ticks
-  expect_is(result$df_for_ticks, "data.frame")
-  expect_equal(nrow(result$df_for_ticks), sum(lengths(idx)))
-  expect_equal(ncol(result$df_for_ticks), 1)
-  expect_equal(sum(is.na(result$df_for_ticks)), 0)
-})
-
-test_that("Throws an error for invalid inputs", {
-  # Test case: Invalid inputs (e.g., idx not provided)
-  expect_error(create_dfs_for_xaxis_redraw(), 
-               message = "argument 'idx' is missing, with no default")
+describe("Testing create_dfs_for_xaxis_redraw function", {
+  test_that("Returns a list of data frames with correct dimensions and values for valid inputs", {
+    # Test case: Valid inputs
+    idx <- list(1:5, 6:10, 11:15)
+    result <- create_dfs_for_xaxis_redraw(idx)
+    expect_is(result, "list")
+    expect_equal(length(result), 2) # 2 data frames returned
+    # Check df_for_line
+    expect_is(result$df_for_line, "data.frame")
+    expect_equal(nrow(result$df_for_line), length(idx))
+    expect_equal(ncol(result$df_for_line), 2)
+    expect_equal(sum(is.na(result$df_for_line)), 0)
+    # Check df_for_ticks
+    expect_is(result$df_for_ticks, "data.frame")
+    expect_equal(nrow(result$df_for_ticks), sum(lengths(idx)))
+    expect_equal(ncol(result$df_for_ticks), 1)
+    expect_equal(sum(is.na(result$df_for_ticks)), 0)
+  })
+  
+  test_that("Throws an error for invalid inputs", {
+    # Test case: Invalid inputs (e.g., idx not provided)
+    expect_error(create_dfs_for_xaxis_redraw(), 
+                 message = "argument 'idx' is missing, with no default")
+  })
 })
