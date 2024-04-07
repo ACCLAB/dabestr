@@ -120,16 +120,12 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     df_for_proportion_bar <- create_dfs_for_proportion_bar(proportion_success, bar_width = raw_bar_width)
   }
 
-  ## Adjustment of labels ##
-  if (ggplot2::as_label(enquo_colour) == "NULL" && main_plot_type != "slope") {
-    enquo_colour <- enquo_x
-  }
-
   #### Initialise raw_plot & Add main_plot_type component ####
   output <- initialize_raw_plot(plot_kwargs, plot_components, dabest_effectsize_obj, df_for_proportion_bar, sankey_df, sankey_bars, idx, float_contrast)
   raw_plot <- output[[1]]
   raw_y_range <- output[[2]]
   raw_y_min <- output[[3]]
+  x_axis_raw <- output[[4]]
 
   #### Add tufte lines component ####
   if (is_tufte_lines) {

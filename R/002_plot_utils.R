@@ -229,6 +229,11 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
   raw_flow_alpha <- plot_kwargs$raw_flow_alpha
   main_plot_type <- plot_components$main_plot_type
   is_summary_lines <- plot_components$is_summary_lines
+  
+  ## Adjustment of labels ##
+  if (ggplot2::as_label(enquo_colour) == "NULL" && main_plot_type != "slope") {
+    enquo_colour <- enquo_x
+  }
 
   # sankey params
   if (!is.null(sankey_df)) {
@@ -368,7 +373,7 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
         )
       )
   }
-  return(list(raw_plot, raw_y_range, raw_y_min))
+  return(list(raw_plot, raw_y_range, raw_y_min, x_axis_raw))
 }
 
 adjust_x_axis_in_delta_plot <- function(delta_plot, main_plot_type, flow, idx, x, delta_y_min, delta_y_mean) {
