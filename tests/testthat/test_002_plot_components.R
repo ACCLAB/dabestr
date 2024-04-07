@@ -14,6 +14,7 @@ describe("Testing add_scaling_component_to_delta_plot function", {
     expect_equal(length(result), 3) # 3 components returned
     # Check delta_plot component
     expect_type(result[[1]], "list")
+    # TODO Add specific expectations to check if the components are created correctly
   })
   
   test_that("Throws an error for invalid inputs", {
@@ -38,6 +39,7 @@ describe("Testing add_violinplot_component_to_delta_plot function", {
     expect_no_error(
       add_violinplot_component_to_delta_plot(delta_plot, dabest_effectsize_obj, main_violin_type, flow, float_contrast, zero_dot_x_breaks)
     )
+    # TODO Add specific expectations to check if the components are created correctly
   })
   
   test_that("Throws an error for invalid inputs", {
@@ -61,6 +63,6 @@ describe("Testing create_violinplot_components function", {
     result <- create_violinplot_components(boots, idx, float_contrast, delta_y_max, delta_y_min, flow, zero_dot)
     expect_type(result, "list")
     expect_equal(length(result), 5) # 5 components returned
-    # Check components for correctness if needed
+    # TODO Add specific expectations to check if the components are created correctly
   })
 })
