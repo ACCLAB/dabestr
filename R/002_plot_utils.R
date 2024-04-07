@@ -218,6 +218,8 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
   swarm_y_text <- plot_kwargs$swarm_y_text
   asymmetric_side <- plot_kwargs$asymmetric_side
   asymmetric_side <- ifelse(asymmetric_side == "right", -1, 1)
+  minimeta <- plot_kwargs$show_mini_meta
+  delta2 <- plot_kwargs$show_delta2
   raw_x_max <- length(unlist(idx))
   x_axis_raw <- c(seq(1, raw_x_max, 1))
   raw_y_range_vector <- dabest_effectsize_obj$ylim
@@ -229,6 +231,11 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
   raw_flow_alpha <- plot_kwargs$raw_flow_alpha
   main_plot_type <- plot_components$main_plot_type
   is_summary_lines <- plot_components$is_summary_lines
+  
+  # Extend x_axis if minimeta/deltadelta is being plotted.
+  if (minimeta || delta2) {
+    raw_x_max <- raw_x_max + 2
+  }
   
   ## Adjustment of labels ##
   if (ggplot2::as_label(enquo_colour) == "NULL" && main_plot_type != "slope") {
