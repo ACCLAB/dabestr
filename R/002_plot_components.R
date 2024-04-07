@@ -201,6 +201,7 @@ add_violinplot_component_to_delta_plot <- function(delta_plot, dabest_effectsize
         ggplot2::aes(x = y, y = x, group = tag)
       )
   }
+  return(delta_plot)
 }
 
 # TODO add documentation
