@@ -231,12 +231,12 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
   raw_flow_alpha <- plot_kwargs$raw_flow_alpha
   main_plot_type <- plot_components$main_plot_type
   is_summary_lines <- plot_components$is_summary_lines
-  
+
   # Extend x_axis if minimeta/deltadelta is being plotted.
   if (minimeta || delta2) {
     raw_x_max <- raw_x_max + 2
   }
-  
+
   ## Adjustment of labels ##
   if (ggplot2::as_label(enquo_colour) == "NULL" && main_plot_type != "slope") {
     enquo_colour <- enquo_x

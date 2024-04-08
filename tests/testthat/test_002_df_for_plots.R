@@ -1,4 +1,3 @@
-
 testthat::test_that("Testing create_dfs_for_proportion_bar function", {
   proportion_success <- c(0.5)
   result <- create_dfs_for_proportion_bar(proportion_success)
@@ -6,7 +5,7 @@ testthat::test_that("Testing create_dfs_for_proportion_bar function", {
   expect_equal(nrow(result), 4)
   expect_equal(ncol(result), 5)
   expect_equal(sum(is.na(result)), 0)
-  
+
   # Test case 2: proportion_success contains 0 and 1
   proportion_success <- c(0, 1)
   result <- create_dfs_for_proportion_bar(proportion_success)
@@ -19,8 +18,9 @@ testthat::test_that("Testing create_dfs_for_proportion_bar function", {
 test_that("Throws an error when proportion_success contains values outside [0, 1]", {
   # Test case: proportion_success contains a value outside [0, 1]
   proportion_success <- c(0.5, 1.5, 0.75)
-  expect_error(create_dfs_for_proportion_bar(proportion_success), 
-               message = "proportion_success values must be between 0 and 1")
+  expect_error(create_dfs_for_proportion_bar(proportion_success),
+    message = "proportion_success values must be between 0 and 1"
+  )
 })
 
 test_that("Returns a data frame with correct dimensions and values for valid inputs", {
@@ -36,8 +36,9 @@ test_that("Returns a data frame with correct dimensions and values for valid inp
 
 test_that("Throws an error for invalid inputs", {
   # Test case: Invalid inputs (e.g., boots not provided)
-  expect_error(create_dfs_for_baseline_ec_violin(), 
-               message = "argument 'boots' is missing, with no default")
+  expect_error(create_dfs_for_baseline_ec_violin(),
+    message = "argument 'boots' is missing, with no default"
+  )
 })
 
 describe("Testing create_dfs_for_xaxis_redraw function", {
@@ -58,10 +59,11 @@ describe("Testing create_dfs_for_xaxis_redraw function", {
     expect_equal(ncol(result$df_for_ticks), 1)
     expect_equal(sum(is.na(result$df_for_ticks)), 0)
   })
-  
+
   test_that("Throws an error for invalid inputs", {
     # Test case: Invalid inputs (e.g., idx not provided)
-    expect_error(create_dfs_for_xaxis_redraw(), 
-                 message = "argument 'idx' is missing, with no default")
+    expect_error(create_dfs_for_xaxis_redraw(),
+      message = "argument 'idx' is missing, with no default"
+    )
   })
 })

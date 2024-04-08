@@ -1,8 +1,8 @@
-get_gender_column <- function(N){
+get_gender_column <- function(N) {
   return(c(rep("Male", N / 2), rep("Female", N / 2)))
 }
 
-get_genotype_column <- function(N){
+get_genotype_column <- function(N) {
   return(c(rep("M", N / 2), rep("W", N / 2)))
 }
 
