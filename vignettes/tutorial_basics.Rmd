@@ -96,7 +96,7 @@ two_groups_unpaired_ci90 <- load(df,
 print(two_groups_unpaired_ci90)
 ```
 
-## Step2: Effect sizes
+## Step 2: Effect sizes
 `dabestr` features a range of effect sizes:
 
 - the mean difference (`mean_diff()`)
@@ -180,7 +180,7 @@ multi_2group %>%
 The **shared control plot** displays another common experimental paradigm, where several test samples are compared against a common reference sample.
 
 This type of Cumming plot is automatically generated if the vector passed to the parameter `idx` has more than two data columns.
-```{r}
+```{r, warnings = FALSE}
 shared_control <- load(df,
   x = Group, y = Measurement,
   idx = c(
@@ -192,7 +192,7 @@ shared_control <- load(df,
 print(shared_control)
 ```
 
-```{r}
+```{r, warnings = FALSE}
 shared_control.mean_diff <- mean_diff(shared_control)
 
 print(shared_control.mean_diff)
@@ -226,8 +226,7 @@ print(multi_groups.mean_diff)
 ```{r, warnings = FALSE}
 dabest_plot(multi_groups.mean_diff)
 ```
----
-**NOTE**
+
 ## Using wide datasets
 `dabestr` does not currently support the use of 'wide' data. To convert datasets from 'wide' to 'long'/'tidy', consider taking a look at [gather()](https://tidyr.tidyverse.org/reference/gather.html) as part of the [tidyr](https://tidyr.tidyverse.org) package.
----
+
