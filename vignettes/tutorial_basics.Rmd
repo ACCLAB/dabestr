@@ -118,7 +118,7 @@ For each comparison, the type of effect size is reported (here, it’s the “un
 
 _[confidenceIntervalWidth LowerBound, UpperBound]_
 
-This confidence interval is generated through bootstrap resampling. See Bootstrap Confidence Intervals for more details.
+This confidence interval is generated through bootstrap resampling. See [Bootstrap Confidence Intervals](https://acclab.github.io/DABEST-python/blog/posts/bootstraps/bootstraps.html) for more details.
 
 ### P-values and statistical tests
 Permutation P values are only provided to allow analysts to satisfy a customary requirement of scientific journals. DABEST's provision of P values does not constitute an endorsement of P values or null-hypothesis significance testing (NHST). If users need to include these in a study, we recommend that they:
@@ -128,7 +128,7 @@ Permutation P values are only provided to allow analysts to satisfy a customary 
 3. state in their Methods section that *"No null-hypothesis significance testing was performed; P values are provided for legacy purposes only."*
 
 ## Step 3: Producing estimation plots
-To produce a **Gardner-Altman estimation plot**, simply use the `dabest_plot()` function. You can read more about its genesis and design inspiration at Robust and Beautiful Statistical Visualization. 
+To produce a **Gardner-Altman estimation plot**, simply use the `dabest_plot()` function. You can read more about its genesis and design inspiration at [Robust and Beautiful Statistical Visualization](https://acclab.github.io/DABEST-python/blog/posts/robust-beautiful/robust-beautiful.html). 
 
 `dabest_plot()` requires only one compulsory parameter to run: the `dabest_effectsize_obj` obtained from the `effect_size()` function. This means that you can quickly create plots for various effect sizes with ease.
 ```{r}
