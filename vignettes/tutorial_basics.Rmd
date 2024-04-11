@@ -164,7 +164,7 @@ The **multi-two-group estimation plot** tiles two or more Cumming plots horizont
 
 As a result, the lower axes in the Cumming plot is effectively a [forest plot](https://en.wikipedia.org/wiki/Forest_plot), commonly used in meta-analyses to aggregate and compare data from different experiments.
 
-```{r}
+```{r, warning = FALSE}
 multi_2group <- load(df,
   x = Group, y = Measurement,
   idx = list(
@@ -227,6 +227,8 @@ print(multi_groups.mean_diff)
 dabest_plot(multi_groups.mean_diff)
 ```
 
-## Using wide datasets
-`dabestr` does not currently support the use of 'wide' data. To convert datasets from 'wide' to 'long'/'tidy', consider taking a look at [gather()](https://tidyr.tidyverse.org/reference/gather.html) as part of the [tidyr](https://tidyr.tidyverse.org) package.
+***
+## **NOTE: Using wide datasets**
+
+>Currently `dabestr` does not support the use of 'wide' data. To convert datasets from 'wide' to 'long'/'tidy', consider taking a look at [gather()](https://tidyr.tidyverse.org/reference/gather.html) as part of the [tidyr](https://tidyr.tidyverse.org) package.
 

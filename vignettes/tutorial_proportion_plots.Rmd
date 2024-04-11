@@ -14,17 +14,21 @@ knitr::opts_chunk$set(
 )
 ```
 
-This vignette documents how `dabestr` is able to generate proportion plots for binary data. 
+This vignette documents how the `dabestr` package is able to generate proportion plots for binary data. 
 
-It’s important to note that the code we provide only supports numerical proportion data, where the values are limited to 0 (failure) and 1 (success). This means that the code is not suitable for analyzing proportion data that contains non-numeric values, such as strings like ‘yes’ and ‘no’.
+***
+**NOTE**
+
+>It’s important to note that the code we provide only supports numerical proportion data, where the values are limited to 0 (failure) and 1 (success). This means that the code is not suitable for analyzing proportion data that contains non-numeric values, such as strings like ‘yes’ and ‘no’.
+
 
 ```{r setup, warning = FALSE, message = FALSE}
 library(dabestr)
 ```
 
 ## Create dataset for demo
-```{r}
-set.seed(12345) # Fix the seed so the results are replicable.
+```{r, warning = FALSE}
+set.seed(12345) # Fix the seed so the results are reproducible.
 N <- 40 # The number of samples taken from each population
 
 # Create samples
@@ -59,13 +63,13 @@ df <- df %>%
   tidyr::gather(key = Group, value = Success, -ID, -Gender)
 ```
 
-```{r}
+```{r, warning = FALSE}
 knitr::kable(head(df))
 ```
 
 ## Loading Data
-When loading data, specify `proportional = TRUE`.
-```{r}
+When loading data, you need to set the parameter `proportional = TRUE`.
+```{r, warning = FALSE}
 two_groups_unpaired <- load(df,
   x = Group, y = Success,
   idx = c("Control 1", "Test 1"),
@@ -84,38 +88,38 @@ For proportion plot, dabest features two effect sizes:
 The output of the `load()` function, a `dabest` object, is then passed into 
 these `effect_size()` functions as a parameter.
 
-```{r}
+```{r, warning = FALSE}
 two_groups_unpaired.mean_diff <- mean_diff(two_groups_unpaired)
 
 print(two_groups_unpaired.mean_diff)
 ```
 
-Let’s compute the Cohen’s h for our comparison.
-```{r}
+Let’s compute the *Cohen’s h* for our comparison.
+```{r, warning = FALSE}
 two_groups_unpaired.cohens_h <- cohens_h(two_groups_unpaired)
 
 print(two_groups_unpaired.cohens_h)
 ```
 
-## Producing Unpaired Proportional Plots
-To produce a **Gardner-Altman estimation plot**, simply use the `dabest_plot()`. 
+## Generating Unpaired Proportional Plots
+To produce a **Gardner-Altman estimation plot**, simply use the `dabest_plot()` function. 
 
-`dabest_plot()` only requires one compulsory parameter to run: the `dabest_effectsize_obj` obtained from the `effect_size()` function. This means you can quickly create plots for different effect sizes easily.
+The `dabest_plot()` function only requires one compulsory parameter to run, the `dabest_effectsize_obj` obtained from the `effect_size()` function. Thus, you can quickly and easily create plots for different effect sizes.
 
-```{r}
+```{r, warning = FALSE}
 dabest_plot(two_groups_unpaired.mean_diff)
 dabest_plot(two_groups_unpaired.cohens_h)
 ```
 
-The white part in the bar represents the proportion of observations in the dataset that do not belong to the category, which is equivalent to the proportion of 0 in the data. The colored part, on the other hand, represents the proportion of observations that belong to the category, which is equivalent to the proportion of 1 in the data. The error bars in the plot display the mean and ± standard deviation of each group as gapped lines. The gap represents the mean, while the vertical ends represent the standard deviation. By default, the bootstrap effect sizes is plotted on the right axis.
+The white portion of the bar represents the proportion of observations in the dataset that do not belong to the category, which is equivalent to the proportion of 0 in the data. The colored portion, on the other hand, represents the proportion of observations that belong to the category, which is equivalent to the proportion of 1 in the data (success). The error bars in the plot display the mean and ± standard deviation of each group as gapped lines. The gap represents the mean, while the vertical ends represent the standard deviation. By default, the bootstrap effect sizes are plotted on the right axis.
 
-Instead of a Gardner-Altman plot, you can produce a **Cumming estimation plot** by setting `float_contrast = FALSE` in the `dabest_plot()` function. This will plot the bootstrap effect sizes below the raw data.
+Alternatively, you can produce a **Cumming estimation plot** instead of a Gardner-Altman plot by setting `float_contrast = FALSE` in the `dabest_plot()` function. This will plot the bootstrap effect sizes below the raw data.
 
-```{r, eval = FALSE}
+```{r, warning = FALSE, eval = FALSE}
 dabest_plot(two_groups_unpaired.mean_diff, float_contrast = FALSE)
 ```
 
-```{r, echo = FALSE}
+```{r, warning = FALSE, echo = FALSE}
 pp_plot <- dabest_plot(two_groups_unpaired.mean_diff,
   float_contrast = FALSE,
   swarm_y_text = 11, contrast_y_text = 11
@@ -129,25 +133,26 @@ cowplot::plot_grid(
 )
 ```
 
-You can also modify the width of bars as you expect by setting `raw_bar_width` in the `dabest_plot()` function.
+You can also modify the width of bars by setting the parameter `raw_bar_width` in the `dabest_plot()` function.
 
-```{r}
+```{r, warning = FALSE}
 dabest_plot(two_groups_unpaired.mean_diff, raw_bar_width = 0.15)
 ```
 
-`swarm_label` and `contrast_label` can be used to set labels for the y-axis of the bar plot and the contrast plot.
-```{r}
+The parameters `swarm_label` and `contrast_label` can be used to set labels for the y-axis of the bar plot and the contrast plot.
+
+```{r, warning = FALSE}
 dabest_plot(two_groups_unpaired.mean_diff,
   swarm_label = "success", contrast_label = "difference"
 )
 ```
 
-## Producing Paired Proportion Plots
-For paired version of proportional plot, we adapt the style of Sankey Diagram. The width of each bar in each xticks represent the proportion of corresponding label in the group, and the strip denotes the paired relationship for each observation.
+## Generating Sankey plots for paired proportions
+For the paired version of the proportion plot, we adopt the style of a Sankey Diagram. The width of each bar in each xtick represents the proportion of the corresponding label in the group, and the strip denotes the paired relationship for each observation.
 
-Similar to the unpaired version, the `dabest_plot()` function is used to produce a **Gardner-Altman estimation plot**, the only difference is that the `paired` parameter is set to either "baseline" or "sequential" when loading data. 
+Similar to the unpaired version, the `dabest_plot()` function is used to produce a **Gardner-Altman estimation plot**, the only difference is that the `paired` parameter is set to either "baseline" or "sequential" when loading the data. 
 
-```{r}
+```{r, warning = FALSE}
 two_groups_baseline.mean_diff <- load(df,
   x = Group, y = Success,
   idx = c("Control 1", "Test 1"),
@@ -161,11 +166,11 @@ dabest_plot(two_groups_baseline.mean_diff)
 
 The paired proportional plot also supports the `float_contrast` parameter, which can be set to `FALSE` to produce a **Cumming estimation plot**.
 
-```{r, eval = FALSE}
+```{r, warning = FALSE, eval = FALSE}
 dabest_plot(two_groups_baseline.mean_diff, float_contrast = FALSE)
 ```
 
-```{r, echo = FALSE}
+```{r, warning = FALSE, echo = FALSE}
 pp_plot <- dabest_plot(two_groups_baseline.mean_diff,
   float_contrast = FALSE,
   swarm_y_text = 11, contrast_y_text = 11,
@@ -180,13 +185,14 @@ cowplot::plot_grid(
 )
 ```
 
-The upper part (grey part) of the bar represents the proportion of observations in the dataset that do not belong to the category, which is equivalent to the proportion of 0 in the data. The lower part, on the other hand, represents the proportion of observations that belong to the category, which is or **success**, which is equivalent to the proportion of 1 in the data.
+The upper part (grey section) of the bar represents the proportion of observations in the dataset that do not belong to the category, equivalent to the proportion of 0 in the data. The lower part, conversely, represents the proportion of observations that belong to the category, synonymous with **success**, equivalent to the proportion of 1 in the data.
 
-Repeated measures is also supported in paired proportional plot, by changing the `paired` parameter, two types of plot can be produced.
+Repeated measures are also supported in paired proportional plot. By adjusting the `paired` parameter, two types of plot can be generated.
 
-By default, the raw data plot (upper part) in both "baseline" and "sequential" repeated measures are the same, the only difference is the lower part. For detailed information about repeated measures, please refer to `vignette("tutorial_repeated_measures")`.
+By default, the raw data plot (upper part) in both "baseline" and "sequential" repeated measures remains the same; the only difference is the lower part. For detailed information about repeated measures, please refer to `vignette("tutorial_repeated_measures")`.
 
-```{r}
+
+```{r, warning = FALSE}
 multi_group_baseline.mean_diff <- load(df,
   x = Group, y = Success,
   idx = list(
@@ -209,7 +215,7 @@ dabest_plot(multi_group_baseline.mean_diff,
 )
 ```
 
-```{r}
+```{r, warning = FALSE}
 multi_group_sequential.mean_diff <- load(df,
   x = Group, y = Success,
   idx = list(
@@ -236,7 +242,7 @@ If you want to specify the order of the groups, you can use the `idx` parameter 
 
 For all the groups to be compared together, you can put all the groups in the `idx` parameter in the `load()` function in a singular vector/non-nested list.
 
-```{r}
+```{r, warning = FALSE}
 multi_group_baseline_specify.mean_diff <- load(df,
   x = Group, y = Success,
   idx = c(
@@ -256,11 +262,11 @@ dabest_plot(multi_group_baseline_specify.mean_diff,
 ```
 
 ### Adjustment parameters
-By changing the `sankey` and `flow` parameter, you can produce different types of paired proportional plot.
+By adjusting the `sankey` and `flow` parameters, you can create different types of paired proportional plots.
 
-By default, the `sankey` and `flow` are set to `TRUE` to cater the need for the repeated measures. When `sankey` is set to `FALSE`, DABEST will generate a bar plot with similar aesthetic to the paired proportional plot. When `flow` is set to `FALSE`, each group of comparison form a sankey diagram which does not connect to other groups of comparison.
+By default, the `sankey` and `flow` arguments are set to `TRUE` to accommodate the needs of repeated-measures analyses. When `sankey` is set to `FALSE`, the `dabestr` package  generates a bar plot with a similar aesthetic to the paired proportional plot. When `flow` is set to `FALSE`, each group of comparison forms a sankey diagram which does not connect to other groups of comparison.
 
-```{r}
+```{r, warning = FALSE}
 separate_control.mean_diff <- load(df,
   x = Group, y = Success,
   idx = list(
