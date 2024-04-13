@@ -20,11 +20,11 @@ library(dabestr)
 
 This vignette documents how `dabestr` is able to compute the calculation of delta-delta, an experimental function that allows the comparison between two bootstrapped effect sizes computed from two independent categorical variables.
 
-Many experimental designs investigate the effects of two interacting independent variables on a dependent variable. The delta-delta effect size lets us distill the net effect of the two variables. To illustrate this, let’s delve into the following problem.
+Many experimental designs investigate the effects of two interacting independent variables on a dependent variable. The delta-delta effect size lets us distill the net effect of the two variables. To illustrate this, let’s delve into the following problem...
 
-Consider an experiment where we test the efficacy of a drug named `Drug` on a disease-causing mutation `M` based on disease metric `Y`. The greater value `Y` has the more severe the disease phenotype is. Phenotype `Y` has been shown to be caused by a gain of function mutation `M`, so we expect a difference between wild type (`W`) subjects and mutant subjects (`M`). Now, we want to know whether this effect is ameliorated by the administration of `Drug` treatment. We also administer a placebo as a control. In theory, we only expect `Drug` to have an effect on the `M` group, although in practice many drugs have non-specific effects on healthy populations too.
+>Consider an experiment where we test the efficacy of a drug named `Drug` on a disease-causing mutation `M` based on a disease metric `Y`. In this experiment, the greater the value `Y`is, the more severe the disease phenotype is. The phenotype `Y` has been shown to be caused by a gain of the function mutation `M`, so we expect a difference between the wild type (`W`) subjects and the mutant subjects (`M`). We want to know whether this effect is ameliorated by the administration of a `Drug` treatment. We also administer a placebo as a control. In theory, we only expect the `Drug` to have an effect on the `M` group, although in practice, many drugs have non-specific effects on healthy populations as well.
 
-Effectively, we have 4 groups of subjects for comparison.
+Effectively, we have 4 groups of subjects for comparison:
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 df <- data.frame(
@@ -38,15 +38,15 @@ knitr::kable(df, escape = FALSE) %>%
   kableExtra::column_spec(1:2, border_right = TRUE)
 ```
 
-There are 2 `Treatment` conditions, `Placebo` (control group) and `Drug` (test group). There are 2 `Genotypes`: `W` (wild type population) and `M` (mutant population). In addition, each experiment was done twice (`Rep1` and `Rep2`). We shall do a few analyses to visualise these differences in a simulated dataset.
+There are 2 `Treatment` conditions: the `Placebo` (control group) and the `Drug` (test group). There are 2 `Genotypes`: `W` (wild type population) and `M` (mutant population). Additionally, each experiment was conducted twice (`Rep1` and `Rep2`). We will perform a few analyses to visualise these differences in a simulated dataset.
 
 ```{r setup, eval = FALSE}
 library(dabestr)
 ```
 
 ## Create dataset for demo
-```{r}
-set.seed(12345) # Fix the seed so the results are replicable.
+```{r, warning = FALSE}
+set.seed(12345) # Fix the seed so the results are reproducible.
 # pop_size = 10000 # Size of each population.
 N <- 20 # The number of samples taken from each population
 
@@ -78,18 +78,16 @@ df <- df %>%
   tidyr::gather(key = Treatment, value = Measurement, -ID, -Genotype, -Rep)
 ```
 
-```{r}
+```{r, warning = FALSE}
 knitr::kable(head(df))
 ```
 
 ## Loading Data
-To make a delta-delta plot, you need to simply set `delta2 = TRUE` in the `load()` function. `colour` will be used to determine the colour of dots for scattered plots or the colour of lines for slopegraphs. The `experiment` input will be used to specify grouping of the data.
-
-For delta-delta plots, the `idx` is a non-compulsory input.
+To make a delta-delta plot, you need to simply set `delta2 = TRUE` in the `load()` function. The `colour` parameter will be used to determine the colour of dots for the scattered plots or the colour of lines for the slopegraphs. The `experiment` parameter will be used to specify the grouping of the data. For delta-delta plots, the `idx` parameter is optional. Here's an example:
 
 ## Unpaired Data
 
-```{r, eval = FALSE}
+```{r, warning = FALSE, eval = FALSE}
 unpaired_delta2 <- load(df,
   x = Genotype, y = Measurement,
   experiment = Treatment, colour = Genotype,
@@ -97,7 +95,7 @@ unpaired_delta2 <- load(df,
 )
 ```
 
-```{r, echo = FALSE}
+```{r, warning = FALSE, echo = FALSE}
 unpaired_delta2 <- load(df,
   x = Genotype, y = Measurement,
   experiment = Treatment, colour = Genotype,
@@ -109,29 +107,34 @@ unpaired_delta2 <- load(df,
 
 The above function creates the following `dabest` object:
 
-```{r}
+```{r, warning = FALSE}
 print(unpaired_delta2)
 ```
 
 We can quickly check out the effect sizes:
 
-```{r}
+```{r, warning = FALSE}
 unpaired_delta2.mean_diff <- mean_diff(unpaired_delta2)
 
 print(unpaired_delta2.mean_diff)
 ```
 
-```{r}
+```{r, warning = FALSE}
 dabest_plot(unpaired_delta2.mean_diff)
 ```
 
-In the above plot, the horizontal axis represents the `Genotype` condition and the dot colour is also specified by `Genotype`. The left pair of scattered plots is based on the `Placebo` group while the right pair is based on the `Drug` group. The bottom left axis contains the two primary deltas: the `Placebo` delta and the `Drug` delta. We can easily see that when only the placebo was administered, the mutant phenotype is around 1.23 [95%CI 0.948, 1.52]. This difference was shrunken to around 0.326 [95%CI 0.0934, 0.584] when the drug was administered. This gives us some indication that the drug is effective in amiliorating the disease phenotype. Since the `Drug` did not completely eliminate the mutant phenotype, we have to calculate how much net effect the drug had. This is where delta-delta comes in. We use the `Placebo` delta as a reference for how much the mutant phenotype is supposed to be, and we subtract the `Drug` delta from it. The bootstrapped mean differences (delta-delta) between the `Placebo` and `Drug` group are plotted at the right bottom with a separate y-axis from other bootstrap plots. This effect size, at about -0.903 [95%CI -1.28, -0.513], is the net effect size of the drug treatment. That is to say that treatment with drug A reduced disease phenotype by 0.903.
+The horizontal axis in the above plot represents the `Genotype` condition, and the dot colour is also specified by `Genotype`. The left pair of scattered plots corresponds to the `Placebo` group, while the right pair is based on the `Drug` group. The bottom left axis contains the two primary deltas: the `Placebo` delta and the `Drug` delta.
 
-Mean difference between mutants and wild types given the placebo treatment is:
+It is evident that when only the placebo was administered, the mutant phenotype was around 1.23 [95% CI: 0.948, 1.52]. However, this difference was reduced to approximately 0.326 [95% CI: 0.0934, 0.584] when the drug was administered, indicating that the drug is effective in ameliorating the disease phenotype. Since the `Drug` did not completely eliminate the mutant phenotype, we need to calculate the net effect of the drug.
+
+Delta-delta comes in handy in this situation. We use the `Placebo` delta as a reference for how much the mutant phenotype is supposed to be, and we subtract the `Drug` delta from it. The bootstrapped mean differences (delta-delta) between the `Placebo` and `Drug` group are plotted at the bottom right with a separate y-axis from other bootstrap plots. This effect size, at about -0.903 [95% CI: -1.28, -0.513], represents the net effect size of the drug treatment. In other words, treatment with drug A reduced the disease phenotype by 0.903.
+
+
+The mean difference between mutants and wild types given the placebo treatment is:
 
 $$\Delta_1 = \bar{X}_{P,M}-\bar{X}_{P,W}$$
 
-Mean difference between mutants and wild types given the drug treatment is:
+The mean difference between mutants and wild types given the drug treatment is:
 
 $$\Delta_2 = \bar{X}_{D,M}-\bar{X}_{D,W}$$
 The net effect of the drug on mutants is:
@@ -142,7 +145,7 @@ where $\bar{X}$ is the sample mean, $\Delta$ is the mean difference.
 ## Specifying Grouping for Comparisons
 In the example above, we used the convention of "test - control' but you can manipulate the orders of experiment groups as well as the horizontal axis variable by setting `experiment_label` and `x1_level`.
 
-```{r}
+```{r, warning = FALSE}
 unpaired_delta2_specified.mean_diff <- load(df,
   x = Genotype, y = Measurement,
   experiment = Treatment, colour = Genotype,
@@ -156,11 +159,13 @@ dabest_plot(unpaired_delta2_specified.mean_diff)
 ```
 
 ## Paired Data
-The delta - delta function also supports paired data, which is useful for us to visualise the data in an alternate way. Assuming that the placebo and drug treatment were done on the same subjects, our data is paired between the treatment conditions. We can specify this by using `Treatment` as `x` and `Genotype` as `experiment`, and we further specify that `id_col` is `ID`, linking data from the same subject with each other. Since we have done two replicates of the experiments, we can also colour the slope lines according to `Rep`.
+The `delta-delta` function also supports paired data, which can be useful for visualizing the data in an alternative way. If the placebo and drug treatment were administered to the same subjects, our data is paired between the treatment conditions. We can specify this by using `Treatment` as `x` and `Genotype` as `experiment`. Additionally, we can link data from the same subject with each other by specifying `ID` as `id_col`.
 
-Although the `idx` is a non-compulsory parameter, it is still possible to have it as an input to adjust the order as opposed to using `experiment_label` and `x1_level`.
+Since we have conducted two replicates of the experiments, we can colour the slope lines according to `Rep` to differentiate between the replicates.
 
-```{r}
+Although `idx` is an optional parameter, it can still be included as an input to adjust the order of the data as opposed to using `experiment_label` and `x1_level`.
+
+```{r, warning = FALSE}
 paired_delta2.mean_diff <- load(df,
   x = Treatment, y = Measurement,
   experiment = Genotype, colour = Rep,
@@ -178,13 +183,13 @@ dabest_plot(paired_delta2.mean_diff,
 )
 ```
 
-We see that the drug had a non-specific effect of `r format(paired_delta2.mean_diff[["boot_result"]][["difference"]][[1]], digits=3)` [95%CI `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_low"]][[1]], digits=3)` , `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_high"]][[1]], digits=3)`] on wild type subjects even when they were not sick, and it had a bigger effect of `r format(paired_delta2.mean_diff[["boot_result"]][["difference"]][[2]], digits=3)` [95%CI `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_low"]][[2]], digits=3)` , `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_high"]][[2]], digits=3)`] in mutant subjects. In this visualisation, we can see the delta-delta value of `r format(paired_delta2.mean_diff[["boot_result"]][["difference"]][[3]], digits=3)` [95%CI `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_low"]][[3]], digits=3)` , `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_high"]][[3]], digits=3)`] as the net effect of the drug accounting for non-specific actions in healthy individuals
+We see that the drug had a non-specific effect of `r format(paired_delta2.mean_diff[["boot_result"]][["difference"]][[1]], digits=3)` [95%CI `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_low"]][[1]], digits=3)` , `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_high"]][[1]], digits=3)`] on the wild type subjects even when they were not sick, and it had a bigger effect of `r format(paired_delta2.mean_diff[["boot_result"]][["difference"]][[2]], digits=3)` [95%CI `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_low"]][[2]], digits=3)` , `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_high"]][[2]], digits=3)`] in the mutant subjects. In this visualisation, we can see the delta-delta value of `r format(paired_delta2.mean_diff[["boot_result"]][["difference"]][[3]], digits=3)` [95%CI `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_low"]][[3]], digits=3)` , `r format(paired_delta2.mean_diff[["boot_result"]][["bca_ci_high"]][[3]], digits=3)`] as the net effect of the drug accounting for non-specific actions in healthy individuals.
 
-Mean difference between drug and placebo treatments in wild type subjects is:
+The mean difference between drug and placebo treatments in wild type subjects is:
 
 $$\Delta_1 = \bar{X}_{D,M}-\bar{X}_{P,W}$$
 
-Mean difference between drug and placebo treatments in mutant subjects is:
+The mean difference between drug and placebo treatments in mutant subjects is:
 
 $$\Delta_2 = \bar{X}_{D,M}-\bar{X}_{P,W}$$
 The net effect of the drug on mutants is:
@@ -193,12 +198,12 @@ $$\Delta_\Delta = \Delta_2 - \Delta_1$$
 where $\bar{X}$ is the sample mean, $\Delta$ is the mean difference.
 
 ## Connection to ANOVA
-The configuration of comparison we performed above is reminiscent of a two-way ANOVA. In fact, the delta - delta is an effect size estimated for the interaction term between `Treatment` and `Genotype`. Main effects of `Treatment` and `Genotype`, on the other hand, can be determined by simpler, univariate contrast plots.
+The comparison we conducted earlier is reminiscent of a two-way ANOVA. In fact, the delta-delta is an effect size estimated for the interaction term between `Treatment` and `Genotype`. On the other hand, main effects of `Treatment` and `Genotype` can be determined through simpler, univariate contrast plots.
 
 ## Omitting Delta-delta Plot
-If for some reason you don't want to display the delta-delta plot, you can easily do so by
+If for some reason you don't want to display the delta-delta plot, you can easily do so by setting `show_delta2` to FALSE:
 
-```{r}
+```{r, warning = FALSE}
 dabest_plot(unpaired_delta2.mean_diff, show_delta2 = FALSE)
 ```
 
@@ -210,27 +215,34 @@ Since the delta-delta function is only applicable to mean differences, plots of 
 ```
 
 ## Statistics
-You can find all outputs of the delta - delta calculation by assessing the column named `boot_result` of the `dabest_effectsize_obj`.
+You can find all the outputs of the delta - delta calculation by assessing the column named `boot_result` of the object `dabest_effectsize_obj`.
 
-```{r}
+```{r, warning = FALSE}
 print(unpaired_delta2.mean_diff$boot_result)
 ```
 
-If you want to extract the permutations, permutation test’s p values, the statistical tests and the p value results, you can access it with the columns `permutation_test_results`, `pval_permtest`, `pval_for_tests` and `pvalues` respectively.
+If you want to extract the permutations, permutation test’s p values, the statistical tests and the p value results, you can access them using the columns `permutation_test_results`, `pval_permtest`, `pval_for_tests` and `pvalues` respectively.
 
-P values for permutation tests `pval_permtest` (and the permutation calculations and results accessed by running the commented out session).
-```{r}
-# print(unpaired_delta2.mean_diff$permtest_pvals$permutation_test_results)
+For instance, the P values for permutation tests `pval_permtest`:
+
+```{r, warning = FALSE}
 print(unpaired_delta2.mean_diff$permtest_pvals$pval_permtest)
 ```
 
-An representative p value for statistical tests (`pval_for_tests`)
+Or the permutation calculations and results could be accessed by:
 
-```{r}
+```{r, warning = FALSE, eval = FALSE}
+print(unpaired_delta2.mean_diff$permtest_pvals$permutation_test_results)
+```
+
+A representative *p value* for statistical tests `pval_for_tests`:
+
+```{r, warning = FALSE}
 print(unpaired_delta2.mean_diff$permtest_pvals$pval_for_tests)
 ```
 
-Statistical test results and `pvalues`.
-```{r}
+Finally here the statistical test results and `pvalues`:
+
+```{r, warning = FALSE}
 print(unpaired_delta2.mean_diff$permtest_pvals$pvalues)
 ```
