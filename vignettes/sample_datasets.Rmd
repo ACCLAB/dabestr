@@ -16,9 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Dabestr comes inbuilt with datasets for each type of estimation plot. To load in
-the datasets, simple call: `data("name_of_dataset")`. If you wish to generate 
-more specific datasets for testing, you may refer to the tutorial vignettes.
+Dabestr arrives equipped with four different datasets, one for each type of estimation plot. To load the datasets, simply call:  `data("name_of_dataset")`. If you wish to generate more specific datasets for testing purposes, please refer to the tutorial vignettes.
 
 ```{r, warning = FALSE, message = FALSE}
 library(dabestr)
