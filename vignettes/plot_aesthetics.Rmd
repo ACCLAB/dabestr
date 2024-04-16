@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Controlling plot aesthetics is straightforward in `dabestr`. A key feature of `dabestr` is the ability for users to freely customize various components of a DABEST estimation plot, allowing for the creation of an optimal-looking plot.
+Controlling plot aesthetics is straightforward in `dabestr`. A key feature of `dabestr` is the ability for users to freely customize various components of a `dabestr` estimation plot, allowing for the creation of an optimal-looking plot.
 
 ## Getting started
 At this point, it is assumed that you have already obtained the effectsize object named `dabest_effectsize_obj`.
