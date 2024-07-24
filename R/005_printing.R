@@ -95,7 +95,7 @@ print_each_comparism_effectsize <- function(dabest_object, effectsize) {
   bca_low <- round(dabest_object$boot_result$bca_ci_low, 3)
   bca_high <- round(dabest_object$boot_result$bca_ci_high, 3)
   ci <- dabest_object$boot_result$ci
-  pvalue <- dabest_object$permtest_pvals$pval_permtest
+  pvalue <- dabest_object$pval_permtest
 
   if (is.null(paired)) {
     rm_status <- ""
