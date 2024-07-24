@@ -96,7 +96,8 @@ print_each_comparism_effectsize <- function(dabest_object, effectsize) {
   bca_high <- round(dabest_object$boot_result$bca_ci_high, 3)
   ci <- dabest_object$boot_result$ci
   pvalue <- dabest_object$permtest_pvals$pval_permtest
-
+  print(class(pvalue[[1]]))
+  print(pvalue)
   if (is.null(paired)) {
     rm_status <- ""
   } else if (paired == "sequential") {
