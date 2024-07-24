@@ -96,8 +96,7 @@ print_each_comparism_effectsize <- function(dabest_object, effectsize) {
   bca_high <- round(dabest_object$boot_result$bca_ci_high, 3)
   ci <- dabest_object$boot_result$ci
   pvalue <- dabest_object$permtest_pvals$pval_permtest
-  print(class(pvalue[[1]]))
-  print(pvalue)
+  cat(stringr::str_interp("{pvalue}\n"))
   if (is.null(paired)) {
     rm_status <- ""
   } else if (paired == "sequential") {
@@ -151,7 +150,7 @@ print_each_comparism_effectsize <- function(dabest_object, effectsize) {
           current_pval <- pvalue[i]
 
           cat(stringr::str_interp("The ${paired_status} ${es} between ${current_group} and ${previous_group} is ${current_difference} [${current_ci}%CI ${current_bca_low}, ${current_bca_high}].\n"))
-          cat(stringr::str_interp("The p-value of the two-sided permutation t-test is ${sprintf(current_pval, fmt = '%#.4f')}, calculated for legacy purposes only."))
+          cat(stringr::str_interp("The p-value of the two-sided permutation t-test is ${sprintf('%#.4f', current_pval)}, calculated for legacy purposes only."))
           cat("\n\n")
           i <- i + 1
         }
@@ -163,7 +162,7 @@ print_each_comparism_effectsize <- function(dabest_object, effectsize) {
 
     for (current_test_group in test_groups) {
       cat(stringr::str_interp("The ${paired_status} ${es} between ${current_test_group} and ${control_group} is ${difference} [${ci}%CI ${bca_low}, ${bca_high}].\n"))
-      cat(stringr::str_interp("The p-value of the two-sided permutation t-test is ${sprintf(current_pval, fmt = '%#.4f')}, calculated for legacy purposes only.\n"))
+      cat(stringr::str_interp("The p-value of the two-sided permutation t-test is ${sprintf('%#.4f', current_pval)}, calculated for legacy purposes only.\n"))
     }
   }
 }
