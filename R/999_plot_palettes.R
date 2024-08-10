@@ -20,7 +20,7 @@ apply_palette <- function(ggplot_object, palette_name) {
     "ucscgb" =
       ggplot_object + ggsci::scale_color_ucscgb() + ggsci::scale_fill_ucscgb(),
     "d3" =
-      ggplot_object + ggsci::scale_color_d3() + ggsci::scale_fill_d3(),
+      ggplot_object + ggsci::scale_color_d3(palette = "category20") + ggsci::scale_fill_d3(palette = "category20"),
     "locuszoom" =
       ggplot_object + ggsci::scale_color_locuszoom() + ggsci::scale_fill_locuszoom(),
     "igv" =
