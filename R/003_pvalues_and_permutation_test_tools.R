@@ -92,6 +92,7 @@ PermutationTest <- function(control,
 
   return(perm_results)
 }
+
 #' Generates statistical test results for possible hypothesis testings.
 #'
 #' This function returns a list that include statistical test results:
@@ -106,6 +107,159 @@ PermutationTest <- function(control,
 #'
 #' @returns a list for statistical test results and p values for the
 #' corresponding tests of a pair of control and test data points.
+#' @noRd
+pvals_statistics <- function(control,
+                             test,
+                             is_paired,
+                             proportional,
+                             effect_size) {
+  pvals_stats <- list()
+  if (isTRUE(is_paired) && !proportional) {
+    # Wilcoxon test (non-parametric version of the paired T-test)
+    wilcoxon <- stats::wilcox.test(control, test)
+    pvalue_wilcoxon <- wilcoxon$p.value
+    statistic_wilcoxon <- wilcoxon$statistic
+
+    paired_t <- NA
+    pvalue_paired_students_t <- NA
+    statistic_paired_students_t <- NA
+
+    if (effect_size != "median_diff") {
+      # Paired Student's t-test
+      paired_t <- stats::t.test(control, test, paired = TRUE, na.rm = TRUE)
+      pvalue_paired_students_t <- paired_t$p.value
+      statistic_paired_students_t <- paired_t$statistic
+    }
+    pvals_stats <- list(
+      pvalue_wilcoxon = pvalue_wilcoxon,
+      wilcoxon = wilcoxon,
+      statistic_wilcoxon = statistic_wilcoxon,
+      paired_t = paired_t,
+      pvalue_paired_students_t = pvalue_paired_students_t,
+      statistic_paired_students_t = statistic_paired_students_t
+    )
+  } else if (isTRUE(is_paired) && proportional) {
+    # McNemar's test for binary paired data
+    table <- matrix(
+      c(
+        sum(control == 0 & test == 0), sum(control == 0 & test == 1),
+        sum(control == 1 & test == 0), sum(control == 1 & test == 1)
+      ),
+      nrow = 2, byrow = TRUE
+    )
+    mcnemar_result <- stats::mcnemar.test(table, correct = TRUE)
+    pvalue_mcnemar <- mcnemar_result$p.value
+    statistic_mcnemar <- mcnemar_result$statistic
+    pvals_stats <- list(
+      pvalue_mcnemar = pvalue_mcnemar,
+      statistic_mcnemar = statistic_mcnemar
+    )
+  } else if (effect_size == "cliffs_delta") {
+    # Brunner-Munzel test
+    brunner_munzel <- brunnermunzel::brunnermunzel.test(control, test, na.rm = TRUE)
+    pvalue_brunner_munzel <- brunner_munzel$p.value
+    statistic_brunner_munzel <- brunner_munzel$statistic
+    pvals_stats <- list(
+      pvalue_brunner_munzel = pvalue_brunner_munzel,
+      statistic_brunner_munzel = statistic_brunner_munzel
+    )
+  } else if (effect_size == "median_diff") {
+    # Kruskal-Wallis H-test
+    kruskal <- stats::kruskal.test(list(control, test))
+    pvalue_kruskal <- kruskal$p.value
+    statistic_kruskal <- kruskal$statistic
+    pvals_stats <- list(
+      pvalue_kruskal = pvalue_kruskal,
+      statistic_kruskal = statistic_kruskal
+    )
+  } else {
+    # For mean difference, Cohen's d, and Hedges' g
+    # Welch's t-test (equal_var = FALSE) to not assume equal variances
+    welch <- stats::t.test(control, test, equal.var = FALSE, na.rm = TRUE)
+    pvalue_welch <- welch$p.value
+    statistic_welch <- welch$statistic
+
+    # Student's t-test (equal_var = TRUE) to assume equal variances
+    students_t <- stats::t.test(control, test, equal.var = TRUE, na.rm = TRUE)
+    pvalue_students_t <- students_t$p.value
+    statistic_students_t <- students_t$statistic
+
+    # Mann-Whitney test: non-parametric, does not assume normality of distributions
+    tryCatch(
+      {
+        mann_whitney <- stats::wilcox.test(control, test, alternative = "two.sided")
+        pvalue_mann_whitney <- mann_whitney$p.value
+        statistic_mann_whitney <- mann_whitney$statistic
+      },
+      error = function(e) {
+        # Occurs when the control and test are exactly identical in terms of rank (e.g., all zeros).
+        pvalue_mann_whitney <- NA
+        statistic_mann_whitney <- NA
+      }
+    )
+
+    standardized_es <- effsize::cohen.d(control, test, is_paired = NULL)
+
+    # Cohen's h calculation for binary categorical data
+    if (isTRUE(proportional)){
+      tryCatch(
+        {
+          cohens_h_cal <- function(control, test) {
+            # remove nas and nulls later on
+            prop_control <- mean(control)
+            prop_test <- mean(test)
+  
+            # Arcsine transformation
+            phi_control <- 2 * asin(sqrt(prop_control))
+            phi_test <- 2 * asin(sqrt(prop_test))
+            result <- phi_test - phi_control
+            return(result)
+          }
+          proportional_difference <- cohens_h_cal(control, test)
+        },
+        error = function(e) {
+          # Occur only when the data consists not only 0's and 1's.
+          proportional_difference <- NA
+        }
+      )
+    }
+
+    pvals_stats <- list(
+      pvalue_welch = pvalue_welch,
+      statistic_welch = statistic_welch,
+      # Student's t-test (equal_var = TRUE) to assume equal variances
+      students_t = students_t,
+      pvalue_students_t = pvalue_students_t,
+      statistic_students_t = statistic_students_t,
+      # Mann-Whitney test: non-parametric, does not assume normality of distributions
+
+      pvalue_mann_whitney = pvalue_mann_whitney,
+      statistic_mann_whitney = statistic_mann_whitney
+    )
+  }
+
+  return(pvals_stats)
+}
+
+#' Generates collated permutaion test results and statistical test results.
+#'
+#' This function returns a tibble (list) that includes statistical test results:
+#' its corresponding statistics and p values.
+#'
+#' @param dabest_object A "dabest_obj" list created by loading in dataset along with other
+#' specified parameters with the [load()] function.
+#' @param seed Integer specifying random seed that will be passed to the
+#' [PermutationTest()] function.
+#' @param permutation_count Integer value specifying the number of permutations
+#'  being carried out in the [PermutationTest()] function.
+#' @param ef_size_fn The effect size function passed to [PermutationTest()] that
+#'  help calculate the specific type of effect size.
+#' @param effect_size_type String. Any one of the following are accepted inputs:
+#' 'mean_diff', 'median_diff', 'cohens_d', 'hedges_g', or 'cliffs_delta'.
+#'
+#' @returns Tibble for statistical test and permutation test results for
+#' all pairs of control and test datasets based on the experimental design
+#' initially specified when passed to the [load()] function.
 #' @noRd
 Pvalues_statistics <- function(dabest_object,
                                seed = 12345,
@@ -298,20 +452,26 @@ Pvalues_statistics <- function(dabest_object,
 #' @return A numeric vector representing the weighted delta for each permutation.
 #' @noRd
 calculate_minimeta <- function(permutations, permutations_var) {
-  all_num <- numeric(ncol(permutations))
-  all_denom <- numeric(ncol(permutations))
-  
-  groups <- nrow(permutations)
-  
-  for (i in seq_len(ncol(permutations))) {
-    weight <- sapply(seq_len(groups), function(j) 1/permutations_var[j, i])
-    all_num[i] <- sum(weight * permutations[, i])
-    all_denom[i] <- sum(weight)
+  #check if the permutations and permutations_var are of the same length
+  if (length(permutations) != length(permutations_var)) {
+    stop("The permutations and permutations_var are not of the same length.")
   }
+
+  if (length(permutations) == 0) {
+    stop("The permutations and permutations_var are empty.")
+  } 
+  all_num <- numeric(length(permutations))
+  all_denom <- numeric(length(permutations))
   
+  # Loop through each permutation
+  weight <- 1/permutations_var
+  all_num <- weight * permutations
+  all_denom <- sum(weight)
+  # Calculate the weighted delta
   output <- all_num / all_denom
   return(output)
 }
+
 
 #' Calculate P-value for Weighted Delta in Mini-Meta Analysis
 #'
