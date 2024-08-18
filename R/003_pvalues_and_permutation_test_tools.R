@@ -92,6 +92,7 @@ PermutationTest <- function(control,
 
   return(perm_results)
 }
+
 #' Generates statistical test results for possible hypothesis testings.
 #'
 #' This function returns a list that include statistical test results:
@@ -239,6 +240,7 @@ pvals_statistics <- function(control,
 
   return(pvals_stats)
 }
+
 #' Generates collated permutaion test results and statistical test results.
 #'
 #' This function returns a tibble (list) that includes statistical test results:
@@ -266,7 +268,6 @@ Pvalues_statistics <- function(dabest_object,
                                effect_size_type) {
   permtest_pvals <- tibble::tibble()
 
-  # check if effect size function is supplied
   if (is.null(ef_size_fn)) {
     stop("No effect size calculation methods are supplied.")
   }
@@ -303,10 +304,8 @@ Pvalues_statistics <- function(dabest_object,
       tests <- group[2:group_length]
 
       for (test_group in tests) {
-        test_group <- test_group
         test_tibble <- raw_data %>%
           dplyr::filter(!!enquo_x == !!test_group)
-
         test_measurement <- test_tibble[[quoname_y]]
 
         xlabels <- paste(test_group, group[1], sep = "\nminus\n")
@@ -326,6 +325,19 @@ Pvalues_statistics <- function(dabest_object,
         )
 
         # calculate p values
+        # If minimeta is TRUE, perform minimeta permutation test
+        if (isTRUE(minimeta)) {
+          permutations <- PermutationTest_result$permutations
+          permutations_var <- PermutationTest_result$permutations_var
+          permutations_weighted_delta <- calculate_minimeta(permutations, permutations_var)
+          
+          threshold <- abs(es)
+          pvalue_minimeta <- calculate_minimeta_pvalue(permutations_weighted_delta, threshold, perm_count)
+          
+          PermutationTest_result$pvalue <- pvalue_minimeta
+          PermutationTest_result$weighted_delta <- permutations_weighted_delta
+        }
+
         pvals_and_stats <- pvals_statistics(ctrl_measurement,
           test_measurement,
           is_paired = is_paired,
@@ -360,7 +372,6 @@ Pvalues_statistics <- function(dabest_object,
         test_tibble <- raw_data %>%
           dplyr::filter(!!enquo_x == !!test_group)
         test_measurement <- test_tibble[[quoname_y]]
-
         xlabels <- paste(test_group, control_group, sep = "\nminus\n")
 
         control_test_measurement <- list(
@@ -390,14 +401,26 @@ Pvalues_statistics <- function(dabest_object,
           random_seed = 12345,
           ef_size_fn = ef_size_fn
         )
-        # calculate p values
+
+        # If minimeta is TRUE, perform minimeta permutation test
+        if (isTRUE(minimeta)) {
+          permutations <- PermutationTest_result$permutations
+          permutations_var <- PermutationTest_result$permutations_var
+          permutations_weighted_delta <- calculate_minimeta(permutations, permutations_var)
+          
+          threshold <- abs(es)
+          pvalue_minimeta <- calculate_minimeta_pvalue(permutations_weighted_delta, threshold, perm_count)
+          
+          PermutationTest_result$pvalue <- pvalue_minimeta
+          PermutationTest_result$weighted_delta <- permutations_weighted_delta
+        }
+
         pvals_and_stats <- pvals_statistics(ctrl_measurement,
           test_measurement,
           is_paired = is_paired,
           proportional = proportional,
           effect_size = effect_size_type
         )
-
 
         pval_row <- list(
           control_group = control_group,
@@ -415,4 +438,54 @@ Pvalues_statistics <- function(dabest_object,
   }
 
   return(list(permtest_pvals = permtest_pvals))
+}
+
+#' Calculate Weighted Delta for Mini-Meta Analysis
+#'
+#' This function calculates the weighted delta across multiple groups for a mini-meta analysis.
+#' The weights are determined by the inverse of the variance of the permutations for each group.
+#' The function returns the weighted average delta for each permutation.
+#'
+#' @param permutations A matrix where each row represents a group, and each column represents a permutation.
+#' @param permutations_var A matrix of the same dimensions as `permutations`, containing the variances of each group for each permutation.
+#'
+#' @return A numeric vector representing the weighted delta for each permutation.
+#' @noRd
+calculate_minimeta <- function(permutations, permutations_var) {
+  #check if the permutations and permutations_var are of the same length
+  if (length(permutations) != length(permutations_var)) {
+    stop("The permutations and permutations_var are not of the same length.")
+  }
+
+  if (length(permutations) == 0) {
+    stop("The permutations and permutations_var are empty.")
+  } 
+  all_num <- numeric(length(permutations))
+  all_denom <- numeric(length(permutations))
+  
+  # Loop through each permutation
+  weight <- 1/permutations_var
+  all_num <- weight * permutations
+  all_denom <- sum(weight)
+  # Calculate the weighted delta
+  output <- all_num / all_denom
+  return(output)
+}
+
+
+#' Calculate P-value for Weighted Delta in Mini-Meta Analysis
+#'
+#' This function calculates the p-value for the weighted delta in a mini-meta analysis.
+#' The p-value is computed based on the number of weighted deltas that exceed a given threshold.
+#'
+#' @param permutations_weighted_delta A numeric vector of weighted deltas for each permutation.
+#' @param threshold A numeric value representing the threshold for significance.
+#' @param permutation_count An integer representing the total number of permutations performed.
+#'
+#' @return A numeric value representing the p-value.
+#' @noRd
+calculate_minimeta_pvalue <- function(permutations_weighted_delta, threshold, permutation_count) {
+  count <- sum(abs(permutations_weighted_delta) > threshold)
+  pvalue <- count / permutation_count
+  return(pvalue)
 }

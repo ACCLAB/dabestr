@@ -95,8 +95,7 @@ print_each_comparism_effectsize <- function(dabest_object, effectsize) {
   bca_low <- round(dabest_object$boot_result$bca_ci_low, 3)
   bca_high <- round(dabest_object$boot_result$bca_ci_high, 3)
   ci <- dabest_object$boot_result$ci
-  pvalue <- dabest_object$permtest_pvals$pval_for_tests
-
+  pvalue <- dabest_object$permtest_pvals$pval_permtest
   if (is.null(paired)) {
     rm_status <- ""
   } else if (paired == "sequential") {
@@ -147,7 +146,7 @@ print_each_comparism_effectsize <- function(dabest_object, effectsize) {
           current_bca_low <- bca_low[i]
           current_bca_high <- bca_high[i]
           current_ci <- ci[i]
-          current_pval <- pvalue[i]
+          current_pval <- as.numeric(pvalue[i])
 
           cat(stringr::str_interp("The ${paired_status} ${es} between ${current_group} and ${previous_group} is ${current_difference} [${current_ci}%CI ${current_bca_low}, ${current_bca_high}].\n"))
           cat(stringr::str_interp("The p-value of the two-sided permutation t-test is ${sprintf(current_pval, fmt = '%#.4f')}, calculated for legacy purposes only."))
