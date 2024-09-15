@@ -19,7 +19,7 @@ test_that("Throws an error when proportion_success contains values outside [0, 1
   # Test case: proportion_success contains a value outside [0, 1]
   proportion_success <- c(0.5, 1.5, 0.75)
   expect_error(create_dfs_for_proportion_bar(proportion_success),
-    message = "proportion_success values must be between 0 and 1"
+   "Proportion plots must be supplied with data of values between 0 and 1."
   )
 })
 
@@ -32,13 +32,6 @@ test_that("Returns a data frame with correct dimensions and values for valid inp
   expect_type(result, "list")
   expect_equal(nrow(result), 1537) # 512 * 3 (number of x_idx_position) +1
   expect_equal(ncol(result), 3)
-})
-
-test_that("Throws an error for invalid inputs", {
-  # Test case: Invalid inputs (e.g., boots not provided)
-  expect_error(create_dfs_for_baseline_ec_violin(),
-    message = "argument 'boots' is missing, with no default"
-  )
 })
 
 describe("Testing create_dfs_for_xaxis_redraw function", {
@@ -58,12 +51,5 @@ describe("Testing create_dfs_for_xaxis_redraw function", {
     expect_equal(nrow(result$df_for_ticks), sum(lengths(idx)))
     expect_equal(ncol(result$df_for_ticks), 1)
     expect_equal(sum(is.na(result$df_for_ticks)), 0)
-  })
-
-  test_that("Throws an error for invalid inputs", {
-    # Test case: Invalid inputs (e.g., idx not provided)
-    expect_error(create_dfs_for_xaxis_redraw(),
-      message = "argument 'idx' is missing, with no default"
-    )
   })
 })

@@ -279,7 +279,8 @@ create_dfs_for_proportion_bar <- function(proportion_success, bar_width = 0.3, g
   for (x in 1:length(proportion_success)) {
     y <- proportion_success[x]
     if ((y > 1) || (y < 0)) {
-      stop("proportion_success values must be between 0 and 1")
+      cli::cli_abort(c("Proportion plots must be supplied with data of values between 0 and 1."
+      ))
     }
 
     x_failure_success <- c(x - bar_width / 2, x + bar_width / 2, x + bar_width / 2, x - bar_width / 2)
