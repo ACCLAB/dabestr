@@ -117,7 +117,7 @@ pvals_statistics <- function(control,
   pvals_stats <- list()
   if (is_paired && !proportional) {
     # Wilcoxon test (non-parametric version of the paired T-test)
-    wilcoxon <- stats::wilcox.test(control, test)
+    wilcoxon <- stats::wilcox.test(control, test, exact = FALSE)
     pvalue_wilcoxon <- wilcoxon$p.value
     statistic_wilcoxon <- wilcoxon$statistic
 
@@ -188,7 +188,7 @@ pvals_statistics <- function(control,
     # Mann-Whitney test: non-parametric, does not assume normality of distributions
     tryCatch(
       {
-        mann_whitney <- stats::wilcox.test(control, test, alternative = "two.sided")
+        mann_whitney <- stats::wilcox.test(control, test, alternative = "two.sided", exact = FALSE)
         pvalue_mann_whitney <- mann_whitney$p.value
         statistic_mann_whitney <- mann_whitney$statistic
       },
