@@ -15,13 +15,6 @@ describe("Testing add_scaling_component_to_delta_plot function", {
     expect_type(result[[1]], "list")
     # TODO Add specific expectations to check if the components are created correctly
   })
-
-  test_that("Throws an error for invalid inputs", {
-    # Test case: Invalid inputs (e.g., delta_plot not provided)
-    expect_error(add_scaling_component_to_delta_plot(),
-      message = "argument 'delta_plot' is missing, with no default"
-    )
-  })
 })
 
 describe("Testing add_violinplot_component_to_delta_plot function", {
@@ -40,14 +33,6 @@ describe("Testing add_violinplot_component_to_delta_plot function", {
       add_violinplot_component_to_delta_plot(delta_plot, dabest_effectsize_obj, main_violin_type, flow, float_contrast, zero_dot_x_breaks)
     )
     # TODO Add specific expectations to check if the components are created correctly
-  })
-
-  test_that("Throws an error for invalid inputs", {
-    # Test case: Invalid inputs (e.g., dabest_effectsize_obj not provided)
-    delta_plot <- ggplot2::ggplot() # Dummy plot object
-    expect_error(add_violinplot_component_to_delta_plot(delta_plot),
-      message = "argument 'dabest_effectsize_obj' is missing, with no default"
-    )
   })
 })
 

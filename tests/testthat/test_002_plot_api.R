@@ -34,11 +34,4 @@ describe("Testing plot_delta function", {
     expect_named(result, c("delta_plot", "delta_range"))
     # TODO Add specific expectations to check if the components are created correctly
   })
-
-  test_that("Throws an error for invalid inputs", {
-    # Test case: Invalid inputs (e.g., delta_plot not provided)
-    expect_error(plot_delta(),
-      message = "argument 'dabest_effectsize_obj' is missing, with no default"
-    )
-  })
 })

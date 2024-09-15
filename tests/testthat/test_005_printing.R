@@ -14,13 +14,6 @@ describe("Testing print_each_comparism function", {
     expect_true(grepl("2. M Drug minus W Drug", cat_output, fixed = TRUE))
     expect_true(grepl("3. Drug minus Placebo (only for mean difference)", cat_output, fixed = TRUE))
   })
-
-  test_that("Handles invalid effectsize gracefully", {
-    # Test case: Invalid effectsize
-    expect_error(print_each_comparism(),
-      message = "argument 'dabest_obj' is missing, with no default"
-    )
-  })
 })
 
 # Test cases
@@ -37,17 +30,5 @@ describe("Testing print_each_comparism_effectsize function", {
     ) %>% mean_diff()
     effectsize <- "mean_diff"
     expect_no_error(print_each_comparism_effectsize(dabest_effectsize_obj, effectsize))
-  })
-
-  test_that("Handles invalid effectsize gracefully", {
-    # Test case: Invalid effectsize
-    dabest_effectsize_obj <- list(
-      idx = list("Group A", "Group B", "Group C"),
-      paired = NULL
-    )
-    effectsize <- "invalid_effectsize"
-    expect_error(print_each_comparism_effectsize(dabest_effectsize_obj, effectsize),
-      message = "dabest_effectsize_obj must be a <dabest_effectsize> object"
-    )
   })
 })

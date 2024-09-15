@@ -14,14 +14,14 @@ knitr::opts_chunk$set(
 )
 ```
 
-This vignette documents how `dabestr` is able to generate estimation plots for experiments with repeated-measures designs. `dabestr` allows for the calculation and plotting of effect sizes for:
+This vignette documents how the `dabestr` package can generate estimation plots for experiments with repeated-measures designs. With `dabestr`, you can calculate and plot effect sizes for:
 
 - Comparing each group to a shared control (control vs. group i; `baseline`)
 - Comparing each measurement to the one directly preceding it (group i vs group i+1; `sequential`)
 
-This is an improved version of paired data plotting in previous versions, which only supported computations involving one test group and one control group.
+This is an improved version of `paired data plotting` in previous versions, which only supported computations involving one test group and one control group.
 
-To use these features, you can simply declare the argument `paired = "sequential"` or `paired = "baseline"` correspondingly while running `load()`. You must also pass a column in the dataset that indicates the identity of each observation, using the `id_col` keyword.
+To use these features, simply declare the `paired` argument as either "sequential" or "baseline" when running the `load()` function. Additionally, you must pass a column in the dataset that indicates the identity of each observation using the `id_col` keyword.
 
 ```{r setup, warning = FALSE, message = FALSE}
 library(dabestr)
@@ -29,8 +29,7 @@ library(dabestr)
 
 ## Create dataset for demo
 ```{r}
-set.seed(12345) # Fix the seed so the results are replicable.
-# pop_size = 10000 # Size of each population.
+set.seed(12345) # Fix the seed so the results are reproducible.
 N <- 20 # The number of samples taken from each population
 
 # Create samples
@@ -63,7 +62,7 @@ df <- df %>%
 ```
 
 ## Loading Data
-```{r}
+```{r, warning = FALSE}
 two_groups_paired_sequential <- load(df,
   x = Group, y = Measurement,
   idx = c("Control 1", "Test 1"),
@@ -73,7 +72,7 @@ two_groups_paired_sequential <- load(df,
 print(two_groups_paired_sequential)
 ```
 
-```{r}
+```{r, warning = FALSE}
 two_groups_paired_baseline <- load(df,
   x = Group, y = Measurement,
   idx = c("Control 1", "Test 1"),
@@ -97,7 +96,7 @@ print(two_groups_paired_sequential.mean_diff)
 print(two_groups_paired_baseline.mean_diff)
 ```
 
-For paired data, we use [slopegraphs](https://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0003nk) (another innovation from Edward Tufte) to connect paired observations. Both Gardner-Altman and Cumming plots support this.
+For paired data, we use [slopegraphs](https://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0003nk%3E) (another innovation from Edward Tufte) to connect paired observations. Both Gardner-Altman and Cumming plots support this.
 
 ```{r}
 dabest_plot(two_groups_paired_sequential.mean_diff,
@@ -105,7 +104,7 @@ dabest_plot(two_groups_paired_sequential.mean_diff,
 )
 ```
 
-```{r, eval = FALSE}
+```{r, warning = FALSE, eval = FALSE}
 dabest_plot(two_groups_paired_sequential.mean_diff,
   float_contrast = FALSE,
   raw_marker_size = 0.5, raw_marker_alpha = 0.3,
@@ -113,7 +112,7 @@ dabest_plot(two_groups_paired_sequential.mean_diff,
 )
 ```
 
-```{r, echo = FALSE}
+```{r, warning = FALSE, echo = FALSE}
 pp_plot <- dabest_plot(two_groups_paired_sequential.mean_diff,
   float_contrast = FALSE,
   raw_marker_size = 0.5, raw_marker_alpha = 0.3,
@@ -128,13 +127,13 @@ cowplot::plot_grid(
 )
 ```
 
-```{r}
+```{r, warning = FALSE}
 dabest_plot(two_groups_paired_baseline.mean_diff,
   raw_marker_size = 0.5, raw_marker_alpha = 0.3
 )
 ```
 
-```{r, eval = FALSE}
+```{r, warning = FALSE, eval = FALSE}
 dabest_plot(two_groups_paired_baseline.mean_diff,
   float_contrast = FALSE,
   raw_marker_size = 0.5, raw_marker_alpha = 0.3,
@@ -142,7 +141,7 @@ dabest_plot(two_groups_paired_baseline.mean_diff,
 )
 ```
 
-```{r, echo = FALSE}
+```{r, warning = FALSE, echo = FALSE}
 pp_plot <- dabest_plot(two_groups_paired_baseline.mean_diff,
   float_contrast = FALSE,
   raw_marker_size = 0.5, raw_marker_alpha = 0.3,
@@ -159,7 +158,7 @@ cowplot::plot_grid(
 
 You can also create repeated-measures plots with multiple test groups. In this case, declaring `paired` to be "sequential" or "baseline" will generate the same slopegraph, reflecting the repeated-measures experimental design, but different contrast plots, to show the "sequential" or "baseline" comparison:
 
-```{r}
+```{r, warning = FALSE}
 sequential_repeated_measures.mean_diff <- load(df,
   x = Group, y = Measurement,
   idx = c(
@@ -173,13 +172,13 @@ sequential_repeated_measures.mean_diff <- load(df,
 print(sequential_repeated_measures.mean_diff)
 ```
 
-```{r}
+```{r, warning = FALSE}
 dabest_plot(sequential_repeated_measures.mean_diff,
   raw_marker_size = 0.5, raw_marker_alpha = 0.3
 )
 ```
 
-```{r}
+```{r, warning = FALSE}
 baseline_repeated_measures.mean_diff <- load(df,
   x = Group, y = Measurement,
   idx = c(
@@ -193,15 +192,15 @@ baseline_repeated_measures.mean_diff <- load(df,
 print(baseline_repeated_measures.mean_diff)
 ```
 
-```{r}
+```{r, warning = FALSE}
 dabest_plot(baseline_repeated_measures.mean_diff,
   raw_marker_size = 0.5, raw_marker_alpha = 0.3
 )
 ```
 
-As with unpaired data, `dabestr` empowers you to perform complex visualizations and statistics for paired data as well.
+Just as with unpaired data, the `dabestr` package enables you to perform complex visualizations and statistics for paired data.
 
-```{r}
+```{r, warning = FALSE}
 multi_baseline_repeated_measures.mean_diff <- load(df,
   x = Group, y = Measurement,
   idx = list(
