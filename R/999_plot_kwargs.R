@@ -46,9 +46,8 @@
 #' npg, aaas, nejm, lancet, jama, jco, ucscgb, d3, locuszoom, igv, cosmic, uchicago, brewer, ordinal, viridis_d.
 #'
 #'
-NULL
-
 assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
+  check_effectsize_object(dabest_effectsize_obj)
   custom_palette <- "d3"
 
   swarm_label <- dabest_effectsize_obj$raw_y_labels
@@ -85,88 +84,88 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   sankey <- TRUE
   flow <- TRUE
 
-  if (isFALSE(is.null(plot_kwargs$swarm_label))) {
+  if (!(is.null(plot_kwargs$swarm_label))) {
     swarm_label <- plot_kwargs$swarm_label
   }
-  if (isFALSE(is.null(plot_kwargs$contrast_label))) {
+  if (!(is.null(plot_kwargs$contrast_label))) {
     contrast_label <- plot_kwargs$contrast_label
   }
-  if (isFALSE(is.null(plot_kwargs$custom_palette))) {
+  if (!(is.null(plot_kwargs$custom_palette))) {
     custom_palette <- plot_kwargs$custom_palette
   }
-  if (isFALSE(is.null(plot_kwargs$swarm_ylim))) {
+  if (!(is.null(plot_kwargs$swarm_ylim))) {
     swarm_ylim <- plot_kwargs$swarm_ylim
   }
-  if (isFALSE(is.null(plot_kwargs$contrast_ylim))) {
+  if (!(is.null(plot_kwargs$contrast_ylim))) {
     contrast_ylim <- plot_kwargs$contrast_ylim
   }
-  if (isFALSE(is.null(plot_kwargs$delta2_ylim))) {
+  if (!(is.null(plot_kwargs$delta2_ylim))) {
     delta2_ylim <- plot_kwargs$delta2_ylim
   }
-  if (isFALSE(is.null(plot_kwargs$delta2_label))) {
+  if (!(is.null(plot_kwargs$delta2_label))) {
     delta2_label <- plot_kwargs$delta2_label
   }
-  if (isFALSE(is.null(plot_kwargs$show_delta2))) {
+  if (!(is.null(plot_kwargs$show_delta2))) {
     show_delta2 <- plot_kwargs$show_delta2
   }
-  if (isFALSE(is.null(plot_kwargs$show_mini_meta))) {
+  if (!(is.null(plot_kwargs$show_mini_meta))) {
     show_mini_meta <- plot_kwargs$show_mini_meta
   }
-  if (isFALSE(is.null(plot_kwargs$raw_marker_size))) {
+  if (!(is.null(plot_kwargs$raw_marker_size))) {
     raw_marker_size <- plot_kwargs$raw_marker_size
   }
-  if (isFALSE(is.null(plot_kwargs$raw_marker_alpha))) {
+  if (!(is.null(plot_kwargs$raw_marker_alpha))) {
     raw_marker_alpha <- plot_kwargs$raw_marker_alpha
   }
-  if (isFALSE(is.null(plot_kwargs$raw_marker_side_shift))) {
+  if (!(is.null(plot_kwargs$raw_marker_side_shift))) {
     raw_marker_side_shift <- plot_kwargs$raw_marker_side_shift
   }
-  if (isFALSE(is.null(plot_kwargs$tufte_size))) {
+  if (!(is.null(plot_kwargs$tufte_size))) {
     tufte_size <- plot_kwargs$tufte_size
   }
-  if (isFALSE(is.null(plot_kwargs$es_marker_size))) {
+  if (!(is.null(plot_kwargs$es_marker_size))) {
     es_marker_size <- plot_kwargs$es_marker_size
   }
-  if (isFALSE(is.null(plot_kwargs$es_line_size))) {
+  if (!(is.null(plot_kwargs$es_line_size))) {
     es_line_size <- plot_kwargs$es_line_size
   }
-  if (isFALSE(is.null(plot_kwargs$raw_bar_width))) {
+  if (!(is.null(plot_kwargs$raw_bar_width))) {
     raw_bar_width <- plot_kwargs$raw_bar_width
   }
-  if (isFALSE(is.null(plot_kwargs$raw_marker_spread))) {
+  if (!(is.null(plot_kwargs$raw_marker_spread))) {
     raw_marker_spread <- plot_kwargs$raw_marker_spread
   }
-  if (isFALSE(is.null(plot_kwargs$sankey))) {
+  if (!(is.null(plot_kwargs$sankey))) {
     sankey <- plot_kwargs$sankey
   }
-  if (isFALSE(is.null(plot_kwargs$flow))) {
+  if (!(is.null(plot_kwargs$flow))) {
     flow <- plot_kwargs$flow
   }
-  if (isFALSE(is.null(plot_kwargs$raw_flow_alpha))) {
+  if (!(is.null(plot_kwargs$raw_flow_alpha))) {
     raw_flow_alpha <- plot_kwargs$raw_flow_alpha
   }
-  if (isFALSE(is.null(plot_kwargs$swarm_y_text))) {
+  if (!(is.null(plot_kwargs$swarm_y_text))) {
     swarm_y_text <- plot_kwargs$swarm_y_text
   }
-  if (isFALSE(is.null(plot_kwargs$swarm_x_text))) {
+  if (!(is.null(plot_kwargs$swarm_x_text))) {
     swarm_x_text <- plot_kwargs$swarm_x_text
   }
-  if (isFALSE(is.null(plot_kwargs$contrast_y_text))) {
+  if (!(is.null(plot_kwargs$contrast_y_text))) {
     contrast_y_text <- plot_kwargs$contrast_y_text
   }
-  if (isFALSE(is.null(plot_kwargs$contrast_x_text))) {
+  if (!(is.null(plot_kwargs$contrast_x_text))) {
     contrast_x_text <- plot_kwargs$contrast_x_text
   }
-  if (isFALSE(is.null(plot_kwargs$show_zero_dot))) {
+  if (!(is.null(plot_kwargs$show_zero_dot))) {
     show_zero_dot <- plot_kwargs$show_zero_dot
   }
-  if (isFALSE(is.null(plot_kwargs$show_baseline_ec))) {
+  if (!(is.null(plot_kwargs$show_baseline_ec))) {
     show_baseline_ec <- plot_kwargs$show_baseline_ec
   }
-  if (isFALSE(is.null(plot_kwargs$show_legend))) {
+  if (!(is.null(plot_kwargs$show_legend))) {
     show_legend <- plot_kwargs$show_legend
   }
-  if (isFALSE(is.null(plot_kwargs$asymmetric_side))) {
+  if (!(is.null(plot_kwargs$asymmetric_side))) {
     asymmetric_side <- plot_kwargs$asymmetric_side
   }
 

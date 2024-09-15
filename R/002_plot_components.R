@@ -18,39 +18,22 @@
 create_rawplot_components <- function(proportional,
                                       is_paired,
                                       float_contrast) {
-  main_plot_type <- ""
-  is_summary_lines <- TRUE
-  is_tufte_lines <- TRUE
+  main_plot_type <- switch(paste(proportional, is_paired),
+    "TRUE FALSE" = "unpaired proportions",
+    "FALSE FALSE" = "swarmplot",
+    "TRUE TRUE" = "sankey",
+    "FALSE TRUE" = "slope"
+  )
 
-  if (isTRUE(proportional)) {
-    if (isFALSE(is_paired)) {
-      main_plot_type <- "unpaired proportions"
-      if (isTRUE(float_contrast)) {
-        is_summary_lines <- TRUE
-      } else {
-        is_summary_lines <- FALSE
-      }
-    } else {
-      main_plot_type <- "sankey"
-      is_summary_lines <- FALSE
-    }
-  } else {
-    if (isFALSE(is_paired)) {
-      main_plot_type <- "swarmplot"
-      if (isTRUE(float_contrast)) {
-        is_summary_lines <- TRUE
-      } else {
-        is_summary_lines <- FALSE
-      }
-    } else {
-      main_plot_type <- "slope"
-      is_tufte_lines <- FALSE
-      if (isTRUE(float_contrast)) {
-        is_summary_lines <- TRUE
-      } else {
-        is_summary_lines <- FALSE
-      }
-    }
+  is_summary_lines <- is_tufte_lines <- TRUE
+  if (!float_contrast) {
+    is_summary_lines <- FALSE
+  }
+  if (main_plot_type == "slope") {
+    is_tufte_lines <- FALSE
+  }
+  if (main_plot_type == "sankey") {
+    is_summary_lines <- FALSE
   }
 
   plot_component <- list(
@@ -58,8 +41,10 @@ create_rawplot_components <- function(proportional,
     is_summary_lines = is_summary_lines,
     is_tufte_lines = is_tufte_lines
   )
+
   return(plot_component)
 }
+
 
 #' Generates list of TRUE/FALSE for delta plot components that will be built
 #'
@@ -88,28 +73,12 @@ create_deltaplot_components <- function(proportional,
                                         show_zero_dot,
                                         flow,
                                         show_baseline_ec) {
-  main_violin_type <- "multicolour"
-  is_summary_lines <- TRUE
+  main_violin_type <- if (is_paired || is_colour) "singlecolour" else "multicolour"
+  is_summary_lines <- float_contrast
   is_bootci <- TRUE
-  is_deltadelta <- FALSE
-  is_zero_dot <- FALSE
-  is_baseline_ec <- FALSE
-
-  if (isTRUE(is_paired) || isTRUE(is_colour)) {
-    main_violin_type <- "singlecolour"
-  }
-  if (isTRUE(delta2)) {
-    is_deltadelta <- TRUE
-  }
-  if (isTRUE(show_zero_dot) && isTRUE(flow)) {
-    is_zero_dot <- TRUE
-  }
-  if (isFALSE(float_contrast)) {
-    is_summary_lines <- FALSE
-  }
-  if (isTRUE(show_baseline_ec)) {
-    is_baseline_ec <- TRUE
-  }
+  is_deltadelta <- delta2
+  is_zero_dot <- show_zero_dot && flow
+  is_baseline_ec <- show_baseline_ec
 
   plot_component <- list(
     main_violin_type = main_violin_type,
@@ -146,37 +115,26 @@ create_violinplot_components <- function(boots,
                                          delta_y_min,
                                          flow = TRUE,
                                          zero_dot = TRUE) {
-  df_for_violin <- data.frame(
-    x = NA,
-    y = NA,
-    tag = NA
-  )
-
+  df_for_violin <- data.frame(x = NA, y = NA, tag = NA)
   x_axis_breaks <- c()
   zero_dot_x_breaks <- c()
   curr_boot_idx <- 1
   curr_x_idx <- 0
-  x_axis_scalar <- ifelse(flow, 0, 0.5)
+  x_axis_scalar <- if (flow) 0 else 0.5
 
   for (group in idx) {
     curr_x_idx <- curr_x_idx + 1
-    if (isTRUE(zero_dot)) {
-      zero_dot_x_breaks <- append(zero_dot_x_breaks, curr_x_idx)
+    if (zero_dot) {
+      zero_dot_x_breaks <- c(zero_dot_x_breaks, curr_x_idx)
     }
-    temp_df_violin <- data.frame(
-      x = NA,
-      y = NA,
-      tag = toString(curr_x_idx)
-    )
-
+    temp_df_violin <- data.frame(x = NA, y = NA, tag = toString(curr_x_idx))
     df_for_violin <- rbind(df_for_violin, temp_df_violin)
 
     for (i in 2:length(group)) {
       curr_x_idx <- curr_x_idx + 1
-      x_axis_breaks <- append(x_axis_breaks, curr_x_idx)
+      x_axis_breaks <- c(x_axis_breaks, curr_x_idx)
 
       ci_coords <- stats::density(boots[[curr_boot_idx]])
-
       x_coords_ci <- ci_coords$x
       y_coords_ci <- ci_coords$y
 
@@ -184,7 +142,7 @@ create_violinplot_components <- function(boots,
       y_coords_ci <- (y_coords_ci - min(y_coords_ci)) / (max(y_coords_ci) - min(y_coords_ci))
       y_coords_ci <- y_coords_ci / 6
 
-      if (isFALSE(float_contrast)) {
+      if (!float_contrast) {
         y_coords_ci <- y_coords_ci / 1.5
       }
 
@@ -194,24 +152,15 @@ create_violinplot_components <- function(boots,
       max_x_coords <- max(x_coords_ci)
 
       # Keeping track of ylim limits
-      if (min_x_coords < delta_y_min) {
-        delta_y_min <- min_x_coords
-      }
-      if (max_x_coords > delta_y_max) {
-        delta_y_max <- max_x_coords
-      }
+      delta_y_min <- min(min_x_coords, delta_y_min)
+      delta_y_max <- max(max_x_coords, delta_y_max)
 
-      temp_df_violin <- data.frame(
-        x = x_coords_ci,
-        y = y_coords_ci,
-        tag = rep(toString(curr_x_idx), 512)
-      )
-
+      temp_df_violin <- data.frame(x = x_coords_ci, y = y_coords_ci, tag = rep(toString(curr_x_idx), 512))
       df_for_violin <- rbind(df_for_violin, temp_df_violin)
-
       curr_boot_idx <- curr_boot_idx + 1
     }
   }
+
   df_for_violin <- df_for_violin %>%
     dplyr::arrange(tag, x, y)
 
@@ -224,4 +173,125 @@ create_violinplot_components <- function(boots,
   )
 
   return(plot_component)
+}
+
+# TODO add documentation
+add_violinplot_component_to_delta_plot <- function(delta_plot, dabest_effectsize_obj, main_violin_type, flow, float_contrast, zero_dot_x_breaks) {
+  baseline_ec_boot_result <- dabest_effectsize_obj$baseline_ec_boot_result
+  baseline_boots <- baseline_ec_boot_result$bootstraps
+
+  df_for_baseline_ec_violin <- create_dfs_for_baseline_ec_violin(
+    baseline_boots,
+    zero_dot_x_breaks,
+    float_contrast,
+    flow
+  )
+  if (main_violin_type == "multicolour") {
+    delta_plot <- delta_plot +
+      geom_halfviolin(
+        na.rm = TRUE,
+        data = df_for_baseline_ec_violin,
+        ggplot2::aes(x = y, y = x, fill = tag)
+      )
+  } else {
+    delta_plot <- delta_plot +
+      geom_halfviolin(
+        na.rm = TRUE,
+        data = df_for_baseline_ec_violin,
+        ggplot2::aes(x = y, y = x, group = tag)
+      )
+  }
+  return(delta_plot)
+}
+
+# TODO add documentation
+add_bootci_component_to_delta_plot <- function(delta_plot, x_axis_breaks, ci_low, ci_high, difference, es_marker_size, es_line_size) {
+  delta_plot <- delta_plot +
+    geom_bootci(ggplot2::aes(
+      x = x_axis_breaks,
+      ymin = ci_low,
+      ymax = ci_high,
+      middle = difference,
+      dotsize = es_marker_size,
+      linesize = es_line_size
+    ))
+  return(delta_plot)
+}
+
+# TODO add documentation
+add_scaling_component_to_delta_plot <- function(delta_plot, float_contrast, boot_result, delta_x_axis_params, delta_y_axis_params, summary_data, plot_kwargs) {
+  minimeta <- plot_kwargs$show_mini_meta
+  delta2 <- plot_kwargs$show_delta2
+
+  # summary control and test
+  control_summary <- summary_data[[1]]
+  test_summary <- summary_data[[2]]
+
+  # axis params
+  delta_x_max <- delta_x_axis_params[[1]]
+  delta_x_labels <- delta_x_axis_params[[2]]
+  x_axis_breaks <- delta_x_axis_params[[3]]
+
+  delta_y_min <- delta_y_axis_params[[1]]
+  delta_y_max <- delta_y_axis_params[[2]]
+  delta_y_mean <- delta_y_axis_params[[3]]
+  raw_ylim <- delta_y_axis_params[[4]]
+
+  min_y_coords <- NULL # only valid for float_contrast
+
+  if (float_contrast) {
+    difference <- boot_result$difference
+
+    # Calculate new ylims to align summary lines
+    min_raw_y <- raw_ylim[1]
+    max_raw_y <- raw_ylim[2]
+    raw_y_range <- max_raw_y - min_raw_y
+    min_y_coords <- difference / (1 - (test_summary - min_raw_y) / (control_summary - min_raw_y))
+    delta_y_range <- raw_y_range * -min_y_coords / (control_summary - min_raw_y)
+
+    delta_plot <- delta_plot +
+      ggplot2::theme_classic() +
+      ggplot2::coord_cartesian(
+        ylim = c(min_y_coords, min_y_coords + delta_y_range),
+        xlim = c(1.8, delta_x_max + 0.4),
+        expand = FALSE
+      ) +
+      ggplot2::scale_x_continuous(
+        breaks = c(2),
+        labels = delta_x_labels
+      ) +
+      ggplot2::scale_y_continuous(position = "right")
+  } else {
+    delta_x_min <- 0.6
+    delta_x_scalar <- 0.3
+
+    # Extend xaxis for minimeta/deltadelta.
+    if (minimeta || delta2) {
+      delta_x_max <- delta_x_max + 2
+    }
+    ## Custom contrast_ylim
+    delta_ylim <- plot_kwargs$contrast_ylim
+    if (!(is.null(delta_ylim))) {
+      delta_y_min <- delta_ylim[1]
+      delta_y_max <- delta_ylim[2]
+      delta_y_mean <- (delta_y_max - delta_y_min) / 2
+    }
+
+    delta_plot <- delta_plot +
+      ggplot2::theme_classic() +
+      ggplot2::coord_cartesian(
+        ylim = c(
+          delta_y_min - delta_y_mean / 10,
+          delta_y_max
+        ),
+        xlim = c(delta_x_min, delta_x_max + delta_x_scalar),
+        expand = FALSE
+      ) +
+      ggplot2::scale_x_continuous(
+        breaks = x_axis_breaks,
+        labels = delta_x_labels
+      )
+  }
+  delta_y_params <- list(min_y_coords, delta_y_min, delta_y_max, delta_y_mean)
+  return(list(delta_plot, delta_x_max, delta_y_params))
 }

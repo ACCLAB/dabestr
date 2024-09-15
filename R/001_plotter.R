@@ -36,11 +36,7 @@
 #' @export
 
 dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
-  if (!methods::is(dabest_effectsize_obj, "dabest_effectsize")) {
-    cli::cli_abort(c("{.field dabest_effectsize_obj} must be a {.cls dabest_effectsize} object."),
-      "x" = "Please supply a {.cls dabest_effectsize} object."
-    )
-  }
+  check_effectsize_object(dabest_effectsize_obj)
 
   plot_kwargs <- list(...)
   plot_kwargs <- assign_plot_kwargs(dabest_effectsize_obj, plot_kwargs)
@@ -58,69 +54,16 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
     float_contrast <- FALSE
   }
 
-  if (isFALSE(float_contrast)) {
-    raw_plot <- plot_raw(dabest_effectsize_obj, float_contrast = FALSE, plot_kwargs)
-    delta_plot <- plot_delta(dabest_effectsize_obj, float_contrast = FALSE, plot_kwargs)
+  raw_plot <- plot_raw(dabest_effectsize_obj, float_contrast, plot_kwargs)
+  delta_plot <- plot_delta(dabest_effectsize_obj, float_contrast, plot_kwargs)
 
-    delta_range <- delta_plot$delta_range
-    delta_plot <- delta_plot$delta_plot
+  delta_plot <- delta_plot$delta_plot
 
-    raw_plot <- apply_palette(raw_plot, custom_palette)
-    delta_plot <- apply_palette(delta_plot, custom_palette)
+  raw_plot <- apply_palette(raw_plot, custom_palette)
+  delta_plot <- apply_palette(delta_plot, custom_palette)
 
-    if (isTRUE(show_legend)) {
-      raw_legend <- cowplot::get_legend(raw_plot +
-        ggplot2::guides(alpha = "none") +
-        ggplot2::theme(legend.box.margin = ggplot2::margin(0, 0, 0, 0)))
-    }
 
-    plot_margin <- ggplot2::unit(c(0, 0, 0, 0), "pt")
-
-    if (isTRUE(is_mini_meta)) {
-      plot_margin <- ggplot2::unit(c(0, 5.5, 0, 0), "pt")
-    }
-
-    final_plot <- cowplot::plot_grid(
-      plotlist = list(
-        raw_plot + ggplot2::theme(
-          legend.position = "none",
-          plot.margin = plot_margin
-        ),
-        delta_plot + ggplot2::theme(
-          legend.position = "none",
-          plot.margin = plot_margin
-        )
-      ),
-      nrow = 2,
-      ncol = 1,
-      axis = "tblr",
-      align = "vh"
-    )
-
-    if (isTRUE(show_legend)){
-      if (isTRUE(is_colour)) {
-        legend_plot <- cowplot::plot_grid(
-          plotlist = list(raw_legend, NULL),
-          nrow = 2,
-          ncol = 1,
-          rel_heights = c(0.1, 0.9)
-        )
-        final_plot <- cowplot::plot_grid(final_plot, legend_plot, ncol = 2, nrow = 1, rel_widths = c(0.9, 0.1))
-      }
-    }
-
-    return(final_plot)
-  } else {
-    # isTRUE(float_contrast)
-    raw_plot <- plot_raw(dabest_effectsize_obj, float_contrast = TRUE, plot_kwargs)
-    delta_plot <- plot_delta(dabest_effectsize_obj, float_contrast = TRUE, plot_kwargs)
-
-    delta_plot_range <- delta_plot$delta_range
-    delta_plot <- delta_plot$delta_plot
-
-    raw_plot <- apply_palette(raw_plot, custom_palette)
-    delta_plot <- apply_palette(delta_plot, custom_palette)
-
+  if (float_contrast) {
     final_plot <- cowplot::plot_grid(
       plotlist = list(
         raw_plot + ggplot2::theme(legend.position = "none"),
@@ -133,18 +76,57 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
       align = "h"
     )
 
-    if (isTRUE(show_legend)) {
-      if (isTRUE(is_colour)) {
-        raw_legend <- cowplot::get_legend(raw_plot +
-          ggplot2::guides(
-            color = ggplot2::guide_legend(nrow = 1),
-            alpha = "none"
-          ) +
-          ggplot2::theme(legend.position = "bottom"))
-  
-        final_plot <- cowplot::plot_grid(final_plot, raw_legend, ncol = 1, rel_heights = c(0.9, 0.1))
-      }
+    if (show_legend & is_colour) {
+      raw_legend <- cowplot::get_legend(raw_plot +
+        ggplot2::guides(
+          color = ggplot2::guide_legend(nrow = 1),
+          alpha = "none"
+        ) +
+        ggplot2::theme(legend.position = "bottom"))
+
+      final_plot <- cowplot::plot_grid(final_plot, raw_legend, ncol = 1, rel_heights = c(0.9, 0.1))
     }
     return(final_plot)
   }
+
+  if (show_legend) {
+    raw_legend <- cowplot::get_legend(raw_plot +
+      ggplot2::guides(alpha = "none") +
+      ggplot2::theme(legend.box.margin = ggplot2::margin(0, 0, 0, 0)))
+  }
+
+  plot_margin <- ggplot2::unit(c(0, 0, 0, 0), "pt")
+
+  if (is_mini_meta) {
+    plot_margin <- ggplot2::unit(c(0, 5.5, 0, 0), "pt")
+  }
+
+  final_plot <- cowplot::plot_grid(
+    plotlist = list(
+      raw_plot + ggplot2::theme(
+        legend.position = "none",
+        plot.margin = plot_margin
+      ),
+      delta_plot + ggplot2::theme(
+        legend.position = "none",
+        plot.margin = plot_margin
+      )
+    ),
+    nrow = 2,
+    ncol = 1,
+    axis = "tblr",
+    align = "vh"
+  )
+
+  if (show_legend & is_colour) {
+    legend_plot <- cowplot::plot_grid(
+      plotlist = list(raw_legend, NULL),
+      nrow = 2,
+      ncol = 1,
+      rel_heights = c(0.1, 0.9)
+    )
+    final_plot <- cowplot::plot_grid(final_plot, legend_plot, ncol = 2, nrow = 1, rel_widths = c(0.9, 0.1))
+  }
+
+  return(final_plot)
 }

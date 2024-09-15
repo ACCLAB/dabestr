@@ -13,6 +13,16 @@
 #' @returns a dataframe for plotting of the tufte lines plot component.
 #' @noRd
 create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional, gap, effsize_type) {
+  # Input validation
+  if (!is.logical(proportional)) {
+    stop("'proportional' must be a logical value.")
+  }
+
+  if (!is.numeric(gap)) {
+    stop("'gap' must be a numeric value.")
+  }
+
+  # Compute summary statistics
   tufte_lines_df <- raw_data %>%
     dplyr::group_by(!!enquo_x) %>%
     dplyr::summarize(
@@ -23,14 +33,20 @@ create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional, gap, e
       upper_quartile = stats::quantile(!!enquo_y)[4]
     )
 
-  if (isTRUE(proportional)) {
-    tufte_lines_df <- tufte_lines_df %>%
-      dplyr::mutate(sd = sd / 7)
+  # Adjust SD if proportional is TRUE
+  if (proportional) {
+    tufte_lines_df$sd <- tufte_lines_df$sd / 7
   }
-  tufte_lines_df <- tufte_lines_df %>%
-    dplyr::mutate(lower_sd = mean - sd, upper_sd = mean + sd)
 
-  if (isTRUE(stringr::str_detect(effsize_type, "edian"))) {
+  # Compute lower and upper SD
+  tufte_lines_df <- tufte_lines_df %>%
+    dplyr::mutate(
+      lower_sd = mean - sd,
+      upper_sd = mean + sd
+    )
+
+  # Compute additional columns based on effsize_type
+  if (!is.null(effsize_type) && grepl("edian", effsize_type, ignore.case = TRUE)) {
     tufte_lines_df <- tufte_lines_df %>%
       dplyr::mutate(no_diff = (sd == 0)) %>%
       dplyr::mutate(
@@ -52,6 +68,7 @@ create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional, gap, e
 
   return(tufte_lines_df)
 }
+
 #' Generates df for tufte lines plot component for raw plot WITH flow = FALSE.
 #'
 #' This function rearranges and duplicates rows in a given dataframe (containing
@@ -68,6 +85,18 @@ create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional, gap, e
 create_dfs_for_nonflow_tufte_lines <- function(idx,
                                                tufte_lines_df,
                                                enquo_x) {
+  # Input validation
+  if (is.null(idx)) {
+    cli::cli_abort(c("Column {.field idx} is currently NULL.",
+      "x" = "Please enter a valid entry for {.field idx}"
+    ))
+  }
+  if (!is.data.frame(tufte_lines_df)) {
+    cli::cli_abort(c("Column {.field tufte_lines_df} is not a data frame",
+      "x" = "Please enter a valid entry for {.field tufte_lines_df}"
+    ))
+  }
+
   new_tufte_lines_df <- tibble::tibble()
   total_length <- length(unlist(idx))
   temp_idx <- unlist(idx)
@@ -129,205 +158,42 @@ create_dfs_for_sankey <- function(
 
   bar_width <- ifelse(float_contrast, 0.15, 0.03)
 
-  if (type == "single sankey" && float_contrast) {
-    scale_factor_sig <- 0.72
-  } else if (type == "multiple sankeys") {
-    scale_factor_sig <- 0.92
-  } else {
-    scale_factor_sig <- 0.95
-  }
+  scale_factor_sig <- switch(type,
+    "single sankey" = if (float_contrast) 0.72 else 0.95,
+    "multiple sankeys" = 0.92
+  )
+
   x_padding <- ifelse(float_contrast, 0.008, 0.006)
 
-  prop <- proportional_data
   ind <- 1
   x_start <- 1
 
-  sankey_bars <- prop
-
-  if (isFALSE(flow)) {
-    sankey_bars <- tibble::tibble()
-
-    for (group in idx) {
-      group_length <- length(group)
-
-      for (i in 1:(group_length - 1)) {
-        ctrl <- group[i]
-        treat <- group[i + 1]
-        temp_row_ctrl <- prop %>%
-          dplyr::group_by(!!enquo_x) %>%
-          dplyr::filter(!!enquo_x == ctrl)
-
-        temp_row_treat <- prop %>%
-          dplyr::group_by(!!enquo_x) %>%
-          dplyr::filter(!!enquo_x == treat)
-        pair_rows <- rbind(temp_row_ctrl, temp_row_treat)
-        sankey_bars <- dplyr::bind_rows(sankey_bars, pair_rows)
-      }
-    }
+  sankey_bars <- if (flow) {
+    proportional_data
+  } else {
+    create_sankey_bars(proportional_data, enquo_x, enquo_y, idx)
   }
 
   means_c_t <- sankey_bars$proportion_success
-  if (isTRUE(sankey)) {
-    for (group in idx) {
-      group_length <- length(group)
+  if (sankey) {
+    sankey_flows <- create_sankey_flows(
+      raw_data,
+      enquo_x,
+      enquo_y,
+      enquo_id_col,
+      idx,
+      N,
+      means_c_t,
+      gap,
+      bar_width,
+      x_padding,
+      scale_factor_sig
+    )
 
-      for (i in 1:(group_length - 1)) {
-        # redraw_x_axis <- append(redraw_x_axis, x_start)
-        success_success <- raw_data %>%
-          dplyr::group_by(!!enquo_id_col) %>%
-          dplyr::summarise(
-            success_change =
-              any(!!enquo_y == 1 & !!enquo_x == group[i]) &
-                any(!!enquo_y == 1 &
-                  !!enquo_x == group[i + 1])
-          ) %>%
-          dplyr::filter(success_change) %>%
-          dplyr::summarise(SS = dplyr::n() / N)
-
-        success_failure <- raw_data %>%
-          dplyr::group_by(!!enquo_id_col) %>%
-          dplyr::summarise(
-            sf_change =
-              any(!!enquo_y == 1 & !!enquo_x == group[i]) &
-                any(!!enquo_y == 0 &
-                  !!enquo_x == group[i + 1])
-          ) %>%
-          dplyr::filter(sf_change) %>%
-          dplyr::summarise(SF = dplyr::n() / N)
-
-        failure_failure <- raw_data %>%
-          dplyr::group_by(!!enquo_id_col) %>%
-          dplyr::summarise(
-            failure_change =
-              any(!!enquo_y == 0 & !!enquo_x == group[i]) &
-                any(!!enquo_y == 0 &
-                  !!enquo_x == group[i + 1])
-          ) %>%
-          dplyr::filter(failure_change) %>%
-          dplyr::summarise(FF = dplyr::n() / N)
-
-        failure_success <- raw_data %>%
-          dplyr::group_by(!!enquo_id_col) %>%
-          dplyr::summarise(
-            failure_change =
-              any(!!enquo_y == 0 & !!enquo_x == group[i]) &
-                any(!!enquo_y == 1 &
-                  !!enquo_x == group[i + 1])
-          ) %>%
-          dplyr::filter(failure_change) %>%
-          dplyr::summarise(FS = dplyr::n() / N)
-        # find values for lower flow success to failure flow
-        ss <- success_success$SS[1]
-        ff <- failure_failure$FF[1]
-        sf <- success_failure$SF[1]
-        fs <- failure_success$FS[1]
-        sf_start1 <- ss
-        sf_start2 <- means_c_t[ind] - gap / 2
-        sf_end1 <- means_c_t[ind + 1] + gap / 2
-        sf_end2 <- 1 - ff
-
-
-        # find values for upper flppied flow success to failure flow
-        fs_start1 <- 1 - ff
-        fs_start2 <- means_c_t[ind] + gap / 2
-        fs_end1 <- means_c_t[ind + 1] - gap / 2
-        fs_end2 <- ss
-
-        # form dataframes from sigmoid / flippedSig functions and the rectangles, later fit into sankeyflow
-        sig_success_failure_bot <- sigmoid(
-          x_start + bar_width - x_padding,
-          scale_factor_sig,
-          sf_start1 - 0.002,
-          sf_end1 + 0.002
-        )
-        sig_success_failure_top <- sigmoid(
-          x_start + bar_width - x_padding,
-          scale_factor_sig,
-          sf_start2 - 0.002,
-          sf_end2 + 0.002
-        )
-        sig_success_failure_bot <- dplyr::arrange(sig_success_failure_bot, dplyr::desc(x))
-        sig_failure_success_top <- flipped_sig(
-          x_start + bar_width - x_padding,
-          scale_factor_sig,
-          fs_start1 + 0.002,
-          fs_end1 - 0.002
-        )
-        sig_failure_success_bot <- flipped_sig(
-          x_start + bar_width - x_padding,
-          scale_factor_sig,
-          fs_start2 + 0.002,
-          fs_end2 - 0.002
-        )
-        sig_failure_success_bot <- dplyr::arrange(sig_failure_success_bot, dplyr::desc(x))
-
-
-        # For datasets with purely 1s or 0s
-        if (sf == 0) {
-          sig_success_failure_top <- data.frame(x = NaN, y = NaN)
-          sig_success_failure_bot <- sig_success_failure_top
-        }
-        if (fs == 0) {
-          sig_failure_success_top <- data.frame(x = NaN, y = NaN)
-          sig_failure_success_bot <- sig_failure_success_top
-        }
-
-        # number of points of data points
-        N_points <- length(sig_success_failure_bot)
-
-        # generate the tag column for all of these
-        tag <- rep(ind, N_points)
-        sankey_success_failure <- rbind(
-          sig_success_failure_top,
-          sig_success_failure_bot
-        )
-        sankey_success_failure <- cbind(sankey_success_failure, tag)
-
-        sankey_failure_success <- rbind(
-          sig_failure_success_top,
-          sig_failure_success_bot
-        )
-        sankey_failure_success <- cbind(sankey_failure_success, tag)
-
-        rect_flow_x <- c(x_start, x_start + 1)
-
-        sankey_failure_failure <- data.frame(
-          x = c(rect_flow_x, rev(rect_flow_x)),
-          y = c(1, 1, rep(fs_start1, 2)),
-          tag = c(rep(ind, 4))
-        )
-        sankey_success_success <- data.frame(
-          x = c(rect_flow_x, rev(rect_flow_x)),
-          y = c(rep(ss, 2), 0, 0),
-          tag = c(rep(ind, 4))
-        )
-
-        x_start <- x_start + 1
-
-        ind <- ind + 1
-
-        # update the 4 sankey flow dfs for plotting
-        flow_success_to_failure <- dplyr::bind_rows(
-          flow_success_to_failure,
-          sankey_success_failure
-        )
-        flow_success_to_success <- dplyr::bind_rows(
-          flow_success_to_success,
-          sankey_success_success
-        )
-        flow_failure_to_success <- dplyr::bind_rows(
-          flow_failure_to_success,
-          sankey_failure_success
-        )
-        flow_failure_to_failure <- dplyr::bind_rows(
-          flow_failure_to_failure,
-          sankey_failure_failure
-        )
-      }
-
-      x_start <- x_start + 1
-      ind <- ind + 1
-    }
+    flow_success_to_failure <- sankey_flows$flow_success_to_failure
+    flow_success_to_success <- sankey_flows$flow_success_to_success
+    flow_failure_to_success <- sankey_flows$flow_failure_to_success
+    flow_failure_to_failure <- sankey_flows$flow_failure_to_failure
   } else {
     flow_success_to_failure <- data.frame(x = NaN, y = NaN, tag = NaN)
     flow_failure_to_success <- data.frame(x = NaN, y = NaN, tag = NaN)
@@ -335,7 +201,7 @@ create_dfs_for_sankey <- function(
     flow_failure_to_failure <- data.frame(x = NaN, y = NaN, tag = NaN)
   }
 
-  redraw_x_axis <- c(1:length(unlist(idx)))
+  redraw_x_axis <- seq_along(unlist(idx))
   dfs_for_sankeys <- list(
     flow_success_to_failure = flow_success_to_failure,
     flow_failure_to_success = flow_failure_to_success,
@@ -474,7 +340,7 @@ create_dfs_for_baseline_ec_violin <- function(boots, x_idx_position, float_contr
     y_coords_ci <- (y_coords_ci - min(y_coords_ci)) / (max(y_coords_ci) - min(y_coords_ci))
     y_coords_ci <- y_coords_ci / 6
 
-    if (isFALSE(float_contrast)) {
+    if (!(float_contrast)) {
       y_coords_ci <- y_coords_ci / 1.5
     }
 
