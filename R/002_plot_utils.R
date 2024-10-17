@@ -396,18 +396,20 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
   stopifnot(length(x_values) == length(y_values))
 
   # getting the parameters
-  contrast_bars_kwargs <- plot_kwargs$contrast_bars_kwargs
-  bars_color <- contrast_bars_kwargs$color
-  alpha <- contrast_bars_kwargs$alpha
+  params_contrast_bars <- plot_kwargs$params_contrast_bars
+  bars_color <- params_contrast_bars$color
+  alpha <- params_contrast_bars$alpha
 
   is_paired <- dabest_effectsize_obj$is_paired
   color_col <- plot_kwargs$color_col
-
+  custom_colour <- NULL
   if (!is.null(bars_color)) {
     contrast_bars_colours <- rep(bars_color, length(x_values))
+    custom_colour <- bars_color
     # this is the same as
   } else if (!is.null(color_col) || is_paired) {
     contrast_bars_colours <- rep("black", length(x_values))
+    custom_colour <- "black"
   } else {
     # use the default palette colours of the ggplot violin plot object
     contrast_bars_colours <- as.character(x_values)
@@ -424,6 +426,16 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
     ymax = y_values, # Heights as provided
     fill_colour = contrast_bars_colours
   )
+  # custom colour
+  if (!is.null(custom_colour)) {
+    return(ggplot2::geom_rect(
+      data = rectangles,
+      ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+      fill = custom_colour,
+      alpha = alpha
+    ))
+  }
+
   if (main_violin_type == "multicolour") {
     return(ggplot2::geom_rect(
       data = rectangles,
@@ -431,6 +443,7 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
       alpha = alpha
     ))
   }
+
   # Single colour
   return(ggplot2::geom_rect(
     data = rectangles,
