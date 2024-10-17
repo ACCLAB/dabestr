@@ -44,6 +44,8 @@
 #' - `flow` Default TRUE. Boolean value determining whether the bars will be plotted in pairs.
 #' - `custom_palette` Default "d3". String. The following palettes are available for use:
 #' npg, aaas, nejm, lancet, jama, jco, ucscgb, d3, locuszoom, igv, cosmic, uchicago, brewer, ordinal, viridis_d.
+#' - `contrast_bars` Default FALSE. Whether or not to display the contrast bars.
+#' - `contrast_bars_kwargs`. Default value: list(color = NULL, alpha = 0.3). Pass relevant keyword arguments to the contrast bars.
 #'
 #'
 assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
@@ -168,6 +170,47 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   if (!(is.null(plot_kwargs$asymmetric_side))) {
     asymmetric_side <- plot_kwargs$asymmetric_side
   }
+  contrast_bars <- TRUE
+  if (!(is.null(plot_kwargs$contrast_bars))) {
+    contrast_bars <- plot_kwargs$contrast_bars
+  }
+
+  # Swarm bars
+  swarm_bars <- TRUE
+  if (!(is.null(plot_kwargs$swarm_bars))) {
+    contrast_bars <- plot_kwargs$swarm_bars
+  }
+  # Swarm bars kwargs
+  default_swarm_bars_kwargs <- list(
+    color = NULL,
+    alpha = 0.3
+  )
+  if (is.null(plot_kwargs$swarm_bars_kwargs)) {
+    # If user has not provided swarm_bars_kwargs, use defaults
+    swarm_bars_kwargs <- default_swarm_bars_kwargs
+  } else {
+    # If user has provided swarm_bars_kwargs, update defaults with user values
+    swarm_bars_kwargs <- modifyList(
+      default_swarm_bars_kwargs,
+      plot_kwargs$swarm_bars_kwargs
+    )
+  }
+  # Contrast bars kwargs.
+  default_contrast_bars_kwargs <- list(
+    color = NULL,
+    alpha = 0.3
+  )
+  if (is.null(plot_kwargs$contrast_bars_kwargs)) {
+    # If user has not provided contrast_bars_kwargs, use defaults
+    contrast_bars_kwargs <- default_contrast_bars_kwargs
+  } else {
+    # If user has provided contrast_bars_kwargs,
+    # update defaults with user values
+    contrast_bars_kwargs <- modifyList(
+      default_contrast_bars_kwargs,
+      plot_kwargs$contrast_bars_kwargs
+    )
+  }
 
   return(list(
     swarm_label = swarm_label,
@@ -197,6 +240,10 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     show_zero_dot = show_zero_dot,
     show_baseline_ec = show_baseline_ec,
     show_legend = show_legend,
-    asymmetric_side = asymmetric_side
+    asymmetric_side = asymmetric_side,
+    contrast_bars = contrast_bars,
+    contrast_bars_kwargs = contrast_bars_kwargs,
+    swarm_bars = swarm_bars,
+    swarm_bars_kwargs = swarm_bars_kwargs
   ))
 }

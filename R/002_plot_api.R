@@ -286,6 +286,13 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       axis.title.y = ggplot2::element_text(size = swarm_y_text)
     )
 
+  ### Add swarm bars if requested ###
+  swarm_bars <- plot_kwargs$swarm_bars
+  if (swarm_bars) {
+    # print("Trying to add some swarm bars to the raw plot")
+    # raw_plot <- raw_plot +
+    #   add_swarm_bars_to_raw_plot(dabest_effectsize_obj, plot_kwargs)
+  }
   return(raw_plot)
 }
 
@@ -561,6 +568,17 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       axis.text.x = ggplot2::element_text(size = contrast_x_text),
       axis.title.y = ggplot2::element_text(size = contrast_y_text)
     )
-
+  ### Add contrast bars if requested ###
+  contrast_bars <- plot_kwargs$contrast_bars
+  if (contrast_bars) {
+    delta_plot <- delta_plot +
+      add_contrast_bars_to_delta_plot(
+        dabest_effectsize_obj,
+        plot_kwargs,
+        x_axis_breaks,
+        difference,
+        main_violin_type
+      )
+  }
   return(list(delta_plot = delta_plot, delta_range = c(delta_y_min - delta_y_mean / 10, delta_y_max)))
 }
