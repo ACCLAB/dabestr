@@ -26,7 +26,9 @@ describe("Testing plot_delta function", {
       contrast_y_text = 12,
       show_zero_dot = TRUE,
       show_baseline_ec = FALSE,
-      swarm_ylim = NULL
+      swarm_ylim = NULL,
+      contrast_bars = TRUE,
+      swarm_bars = TRUE
     )
 
     result <- plot_delta(dabest_effectsize_obj, float_contrast, plot_kwargs)

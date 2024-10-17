@@ -383,6 +383,62 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
   return(list(raw_plot, raw_y_range, raw_y_min, x_axis_raw))
 }
 
+
+add_swarm_bars_to_raw_plot <- function(dabest_effectsize_obj, plot_kwargs) {
+  print("WIP")
+}
+
+add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, x_values, y_values, main_violin_type) {
+  # Function to generate a ggplot object with the contrast bars
+  # for the dabest delta object
+
+  # Assert that both vectors have the same length
+  stopifnot(length(x_values) == length(y_values))
+
+  # getting the parameters
+  contrast_bars_kwargs <- plot_kwargs$contrast_bars_kwargs
+  bars_color <- contrast_bars_kwargs$color
+  alpha <- contrast_bars_kwargs$alpha
+
+  is_paired <- dabest_effectsize_obj$is_paired
+  color_col <- plot_kwargs$color_col
+
+  if (!is.null(bars_color)) {
+    contrast_bars_colours <- rep(bars_color, length(x_values))
+    # this is the same as
+  } else if (!is.null(color_col) || is_paired) {
+    contrast_bars_colours <- rep("black", length(x_values))
+  } else {
+    # use the default palette colours of the ggplot violin plot object
+    contrast_bars_colours <- as.character(x_values)
+  }
+
+  # Define width and height for each rectangle
+  width <- 0.5
+
+  # Calculate xmin, xmax, ymin, ymax for each rectangle
+  rectangles <- data.frame(
+    xmin = x_values - (width / 2),
+    xmax = x_values + (width / 2),
+    ymin = rep(0, length(x_values)), # All rectangles start at y = 0
+    ymax = y_values, # Heights as provided
+    fill_colour = contrast_bars_colours
+  )
+  if (main_violin_type == "multicolour") {
+    return(ggplot2::geom_rect(
+      data = rectangles,
+      ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = fill_colour),
+      alpha = alpha
+    ))
+  }
+  # Single colour
+  return(ggplot2::geom_rect(
+    data = rectangles,
+    ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, group = fill_colour),
+    alpha = alpha
+  ))
+}
+
 adjust_x_axis_in_delta_plot <- function(delta_plot, main_plot_type, flow, idx, x, delta_y_min, delta_y_mean) {
   if (main_plot_type == "sankey" && !(flow)) {
     idx_for_xaxis_redraw <- remove_last_ele_from_nested_list(idx)
