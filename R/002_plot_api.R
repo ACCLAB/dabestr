@@ -288,11 +288,10 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
 
   ### Add swarm bars if requested ###
   swarm_bars <- plot_kwargs$swarm_bars
-  if (swarm_bars) {
-    # print("Trying to add some swarm bars to the raw plot")
-    # raw_plot <- raw_plot +
-    #   add_swarm_bars_to_raw_plot(dabest_effectsize_obj, plot_kwargs)
-  }
+  # if (swarm_bars) {
+  #   raw_plot <- raw_plot +
+  #     add_swarm_bars_to_raw_plot(dabest_effectsize_obj, plot_kwargs)
+  # }
   return(raw_plot)
 }
 

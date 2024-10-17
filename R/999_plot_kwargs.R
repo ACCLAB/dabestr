@@ -44,8 +44,10 @@
 #' - `flow` Default TRUE. Boolean value determining whether the bars will be plotted in pairs.
 #' - `custom_palette` Default "d3". String. The following palettes are available for use:
 #' npg, aaas, nejm, lancet, jama, jco, ucscgb, d3, locuszoom, igv, cosmic, uchicago, brewer, ordinal, viridis_d.
-#' - `contrast_bars` Default FALSE. Whether or not to display the contrast bars.
-#' - `contrast_bars_kwargs`. Default value: list(color = NULL, alpha = 0.3). Pass relevant keyword arguments to the contrast bars.
+#' - `contrast_bars` Default TRUE. Whether or not to display the contrast bars at the delta plot.
+#' - `params_contrast_bars`. Default value: list(color = NULL, alpha = 0.3). Pass relevant keyword arguments to the contrast bars.
+#' - `swarm_bars` Default TRUE. Whether or not to display the swarm bars.
+#' - `params_swarm_bars`. Default value: list(color = NULL, alpha = 0.3). Pass relevant keyword arguments to the swarm bars.
 #'
 #'
 assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
@@ -181,34 +183,34 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     contrast_bars <- plot_kwargs$swarm_bars
   }
   # Swarm bars kwargs
-  default_swarm_bars_kwargs <- list(
+  default_params_swarm_bars <- list(
     color = NULL,
     alpha = 0.3
   )
-  if (is.null(plot_kwargs$swarm_bars_kwargs)) {
-    # If user has not provided swarm_bars_kwargs, use defaults
-    swarm_bars_kwargs <- default_swarm_bars_kwargs
+  if (is.null(plot_kwargs$params_swarm_bars)) {
+    # If user has not provided params_swarm_bars, use defaults
+    params_swarm_bars <- default_params_swarm_bars
   } else {
-    # If user has provided swarm_bars_kwargs, update defaults with user values
-    swarm_bars_kwargs <- modifyList(
-      default_swarm_bars_kwargs,
-      plot_kwargs$swarm_bars_kwargs
+    # If user has provided params_swarm_bars, update defaults with user values
+    params_swarm_bars <- modifyList(
+      default_params_swarm_bars,
+      plot_kwargs$params_swarm_bars
     )
   }
   # Contrast bars kwargs.
-  default_contrast_bars_kwargs <- list(
+  default_params_contrast_bars <- list(
     color = NULL,
     alpha = 0.3
   )
-  if (is.null(plot_kwargs$contrast_bars_kwargs)) {
-    # If user has not provided contrast_bars_kwargs, use defaults
-    contrast_bars_kwargs <- default_contrast_bars_kwargs
+  if (is.null(plot_kwargs$params_contrast_bars)) {
+    # If user has not provided params_contrast_bars, use defaults
+    params_contrast_bars <- default_params_contrast_bars
   } else {
-    # If user has provided contrast_bars_kwargs,
+    # If user has provided params_contrast_bars,
     # update defaults with user values
-    contrast_bars_kwargs <- modifyList(
-      default_contrast_bars_kwargs,
-      plot_kwargs$contrast_bars_kwargs
+    params_contrast_bars <- modifyList(
+      default_params_contrast_bars,
+      plot_kwargs$params_contrast_bars
     )
   }
 
@@ -242,8 +244,8 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     show_legend = show_legend,
     asymmetric_side = asymmetric_side,
     contrast_bars = contrast_bars,
-    contrast_bars_kwargs = contrast_bars_kwargs,
+    params_contrast_bars = params_contrast_bars,
     swarm_bars = swarm_bars,
-    swarm_bars_kwargs = swarm_bars_kwargs
+    params_swarm_bars = params_swarm_bars
   ))
 }
