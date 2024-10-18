@@ -59,9 +59,6 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
 
   #### Load in sizes of plot elements ####
-  raw_marker_size <- plot_kwargs$raw_marker_size
-  raw_marker_alpha <- plot_kwargs$raw_marker_alpha
-  raw_marker_spread <- plot_kwargs$raw_marker_spread
   raw_marker_side_shift <- plot_kwargs$raw_marker_side_shift
   raw_bar_width <- plot_kwargs$raw_bar_width
   tufte_size <- plot_kwargs$tufte_size
@@ -349,8 +346,6 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
 
   #### Load in sizes of plot elements ####
-  raw_marker_size <- plot_kwargs$raw_marker_size
-  raw_marker_alpha <- plot_kwargs$raw_marker_alpha
   raw_bar_width <- plot_kwargs$raw_bar_width
   tufte_size <- plot_kwargs$tufte_size
   es_marker_size <- plot_kwargs$es_marker_size
