@@ -416,10 +416,19 @@ add_swarm_bars_to_raw_plot <- function(dabest_effectsize_obj, plot_kwargs, x_val
     custom_colour <- "black"
   } else {
     # use the default palette colours of the ggplot raw plot object
-    # TODO except for delta-delta objects
+    # except for delta-delta objects
     if (plot_kwargs$show_delta2) {
-      # swarm_bars_colours <- !!dabest_effectsize_obj$enquo_colour
-      swarm_bars_colours <- rlang::eval_tidy(dabest_effectsize_obj$enquo_colour, data = dabest_effectsize_obj)
+      color_mapping <- dabest_effectsize_obj$raw_data %>%
+        dplyr::select(!!dabest_effectsize_obj$enquo_x, !!dabest_effectsize_obj$enquo_colour) %>%
+        dplyr::distinct()
+
+      # Get the group names in the same order as x according to the index idx
+      group_labels <- unlist(dabest_effectsize_obj$idx)
+      genotype_values <- color_mapping[[rlang::as_name(dabest_effectsize_obj$enquo_colour)]][
+        match(group_labels, color_mapping[[rlang::as_name(dabest_effectsize_obj$enquo_x)]])
+      ]
+      # Assign colours based on Genotype
+      swarm_bars_colours <- genotype_values
     } else {
       swarm_bars_colours <- as.character(x_values)
     }
