@@ -180,7 +180,7 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   # Swarm bars
   swarm_bars <- TRUE
   if (!(is.null(plot_kwargs$swarm_bars))) {
-    contrast_bars <- plot_kwargs$swarm_bars
+    swarm_bars <- plot_kwargs$swarm_bars
   }
   # Swarm bars kwargs
   default_params_swarm_bars <- list(

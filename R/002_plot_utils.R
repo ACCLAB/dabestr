@@ -380,9 +380,77 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
   return(list(raw_plot, raw_y_range, raw_y_min, x_axis_raw))
 }
 
+#' Adds Swarm Bars to a Raw Data Plot
+#'
+#' This function takes a `dabest_effectsize_obj` and enhances its raw data plot by adding swarm bars.
+#' It utilizes the provided plotting parameters along with specific x and y values to customize the
+#' appearance and positioning of the swarm bars. The `y_min` parameter ensures that the swarm bars
+#' are appropriately placed within the plot's y-axis limits.
+#'
+#' @param dabest_effectsize_obj A `dabest_effectsize_obj` created by the [effect_size()] function.
+#' @param plot_kwargs A list of parameters used to adjust and control the appearance of the plot.
+#'   (Refer to [plot_kwargs] for all possible adjustment parameters.)
+#' @param x_values A numeric or character vector specifying the x-axis values where the swarm bars
+#'   should be added.
+#' @param y_values A numeric vector specifying the y-axis values corresponding to the swarm bars.
+#' @param y_min A numeric value indicating the minimum y-axis limit to position the swarm bars appropriately.
+#'
+#' @return A `ggplot` object with the swarm bars to be added to the raw data plot.
+#'
+#' @noRd
+add_swarm_bars_to_raw_plot <- function(dabest_effectsize_obj, plot_kwargs, x_values, y_values, y_min) {
+  # getting the parameters
+  params_swarm_bars <- plot_kwargs$params_swarm_bars
+  bars_color <- params_swarm_bars$color
+  alpha <- params_swarm_bars$alpha
 
-add_swarm_bars_to_raw_plot <- function(dabest_effectsize_obj, plot_kwargs) {
-  print("WIP")
+  is_paired <- dabest_effectsize_obj$is_paired
+  color_col <- plot_kwargs$color_col
+  custom_colour <- NULL
+  if (!is.null(bars_color)) {
+    swarm_bars_colours <- rep(bars_color, length(x_values))
+    custom_colour <- bars_color
+    # this is the same as
+  } else if (!is.null(color_col) || is_paired) {
+    swarm_bars_colours <- rep("black", length(x_values))
+    custom_colour <- "black"
+  } else {
+    # use the default palette colours of the ggplot raw plot object
+    # TODO except for delta-delta objects
+    if (plot_kwargs$show_delta2) {
+      # swarm_bars_colours <- !!dabest_effectsize_obj$enquo_colour
+      swarm_bars_colours <- rlang::eval_tidy(dabest_effectsize_obj$enquo_colour, data = dabest_effectsize_obj)
+    } else {
+      swarm_bars_colours <- as.character(x_values)
+    }
+  }
+  print("swarm bars colours")
+  print(swarm_bars_colours)
+  # Define width and height for each rectangle
+  width <- 0.5
+
+  # Calculate xmin, xmax, ymin, ymax for each rectangle
+  rectangles <- data.frame(
+    xmin = x_values - (width / 2),
+    xmax = x_values + (width / 2),
+    ymin = rep(y_min, length(x_values)),
+    ymax = y_values, # Heights as provided
+    fill_colour = swarm_bars_colours
+  )
+  # custom colour
+  if (!is.null(custom_colour)) {
+    return(ggplot2::geom_rect(
+      data = rectangles,
+      ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+      fill = custom_colour,
+      alpha = alpha
+    ))
+  }
+  return(ggplot2::geom_rect(
+    data = rectangles,
+    ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = fill_colour),
+    alpha = alpha
+  ))
 }
 
 #' Adds Contrast Bars to a Delta Plot

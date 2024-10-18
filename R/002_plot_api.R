@@ -285,10 +285,19 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
 
   ### Add swarm bars if requested ###
   swarm_bars <- plot_kwargs$swarm_bars
-  # if (swarm_bars) {
-  #   raw_plot <- raw_plot +
-  #     add_swarm_bars_to_raw_plot(dabest_effectsize_obj, plot_kwargs)
-  # }
+  if (swarm_bars) {
+    if (is_tufte_lines) {
+      print("with tufte lines")
+      # the starting point of y needs to be computed using tufte_gap_value
+      y_values <- tufte_lines_df$y_bot_start + tufte_gap_value
+      raw_plot <- raw_plot +
+        add_swarm_bars_to_raw_plot(dabest_effectsize_obj, plot_kwargs, row_ref, y_values, raw_y_min + raw_y_range / 40)
+    } else {
+      print("without tufte lines")
+      raw_plot <- raw_plot +
+        add_swarm_bars_to_raw_plot(dabest_effectsize_obj, plot_kwargs, raw_plot$x, raw_plot$mean, raw_y_min + raw_y_range / 40)
+    }
+  }
   return(raw_plot)
 }
 
