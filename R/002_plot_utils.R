@@ -213,9 +213,6 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
   raw_marker_alpha <- plot_kwargs$raw_marker_alpha
   raw_marker_spread <- plot_kwargs$raw_marker_spread
   raw_marker_side_shift <- plot_kwargs$raw_marker_side_shift
-  es_marker_size <- plot_kwargs$es_marker_size
-  swarm_x_text <- plot_kwargs$swarm_x_text
-  swarm_y_text <- plot_kwargs$swarm_y_text
   asymmetric_side <- plot_kwargs$asymmetric_side
   asymmetric_side <- ifelse(asymmetric_side == "right", -1, 1)
   minimeta <- plot_kwargs$show_mini_meta
@@ -388,10 +385,25 @@ add_swarm_bars_to_raw_plot <- function(dabest_effectsize_obj, plot_kwargs) {
   print("WIP")
 }
 
+#' Adds Contrast Bars to a Delta Plot
+#'
+#' This function takes a `dabest_effectsize_obj` and augments its delta plot by adding contrast bars.
+#' It utilizes the provided plotting parameters and specific x and y values to customize the appearance
+#' of the contrast bars based on the main violin plot type.
+#'
+#' @param dabest_effectsize_obj A `dabest_effectsize_obj` created by the [effect_size()] function.
+#' @param plot_kwargs A list of parameters used to adjust and control the appearance of the plot.
+#'   (Refer to [plot_kwargs] for all possible adjustment parameters.)
+#' @param x_values A numeric or character vector specifying the x-axis values where the contrast bars
+#'   should be added.
+#' @param y_values A numeric vector specifying the y-axis values corresponding to the contrast bars.
+#' @param main_violin_type A string indicating the type of violin plot used in the main plot.
+#'   Determines the styling and positioning of the contrast bars.
+#'
+#' @return A `ggplot` object with contrast bars to be added to the delta plot.
+#'
+#' @noRd
 add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, x_values, y_values, main_violin_type) {
-  # Function to generate a ggplot object with the contrast bars
-  # for the dabest delta object
-
   # Assert that both vectors have the same length
   stopifnot(length(x_values) == length(y_values))
 
