@@ -118,7 +118,16 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
 
   #### Initialise raw_plot & Add main_plot_type component ####
-  output <- initialize_raw_plot(plot_kwargs, plot_components, dabest_effectsize_obj, df_for_proportion_bar, sankey_df, sankey_bars, idx, float_contrast)
+  output <- initialize_raw_plot(
+    plot_kwargs,
+    plot_components,
+    dabest_effectsize_obj,
+    df_for_proportion_bar,
+    sankey_df,
+    sankey_bars,
+    idx,
+    float_contrast
+  )
   raw_plot <- output[[1]]
   raw_y_range <- output[[2]]
   raw_y_min <- output[[3]]
@@ -283,17 +292,39 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       axis.title.y = ggplot2::element_text(size = swarm_y_text)
     )
 
-  ### Add swarm bars if requested ###
+  ### Add swarm bars if plot type is compatible and requested ###
   swarm_bars <- plot_kwargs$swarm_bars
-  if ((main_plot_type == "swarmplot") && (swarm_bars)) {
+  valid_plots <- (main_plot_type == "slope") || (main_plot_type == "swarmplot")
+  if (valid_plots && (swarm_bars)) {
     if (is_tufte_lines) {
       # the starting point of y needs to be computed using tufte_gap_value
       y_values <- tufte_lines_df$y_bot_start + tufte_gap_value
       raw_plot <- raw_plot +
-        add_swarm_bars_to_raw_plot(dabest_effectsize_obj, plot_kwargs, row_ref, y_values, raw_y_min + raw_y_range / 40)
+        add_swarm_bars_to_raw_plot(
+          dabest_effectsize_obj,
+          plot_kwargs,
+          row_ref,
+          y_values,
+          raw_y_min + raw_y_range / 40,
+          main_plot_type
+        )
     } else {
+      # compute the mean values
+      mean_values <- raw_data %>%
+        dplyr::group_by(!!enquo_x) %>%
+        dplyr::summarize(
+          mean = mean(!!enquo_y),
+        )
+
       raw_plot <- raw_plot +
-        add_swarm_bars_to_raw_plot(dabest_effectsize_obj, plot_kwargs, raw_plot$x, raw_plot$mean, raw_y_min + raw_y_range / 40)
+        add_swarm_bars_to_raw_plot(
+          dabest_effectsize_obj,
+          plot_kwargs,
+          x_axis_raw,
+          mean_values$mean,
+          raw_y_min + raw_y_range / 40,
+          main_plot_type
+        )
     }
   }
   return(raw_plot)

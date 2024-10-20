@@ -398,40 +398,26 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
 #' @return A `ggplot` object with the swarm bars to be added to the raw data plot.
 #'
 #' @noRd
-add_swarm_bars_to_raw_plot <- function(dabest_effectsize_obj, plot_kwargs, x_values, y_values, y_min) {
+add_swarm_bars_to_raw_plot <- function(dabest_effectsize_obj, plot_kwargs, x_values, y_values, y_min, main_plot_type) {
+  stopifnot(length(x_values) == length(y_values))
   # getting the parameters
   params_swarm_bars <- plot_kwargs$params_swarm_bars
   bars_color <- params_swarm_bars$color
   alpha <- params_swarm_bars$alpha
 
   is_paired <- dabest_effectsize_obj$is_paired
-  color_col <- plot_kwargs$color_col
+  is_colour <- dabest_effectsize_obj$is_colour
+
   custom_colour <- NULL
   if (!is.null(bars_color)) {
     swarm_bars_colours <- rep(bars_color, length(x_values))
     custom_colour <- bars_color
     # this is the same as
-  } else if (!is.null(color_col) || is_paired) {
+  } else if ((main_plot_type == "slope") || is_colour || is_paired) {
     swarm_bars_colours <- rep("black", length(x_values))
     custom_colour <- "black"
   } else {
-    # use the default palette colours of the ggplot raw plot object
-    # except for delta-delta objects
-    if (plot_kwargs$show_delta2) {
-      color_mapping <- dabest_effectsize_obj$raw_data %>%
-        dplyr::select(!!dabest_effectsize_obj$enquo_x, !!dabest_effectsize_obj$enquo_colour) %>%
-        dplyr::distinct()
-
-      # Get the group names in the same order as x according to the index idx
-      group_labels <- unlist(dabest_effectsize_obj$idx)
-      genotype_values <- color_mapping[[rlang::as_name(dabest_effectsize_obj$enquo_colour)]][
-        match(group_labels, color_mapping[[rlang::as_name(dabest_effectsize_obj$enquo_x)]])
-      ]
-      # Assign colours based on Genotype
-      swarm_bars_colours <- genotype_values
-    } else {
-      swarm_bars_colours <- as.character(x_values)
-    }
+    swarm_bars_colours <- as.character(x_values)
   }
 
   # Define width and height for each rectangle
@@ -445,6 +431,7 @@ add_swarm_bars_to_raw_plot <- function(dabest_effectsize_obj, plot_kwargs, x_val
     ymax = y_values, # Heights as provided
     fill_colour = swarm_bars_colours
   )
+
   # custom colour
   if (!is.null(custom_colour)) {
     return(ggplot2::geom_rect(

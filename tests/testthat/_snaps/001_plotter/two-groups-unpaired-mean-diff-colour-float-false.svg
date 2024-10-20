@@ -85,8 +85,8 @@
 <line x1='178.32' y1='242.77' x2='539.61' y2='242.77' style='stroke-width: 1.07; stroke-linecap: square;' />
 <line x1='178.32' y1='242.77' x2='178.32' y2='248.99' style='stroke-width: 1.07; stroke-linecap: square;' />
 <line x1='539.61' y1='242.77' x2='539.61' y2='248.99' style='stroke-width: 1.07; stroke-linecap: square;' />
-<rect x='69.93' y='156.44' width='180.65' height='86.33' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #1F77B4; fill-opacity: 0.30;' />
-<rect x='431.23' y='103.62' width='180.65' height='139.14' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #FF7F0E; fill-opacity: 0.30;' />
+<rect x='69.93' y='156.44' width='180.65' height='86.33' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #000000; fill-opacity: 0.30;' />
+<rect x='431.23' y='103.62' width='180.65' height='139.14' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #000000; fill-opacity: 0.30;' />
 <polyline points='33.80,248.99 33.80,0.00 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
 <text x='28.87' y='162.23' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>3</text>
 <text x='28.87' y='72.02' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>4</text>
