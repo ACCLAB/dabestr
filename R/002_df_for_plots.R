@@ -29,8 +29,8 @@ create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional, gap, e
       mean = mean(!!enquo_y),
       median = stats::median(!!enquo_y),
       sd = stats::sd(!!enquo_y),
-      lower_quartile = stats::quantile(!!enquo_y)[2],
-      upper_quartile = stats::quantile(!!enquo_y)[4]
+      lower_quartile = stats::quantile(!!enquo_y, names = FALSE)[2],
+      upper_quartile = stats::quantile(!!enquo_y, names = FALSE)[4]
     )
 
   # Adjust SD if proportional is TRUE
@@ -279,8 +279,7 @@ create_dfs_for_proportion_bar <- function(proportion_success, bar_width = 0.3, g
   for (x in 1:length(proportion_success)) {
     y <- proportion_success[x]
     if ((y > 1) || (y < 0)) {
-      cli::cli_abort(c("Proportion plots must be supplied with data of values between 0 and 1."
-      ))
+      cli::cli_abort(c("Proportion plots must be supplied with data of values between 0 and 1."))
     }
 
     x_failure_success <- c(x - bar_width / 2, x + bar_width / 2, x + bar_width / 2, x - bar_width / 2)
