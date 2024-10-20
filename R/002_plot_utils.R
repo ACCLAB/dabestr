@@ -433,8 +433,7 @@ add_swarm_bars_to_raw_plot <- function(dabest_effectsize_obj, plot_kwargs, x_val
       swarm_bars_colours <- as.character(x_values)
     }
   }
-  print("swarm bars colours")
-  print(swarm_bars_colours)
+
   # Define width and height for each rectangle
   width <- 0.5
 
@@ -452,13 +451,15 @@ add_swarm_bars_to_raw_plot <- function(dabest_effectsize_obj, plot_kwargs, x_val
       data = rectangles,
       ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
       fill = custom_colour,
-      alpha = alpha
+      alpha = alpha,
+      show.legend = FALSE
     ))
   }
   return(ggplot2::geom_rect(
     data = rectangles,
     ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = fill_colour),
-    alpha = alpha
+    alpha = alpha,
+    show.legend = FALSE
   ))
 }
 
