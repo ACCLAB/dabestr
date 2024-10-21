@@ -529,6 +529,69 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
   ))
 }
 
+add_delta_text_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, x_values, y_values, main_violin_type) {
+  # Assert that both vectors have the same length
+  stopifnot(length(x_coordinates) == length(y_values))
+
+  # getting the parameters
+  text_color <- params_delta_text$color
+  alpha <- params_delta_text$alpha
+  fontsize <- params_delta_text$fontsizex_coordinates
+  ha <- params_delta_text$ha
+  va <- params_delta_text$va
+  rotation <- params_delta_text$rotation
+  x_location <- params_delta_text$x_location
+  x_adjust <- params_delta_text$x_adjust
+  # array to replace the default x_valuesx_coordinates
+  x_coordinates <- x_values
+  if (!is.null(params_delta_text$x_coordinates)) {
+    x_coordinates <- params_delta_text$x_coordinates
+  }
+  # array to replace the default y_valux_coordinates
+  y_coordinates <- y_values
+  if (!is.null(params_delta_text$y_coordinates)) {
+    y_coordinates <- params_delta_text$y_coordinates
+  }
+
+  is_paired <- dabest_effectsize_obj$is_paired
+  color_col <- plot_kwargs$color_col
+  custom_colour <- NULL
+  if (!is.null(bars_color)) {
+    delta_text_colours <- rep(bars_color, length(x_values))
+    custom_colour <- bars_color
+    # this is the same as
+  } else if (!is.null(color_col) || is_paired) {
+    delta_text_colours <- rep("black", length(x_values))
+    custom_colour <- "black"
+  } else {
+    # use the default palette colours of the ggplot violin plot object
+    delta_text_colours <- as.character(x_values)
+  }
+
+  # Prepare the text for each coordinate
+  texts <- data.frame(
+    x = x_coordinates, # Replace with your specific x-coordinate
+    y = y_coordinates, # Replace with your specific y-coordinate
+    t = t_value # TODO transform the y values into text
+  )
+  # Create the formatted text within the data frame
+  texts$formatted_text <- sprintf("%+.2f", texts$t)
+  # custom colour
+  if (!is.null(custom_colour)) {
+    return(ggplot2::geom_text(
+      data = texts,
+      ggplot2::aes(x = x, y = y, label = formatted_text, vjust = )
+    ))
+    return(ggplot2::geom_rect(
+      data = rectangles,
+      ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+      fill = custom_colour,
+      alpha = alpha
+    ))
+    geom_text(data = df, aes(x = x, y = y, label = formatted_text), vjust = -1)
+  }
+}
+
 adjust_x_axis_in_delta_plot <- function(delta_plot, main_plot_type, flow, idx, x, delta_y_min, delta_y_mean) {
   if (main_plot_type == "sankey" && !(flow)) {
     idx_for_xaxis_redraw <- remove_last_ele_from_nested_list(idx)
