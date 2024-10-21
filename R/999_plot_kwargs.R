@@ -176,7 +176,6 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   if (!(is.null(plot_kwargs$contrast_bars))) {
     contrast_bars <- plot_kwargs$contrast_bars
   }
-
   # Swarm bars
   swarm_bars <- TRUE
   if (!(is.null(plot_kwargs$swarm_bars))) {
@@ -213,6 +212,52 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
       plot_kwargs$params_contrast_bars
     )
   }
+  delta_text <- TRUE
+  if (!(is.null(plot_kwargs$delta_text))) {
+    delta_text <- plot_kwargs$delta_text
+  }
+  delta_dots <- TRUE
+  if (!(is.null(plot_kwargs$delta_dots))) {
+    delta_dots <- plot_kwargs$delta_dots
+  }
+
+  # Delta dots kwargs.
+  default_params_delta_dots <- list(
+    "marker" = "^",
+    "alpha" = 0.5,
+    "zorder" = 2,
+    "size" = 3,
+    "side" = "right"
+  )
+  if (is.null(plot_kwargs$params_delta_dots)) {
+    params_delta_dots <- default_params_delta_dots
+  } else {
+    params_delta_dots <- modifyList(
+      default_params_delta_dots,
+      plot_kwargs$params_delta_dots
+    )
+  }
+  # Delta text kwargs.
+  default_params_delta_text <- list(
+    "color" = NULL,
+    "alpha" = 1,
+    "fontsize" = 10,
+    "ha" = "center",
+    "va" = "center",
+    "rotation" = 0,
+    "x_location" = "right",
+    "x_coordinates" = NULL,
+    "y_coordinates" = NULL,
+    "x_adjust" = 0
+  )
+  if (is.null(plot_kwargs$params_delta_text)) {
+    params_delta_text <- default_params_delta_text
+  } else {
+    params_delta_text <- modifyList(
+      default_params_delta_text,
+      plot_kwargs$params_delta_text
+    )
+  }
 
   return(list(
     swarm_label = swarm_label,
@@ -246,6 +291,10 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     contrast_bars = contrast_bars,
     params_contrast_bars = params_contrast_bars,
     swarm_bars = swarm_bars,
-    params_swarm_bars = params_swarm_bars
+    params_swarm_bars = params_swarm_bars,
+    delta_text = delta_text,
+    params_delta_text = params_delta_text,
+    delta_dots = delta_dots,
+    params_delta_dots = params_delta_dots,
   ))
 }
