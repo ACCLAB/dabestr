@@ -242,8 +242,8 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     "color" = NULL,
     "alpha" = 1,
     "fontsize" = 10,
-    "ha" = "center",
-    "va" = "center",
+    "ha" = "center", # hjust
+    "va" = "center", # vjust
     "rotation" = 0,
     "x_location" = "right",
     "x_coordinates" = NULL,
@@ -295,6 +295,6 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     delta_text = delta_text,
     params_delta_text = params_delta_text,
     delta_dots = delta_dots,
-    params_delta_dots = params_delta_dots,
+    params_delta_dots = params_delta_dots
   ))
 }
