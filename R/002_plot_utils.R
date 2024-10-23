@@ -489,7 +489,8 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
     custom_colour <- "black"
   } else {
     # use the default palette colours of the ggplot violin plot object
-    contrast_bars_colours <- as.character(x_values)
+    contrast_bars_colours <- as.character((x_values))
+    # contrast_bars_colours <- factor(as.character(x_values), levels = group_levels)
   }
 
   # Define width and height for each rectangle
@@ -501,8 +502,9 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
     xmax = x_values + (width / 2),
     ymin = rep(0, length(x_values)), # All rectangles start at y = 0
     ymax = y_values, # Heights as provided
-    fill_colour = contrast_bars_colours
+    group = contrast_bars_colours
   )
+  print(rectangles)
   # custom colour
   if (!is.null(custom_colour)) {
     return(ggplot2::geom_rect(
@@ -516,7 +518,7 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
   if (main_violin_type == "multicolour") {
     return(ggplot2::geom_rect(
       data = rectangles,
-      ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = fill_colour),
+      ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = group),
       alpha = alpha
     ))
   }
@@ -524,30 +526,47 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
   # Single colour
   return(ggplot2::geom_rect(
     data = rectangles,
-    ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, group = fill_colour),
+    ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, group = group),
     alpha = alpha
   ))
 }
 
-add_delta_text_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, x_values, y_values, main_violin_type) {
+add_delta_text_to_delta_plot <- function(dabest_effectsize_obj,
+                                         plot_kwargs,
+                                         x_values,
+                                         y_values,
+                                         main_violin_type) {
   # Assert that both vectors have the same length
-  stopifnot(length(x_coordinates) == length(y_values))
+  stopifnot(length(x_values) == length(y_values))
+  group_levels <- as.character(seq(1, max(x_values)))
+  print("group levels")
+  print(group_levels)
 
+  params_delta_text <- plot_kwargs$params_delta_text
   # getting the parameters
   text_color <- params_delta_text$color
   alpha <- params_delta_text$alpha
-  fontsize <- params_delta_text$fontsizex_coordinates
-  ha <- params_delta_text$ha
-  va <- params_delta_text$va
+  fontsize <- params_delta_text$fontsize
+  hjust <- params_delta_text$ha
+  vjust <- params_delta_text$va
   rotation <- params_delta_text$rotation
   x_location <- params_delta_text$x_location
   x_adjust <- params_delta_text$x_adjust
-  # array to replace the default x_valuesx_coordinates
+
   x_coordinates <- x_values
   if (!is.null(params_delta_text$x_coordinates)) {
     x_coordinates <- params_delta_text$x_coordinates
+  } else {
+    # check x_location and x_adjust
+    # width of the contrast_bars is 0.5
+    if (x_location == "right") {
+      margin <- 0.48
+    } else {
+      margin <- -0.38
+    }
+    x_adjust <- x_adjust + margin
   }
-  # array to replace the default y_valux_coordinates
+
   y_coordinates <- y_values
   if (!is.null(params_delta_text$y_coordinates)) {
     y_coordinates <- params_delta_text$y_coordinates
@@ -556,40 +575,67 @@ add_delta_text_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, x_v
   is_paired <- dabest_effectsize_obj$is_paired
   color_col <- plot_kwargs$color_col
   custom_colour <- NULL
-  if (!is.null(bars_color)) {
-    delta_text_colours <- rep(bars_color, length(x_values))
-    custom_colour <- bars_color
+  if (!is.null(text_color)) {
+    delta_text_colours <- rep(text_color, length(x_values))
+    custom_colour <- text_color
     # this is the same as
   } else if (!is.null(color_col) || is_paired) {
     delta_text_colours <- rep("black", length(x_values))
     custom_colour <- "black"
   } else {
+    print("hello")
     # use the default palette colours of the ggplot violin plot object
-    delta_text_colours <- as.character(x_values)
+    delta_text_colours <- factor(as.character(x_values), levels = group_levels)
+    print(delta_text_colours)
   }
 
   # Prepare the text for each coordinate
   texts <- data.frame(
-    x = x_coordinates, # Replace with your specific x-coordinate
+    x = x_coordinates + x_adjust, # Replace with your specific x-coordinate
     y = y_coordinates, # Replace with your specific y-coordinate
-    t = t_value # TODO transform the y values into text
+    text = sprintf("%+.2f", y_values),
+    group = delta_text_colours
   )
-  # Create the formatted text within the data frame
-  texts$formatted_text <- sprintf("%+.2f", texts$t)
+  print(texts)
   # custom colour
   if (!is.null(custom_colour)) {
     return(ggplot2::geom_text(
       data = texts,
-      ggplot2::aes(x = x, y = y, label = formatted_text, vjust = )
+      ggplot2::aes(x = x, y = y, label = text),
+      colour = custom_colour,
+      alpha = alpha,
+      check_overlap = TRUE,
+      size.unit = "pt",
+      size = fontsize,
+      vjust = vjust,
+      hjust = hjust,
+      angle = rotation
     ))
-    return(ggplot2::geom_rect(
-      data = rectangles,
-      ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
-      fill = custom_colour,
-      alpha = alpha
-    ))
-    geom_text(data = df, aes(x = x, y = y, label = formatted_text), vjust = -1)
   }
+  if (main_violin_type == "multicolour") {
+    return(ggplot2::geom_text(
+      data = texts,
+      ggplot2::aes(x = x, y = y, label = text, colour = group),
+      alpha = alpha,
+      check_overlap = TRUE,
+      size.unit = "pt",
+      size = fontsize,
+      vjust = vjust,
+      hjust = hjust,
+      angle = rotation
+    ))
+  }
+  return(ggplot2::geom_text(
+    data = texts,
+    ggplot2::aes(x = x, y = y, label = text, group = group),
+    alpha = alpha,
+    check_overlap = TRUE,
+    size.unit = "pt",
+    size = fontsize,
+    vjust = vjust,
+    hjust = hjust,
+    angle = rotation
+  ))
 }
 
 adjust_x_axis_in_delta_plot <- function(delta_plot, main_plot_type, flow, idx, x, delta_y_min, delta_y_mean) {

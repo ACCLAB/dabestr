@@ -569,6 +569,14 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     if (is_deltadelta) {
       zero_line_xend <- zero_line_xend + 0.2
     }
+    if (plot_kwargs$delta_text) {
+      # THis is not working
+      if (plot_kwargs$params_delta_text$x_location == "right") {
+        zero_line_xend <- zero_line_xend + 1
+        print("zero line end")
+        print(zero_line_xend)
+      }
+    }
     delta_plot <- delta_plot +
       ggplot2::geom_segment(
         colour = "black",
@@ -601,26 +609,27 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   ### Add contrast bars if requested ###
   contrast_bars <- plot_kwargs$contrast_bars
   if (contrast_bars) {
-    delta_plot <- delta_plot +
-      add_contrast_bars_to_delta_plot(
-        dabest_effectsize_obj,
-        plot_kwargs,
-        x_axis_breaks,
-        difference,
-        main_violin_type
-      )
+    cb <- add_contrast_bars_to_delta_plot(
+      dabest_effectsize_obj,
+      plot_kwargs,
+      x_axis_breaks,
+      difference,
+      main_violin_type
+    )
+    delta_plot <- delta_plot + cb
   }
+
   ### Add delta text if requested
   delta_text <- plot_kwargs$delta_text
   if (delta_text) {
-    delta_plot <- delta_plot +
-      add_delta_text_to_delta_plot(
-        dabest_effectsize_obj,
-        plot_kwargs,
-        x_axis_breaks,
-        difference,
-        main_violin_type
-      )
+    text <- add_delta_text_to_delta_plot(
+      dabest_effectsize_obj,
+      plot_kwargs,
+      x_axis_breaks,
+      difference,
+      main_violin_type
+    )
+    delta_plot <- delta_plot + text
   }
   return(list(delta_plot = delta_plot, delta_range = c(delta_y_min - delta_y_mean / 10, delta_y_max)))
 }
