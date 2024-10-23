@@ -595,7 +595,7 @@ add_delta_text_to_delta_plot <- function(delta_plot,
   )
   # custom colour
   if (!is.null(custom_colour)) {
-    return(delta_plot +
+    delta_plot <- delta_plot +
       ggplot2::geom_text(
         data = texts,
         ggplot2::aes(x = x, y = y, label = text),
@@ -607,9 +607,8 @@ add_delta_text_to_delta_plot <- function(delta_plot,
         vjust = vjust,
         hjust = hjust,
         angle = rotation
-      ))
-  }
-  if (main_violin_type == "multicolour") {
+      )
+  } else if (main_violin_type == "multicolour") {
     for (i in seq_along(x_coordinates)) {
       x <- x_coordinates[i] + x_adjust
       y <- y_coordinates[i]
@@ -630,20 +629,21 @@ add_delta_text_to_delta_plot <- function(delta_plot,
         angle = rotation
       )
     }
-    return(delta_plot)
+  } else {
+    delta_plot <- delta_plot +
+      ggplot2::geom_text(
+        data = texts,
+        ggplot2::aes(x = x, y = y, label = text, group = group),
+        alpha = alpha,
+        check_overlap = TRUE,
+        size.unit = "pt",
+        size = fontsize,
+        vjust = vjust,
+        hjust = hjust,
+        angle = rotation
+      )
   }
-  return(delta_plot +
-    ggplot2::geom_text(
-      data = texts,
-      ggplot2::aes(x = x, y = y, label = text, group = group),
-      alpha = alpha,
-      check_overlap = TRUE,
-      size.unit = "pt",
-      size = fontsize,
-      vjust = vjust,
-      hjust = hjust,
-      angle = rotation
-    ))
+  return(delta_plot)
 }
 
 adjust_x_axis_in_delta_plot <- function(delta_plot, main_plot_type, flow, idx, x, delta_y_min, delta_y_mean) {
