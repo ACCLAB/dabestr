@@ -504,7 +504,7 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
     ymax = y_values, # Heights as provided
     group = contrast_bars_colours
   )
-  print(rectangles)
+
   # custom colour
   if (!is.null(custom_colour)) {
     return(ggplot2::geom_rect(
@@ -514,7 +514,6 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
       alpha = alpha
     ))
   }
-
   if (main_violin_type == "multicolour") {
     return(ggplot2::geom_rect(
       data = rectangles,
@@ -531,16 +530,14 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
   ))
 }
 
-add_delta_text_to_delta_plot <- function(dabest_effectsize_obj,
+add_delta_text_to_delta_plot <- function(delta_plot,
+                                         dabest_effectsize_obj,
                                          plot_kwargs,
                                          x_values,
                                          y_values,
                                          main_violin_type) {
   # Assert that both vectors have the same length
   stopifnot(length(x_values) == length(y_values))
-  group_levels <- as.character(seq(1, max(x_values)))
-  print("group levels")
-  print(group_levels)
 
   params_delta_text <- plot_kwargs$params_delta_text
   # getting the parameters
@@ -583,12 +580,12 @@ add_delta_text_to_delta_plot <- function(dabest_effectsize_obj,
     delta_text_colours <- rep("black", length(x_values))
     custom_colour <- "black"
   } else {
-    print("hello")
     # use the default palette colours of the ggplot violin plot object
-    delta_text_colours <- factor(as.character(x_values), levels = group_levels)
-    print(delta_text_colours)
+    colours <- get_palette_colours(plot_kwargs$custom_palette, max(x_values))
+    # Select colors at positions specified by x_values
+    delta_text_colours <- colours[x_values]
   }
-
+  labels <- sprintf("%+.2f", y_values)
   # Prepare the text for each coordinate
   texts <- data.frame(
     x = x_coordinates + x_adjust, # Replace with your specific x-coordinate
@@ -596,26 +593,49 @@ add_delta_text_to_delta_plot <- function(dabest_effectsize_obj,
     text = sprintf("%+.2f", y_values),
     group = delta_text_colours
   )
-  print(texts)
   # custom colour
   if (!is.null(custom_colour)) {
-    return(ggplot2::geom_text(
-      data = texts,
-      ggplot2::aes(x = x, y = y, label = text),
-      colour = custom_colour,
-      alpha = alpha,
-      check_overlap = TRUE,
-      size.unit = "pt",
-      size = fontsize,
-      vjust = vjust,
-      hjust = hjust,
-      angle = rotation
-    ))
+    return(delta_plot +
+      ggplot2::geom_text(
+        data = texts,
+        ggplot2::aes(x = x, y = y, label = text),
+        colour = custom_colour,
+        alpha = alpha,
+        check_overlap = TRUE,
+        size.unit = "pt",
+        size = fontsize,
+        vjust = vjust,
+        hjust = hjust,
+        angle = rotation
+      ))
   }
   if (main_violin_type == "multicolour") {
-    return(ggplot2::geom_text(
+    for (i in seq_along(x_coordinates)) {
+      x <- x_coordinates[i] + x_adjust
+      y <- y_coordinates[i]
+      label <- labels[i]
+      text_colour <- delta_text_colours[i]
+      delta_plot <- delta_plot + ggplot2::geom_text(
+        data = texts,
+        x = x,
+        y = y,
+        label = label,
+        colour = text_colour,
+        alpha = alpha,
+        check_overlap = TRUE,
+        size.unit = "pt",
+        size = fontsize,
+        vjust = vjust,
+        hjust = hjust,
+        angle = rotation
+      )
+    }
+    return(delta_plot)
+  }
+  return(delta_plot +
+    ggplot2::geom_text(
       data = texts,
-      ggplot2::aes(x = x, y = y, label = text, colour = group),
+      ggplot2::aes(x = x, y = y, label = text, group = group),
       alpha = alpha,
       check_overlap = TRUE,
       size.unit = "pt",
@@ -624,18 +644,6 @@ add_delta_text_to_delta_plot <- function(dabest_effectsize_obj,
       hjust = hjust,
       angle = rotation
     ))
-  }
-  return(ggplot2::geom_text(
-    data = texts,
-    ggplot2::aes(x = x, y = y, label = text, group = group),
-    alpha = alpha,
-    check_overlap = TRUE,
-    size.unit = "pt",
-    size = fontsize,
-    vjust = vjust,
-    hjust = hjust,
-    angle = rotation
-  ))
 }
 
 adjust_x_axis_in_delta_plot <- function(delta_plot, main_plot_type, flow, idx, x, delta_y_min, delta_y_mean) {
