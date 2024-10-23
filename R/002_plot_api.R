@@ -569,14 +569,6 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     if (is_deltadelta) {
       zero_line_xend <- zero_line_xend + 0.2
     }
-    if (plot_kwargs$delta_text) {
-      # THis is not working
-      if (plot_kwargs$params_delta_text$x_location == "right") {
-        zero_line_xend <- zero_line_xend + 1
-        print("zero line end")
-        print(zero_line_xend)
-      }
-    }
     delta_plot <- delta_plot +
       ggplot2::geom_segment(
         colour = "black",
@@ -630,6 +622,9 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       difference,
       main_violin_type
     )
+    if (plot_kwargs$params_delta_text$x_location == "right") {
+      delta_plot <- delta_plot + ggplot2::coord_cartesian(clip = "off")
+    }
   }
   return(list(delta_plot = delta_plot, delta_range = c(delta_y_min - delta_y_mean / 10, delta_y_max)))
 }
