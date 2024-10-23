@@ -622,14 +622,14 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   ### Add delta text if requested
   delta_text <- plot_kwargs$delta_text
   if (delta_text) {
-    text <- add_delta_text_to_delta_plot(
+    delta_plot <- add_delta_text_to_delta_plot(
+      delta_plot,
       dabest_effectsize_obj,
       plot_kwargs,
       x_axis_breaks,
       difference,
       main_violin_type
     )
-    delta_plot <- delta_plot + text
   }
   return(list(delta_plot = delta_plot, delta_range = c(delta_y_min - delta_y_mean / 10, delta_y_max)))
 }
