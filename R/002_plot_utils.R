@@ -342,11 +342,15 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
   raw_x_min <- ifelse(float_contrast, 0.6, 0.6)
   raw_x_scalar <- ifelse(float_contrast, 0.5, 0.3)
 
+  delta_text_space <- 0
+  if (!(float_contrast) && (plot_kwargs$delta_text) && (plot_kwargs$params_delta_text$x_location == "right")) {
+    delta_text_space <- 0.4
+  }
   raw_plot <- raw_plot +
     ggplot2::theme_classic() +
     ggplot2::coord_cartesian(
       ylim = c(raw_y_min, raw_y_max),
-      xlim = c(raw_x_min, raw_x_max + raw_x_scalar),
+      xlim = c(raw_x_min, raw_x_max + raw_x_scalar + delta_text_space),
       expand = FALSE,
       clip = "off"
     ) +
@@ -535,7 +539,8 @@ add_delta_text_to_delta_plot <- function(delta_plot,
                                          plot_kwargs,
                                          x_values,
                                          y_values,
-                                         main_violin_type) {
+                                         main_violin_type,
+                                         float_contrast) {
   # Assert that both vectors have the same length
   stopifnot(length(x_values) == length(y_values))
 
@@ -550,6 +555,14 @@ add_delta_text_to_delta_plot <- function(delta_plot,
   x_location <- params_delta_text$x_location
   x_adjust <- params_delta_text$x_adjust
 
+  if (float_contrast) {
+    x_location <- "left"
+    if (y_values[[1]] >= 0) {
+      vjust <- "bottom"
+    } else {
+      vjust <- "top"
+    }
+  }
   x_coordinates <- x_values
   if (!is.null(params_delta_text$x_coordinates)) {
     x_coordinates <- params_delta_text$x_coordinates
@@ -557,9 +570,9 @@ add_delta_text_to_delta_plot <- function(delta_plot,
     # check x_location and x_adjust
     # width of the contrast_bars is 0.5
     if (x_location == "right") {
-      margin <- 0.48
+      margin <- 0.38
     } else {
-      margin <- -0.38
+      margin <- -0.28
     }
     x_adjust <- x_adjust + margin
   }
@@ -643,6 +656,125 @@ add_delta_text_to_delta_plot <- function(delta_plot,
         angle = rotation
       )
   }
+  return(delta_plot)
+}
+
+create_delta_dots_data <- function(dabest_effectsize_obj, x_axis_breaks) {
+  # getting params
+  is_paired <- dabest_effectsize_obj$is_paired
+  raw_data <- dabest_effectsize_obj$raw_data
+  delta_x_labels <- dabest_effectsize_obj$delta_x_labels
+  x <- rlang::as_name(dabest_effectsize_obj$enquo_x)
+  y <- rlang::as_name(dabest_effectsize_obj$enquo_y)
+  color_col <- NULL
+  if (dabest_effectsize_obj$is_colour) {
+    color_col <- rlang::as_name(dabest_effectsize_obj$enquo_colour)
+  }
+
+  delta_dots_data <- lapply(1:length(delta_x_labels), function(i) {
+    x_value <- x_axis_breaks[[i]]
+    label <- delta_x_labels[[i]]
+    values <- strsplit(label, split = "\nminus\n")
+    test_label <- values[[1]][1]
+    control_label <- values[[1]][2]
+    test_samples <- raw_data %>%
+      dplyr::filter(!!rlang::sym(x) == test_label) %>%
+      dplyr::pull(!!rlang::sym(y))
+    control_samples <- raw_data %>%
+      dplyr::filter(!!rlang::sym(x) == control_label) %>%
+      dplyr::pull(!!rlang::sym(y))
+    stopifnot(length(test_samples) == length(control_samples))
+    diff_samples <- test_samples - control_samples
+    if (!is.null(color_col)) {
+      # test and control should have the same colour label
+      color_samples <- raw_data %>%
+        dplyr::filter(!!rlang::sym(x) == control_label) %>%
+        dplyr::pull(!!rlang::sym(color_col))
+      data.frame(x_var = rep(x_value, length(diff_samples)), y_var = diff_samples, colour_var = color_samples)
+    } else {
+      data.frame(x_var = rep(x_value, length(diff_samples)), y_var = diff_samples)
+    }
+  }) %>%
+    dplyr::bind_rows()
+
+  return(delta_dots_data)
+}
+
+add_delta_dots_to_delta_plot <- function(delta_plot,
+                                         dabest_effectsize_obj,
+                                         plot_kwargs,
+                                         x_axis_breaks,
+                                         main_violin_type,
+                                         delta_dots_data) {
+  # get delta dots params
+  params_delta_dots <- plot_kwargs$params_delta_dots
+  pch <- params_delta_dots$pch
+  alpha <- params_delta_dots$alpha
+  # this parameter is only used for horizontal plots
+  cex <- params_delta_dots$cex
+  size <- params_delta_dots$size
+  side <- params_delta_dots$side
+  if (side == "right") {
+    side <- 1
+  } else {
+    side <- -1 # left
+  }
+
+  # handling color
+  if (dabest_effectsize_obj$is_colour) {
+    delta_plot <- delta_plot +
+      ggbeeswarm::geom_beeswarm(
+        data = delta_dots_data,
+        ggplot2::aes(
+          x = x_var,
+          y = y_var,
+          color = colour_var,
+        ),
+        cex = cex,
+        method = "swarm",
+        pch = pch,
+        side = side,
+        size = size,
+        alpha = alpha,
+        corral = "omit"
+      )
+  } else {
+    if (main_violin_type == "multicolor") {
+      delta_plot <- delta_plot +
+        ggbeeswarm::geom_beeswarm(
+          data = delta_dots_data,
+          ggplot2::aes(
+            x = x_var,
+            y = y_var,
+            color = x_var,
+          ),
+          cex = cex,
+          method = "swarm",
+          pch = pch,
+          side = side,
+          size = size,
+          alpha = alpha,
+          corral = "omit"
+        )
+    } else {
+      delta_plot <- delta_plot +
+        ggbeeswarm::geom_beeswarm(
+          data = delta_dots_data,
+          ggplot2::aes(
+            x = x_var,
+            y = y_var,
+          ),
+          cex = cex,
+          method = "swarm",
+          pch = pch,
+          side = side,
+          size = size,
+          alpha = alpha,
+          corral = "omit"
+        )
+    }
+  }
+
   return(delta_plot)
 }
 
