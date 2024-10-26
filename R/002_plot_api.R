@@ -478,6 +478,14 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   } else {
     raw_ylim
   }
+
+  ### Preparing delta dots data
+  delta_dots <- plot_kwargs$delta_dots
+  if (is_paired && delta_dots) {
+    delta_dots_data <- create_delta_dots_data(dabest_effectsize_obj, x_axis_breaks)
+    delta_y_min <- min(delta_dots_data$y_var)
+    delta_y_max <- max(delta_dots_data$y_var)
+  }
   summary_data <- list(control_summary, test_summary)
   delta_x_axis_params <- list(delta_x_max, delta_x_labels, x_axis_breaks)
   delta_y_axis_params <- list(delta_y_min, delta_y_max, delta_y_mean, raw_ylim)
@@ -490,6 +498,8 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   delta_y_min <- delta_y_params[[2]]
   delta_y_max <- delta_y_params[[3]]
   delta_y_mean <- delta_y_params[[4]]
+
+
 
   #### Add bootci Component ####
   if (delta2 != dabest_effectsize_obj$delta2 || minimeta != dabest_effectsize_obj$minimeta) {
@@ -620,11 +630,22 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       plot_kwargs,
       x_axis_breaks,
       difference,
-      main_violin_type
+      main_violin_type,
+      float_contrast
     )
-    if (plot_kwargs$params_delta_text$x_location == "right") {
-      delta_plot <- delta_plot + ggplot2::coord_cartesian(clip = "off")
-    }
   }
+  ### Add delta dots if requested
+  delta_dots <- plot_kwargs$delta_dots
+  if (is_paired && delta_dots) {
+    delta_plot <- add_delta_dots_to_delta_plot(
+      delta_plot,
+      dabest_effectsize_obj,
+      plot_kwargs,
+      x_axis_breaks,
+      main_violin_type,
+      delta_dots_data
+    )
+  }
+
   return(list(delta_plot = delta_plot, delta_range = c(delta_y_min - delta_y_mean / 10, delta_y_max)))
 }

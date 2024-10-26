@@ -223,10 +223,10 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
 
   # Delta dots kwargs.
   default_params_delta_dots <- list(
-    "marker" = "^",
+    "pch" = 17, # default dot symbol is triangle
     "alpha" = 0.5,
-    "zorder" = 2,
-    "size" = 3,
+    "cex" = 2,
+    "size" = 2, # size 3 is too big
     "side" = "right"
   )
   if (is.null(plot_kwargs$params_delta_dots)) {

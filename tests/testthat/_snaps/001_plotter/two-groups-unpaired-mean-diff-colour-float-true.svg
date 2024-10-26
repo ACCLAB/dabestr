@@ -124,6 +124,7 @@
 <line x1='540.00' y1='321.27' x2='693.70' y2='321.27' style='stroke-width: 0.64; stroke-linecap: butt;' />
 <line x1='540.00' y1='479.39' x2='693.70' y2='479.39' style='stroke-width: 1.71; stroke-linecap: butt;' />
 <rect x='527.19' y='212.81' width='128.08' height='108.46' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #595959; fill-opacity: 0.30;' />
+<text x='519.51' y='212.81' text-anchor='middle' style='font-size: 10.00px; font-family: sans;' textLength='25.31px' lengthAdjust='spacingAndGlyphs'>+0.59</text>
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
 <polyline points='693.70,479.39 693.70,0.00 ' style='stroke-width: 1.07; stroke-linecap: butt;' />

@@ -28,9 +28,11 @@ describe("Testing plot_delta function", {
       show_baseline_ec = FALSE,
       swarm_ylim = NULL,
       contrast_bars = TRUE,
-      swarm_bars = TRUE
+      swarm_bars = TRUE,
+      delta_text = TRUE,
+      delta_dots = TRUE
     )
-
+    plot_kwargs <- assign_plot_kwargs(dabest_effectsize_obj, plot_kwargs)
     result <- plot_delta(dabest_effectsize_obj, float_contrast, plot_kwargs)
     expect_type(result, "list")
     expect_named(result, c("delta_plot", "delta_range"))

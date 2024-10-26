@@ -36,7 +36,6 @@
 #' @export
 
 dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
-  print("Local dabest_plot: Checking effectsize object")
   check_effectsize_object(dabest_effectsize_obj)
 
   plot_kwargs <- list(...)
