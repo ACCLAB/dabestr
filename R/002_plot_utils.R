@@ -534,6 +534,23 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
   ))
 }
 
+#' Adds Delta Text to a Delta Plot
+#'
+#' This function enhances a delta plot by adding delta text using the provided parameters.
+#' It takes a delta plot, a dabest_effectsize_obj, plotting parameters, and specific x and y values.
+#' The function also considers the main violin type and float contrast to customize the delta text.
+#'
+#' @param delta_plot A ggplot object representing the delta plot.
+#' @param dabest_effectsize_obj A dabest_effectsize_obj created by the effect_size() function.
+#' @param plot_kwargs A list of parameters used to adjust the appearance of the plot.
+#' @param x_values A numeric or character vector specifying the x-axis values for delta text positioning.
+#' @param y_values A numeric vector specifying the y-axis values for delta text positioning.
+#' @param main_violin_type A character string indicating the type of main violin plot ("violin" or "box").
+#' @param float_contrast A logical value indicating whether to float the contrast labels.
+#'
+#' @return A ggplot object with the delta text added to the delta plot.
+#'
+#' @noRd
 add_delta_text_to_delta_plot <- function(delta_plot,
                                          dabest_effectsize_obj,
                                          plot_kwargs,
@@ -700,6 +717,22 @@ create_delta_dots_data <- function(dabest_effectsize_obj, x_axis_breaks) {
   return(delta_dots_data)
 }
 
+#' Adds Delta Dots to a Delta Plot
+#'
+#' This function enhances a delta plot by adding delta dots using the provided parameters.
+#' It takes a delta plot, a dabest_effectsize_obj, plotting parameters, x-axis breaks,
+#' and delta dots data. The function also considers the main violin type to customize the delta dots.
+#'
+#' @param delta_plot A ggplot object representing the delta plot.
+#' @param dabest_effectsize_obj A dabest_effectsize_obj created by the effect_size() function.
+#' @param plot_kwargs A list of parameters used to adjust the appearance of the plot.
+#' @param x_axis_breaks A numeric or character vector specifying the x-axis breaks.
+#' @param main_violin_type A character string indicating the type of main violin plot ("violin" or "box").
+#' @param delta_dots_data A data frame containing the data for delta dots.
+#'
+#' @return A ggplot object with the delta dots added to the delta plot.
+#'
+#' @noRd
 add_delta_dots_to_delta_plot <- function(delta_plot,
                                          dabest_effectsize_obj,
                                          plot_kwargs,
