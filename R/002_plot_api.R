@@ -481,7 +481,8 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
 
   ### Preparing delta dots data
   delta_dots <- plot_kwargs$delta_dots
-  if (is_paired && delta_dots) {
+  show_delta_dots <- (is_paired && !(proportional) && delta_dots)
+  if (show_delta_dots) {
     delta_dots_data <- create_delta_dots_data(dabest_effectsize_obj, x_axis_breaks)
     delta_y_min <- min(delta_dots_data$y_var)
     delta_y_max <- max(delta_dots_data$y_var)
@@ -635,8 +636,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     )
   }
   ### Add delta dots if requested
-  delta_dots <- plot_kwargs$delta_dots
-  if (is_paired && delta_dots) {
+  if (show_delta_dots) {
     delta_plot <- add_delta_dots_to_delta_plot(
       delta_plot,
       dabest_effectsize_obj,
