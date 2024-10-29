@@ -595,6 +595,10 @@ add_delta_text_to_delta_plot <- function(delta_plot,
   }
 
   y_coordinates <- y_values
+  if (float_contrast) {
+    # Adding a bit extra space not to touch the horizontal lines
+    y_coordinates <- y_coordinates + 0.01
+  }
   if (!is.null(params_delta_text$y_coordinates)) {
     y_coordinates <- params_delta_text$y_coordinates
   }
@@ -616,6 +620,7 @@ add_delta_text_to_delta_plot <- function(delta_plot,
     delta_text_colours <- colours[x_values]
   }
   labels <- sprintf("%+.2f", y_values)
+
   # Prepare the text for each coordinate
   texts <- data.frame(
     x = x_coordinates + x_adjust, # Replace with your specific x-coordinate
@@ -623,6 +628,7 @@ add_delta_text_to_delta_plot <- function(delta_plot,
     text = sprintf("%+.2f", y_values),
     group = delta_text_colours
   )
+
   # custom colour
   if (!is.null(custom_colour)) {
     delta_plot <- delta_plot +
@@ -640,15 +646,15 @@ add_delta_text_to_delta_plot <- function(delta_plot,
       )
   } else if (main_violin_type == "multicolour") {
     for (i in seq_along(x_coordinates)) {
-      x <- x_coordinates[i] + x_adjust
-      y <- y_coordinates[i]
-      label <- labels[i]
+      x_i <- x_coordinates[i] + x_adjust
+      y_i <- y_coordinates[i]
+      label_i <- labels[i]
       text_colour <- delta_text_colours[i]
       delta_plot <- delta_plot + ggplot2::geom_text(
         data = texts,
-        x = x,
-        y = y,
-        label = label,
+        x = x_i,
+        y = y_i,
+        label = label_i,
         colour = text_colour,
         alpha = alpha,
         check_overlap = TRUE,
