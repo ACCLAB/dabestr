@@ -259,8 +259,8 @@ add_scaling_component_to_delta_plot <- function(delta_plot, float_contrast, boot
       ggplot2::coord_cartesian(
         ylim = c(min_y_coords, min_y_coords + delta_y_range),
         xlim = c(1.8, delta_x_max + 0.4 + delta_text_space),
-        expand = FALSE
-        # clip = "off"
+        expand = FALSE,
+        clip = "off"
       ) +
       ggplot2::scale_x_continuous(
         breaks = c(2),
