@@ -315,7 +315,7 @@ boot_weighted_row <- function(boot_result, ci) {
 #'
 #' @return A list with the deltadelta parameters.
 #' @noRd
-#' 
+#'
 boot_delta_delta <- function(boot_result, ci) {
   bootstrap_delta_delta_neg <- Reduce("-", boot_result$bootstraps)
   bootstrap_delta_delta <- bootstrap_delta_delta_neg * -1
