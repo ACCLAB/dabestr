@@ -44,6 +44,10 @@
 #' - `flow` Default TRUE. Boolean value determining whether the bars will be plotted in pairs.
 #' - `custom_palette` Default "d3". String. The following palettes are available for use:
 #' npg, aaas, nejm, lancet, jama, jco, ucscgb, d3, locuszoom, igv, cosmic, uchicago, brewer, ordinal, viridis_d.
+#' - `contrast_bars` Default TRUE. Whether or not to display the contrast bars at the delta plot.
+#' - `params_contrast_bars`. Default value: list(color = NULL, alpha = 0.3). Pass relevant keyword arguments to the contrast bars.
+#' - `swarm_bars` Default TRUE. Whether or not to display the swarm bars.
+#' - `params_swarm_bars`. Default value: list(color = NULL, alpha = 0.3). Pass relevant keyword arguments to the swarm bars.
 #'
 #'
 assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
@@ -168,6 +172,92 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   if (!(is.null(plot_kwargs$asymmetric_side))) {
     asymmetric_side <- plot_kwargs$asymmetric_side
   }
+  contrast_bars <- TRUE
+  if (!(is.null(plot_kwargs$contrast_bars))) {
+    contrast_bars <- plot_kwargs$contrast_bars
+  }
+  # Swarm bars
+  swarm_bars <- TRUE
+  if (!(is.null(plot_kwargs$swarm_bars))) {
+    swarm_bars <- plot_kwargs$swarm_bars
+  }
+  # Swarm bars kwargs
+  default_params_swarm_bars <- list(
+    color = NULL,
+    alpha = 0.3
+  )
+  if (is.null(plot_kwargs$params_swarm_bars)) {
+    # If user has not provided params_swarm_bars, use defaults
+    params_swarm_bars <- default_params_swarm_bars
+  } else {
+    # If user has provided params_swarm_bars, update defaults with user values
+    params_swarm_bars <- utils::modifyList(
+      default_params_swarm_bars,
+      plot_kwargs$params_swarm_bars
+    )
+  }
+  # Contrast bars kwargs.
+  default_params_contrast_bars <- list(
+    color = NULL,
+    alpha = 0.3
+  )
+  if (is.null(plot_kwargs$params_contrast_bars)) {
+    # If user has not provided params_contrast_bars, use defaults
+    params_contrast_bars <- default_params_contrast_bars
+  } else {
+    # If user has provided params_contrast_bars,
+    # update defaults with user values
+    params_contrast_bars <- utils::modifyList(
+      default_params_contrast_bars,
+      plot_kwargs$params_contrast_bars
+    )
+  }
+  delta_text <- TRUE
+  if (!(is.null(plot_kwargs$delta_text))) {
+    delta_text <- plot_kwargs$delta_text
+  }
+  delta_dots <- TRUE
+  if (!(is.null(plot_kwargs$delta_dots))) {
+    delta_dots <- plot_kwargs$delta_dots
+  }
+
+  # Delta dots kwargs.
+  default_params_delta_dots <- list(
+    "pch" = 17, # default dot symbol is triangle
+    "alpha" = 0.5,
+    "cex" = 2,
+    "size" = 2, # size 3 is too big
+    "side" = "right"
+  )
+  if (is.null(plot_kwargs$params_delta_dots)) {
+    params_delta_dots <- default_params_delta_dots
+  } else {
+    params_delta_dots <- utils::modifyList(
+      default_params_delta_dots,
+      plot_kwargs$params_delta_dots
+    )
+  }
+  # Delta text kwargs.
+  default_params_delta_text <- list(
+    "color" = NULL,
+    "alpha" = 1,
+    "fontsize" = 10,
+    "ha" = "center", # hjust
+    "va" = "center", # vjust
+    "rotation" = 0,
+    "x_location" = "right",
+    "x_coordinates" = NULL,
+    "y_coordinates" = NULL,
+    "x_adjust" = 0
+  )
+  if (is.null(plot_kwargs$params_delta_text)) {
+    params_delta_text <- default_params_delta_text
+  } else {
+    params_delta_text <- utils::modifyList(
+      default_params_delta_text,
+      plot_kwargs$params_delta_text
+    )
+  }
 
   return(list(
     swarm_label = swarm_label,
@@ -197,6 +287,14 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     show_zero_dot = show_zero_dot,
     show_baseline_ec = show_baseline_ec,
     show_legend = show_legend,
-    asymmetric_side = asymmetric_side
+    asymmetric_side = asymmetric_side,
+    contrast_bars = contrast_bars,
+    params_contrast_bars = params_contrast_bars,
+    swarm_bars = swarm_bars,
+    params_swarm_bars = params_swarm_bars,
+    delta_text = delta_text,
+    params_delta_text = params_delta_text,
+    delta_dots = delta_dots,
+    params_delta_dots = params_delta_dots
   ))
 }

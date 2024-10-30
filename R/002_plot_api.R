@@ -59,9 +59,6 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
 
   #### Load in sizes of plot elements ####
-  raw_marker_size <- plot_kwargs$raw_marker_size
-  raw_marker_alpha <- plot_kwargs$raw_marker_alpha
-  raw_marker_spread <- plot_kwargs$raw_marker_spread
   raw_marker_side_shift <- plot_kwargs$raw_marker_side_shift
   raw_bar_width <- plot_kwargs$raw_bar_width
   tufte_size <- plot_kwargs$tufte_size
@@ -121,7 +118,16 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
 
   #### Initialise raw_plot & Add main_plot_type component ####
-  output <- initialize_raw_plot(plot_kwargs, plot_components, dabest_effectsize_obj, df_for_proportion_bar, sankey_df, sankey_bars, idx, float_contrast)
+  output <- initialize_raw_plot(
+    plot_kwargs,
+    plot_components,
+    dabest_effectsize_obj,
+    df_for_proportion_bar,
+    sankey_df,
+    sankey_bars,
+    idx,
+    float_contrast
+  )
   raw_plot <- output[[1]]
   raw_y_range <- output[[2]]
   raw_y_min <- output[[3]]
@@ -286,6 +292,41 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       axis.title.y = ggplot2::element_text(size = swarm_y_text)
     )
 
+  ### Add swarm bars if plot type is compatible and requested ###
+  swarm_bars <- plot_kwargs$swarm_bars
+  valid_plots <- (main_plot_type == "slope") || (main_plot_type == "swarmplot")
+  if (valid_plots && (swarm_bars)) {
+    if (is_tufte_lines) {
+      # the starting point of y needs to be computed using tufte_gap_value
+      y_values <- tufte_lines_df$y_bot_start + tufte_gap_value
+      raw_plot <- raw_plot +
+        add_swarm_bars_to_raw_plot(
+          dabest_effectsize_obj,
+          plot_kwargs,
+          row_ref,
+          y_values,
+          raw_y_min + raw_y_range / 40,
+          main_plot_type
+        )
+    } else {
+      # compute the mean values
+      mean_values <- raw_data %>%
+        dplyr::group_by(!!enquo_x) %>%
+        dplyr::summarize(
+          mean = mean(!!enquo_y),
+        )
+
+      raw_plot <- raw_plot +
+        add_swarm_bars_to_raw_plot(
+          dabest_effectsize_obj,
+          plot_kwargs,
+          x_axis_raw,
+          mean_values$mean,
+          raw_y_min + raw_y_range / 40,
+          main_plot_type
+        )
+    }
+  }
   return(raw_plot)
 }
 
@@ -308,7 +349,6 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
 plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   idx <- dabest_effectsize_obj$idx
   separated_idx <- idx
-  bootstraps <- dabest_effectsize_obj$bootstraps
   proportional <- dabest_effectsize_obj$proportional
   paired <- dabest_effectsize_obj$paired
 
@@ -343,9 +383,6 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
 
   #### Load in sizes of plot elements ####
-  raw_marker_size <- plot_kwargs$raw_marker_size
-  raw_marker_alpha <- plot_kwargs$raw_marker_alpha
-  raw_bar_width <- plot_kwargs$raw_bar_width
   tufte_size <- plot_kwargs$tufte_size
   es_marker_size <- plot_kwargs$es_marker_size
   es_line_size <- plot_kwargs$es_line_size
@@ -441,6 +478,15 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   } else {
     raw_ylim
   }
+
+  ### Preparing delta dots data
+  delta_dots <- plot_kwargs$delta_dots
+  show_delta_dots <- (is_paired && !(proportional) && delta_dots)
+  if (show_delta_dots) {
+    delta_dots_data <- create_delta_dots_data(dabest_effectsize_obj, x_axis_breaks)
+    delta_y_min <- min(delta_dots_data$y_var)
+    delta_y_max <- max(delta_dots_data$y_var)
+  }
   summary_data <- list(control_summary, test_summary)
   delta_x_axis_params <- list(delta_x_max, delta_x_labels, x_axis_breaks)
   delta_y_axis_params <- list(delta_y_min, delta_y_max, delta_y_mean, raw_ylim)
@@ -453,6 +499,8 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   delta_y_min <- delta_y_params[[2]]
   delta_y_max <- delta_y_params[[3]]
   delta_y_mean <- delta_y_params[[4]]
+
+
 
   #### Add bootci Component ####
   if (delta2 != dabest_effectsize_obj$delta2 || minimeta != dabest_effectsize_obj$minimeta) {
@@ -561,6 +609,43 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       axis.text.x = ggplot2::element_text(size = contrast_x_text),
       axis.title.y = ggplot2::element_text(size = contrast_y_text)
     )
+  ### Add contrast bars if requested ###
+  contrast_bars <- plot_kwargs$contrast_bars
+  if (contrast_bars) {
+    cb <- add_contrast_bars_to_delta_plot(
+      dabest_effectsize_obj,
+      plot_kwargs,
+      x_axis_breaks,
+      difference,
+      main_violin_type
+    )
+    delta_plot <- delta_plot + cb
+  }
+
+  ### Add delta text if requested
+  delta_text <- plot_kwargs$delta_text
+  if (delta_text) {
+    delta_plot <- add_delta_text_to_delta_plot(
+      delta_plot,
+      dabest_effectsize_obj,
+      plot_kwargs,
+      x_axis_breaks,
+      difference,
+      main_violin_type,
+      float_contrast
+    )
+  }
+  ### Add delta dots if requested
+  if (show_delta_dots) {
+    delta_plot <- add_delta_dots_to_delta_plot(
+      delta_plot,
+      dabest_effectsize_obj,
+      plot_kwargs,
+      x_axis_breaks,
+      main_violin_type,
+      delta_dots_data
+    )
+  }
 
   return(list(delta_plot = delta_plot, delta_range = c(delta_y_min - delta_y_mean / 10, delta_y_max)))
 }

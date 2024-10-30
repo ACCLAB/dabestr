@@ -261,7 +261,7 @@ create_dfs_for_xaxis_redraw <- function(idx) {
 #'
 #' This function generates data frames to
 #' represent bars with proportional data in a graphical display.
-#' @param proportion_success
+#' @param proportion_success List of values containing percentages
 #' @param bar_width Numeric value determining the width of the bar in the sankey diagram.
 #' @param gap Integer value specifying the amount of gap for each tufte line.
 #'
@@ -279,8 +279,7 @@ create_dfs_for_proportion_bar <- function(proportion_success, bar_width = 0.3, g
   for (x in 1:length(proportion_success)) {
     y <- proportion_success[x]
     if ((y > 1) || (y < 0)) {
-      cli::cli_abort(c("Proportion plots must be supplied with data of values between 0 and 1."
-      ))
+      cli::cli_abort(c("Proportion plots must be supplied with data of values between 0 and 1."))
     }
 
     x_failure_success <- c(x - bar_width / 2, x + bar_width / 2, x + bar_width / 2, x - bar_width / 2)

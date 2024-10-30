@@ -18,8 +18,9 @@ testthat::test_that("Testing create_dfs_for_proportion_bar function", {
 test_that("Throws an error when proportion_success contains values outside [0, 1]", {
   # Test case: proportion_success contains a value outside [0, 1]
   proportion_success <- c(0.5, 1.5, 0.75)
-  expect_error(create_dfs_for_proportion_bar(proportion_success),
-   "Proportion plots must be supplied with data of values between 0 and 1."
+  expect_error(
+    create_dfs_for_proportion_bar(proportion_success),
+    "Proportion plots must be supplied with data of values between 0 and 1."
   )
 })
 

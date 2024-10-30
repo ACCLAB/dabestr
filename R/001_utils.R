@@ -1,21 +1,7 @@
 #' Validate the input parameters for the load function
 #'
+#' TODO Add documentation
 #' @noRd
-#' TODO Add description of parameters
-#' @param data A tidy dataframe.
-#' @param name_x
-#' @param name_y
-#' @param id_col_params
-#' @param colour_params
-#' @param delta2
-#' @param idx
-#' @param paired
-#' @param proportional
-#'
-#' @return no error if all parameters are fine
-#'
-#'
-#'
 validate_load_params <- function(data, name_x, name_y,
                                  id_col, enquo_id_col, is_id_col,
                                  colour, enquo_colour, is_colour,
@@ -104,7 +90,8 @@ validate_load_params <- function(data, name_x, name_y,
   }
 }
 
-# TODO Add documentation
+#' TODO Add documentation
+#' @noRd
 validate_minimeta_params <- function(proportional, delta2, minimeta_idx_lengths) {
   if (proportional) {
     cli::cli_abort(c(
@@ -127,7 +114,8 @@ validate_minimeta_params <- function(proportional, delta2, minimeta_idx_lengths)
   }
 }
 
-# TODO Add documentation
+#' TODO Add documentation
+#' @noRd
 check_dabest_object <- function(dabest_obj) {
   if (!inherits(dabest_obj, "dabest")) {
     cli::cli_abort(c("{.field dabest_obj} must be a {.cls dabest} object."),
@@ -136,7 +124,8 @@ check_dabest_object <- function(dabest_obj) {
   }
 }
 
-# TODO Add documentation
+#' TODO Add documentation
+#' @noRd
 check_effectsize_object <- function(dabest_effectsize_obj) {
   if (!inherits(dabest_effectsize_obj, "dabest_effectsize")) {
     cli::cli_abort(c("{.field dabest_effectsize_obj} must be a {.cls dabest_effectsize} object.",

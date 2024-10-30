@@ -213,9 +213,6 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
   raw_marker_alpha <- plot_kwargs$raw_marker_alpha
   raw_marker_spread <- plot_kwargs$raw_marker_spread
   raw_marker_side_shift <- plot_kwargs$raw_marker_side_shift
-  es_marker_size <- plot_kwargs$es_marker_size
-  swarm_x_text <- plot_kwargs$swarm_x_text
-  swarm_y_text <- plot_kwargs$swarm_y_text
   asymmetric_side <- plot_kwargs$asymmetric_side
   asymmetric_side <- ifelse(asymmetric_side == "right", -1, 1)
   minimeta <- plot_kwargs$show_mini_meta
@@ -345,11 +342,15 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
   raw_x_min <- ifelse(float_contrast, 0.6, 0.6)
   raw_x_scalar <- ifelse(float_contrast, 0.5, 0.3)
 
+  delta_text_space <- 0
+  if (!(float_contrast) && (plot_kwargs$delta_text) && (plot_kwargs$params_delta_text$x_location == "right")) {
+    delta_text_space <- 0.4
+  }
   raw_plot <- raw_plot +
     ggplot2::theme_classic() +
     ggplot2::coord_cartesian(
       ylim = c(raw_y_min, raw_y_max),
-      xlim = c(raw_x_min, raw_x_max + raw_x_scalar),
+      xlim = c(raw_x_min, raw_x_max + raw_x_scalar + delta_text_space),
       expand = FALSE,
       clip = "off"
     ) +
@@ -381,6 +382,439 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
       )
   }
   return(list(raw_plot, raw_y_range, raw_y_min, x_axis_raw))
+}
+
+#' Adds Swarm Bars to a Raw Data Plot
+#'
+#' This function takes a `dabest_effectsize_obj` and enhances its raw data plot by adding swarm bars.
+#' It utilizes the provided plotting parameters along with specific x and y values to customize the
+#' appearance and positioning of the swarm bars. The `y_min` parameter ensures that the swarm bars
+#' are appropriately placed within the plot's y-axis limits.
+#'
+#' @param dabest_effectsize_obj A `dabest_effectsize_obj` created by the [effect_size()] function.
+#' @param plot_kwargs A list of parameters used to adjust and control the appearance of the plot.
+#'   (Refer to [plot_kwargs] for all possible adjustment parameters.)
+#' @param x_values A numeric or character vector specifying the x-axis values where the swarm bars
+#'   should be added.
+#' @param y_values A numeric vector specifying the y-axis values corresponding to the swarm bars.
+#' @param y_min A numeric value indicating the minimum y-axis limit to position the swarm bars appropriately.
+#'
+#' @return A `ggplot` object with the swarm bars to be added to the raw data plot.
+#'
+#' @noRd
+add_swarm_bars_to_raw_plot <- function(dabest_effectsize_obj, plot_kwargs, x_values, y_values, y_min, main_plot_type) {
+  stopifnot(length(x_values) == length(y_values))
+  # getting the parameters
+  params_swarm_bars <- plot_kwargs$params_swarm_bars
+  bars_color <- params_swarm_bars$color
+  alpha <- params_swarm_bars$alpha
+
+  is_paired <- dabest_effectsize_obj$is_paired
+  is_colour <- dabest_effectsize_obj$is_colour
+
+  custom_colour <- NULL
+  if (!is.null(bars_color)) {
+    swarm_bars_colours <- rep(bars_color, length(x_values))
+    custom_colour <- bars_color
+    # this is the same as
+  } else if ((main_plot_type == "slope") || is_colour || is_paired) {
+    swarm_bars_colours <- rep("black", length(x_values))
+    custom_colour <- "black"
+  } else {
+    swarm_bars_colours <- as.character(x_values)
+  }
+
+  # Define width and height for each rectangle
+  width <- 0.5
+
+  # Calculate xmin, xmax, ymin, ymax for each rectangle
+  rectangles <- data.frame(
+    xmin = x_values - (width / 2),
+    xmax = x_values + (width / 2),
+    ymin = rep(y_min, length(x_values)),
+    ymax = y_values, # Heights as provided
+    fill_colour = swarm_bars_colours
+  )
+
+  # custom colour
+  if (!is.null(custom_colour)) {
+    return(ggplot2::geom_rect(
+      data = rectangles,
+      ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+      fill = custom_colour,
+      alpha = alpha,
+      show.legend = FALSE
+    ))
+  }
+  return(ggplot2::geom_rect(
+    data = rectangles,
+    ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = fill_colour),
+    alpha = alpha,
+    show.legend = FALSE
+  ))
+}
+
+#' Adds Contrast Bars to a Delta Plot
+#'
+#' This function takes a `dabest_effectsize_obj` and augments its delta plot by adding contrast bars.
+#' It utilizes the provided plotting parameters and specific x and y values to customize the appearance
+#' of the contrast bars based on the main violin plot type.
+#'
+#' @param dabest_effectsize_obj A `dabest_effectsize_obj` created by the [effect_size()] function.
+#' @param plot_kwargs A list of parameters used to adjust and control the appearance of the plot.
+#'   (Refer to [plot_kwargs] for all possible adjustment parameters.)
+#' @param x_values A numeric or character vector specifying the x-axis values where the contrast bars
+#'   should be added.
+#' @param y_values A numeric vector specifying the y-axis values corresponding to the contrast bars.
+#' @param main_violin_type A string indicating the type of violin plot used in the main plot.
+#'   Determines the styling and positioning of the contrast bars.
+#'
+#' @return A `ggplot` object with contrast bars to be added to the delta plot.
+#'
+#' @noRd
+add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, x_values, y_values, main_violin_type) {
+  # Assert that both vectors have the same length
+  stopifnot(length(x_values) == length(y_values))
+
+  # getting the parameters
+  params_contrast_bars <- plot_kwargs$params_contrast_bars
+  bars_color <- params_contrast_bars$color
+  alpha <- params_contrast_bars$alpha
+
+  is_paired <- dabest_effectsize_obj$is_paired
+  color_col <- plot_kwargs$color_col
+  custom_colour <- NULL
+  if (!is.null(bars_color)) {
+    contrast_bars_colours <- rep(bars_color, length(x_values))
+    custom_colour <- bars_color
+    # this is the same as
+  } else if (!is.null(color_col) || is_paired) {
+    contrast_bars_colours <- rep("black", length(x_values))
+    custom_colour <- "black"
+  } else {
+    # use the default palette colours of the ggplot violin plot object
+    contrast_bars_colours <- as.character((x_values))
+    # contrast_bars_colours <- factor(as.character(x_values), levels = group_levels)
+  }
+
+  # Define width and height for each rectangle
+  width <- 0.5
+
+  # Calculate xmin, xmax, ymin, ymax for each rectangle
+  rectangles <- data.frame(
+    xmin = x_values - (width / 2),
+    xmax = x_values + (width / 2),
+    ymin = rep(0, length(x_values)), # All rectangles start at y = 0
+    ymax = y_values, # Heights as provided
+    group = contrast_bars_colours
+  )
+
+  # custom colour
+  if (!is.null(custom_colour)) {
+    return(ggplot2::geom_rect(
+      data = rectangles,
+      ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+      fill = custom_colour,
+      alpha = alpha
+    ))
+  }
+  if (main_violin_type == "multicolour") {
+    return(ggplot2::geom_rect(
+      data = rectangles,
+      ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = group),
+      alpha = alpha
+    ))
+  }
+
+  # Single colour
+  return(ggplot2::geom_rect(
+    data = rectangles,
+    ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, group = group),
+    alpha = alpha
+  ))
+}
+
+#' Adds Delta Text to a Delta Plot
+#'
+#' This function enhances a delta plot by adding delta text using the provided parameters.
+#' It takes a delta plot, a dabest_effectsize_obj, plotting parameters, and specific x and y values.
+#' The function also considers the main violin type and float contrast to customize the delta text.
+#'
+#' @param delta_plot A ggplot object representing the delta plot.
+#' @param dabest_effectsize_obj A dabest_effectsize_obj created by the effect_size() function.
+#' @param plot_kwargs A list of parameters used to adjust the appearance of the plot.
+#' @param x_values A numeric or character vector specifying the x-axis values for delta text positioning.
+#' @param y_values A numeric vector specifying the y-axis values for delta text positioning.
+#' @param main_violin_type A character string indicating the type of main violin plot ("violin" or "box").
+#' @param float_contrast A logical value indicating whether to float the contrast labels.
+#'
+#' @return A ggplot object with the delta text added to the delta plot.
+#'
+#' @noRd
+add_delta_text_to_delta_plot <- function(delta_plot,
+                                         dabest_effectsize_obj,
+                                         plot_kwargs,
+                                         x_values,
+                                         y_values,
+                                         main_violin_type,
+                                         float_contrast) {
+  # Assert that both vectors have the same length
+  stopifnot(length(x_values) == length(y_values))
+
+  params_delta_text <- plot_kwargs$params_delta_text
+  # getting the parameters
+  text_color <- params_delta_text$color
+  alpha <- params_delta_text$alpha
+  fontsize <- params_delta_text$fontsize
+  hjust <- params_delta_text$ha
+  vjust <- params_delta_text$va
+  rotation <- params_delta_text$rotation
+  x_location <- params_delta_text$x_location
+  x_adjust <- params_delta_text$x_adjust
+
+  if (float_contrast) {
+    x_location <- "left"
+    if (y_values[[1]] >= 0) {
+      vjust <- "bottom"
+    } else {
+      vjust <- "top"
+    }
+  }
+  x_coordinates <- x_values
+  if (!is.null(params_delta_text$x_coordinates)) {
+    x_coordinates <- params_delta_text$x_coordinates
+  } else {
+    # check x_location and x_adjust
+    # width of the contrast_bars is 0.5
+    if (x_location == "right") {
+      margin <- 0.38
+    } else {
+      margin <- -0.28
+    }
+    x_adjust <- x_adjust + margin
+  }
+
+  y_coordinates <- y_values
+  if (float_contrast) {
+    # Adding a bit extra space not to touch the horizontal lines
+    y_coordinates <- y_coordinates + 0.01
+  }
+  if (!is.null(params_delta_text$y_coordinates)) {
+    y_coordinates <- params_delta_text$y_coordinates
+  }
+
+  is_paired <- dabest_effectsize_obj$is_paired
+  color_col <- plot_kwargs$color_col
+  custom_colour <- NULL
+  if (!is.null(text_color)) {
+    delta_text_colours <- rep(text_color, length(x_values))
+    custom_colour <- text_color
+    # this is the same as
+  } else if (!is.null(color_col) || is_paired) {
+    delta_text_colours <- rep("black", length(x_values))
+    custom_colour <- "black"
+  } else {
+    # use the default palette colours of the ggplot violin plot object
+    colours <- get_palette_colours(plot_kwargs$custom_palette, max(x_values))
+    # Select colors at positions specified by x_values
+    delta_text_colours <- colours[x_values]
+  }
+  labels <- sprintf("%+.2f", y_values)
+
+  # Prepare the text for each coordinate
+  texts <- data.frame(
+    x = x_coordinates + x_adjust, # Replace with your specific x-coordinate
+    y = y_coordinates, # Replace with your specific y-coordinate
+    text = sprintf("%+.2f", y_values),
+    group = delta_text_colours
+  )
+
+  # custom colour
+  if (!is.null(custom_colour)) {
+    delta_plot <- delta_plot +
+      ggplot2::geom_text(
+        data = texts,
+        ggplot2::aes(x = x, y = y, label = text),
+        colour = custom_colour,
+        alpha = alpha,
+        check_overlap = TRUE,
+        size.unit = "pt",
+        size = fontsize,
+        vjust = vjust,
+        hjust = hjust,
+        angle = rotation
+      )
+  } else if (main_violin_type == "multicolour") {
+    for (i in seq_along(x_coordinates)) {
+      x_i <- x_coordinates[i] + x_adjust
+      y_i <- y_coordinates[i]
+      label_i <- labels[i]
+      text_colour <- delta_text_colours[i]
+      delta_plot <- delta_plot + ggplot2::geom_text(
+        data = texts,
+        x = x_i,
+        y = y_i,
+        label = label_i,
+        colour = text_colour,
+        alpha = alpha,
+        check_overlap = TRUE,
+        size.unit = "pt",
+        size = fontsize,
+        vjust = vjust,
+        hjust = hjust,
+        angle = rotation
+      )
+    }
+  } else {
+    delta_plot <- delta_plot +
+      ggplot2::geom_text(
+        data = texts,
+        ggplot2::aes(x = x, y = y, label = text, group = group),
+        alpha = alpha,
+        check_overlap = TRUE,
+        size.unit = "pt",
+        size = fontsize,
+        vjust = vjust,
+        hjust = hjust,
+        angle = rotation
+      )
+  }
+  return(delta_plot)
+}
+
+create_delta_dots_data <- function(dabest_effectsize_obj, x_axis_breaks) {
+  # getting params
+  is_paired <- dabest_effectsize_obj$is_paired
+  raw_data <- dabest_effectsize_obj$raw_data
+  delta_x_labels <- dabest_effectsize_obj$delta_x_labels
+  x <- rlang::as_name(dabest_effectsize_obj$enquo_x)
+  y <- rlang::as_name(dabest_effectsize_obj$enquo_y)
+  color_col <- NULL
+  if (dabest_effectsize_obj$is_colour) {
+    color_col <- rlang::as_name(dabest_effectsize_obj$enquo_colour)
+  }
+
+  delta_dots_data <- lapply(1:length(delta_x_labels), function(i) {
+    x_value <- x_axis_breaks[[i]]
+    label <- delta_x_labels[[i]]
+    values <- strsplit(label, split = "\nminus\n")
+    test_label <- values[[1]][1]
+    control_label <- values[[1]][2]
+    test_samples <- raw_data %>%
+      dplyr::filter(!!rlang::sym(x) == test_label) %>%
+      dplyr::pull(!!rlang::sym(y))
+    control_samples <- raw_data %>%
+      dplyr::filter(!!rlang::sym(x) == control_label) %>%
+      dplyr::pull(!!rlang::sym(y))
+    stopifnot(length(test_samples) == length(control_samples))
+    diff_samples <- test_samples - control_samples
+    if (!is.null(color_col)) {
+      # test and control should have the same colour label
+      color_samples <- raw_data %>%
+        dplyr::filter(!!rlang::sym(x) == control_label) %>%
+        dplyr::pull(!!rlang::sym(color_col))
+      data.frame(x_var = rep(x_value, length(diff_samples)), y_var = diff_samples, colour_var = color_samples)
+    } else {
+      data.frame(x_var = rep(x_value, length(diff_samples)), y_var = diff_samples)
+    }
+  }) %>%
+    dplyr::bind_rows()
+
+  return(delta_dots_data)
+}
+
+#' Adds Delta Dots to a Delta Plot
+#'
+#' This function enhances a delta plot by adding delta dots using the provided parameters.
+#' It takes a delta plot, a dabest_effectsize_obj, plotting parameters, x-axis breaks,
+#' and delta dots data. The function also considers the main violin type to customize the delta dots.
+#'
+#' @param delta_plot A ggplot object representing the delta plot.
+#' @param dabest_effectsize_obj A dabest_effectsize_obj created by the effect_size() function.
+#' @param plot_kwargs A list of parameters used to adjust the appearance of the plot.
+#' @param x_axis_breaks A numeric or character vector specifying the x-axis breaks.
+#' @param main_violin_type A character string indicating the type of main violin plot ("violin" or "box").
+#' @param delta_dots_data A data frame containing the data for delta dots.
+#'
+#' @return A ggplot object with the delta dots added to the delta plot.
+#'
+#' @noRd
+add_delta_dots_to_delta_plot <- function(delta_plot,
+                                         dabest_effectsize_obj,
+                                         plot_kwargs,
+                                         x_axis_breaks,
+                                         main_violin_type,
+                                         delta_dots_data) {
+  # get delta dots params
+  params_delta_dots <- plot_kwargs$params_delta_dots
+  pch <- params_delta_dots$pch
+  alpha <- params_delta_dots$alpha
+  # this parameter is only used for horizontal plots
+  cex <- params_delta_dots$cex
+  size <- params_delta_dots$size
+  side <- params_delta_dots$side
+  if (side == "right") {
+    side <- 1
+  } else {
+    side <- -1 # left
+  }
+
+  # handling color
+  if (dabest_effectsize_obj$is_colour) {
+    delta_plot <- delta_plot +
+      ggbeeswarm::geom_beeswarm(
+        data = delta_dots_data,
+        ggplot2::aes(
+          x = x_var,
+          y = y_var,
+          color = colour_var,
+        ),
+        cex = cex,
+        method = "swarm",
+        pch = pch,
+        side = side,
+        size = size,
+        alpha = alpha,
+        corral = "omit"
+      )
+  } else {
+    if (main_violin_type == "multicolor") {
+      delta_plot <- delta_plot +
+        ggbeeswarm::geom_beeswarm(
+          data = delta_dots_data,
+          ggplot2::aes(
+            x = x_var,
+            y = y_var,
+            color = x_var,
+          ),
+          cex = cex,
+          method = "swarm",
+          pch = pch,
+          side = side,
+          size = size,
+          alpha = alpha,
+          corral = "omit"
+        )
+    } else {
+      delta_plot <- delta_plot +
+        ggbeeswarm::geom_beeswarm(
+          data = delta_dots_data,
+          ggplot2::aes(
+            x = x_var,
+            y = y_var,
+          ),
+          cex = cex,
+          method = "swarm",
+          pch = pch,
+          side = side,
+          size = size,
+          alpha = alpha,
+          corral = "omit"
+        )
+    }
+  }
+
+  return(delta_plot)
 }
 
 adjust_x_axis_in_delta_plot <- function(delta_plot, main_plot_type, flow, idx, x, delta_y_min, delta_y_mean) {

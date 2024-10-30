@@ -237,6 +237,11 @@ add_scaling_component_to_delta_plot <- function(delta_plot, float_contrast, boot
   delta_y_mean <- delta_y_axis_params[[3]]
   raw_ylim <- delta_y_axis_params[[4]]
 
+  delta_text_space <- 0
+  if (!(float_contrast) && (plot_kwargs$delta_text) && (plot_kwargs$params_delta_text$x_location == "right")) {
+    delta_text_space <- 0.4
+  }
+
   min_y_coords <- NULL # only valid for float_contrast
 
   if (float_contrast) {
@@ -253,8 +258,9 @@ add_scaling_component_to_delta_plot <- function(delta_plot, float_contrast, boot
       ggplot2::theme_classic() +
       ggplot2::coord_cartesian(
         ylim = c(min_y_coords, min_y_coords + delta_y_range),
-        xlim = c(1.8, delta_x_max + 0.4),
-        expand = FALSE
+        xlim = c(1.8, delta_x_max + 0.4 + delta_text_space),
+        expand = FALSE,
+        clip = "off"
       ) +
       ggplot2::scale_x_continuous(
         breaks = c(2),
@@ -284,8 +290,9 @@ add_scaling_component_to_delta_plot <- function(delta_plot, float_contrast, boot
           delta_y_min - delta_y_mean / 10,
           delta_y_max
         ),
-        xlim = c(delta_x_min, delta_x_max + delta_x_scalar),
-        expand = FALSE
+        xlim = c(delta_x_min, delta_x_max + delta_x_scalar + delta_text_space),
+        expand = FALSE,
+        clip = "off"
       ) +
       ggplot2::scale_x_continuous(
         breaks = x_axis_breaks,

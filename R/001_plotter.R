@@ -39,8 +39,8 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
   check_effectsize_object(dabest_effectsize_obj)
 
   plot_kwargs <- list(...)
-  plot_kwargs <- assign_plot_kwargs(dabest_effectsize_obj, plot_kwargs)
 
+  plot_kwargs <- assign_plot_kwargs(dabest_effectsize_obj, plot_kwargs)
   custom_palette <- plot_kwargs$custom_palette
 
   is_colour <- dabest_effectsize_obj$is_colour
@@ -61,7 +61,6 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
 
   raw_plot <- apply_palette(raw_plot, custom_palette)
   delta_plot <- apply_palette(delta_plot, custom_palette)
-
 
   if (float_contrast) {
     final_plot <- cowplot::plot_grid(
