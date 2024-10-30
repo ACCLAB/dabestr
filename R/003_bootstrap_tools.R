@@ -266,14 +266,12 @@ bca <- function(bootstraps, conf.level = .95) {
 # TODO Add documentation
 #' Creates df of values (bca ci, weighted bootstraps) for `minimeta`
 #'
-#' @noRd
-#'
-#' @param boot_result
-#' @param ci
+#' @param boot_result boot_result
+#' @param ci ci
 #'
 #' @return A list with the minimeta parameters.
+#' @noRd
 #'
-#' @examples
 boot_weighted_row <- function(boot_result, ci) {
   bootstraps <- boot_result$bootstraps
   weights <- boot_result$weight
@@ -312,14 +310,12 @@ boot_weighted_row <- function(boot_result, ci) {
 # TODO Add documentation
 #' Creates df of values (bca ci, weighted bootstraps) for `deltadelta`
 #'
-#' @noRd
-#'
-#' @param boot_result
-#' @param ci
+#' @param boot_result boot_result
+#' @param ci ci
 #'
 #' @return A list with the deltadelta parameters.
-#'
-#' @examples
+#' @noRd
+#' 
 boot_delta_delta <- function(boot_result, ci) {
   bootstrap_delta_delta_neg <- Reduce("-", boot_result$bootstraps)
   bootstrap_delta_delta <- bootstrap_delta_delta_neg * -1
