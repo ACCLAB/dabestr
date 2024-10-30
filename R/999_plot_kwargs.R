@@ -191,7 +191,7 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     params_swarm_bars <- default_params_swarm_bars
   } else {
     # If user has provided params_swarm_bars, update defaults with user values
-    params_swarm_bars <- modifyList(
+    params_swarm_bars <- utils::modifyList(
       default_params_swarm_bars,
       plot_kwargs$params_swarm_bars
     )
@@ -207,7 +207,7 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   } else {
     # If user has provided params_contrast_bars,
     # update defaults with user values
-    params_contrast_bars <- modifyList(
+    params_contrast_bars <- utils::modifyList(
       default_params_contrast_bars,
       plot_kwargs$params_contrast_bars
     )
@@ -232,7 +232,7 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   if (is.null(plot_kwargs$params_delta_dots)) {
     params_delta_dots <- default_params_delta_dots
   } else {
-    params_delta_dots <- modifyList(
+    params_delta_dots <- utils::modifyList(
       default_params_delta_dots,
       plot_kwargs$params_delta_dots
     )
@@ -253,7 +253,7 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   if (is.null(plot_kwargs$params_delta_text)) {
     params_delta_text <- default_params_delta_text
   } else {
-    params_delta_text <- modifyList(
+    params_delta_text <- utils::modifyList(
       default_params_delta_text,
       plot_kwargs$params_delta_text
     )
