@@ -114,8 +114,7 @@ create_violin_plot <- function(df_for_violin, violin_kwargs, alpha_violin_plot, 
     print("Creating violin plot")
     stat <- "identity"
     position <- "identity"
-    # TODO which violin_kwargs not working
-    # violin_kwargs <- NULL
+
     if (!is.null(violin_kwargs)) {
         if (!is.null(violin_kwargs$stat)) {
             stat <- violin_kwargs$stat
@@ -223,15 +222,25 @@ forest_plot <- function(
         bca_lows, bca_highs, differences,
         marker_size, ci_line_width
     )
+    ### White background
+    forest_plot <- forest_plot +
+        ggplot2::theme_classic()
 
     ## Adjust axis, title and labels
     forest_plot <- forest_plot +
+        ggplot2::coord_cartesian(
+            ylim = c(min(df_for_violin$x), max(df_for_violin$x)),
+            xlim = c(0.8, length(contrast_labels) + 0.5),
+            expand = FALSE,
+            clip = "off"
+        ) +
         ggplot2::ylab(y_title) +
         ggplot2::theme(
             axis.title.x = ggplot2::element_blank(),
             axis.title.y = ggplot2::element_text(size = fontsize)
         ) +
         ggplot2::scale_x_continuous(breaks = seq(1, length(contrast_labels), by = 1), labels = contrast_labels)
+
     forest_plot <- forest_plot +
         ggplot2::ggtitle(title) +
         ggplot2::theme(
@@ -241,6 +250,18 @@ forest_plot <- function(
             legend.position = "none",
             plot.margin = ggplot2::margin(t = 0.5, r = 0, b = 1, l = 0.5, unit = "lines")
         )
-
+    #### Add y = 0 line Component ####
+    zero_line_xend <- length(contrast_labels) + 0.3
+    forest_plot <- forest_plot +
+        ggplot2::geom_segment(
+            colour = "black",
+            linewidth = 0.3,
+            ggplot2::aes(
+                x = 0.8,
+                xend = zero_line_xend,
+                y = 0,
+                yend = 0
+            )
+        )
     return(forest_plot)
 }
