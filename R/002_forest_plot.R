@@ -7,8 +7,8 @@
 #'
 #' @return The list of updated dabest effectsize objects
 #'
-apply_effectsize <- function(contrasts, effect_size = "mean_diff") {
-    print("applying effect size to the contrast objects")
+apply_effectsize <- function(contrast_objects, effect_size = "mean_diff") {
+    print(paste("applying effect size to the contrast objects", effect_size))
     effect_attr_map <- list(
         mean_diff = "mean_diff",
         median_diff = "median_diff",
@@ -24,8 +24,8 @@ apply_effectsize <- function(contrasts, effect_size = "mean_diff") {
     }
     contrasts_updated <- list()
     # Apply effect_size attributes
-    for (i in seq_along(contrasts)) {
-        contrast_obj <- contrasts[[i]]
+    for (i in seq_along(contrast_objects)) {
+        contrast_obj <- contrast_objects[[i]]
         if (effect_attr == "mean_diff") {
             contrast_obj <- contrast_obj %>% dabestr::mean_diff()
         } else if (effect_attr == "median_diff") {
@@ -74,16 +74,15 @@ get_y_title <- function(effect_size) {
     return(y_title)
 }
 
-get_forest_plot_data <- function(contrasts, contrast_type, x_axis_breaks) {
+get_forest_plot_data <- function(contrast_objects, contrast_type, x_axis_breaks) {
     print("get_forest_plot_data")
     bootstraps <- list()
     differences <- c()
     bca_lows <- c()
     bca_highs <- c()
     df_for_violin <- data.frame(x = NULL, contrast_label = NULL)
-    for (i in seq_along(contrasts)) {
-        print(paste("i", i))
-        dabest_effectsize_obj <- contrasts[[i]]
+    for (i in seq_along(contrast_objects)) {
+        dabest_effectsize_obj <- contrast_objects[[i]]
         # Obtain values
         boot_result <- dabest_effectsize_obj$boot_result
         #  Get the row specific for the contrast_type
@@ -97,12 +96,10 @@ get_forest_plot_data <- function(contrasts, contrast_type, x_axis_breaks) {
         bca_lows <- c(bca_lows, row$bca_ci_low)
         bca_highs <- c(bca_highs, row$bca_ci_high)
     }
-    print(paste("length of bootstraps", length(bootstraps)))
-    print(paste("x axis breaks", x_axis_breaks))
     df_for_violin <- create_dfs_for_baseline_ec_violin(
         bootstraps,
         x_axis_breaks,
-        float_contrast = FALSE
+        float_contrast = TRUE
     )
     plotting_data <- list(
         df_for_violin = df_for_violin,
@@ -113,8 +110,38 @@ get_forest_plot_data <- function(contrasts, contrast_type, x_axis_breaks) {
     return(plotting_data)
 }
 
-create_violin_forest_plot <- function() {
-
+create_violin_plot <- function(df_for_violin, violin_kwargs, alpha_violin_plot, custom_palette) {
+    print("Creating violin plot")
+    stat <- "identity"
+    position <- "identity"
+    # TODO which violin_kwargs not working
+    # violin_kwargs <- NULL
+    if (!is.null(violin_kwargs)) {
+        if (!is.null(violin_kwargs$stat)) {
+            stat <- violin_kwargs$stat
+            print(paste("stat", stat))
+        }
+        if (!is.null(violin_kwargs$position)) {
+            position <- violin_kwargs$position
+            print(paste("position", position))
+        }
+    }
+    forest_plot <-
+        ggplot2::ggplot() +
+        geom_halfviolin(
+            na.rm = TRUE,
+            data = df_for_violin,
+            ggplot2::aes(x = y, y = x, fill = tag),
+            alpha = alpha_violin_plot,
+            stat = stat,
+            position = position
+        )
+    if (!is.null(custom_palette)) {
+        forest_plot <-
+            forest_plot +
+            ggplot2::scale_fill_manual(values = custom_palette)
+    }
+    return(forest_plot)
 }
 
 #'  Generates a Forest Plot
@@ -145,82 +172,75 @@ create_violin_forest_plot <- function() {
 #' E.g., ['gray', 'blue', 'green'] or {'Drug1':'gray', 'Drug2':'blue', 'Drug3':'green'}. Default NULL.
 #' @param rotation_for_xlabels Rotation angle for x-axis labels, improving readability. Default is 45.
 #' @param alpha_violin_plot Transparency level for violin plots. Default is 0.8
+#' @param horizontal Bool. If TRUE the forest plot is painted horizontally. Default FALSE.
 #' @return A ggplot object representing the forest plot.
 #'
 #' @noRd
 forest_plot <- function(
-    contrasts, contrast_labels,
+    contrast_objects, contrast_labels,
     contrast_type = "delta2",
     effect_size = "mean_diff",
     ylabel = "effect size", title = "ΔΔ Forest",
     fontsize = 12,
     title_font_size = 16,
-    # violin_kwargs = NULL,
-    marker_size = 20,
-    ci_line_width = 2.5,
+    violin_kwargs = NULL,
+    marker_size = 1.1,
+    ci_line_width = 1.3,
     custom_palette = NULL,
     rotation_for_xlabels = 45,
     alpha_violin_plot = 0.8) {
     # TODO check parameters
-
+    print("forest plot function")
     if ((contrast_type != "delta2") && (contrast_type != "minimeta")) {
         stop(paste0("Invalid contrast_type: ", contrast_type, ". Available options: [delta2, minimeta]"))
     }
 
     # Apply the corresponding effect size to all objects
-    contrasts <- apply_effectsize(contrasts, effect_size)
+    contrast_objects <- apply_effectsize(contrast_objects, effect_size)
 
     # Check that the contrast attributes are correct
-    check_contrast_attributes(contrasts, contrast_type)
+    check_contrast_attributes(contrast_objects, contrast_type)
 
     # get y title
     y_title <- get_y_title(effect_size)
 
     delta2 <- (contrast_type == "delta2")
     minimeta <- (contrast_type == "minimeta")
-    x_axis_breaks <- seq_along(contrasts)
-    print(x_axis_breaks)
+    x_axis_breaks <- seq_along(contrast_objects)
     # get data for plotting
-    plotting_data <- get_forest_plot_data(contrasts, contrast_type, x_axis_breaks)
+    plotting_data <- get_forest_plot_data(contrast_objects, contrast_type, x_axis_breaks)
     df_for_violin <- plotting_data$df_for_violin
+    df_for_violin <- df_for_violin %>% tidyr::drop_na()
     differences <- plotting_data$differences
     bca_lows <- plotting_data$bca_lows
     bca_highs <- plotting_data$bca_highs
 
-    print("Painting the baseline violinplot")
-    forest_plot <-
-        ggplot2::ggplot() +
-        geom_halfviolin(
-            na.rm = TRUE,
-            data = df_for_violin,
-            ggplot2::aes(x = y, y = x, fill = tag),
-            alpha = alpha_violin_plot
-        )
+    forest_plot <- create_violin_plot(df_for_violin, violin_kwargs, alpha_violin_plot, custom_palette)
 
-    # TODO scale axis the same way as in "add_scaling_component_to_delta_plot"
-    es_marker_size <- 0.5
-    es_line_size <- 0.8
-    # TODO Add bci components. Ask about this function
+    # Add bci components
     forest_plot <- add_bootci_component_to_delta_plot(
         forest_plot, x_axis_breaks,
         bca_lows, bca_highs, differences,
-        es_marker_size, es_line_size
+        marker_size, ci_line_width
     )
 
-
-    ## Adjust x,y title and labels
+    ## Adjust axis, title and labels
     forest_plot <- forest_plot +
         ggplot2::ylab(y_title) +
-        ggplot2::theme(axis.title.x = ggplot2::element_blank()) +
-        ggplot2::scale_x_discrete(label = contrast_labels)
-
-    #### Adjust font size and title ####
-    forest_plot <- forest_plot +
         ggplot2::theme(
-            axis.text.x = ggplot2::element_text(size = fontsize),
-            axis.text.y = ggplot2::element_text(size = fontsize)
+            axis.title.x = ggplot2::element_blank(),
+            axis.title.y = ggplot2::element_text(size = fontsize)
         ) +
-        ggplot2::ggtitle(title)
+        ggplot2::scale_x_continuous(breaks = seq(1, length(contrast_labels), by = 1), labels = contrast_labels)
+    forest_plot <- forest_plot +
+        ggplot2::ggtitle(title) +
+        ggplot2::theme(
+            plot.title = ggplot2::element_text(hjust = 0.5), # centered
+            axis.text.x = ggplot2::element_text(size = fontsize, angle = rotation_for_xlabels, vjust = -0.01),
+            axis.text.y = ggplot2::element_text(size = fontsize),
+            legend.position = "none",
+            plot.margin = ggplot2::margin(t = 0.5, r = 0, b = 1, l = 0.5, unit = "lines")
+        )
 
     return(forest_plot)
 }
