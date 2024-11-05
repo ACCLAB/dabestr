@@ -8,7 +8,6 @@
 #' @return The list of updated dabest effectsize objects
 #'
 apply_effectsize <- function(contrast_objects, effect_size = "mean_diff") {
-    print(paste("applying effect size to the contrast objects", effect_size))
     effect_attr_map <- list(
         mean_diff = "mean_diff",
         median_diff = "median_diff",
@@ -43,7 +42,6 @@ apply_effectsize <- function(contrast_objects, effect_size = "mean_diff") {
 }
 
 check_contrast_attributes <- function(contrasts, contrast_type) {
-    print("checking parameters of effectsize")
     for (i in seq_along(contrasts)) {
         contrast_obj <- contrasts[[i]]
         condition_to_check <- list(
@@ -75,7 +73,6 @@ get_y_title <- function(effect_size) {
 }
 
 get_forest_plot_data <- function(contrast_objects, contrast_type, x_axis_breaks) {
-    print("get_forest_plot_data")
     bootstraps <- list()
     differences <- c()
     bca_lows <- c()
@@ -111,18 +108,15 @@ get_forest_plot_data <- function(contrast_objects, contrast_type, x_axis_breaks)
 }
 
 create_violin_plot <- function(df_for_violin, violin_kwargs, alpha_violin_plot, custom_palette) {
-    print("Creating violin plot")
     stat <- "identity"
     position <- "identity"
 
     if (!is.null(violin_kwargs)) {
         if (!is.null(violin_kwargs$stat)) {
             stat <- violin_kwargs$stat
-            print(paste("stat", stat))
         }
         if (!is.null(violin_kwargs$position)) {
             position <- violin_kwargs$position
-            print(paste("position", position))
         }
     }
     forest_plot <-
@@ -186,10 +180,17 @@ forest_plot <- function(
     marker_size = 1.1,
     ci_line_width = 1.3,
     custom_palette = NULL,
-    rotation_for_xlabels = 45,
+    rotation_for_xlabels = 0,
     alpha_violin_plot = 0.8) {
-    # TODO check parameters
-    print("forest plot function")
+    if (is.null(contrast_objects)) {
+        stop("Error: no contrast objects parameter was found")
+    }
+    if (is.null(contrast_labels)) {
+        stop("Error: no contrast labels parameter was found")
+    }
+    # Assert that both vectors have the same length
+    stopifnot(length(contrast_objects) == length(contrast_labels))
+
     if ((contrast_type != "delta2") && (contrast_type != "minimeta")) {
         stop(paste0("Invalid contrast_type: ", contrast_type, ". Available options: [delta2, minimeta]"))
     }
@@ -222,6 +223,7 @@ forest_plot <- function(
         bca_lows, bca_highs, differences,
         marker_size, ci_line_width
     )
+
     ### White background
     forest_plot <- forest_plot +
         ggplot2::theme_classic()
@@ -237,7 +239,8 @@ forest_plot <- function(
         ggplot2::ylab(y_title) +
         ggplot2::theme(
             axis.title.x = ggplot2::element_blank(),
-            axis.title.y = ggplot2::element_text(size = fontsize)
+            axis.title.y = ggplot2::element_text(size = fontsize),
+            axis.line.x = ggplot2::element_blank() ## Remove the x-axis line
         ) +
         ggplot2::scale_x_continuous(breaks = seq(1, length(contrast_labels), by = 1), labels = contrast_labels)
 
@@ -263,5 +266,6 @@ forest_plot <- function(
                 yend = 0
             )
         )
+
     return(forest_plot)
 }
