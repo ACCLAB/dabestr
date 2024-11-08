@@ -6,6 +6,7 @@
 #' dabest_obj along with other specified parameters with the [effect_size()] function.
 #' @param float_contrast Default TRUE. If TRUE, a Gardner-Altman plot will be produced.
 #' If FALSE, a Cumming estimation plot will be produced.
+#' @param horizontal Boolean. If TRUE the plots are generated using horizontal layout instead of vertical.
 #' @param ... Adjustment parameters to control and adjust the appearance of the plot.
 #' (list of all possible adjustment parameters can be found under [plot_kwargs])
 #'
@@ -35,7 +36,9 @@
 #'
 #' @export
 
-dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
+dabest_plot <- function(dabest_effectsize_obj,
+                        float_contrast = TRUE,
+                        horizontal = FALSE, ...) {
   check_effectsize_object(dabest_effectsize_obj)
 
   plot_kwargs <- list(...)
@@ -54,15 +57,20 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
     float_contrast <- FALSE
   }
 
-  raw_plot <- plot_raw(dabest_effectsize_obj, float_contrast, plot_kwargs)
-  delta_plot <- plot_delta(dabest_effectsize_obj, float_contrast, plot_kwargs)
+  raw_plot <- plot_raw(dabest_effectsize_obj, float_contrast, horizontal, plot_kwargs)
+  delta_plot <- plot_delta(dabest_effectsize_obj, float_contrast, horizontal, plot_kwargs)
 
   delta_plot <- delta_plot$delta_plot
 
   raw_plot <- apply_palette(raw_plot, custom_palette)
   delta_plot <- apply_palette(delta_plot, custom_palette)
 
-  if (float_contrast) {
+
+  if (float_contrast || horizontal) {
+    widths <- c(0.75, 0.25)
+    if (horizontal) {
+      widths <- c(0.5, 0.5)
+    }
     final_plot <- cowplot::plot_grid(
       plotlist = list(
         raw_plot + ggplot2::theme(legend.position = "none"),
@@ -70,7 +78,7 @@ dabest_plot <- function(dabest_effectsize_obj, float_contrast = TRUE, ...) {
       ),
       nrow = 1,
       ncol = 2,
-      rel_widths = c(0.75, 0.25),
+      rel_widths = widths,
       axis = "lr",
       align = "h"
     )

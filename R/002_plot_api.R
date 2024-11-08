@@ -9,12 +9,13 @@
 #' dabest_obj along with other specified parameters with the [effect_size()] function.
 #' @param float_contrast Boolean. If TRUE, a Gardner-Altman plot will be produced.
 #' If FALSE, a Cumming estimation plot will be produced.
+#' @param horizontal Boolean. If TRUE the plots are generated using horizontal layout instead of vertical.
 #' @param plot_kwargs Adjustment parameters to control and adjust the appearance of the plot.
 #' (list of all possible adjustment parameters can be found under [plot_kwargs])
 #'
 #' @return ggplot object containing plot components for the rawplot.
 #' @noRd
-plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
+plot_raw <- function(dabest_effectsize_obj, float_contrast, horizontal, plot_kwargs) {
   check_effectsize_object(dabest_effectsize_obj)
 
   enquo_x <- dabest_effectsize_obj$enquo_x
@@ -53,8 +54,8 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
 
   effsize_type <- dabest_effectsize_obj$delta_y_labels
 
-  # Check if multiplot.
-  if (length(unlist(idx)) >= 3) {
+  # Check if multiplot or horizontal
+  if (horizontal || (length(unlist(idx)) >= 3)) {
     float_contrast <- FALSE
   }
 
@@ -62,11 +63,8 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   raw_marker_side_shift <- plot_kwargs$raw_marker_side_shift
   raw_bar_width <- plot_kwargs$raw_bar_width
   tufte_size <- plot_kwargs$tufte_size
-  es_marker_size <- plot_kwargs$es_marker_size
-  es_line_size <- plot_kwargs$es_line_size
   sankey <- plot_kwargs$sankey
   flow <- plot_kwargs$flow
-  raw_flow_alpha <- plot_kwargs$raw_flow_alpha
   swarm_x_text <- plot_kwargs$swarm_x_text
   swarm_y_text <- plot_kwargs$swarm_y_text
   asymmetric_side <- plot_kwargs$asymmetric_side
@@ -75,7 +73,6 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   #### Rawplot Building ####
   plot_components <- create_rawplot_components(proportional, is_paired, float_contrast)
   main_plot_type <- plot_components$main_plot_type
-  is_summary_lines <- plot_components$is_summary_lines
   is_tufte_lines <- plot_components$is_tufte_lines
 
   ## Creation of dfs for specific main_plot_types ##
@@ -126,7 +123,8 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     sankey_df,
     sankey_bars,
     idx,
-    float_contrast
+    float_contrast,
+    horizontal
   )
   raw_plot <- output[[1]]
   raw_y_range <- output[[2]]
@@ -226,7 +224,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       ggplot2::geom_segment(
         linewidth = 0.4,
         color = "black",
-        ggplot2::aes(x = raw_x_min, xend = raw_x_max + 0.2, y = raw_y_min, yend = raw_y_min)
+        ggplot2::aes(x = raw__min, xend = raw_x_max + 0.2, y = raw_y_min, yend = raw_y_min)
       )
   } else {
     # Obtain dfs for xaxis redraw
@@ -327,6 +325,24 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
         )
     }
   }
+  if (horizontal) {
+    raw_y_range_vector <- dabest_effectsize_obj$ylim
+    raw_y_max <- raw_y_range_vector[2]
+    raw_y_min <- raw_y_range_vector[1]
+    raw_plot <- raw_plot +
+      ggplot2::coord_flip() +
+      ggplot2::theme(
+        axis.line.y = ggplot2::element_blank()
+      ) +
+      ggplot2::geom_segment(
+        linewidth = 0.4,
+        color = "black",
+        ggplot2::aes(
+          x = 0.6, xend = 0.6,
+          y = raw_y_min - 0.6, yend = raw_y_max + 0.6
+        )
+      )
+  }
   return(raw_plot)
 }
 
@@ -341,12 +357,13 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
 #' dabest_obj along with other specified parameters with the [effect_size()] function.
 #' @param float_contrast Boolean. If TRUE, a Gardner-Altman plot will be produced.
 #' If FALSE, a Cumming estimation plot will be produced.
+#' @param horizontal Boolean. If TRUE the plots are generated using horizontal layout instead of vertical.
 #' @param plot_kwargs Adjustment parameters to control and adjust the appearance of the plot.
 #' (list of all possible adjustment parameters can be found under [plot_kwargs])
 #'
 #' @return ggplot object containing plot components for the deltaplot.
 #' @noRd
-plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
+plot_delta <- function(dabest_effectsize_obj, float_contrast, horizontal, plot_kwargs) {
   idx <- dabest_effectsize_obj$idx
   separated_idx <- idx
   proportional <- dabest_effectsize_obj$proportional
@@ -377,13 +394,12 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   boot_result <- dabest_effectsize_obj$boot_result
   boots <- boot_result$bootstraps
 
-  # Check if multiplot
-  if (length(unlist(idx)) >= 3) {
+  # Check if multiplot or horizontal
+  if (horizontal || (length(unlist(idx)) >= 3)) {
     float_contrast <- FALSE
   }
 
   #### Load in sizes of plot elements ####
-  tufte_size <- plot_kwargs$tufte_size
   es_marker_size <- plot_kwargs$es_marker_size
   es_line_size <- plot_kwargs$es_line_size
   flow <- plot_kwargs$flow
@@ -479,6 +495,12 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     raw_ylim
   }
 
+  ## TODO horizontal
+  #   if horizontal:
+  #     ax_ylims = ax.get_xlim()
+  # else:
+  #     ax_ylims = ax.get_ylim()
+
   ### Preparing delta dots data
   delta_dots <- plot_kwargs$delta_dots
   show_delta_dots <- (is_paired && !(proportional) && delta_dots)
@@ -491,7 +513,11 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   delta_x_axis_params <- list(delta_x_max, delta_x_labels, x_axis_breaks)
   delta_y_axis_params <- list(delta_y_min, delta_y_max, delta_y_mean, raw_ylim)
 
-  output <- add_scaling_component_to_delta_plot(delta_plot, float_contrast, boot_result, delta_x_axis_params, delta_y_axis_params, summary_data, plot_kwargs)
+  output <- add_scaling_component_to_delta_plot(
+    delta_plot, float_contrast,
+    boot_result, delta_x_axis_params, delta_y_axis_params,
+    summary_data, plot_kwargs
+  )
   delta_plot <- output[[1]]
   delta_x_max <- output[[2]]
   delta_y_params <- output[[3]]
@@ -511,7 +537,11 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   difference <- boot_result$difference
 
   if (is_bootci) {
-    delta_plot <- add_bootci_component_to_delta_plot(delta_plot, x_axis_breaks, ci_low, ci_high, difference, es_marker_size, es_line_size)
+    delta_plot <- add_bootci_component_to_delta_plot(
+      delta_plot, x_axis_breaks,
+      ci_low, ci_high, difference,
+      es_marker_size, es_line_size
+    )
   }
 
   #### Add zero_dot Component ####

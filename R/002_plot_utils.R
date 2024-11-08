@@ -203,7 +203,9 @@ create_sankey_flows <- function(raw_data, enquo_x, enquo_y, enquo_id_col, idx, N
 }
 
 # TODO Add documentation
-initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_obj, df_for_proportion_bar, sankey_df, sankey_bars, idx, float_contrast) {
+initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_obj,
+                                df_for_proportion_bar, sankey_df, sankey_bars, idx,
+                                float_contrast, horizontal) {
   raw_data <- dabest_effectsize_obj$raw_data
   enquo_x <- dabest_effectsize_obj$enquo_x
   enquo_y <- dabest_effectsize_obj$enquo_y
@@ -381,6 +383,9 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
         )
       )
   }
+  # if (horizontal) {
+  #   raw_plot <- raw_plot + ggplot2::coord_flip()
+  # }
   return(list(raw_plot, raw_y_range, raw_y_min, x_axis_raw))
 }
 

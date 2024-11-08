@@ -219,7 +219,9 @@ add_bootci_component_to_delta_plot <- function(delta_plot, x_axis_breaks, ci_low
 }
 
 # TODO add documentation
-add_scaling_component_to_delta_plot <- function(delta_plot, float_contrast, boot_result, delta_x_axis_params, delta_y_axis_params, summary_data, plot_kwargs) {
+add_scaling_component_to_delta_plot <- function(delta_plot, float_contrast,
+                                                boot_result, delta_x_axis_params,
+                                                delta_y_axis_params, summary_data, plot_kwargs) {
   minimeta <- plot_kwargs$show_mini_meta
   delta2 <- plot_kwargs$show_delta2
 
@@ -268,6 +270,7 @@ add_scaling_component_to_delta_plot <- function(delta_plot, float_contrast, boot
       ) +
       ggplot2::scale_y_continuous(position = "right")
   } else {
+    print("float contrast is false")
     delta_x_min <- 0.6
     delta_x_scalar <- 0.3
 
@@ -299,6 +302,7 @@ add_scaling_component_to_delta_plot <- function(delta_plot, float_contrast, boot
         labels = delta_x_labels
       )
   }
+
   delta_y_params <- list(min_y_coords, delta_y_min, delta_y_max, delta_y_mean)
   return(list(delta_plot, delta_x_max, delta_y_params))
 }
