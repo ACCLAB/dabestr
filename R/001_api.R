@@ -229,6 +229,10 @@ load <- function(
     dplyr::group_by(!!enquo_x) %>%
     dplyr::count()
   Ns$swarmticklabs <- do.call(paste, c(Ns[c(name_x, "n")], sep = "\nN = "))
+  horizontal_swarmticklabs <- do.call(paste, c(Ns[c(name_x, "n")], sep = " (N="))
+  horizontal_swarmticklabs <- paste0(horizontal_swarmticklabs, ")")
+  Ns$horizontal_swarmticklabs <- horizontal_swarmticklabs
+
 
   ## Check to ensure control & treatment groups have the same sample size if is_paired is TRUE
   if (is_paired) {

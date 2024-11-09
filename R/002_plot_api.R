@@ -9,13 +9,12 @@
 #' dabest_obj along with other specified parameters with the [effect_size()] function.
 #' @param float_contrast Boolean. If TRUE, a Gardner-Altman plot will be produced.
 #' If FALSE, a Cumming estimation plot will be produced.
-#' @param horizontal Boolean. If TRUE the plots are generated using horizontal layout instead of vertical.
 #' @param plot_kwargs Adjustment parameters to control and adjust the appearance of the plot.
 #' (list of all possible adjustment parameters can be found under [plot_kwargs])
 #'
 #' @return ggplot object containing plot components for the rawplot.
 #' @noRd
-plot_raw <- function(dabest_effectsize_obj, float_contrast, horizontal, plot_kwargs) {
+plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   check_effectsize_object(dabest_effectsize_obj)
 
   enquo_x <- dabest_effectsize_obj$enquo_x
@@ -34,7 +33,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, horizontal, plot_kwa
   raw_data <- dabest_effectsize_obj$raw_data
   Ns <- dabest_effectsize_obj$Ns
   raw_y_range_vector <- dabest_effectsize_obj$ylim
-
+  horizontal <- plot_kwargs$horizontal
   test_summary <- dabest_effectsize_obj$test_summary
   control_summary <- dabest_effectsize_obj$control_summary
   is_paired <- dabest_effectsize_obj$is_paired
@@ -68,7 +67,10 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, horizontal, plot_kwa
   swarm_x_text <- plot_kwargs$swarm_x_text
   swarm_y_text <- plot_kwargs$swarm_y_text
   asymmetric_side <- plot_kwargs$asymmetric_side
-  asymmetric_side <- ifelse(asymmetric_side == "right", -1, 1)
+  asymmetric_x_adjustment <- ifelse(asymmetric_side == "right", -1, 1)
+  if (horizontal) {
+    asymmetric_x_adjustment <- ifelse(asymmetric_side == "right", 1, -1)
+  }
 
   #### Rawplot Building ####
   plot_components <- create_rawplot_components(proportional, is_paired, float_contrast)
@@ -151,9 +153,13 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, horizontal, plot_kwa
     ## Adjusting side shifting of tufte lines
     tufte_side_adjust_value <- ifelse(proportional, 0, 0.05)
     row_num <- max(x_axis_raw)
-    row_ref <- c(seq(1, row_num, 1)) + asymmetric_side * tufte_side_adjust_value + asymmetric_side * raw_marker_side_shift
+    row_ref <- c(seq(1, row_num, 1)) +
+      asymmetric_x_adjustment * tufte_side_adjust_value +
+      asymmetric_x_adjustment * raw_marker_side_shift
     if (!(flow)) {
-      row_ref <- c(seq(1, raw_x_max, 1)) + asymmetric_side * tufte_side_adjust_value + asymmetric_side * raw_marker_side_shift
+      row_ref <- c(seq(1, raw_x_max, 1)) +
+        asymmetric_x_adjustment * tufte_side_adjust_value +
+        asymmetric_x_adjustment * raw_marker_side_shift
     }
 
     # to change: temporary fix for tufte lines black for proportional graphs
@@ -224,59 +230,10 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, horizontal, plot_kwa
       ggplot2::geom_segment(
         linewidth = 0.4,
         color = "black",
-        ggplot2::aes(x = raw__min, xend = raw_x_max + 0.2, y = raw_y_min, yend = raw_y_min)
+        ggplot2::aes(x = raw_x_min, xend = raw_x_max + 0.2, y = raw_y_min, yend = raw_y_min)
       )
   } else {
-    # Obtain dfs for xaxis redraw
-    if (main_plot_type == "sankey" && !(flow)) {
-      idx_for_xaxis_redraw <- remove_last_ele_from_nested_list(idx)
-      dfs_for_xaxis_redraw <- create_dfs_for_xaxis_redraw(idx_for_xaxis_redraw)
-      df_for_line <- dfs_for_xaxis_redraw$df_for_line
-      df_for_ticks <- dfs_for_xaxis_redraw$df_for_ticks
-
-      df_for_line <- df_for_line %>%
-        dplyr::mutate(
-          x = x + 0.5 + (x - 1),
-          xend = xend + 0.5 + (xend - 1)
-        )
-
-      df_for_ticks <- df_for_ticks %>%
-        dplyr::mutate(x = x + 0.5 + (x - 1))
-    } else {
-      idx_for_xaxis_redraw <- idx
-      dfs_for_xaxis_redraw <- create_dfs_for_xaxis_redraw(idx_for_xaxis_redraw)
-      df_for_line <- dfs_for_xaxis_redraw$df_for_line
-      df_for_ticks <- dfs_for_xaxis_redraw$df_for_ticks
-    }
-
-    raw_plot <- raw_plot +
-      non_float_contrast_theme +
-      # Redraw xaxis line
-      ggplot2::geom_segment(
-        data = df_for_line,
-        linewidth = 0.5,
-        lineend = "square",
-        color = "black",
-        ggplot2::aes(
-          x = x,
-          xend = xend,
-          y = raw_y_min + raw_y_range / 40,
-          yend = raw_y_min + raw_y_range / 40
-        )
-      ) +
-      # Redraw xaxis ticks
-      ggplot2::geom_segment(
-        data = df_for_ticks,
-        linewidth = 0.5,
-        lineend = "square",
-        color = "black",
-        ggplot2::aes(
-          x = x,
-          xend = x,
-          y = raw_y_min + raw_y_range / 40,
-          yend = raw_y_min
-        )
-      )
+    raw_plot <- add_x_axis_component_to_rawplot(raw_plot, main_plot_type, flow, horizontal, idx, raw_y_min, raw_y_range)
   }
 
   #### Add y_labels component ####
@@ -330,18 +287,16 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, horizontal, plot_kwa
     raw_y_max <- raw_y_range_vector[2]
     raw_y_min <- raw_y_range_vector[1]
     raw_plot <- raw_plot +
-      ggplot2::coord_flip() +
+      # restore axis configuration components
+      ggplot2::labs(y = raw_y_labels, x = "") + # Add x-axis title
       ggplot2::theme(
-        axis.line.y = ggplot2::element_blank()
+        axis.line.y = ggplot2::element_blank(),
+        axis.line.x = ggplot2::element_line(),
+        axis.ticks.x = ggplot2::element_line(),
+        axis.title = ggplot2::element_text(size = swarm_y_text),
+        axis.title.y = ggplot2::element_text(size = swarm_y_text)
       ) +
-      ggplot2::geom_segment(
-        linewidth = 0.4,
-        color = "black",
-        ggplot2::aes(
-          x = 0.6, xend = 0.6,
-          y = raw_y_min - 0.6, yend = raw_y_max + 0.6
-        )
-      )
+      ggplot2::coord_flip()
   }
   return(raw_plot)
 }
@@ -357,18 +312,17 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, horizontal, plot_kwa
 #' dabest_obj along with other specified parameters with the [effect_size()] function.
 #' @param float_contrast Boolean. If TRUE, a Gardner-Altman plot will be produced.
 #' If FALSE, a Cumming estimation plot will be produced.
-#' @param horizontal Boolean. If TRUE the plots are generated using horizontal layout instead of vertical.
 #' @param plot_kwargs Adjustment parameters to control and adjust the appearance of the plot.
 #' (list of all possible adjustment parameters can be found under [plot_kwargs])
 #'
 #' @return ggplot object containing plot components for the deltaplot.
 #' @noRd
-plot_delta <- function(dabest_effectsize_obj, float_contrast, horizontal, plot_kwargs) {
+plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   idx <- dabest_effectsize_obj$idx
   separated_idx <- idx
   proportional <- dabest_effectsize_obj$proportional
   paired <- dabest_effectsize_obj$paired
-
+  horizontal <- plot_kwargs$horizontal
   delta_x_labels <- unlist(dabest_effectsize_obj$delta_x_labels)
   delta_y_labels <- plot_kwargs$contrast_label
 

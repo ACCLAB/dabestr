@@ -34,5 +34,7 @@ remove_all_axes_theme <- ggplot2::theme(
 # Theme for horizontal plots
 horizontal_theme <- ggplot2::theme(
   plot.margin = ggplot2::unit(c(0, 0, 0, 0), "pt"),
-  axis.line.y = ggplot2::element_blank()
+  axis.line.x = ggplot2::element_blank(),
+  axis.ticks.x = ggplot2::element_blank(),
+  legend.title = ggplot2::element_blank()
 )

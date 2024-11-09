@@ -64,7 +64,7 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
 
   show_delta2 <- dabest_effectsize_obj$delta2
   show_mini_meta <- dabest_effectsize_obj$minimeta
-
+  horizontal <- FALSE
   asymmetric_side <- "right"
   raw_marker_size <- 1.5
   raw_marker_alpha <- 1
@@ -168,6 +168,9 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   }
   if (!(is.null(plot_kwargs$show_legend))) {
     show_legend <- plot_kwargs$show_legend
+  }
+  if (!(is.null(plot_kwargs$horizontal))) {
+    horizontal <- plot_kwargs$horizontal
   }
   if (!(is.null(plot_kwargs$asymmetric_side))) {
     asymmetric_side <- plot_kwargs$asymmetric_side
@@ -288,6 +291,7 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     show_baseline_ec = show_baseline_ec,
     show_legend = show_legend,
     asymmetric_side = asymmetric_side,
+    horizontal = horizontal,
     contrast_bars = contrast_bars,
     params_contrast_bars = params_contrast_bars,
     swarm_bars = swarm_bars,

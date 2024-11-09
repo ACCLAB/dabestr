@@ -38,12 +38,13 @@
 
 dabest_plot <- function(dabest_effectsize_obj,
                         float_contrast = TRUE,
-                        horizontal = FALSE, ...) {
+                        ...) {
   check_effectsize_object(dabest_effectsize_obj)
 
   plot_kwargs <- list(...)
 
   plot_kwargs <- assign_plot_kwargs(dabest_effectsize_obj, plot_kwargs)
+  horizontal <- plot_kwargs$horizontal
   custom_palette <- plot_kwargs$custom_palette
 
   is_colour <- dabest_effectsize_obj$is_colour
@@ -57,8 +58,8 @@ dabest_plot <- function(dabest_effectsize_obj,
     float_contrast <- FALSE
   }
 
-  raw_plot <- plot_raw(dabest_effectsize_obj, float_contrast, horizontal, plot_kwargs)
-  delta_plot <- plot_delta(dabest_effectsize_obj, float_contrast, horizontal, plot_kwargs)
+  raw_plot <- plot_raw(dabest_effectsize_obj, float_contrast, plot_kwargs)
+  delta_plot <- plot_delta(dabest_effectsize_obj, float_contrast, plot_kwargs)
 
   delta_plot <- delta_plot$delta_plot
 
@@ -68,6 +69,7 @@ dabest_plot <- function(dabest_effectsize_obj,
 
   if (float_contrast || horizontal) {
     widths <- c(0.75, 0.25)
+
     if (horizontal) {
       widths <- c(0.5, 0.5)
     }

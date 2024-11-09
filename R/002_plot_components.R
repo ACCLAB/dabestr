@@ -175,7 +175,20 @@ create_violinplot_components <- function(boots,
   return(plot_component)
 }
 
-# TODO add documentation
+#' Adds violin plot component to the delta plot
+#'
+#' This function adds a violin plot component to an existing delta plot,
+#' incorporating effect size data and customization options.
+#'
+#' @param delta_plot A delta plot object, typically created using ggplot2.
+#' @param dabest_effectsize_obj A list containing effect size data and bootstrap results.
+#' @param main_violin_type Character string specifying the type of violin plot. Can be "multicolour" or other types.
+#' @param flow Boolean value determining the arrangement of violins.
+#' @param float_contrast Boolean value for additional customization.
+#' @param zero_dot_x_breaks X-axis breaks for the zero dot.
+#'
+#' @return A delta plot with the violin plot component added.
+#' @noRd
 add_violinplot_component_to_delta_plot <- function(delta_plot, dabest_effectsize_obj, main_violin_type, flow, float_contrast, zero_dot_x_breaks) {
   baseline_ec_boot_result <- dabest_effectsize_obj$baseline_ec_boot_result
   baseline_boots <- baseline_ec_boot_result$bootstraps
@@ -204,7 +217,21 @@ add_violinplot_component_to_delta_plot <- function(delta_plot, dabest_effectsize
   return(delta_plot)
 }
 
-# TODO add documentation
+#' Adds bootstrap confidence intervals to the delta plot
+#'
+#' This function enhances a delta plot by adding bootstrap confidence intervals,
+#' providing a visual representation of uncertainty in the data.
+#'
+#' @param delta_plot A delta plot object, typically created using ggplot2.
+#' @param x_axis_breaks X-axis breaks for the confidence intervals.
+#' @param ci_low Lower bounds of the confidence intervals.
+#' @param ci_high Upper bounds of the confidence intervals.
+#' @param difference The middle value of the confidence intervals.
+#' @param es_marker_size Size of the effect size marker.
+#' @param es_line_size Thickness of the confidence interval lines.
+#'
+#' @return A delta plot with bootstrap confidence intervals added.
+#' @noRd
 add_bootci_component_to_delta_plot <- function(delta_plot, x_axis_breaks, ci_low, ci_high, difference, es_marker_size, es_line_size) {
   delta_plot <- delta_plot +
     geom_bootci(ggplot2::aes(
@@ -270,7 +297,6 @@ add_scaling_component_to_delta_plot <- function(delta_plot, float_contrast,
       ) +
       ggplot2::scale_y_continuous(position = "right")
   } else {
-    print("float contrast is false")
     delta_x_min <- 0.6
     delta_x_scalar <- 0.3
 
@@ -305,4 +331,89 @@ add_scaling_component_to_delta_plot <- function(delta_plot, float_contrast,
 
   delta_y_params <- list(min_y_coords, delta_y_min, delta_y_max, delta_y_mean)
   return(list(delta_plot, delta_x_max, delta_y_params))
+}
+
+#' Adds x-axis component to the raw plot
+#'
+#' This function enhances a raw plot by adding the x-axis component,
+#' including lines and ticks, with adjustments for different plot types.
+#'
+#' @param raw_plot A raw plot object, typically created using ggplot2.
+#' @param main_plot_type Character string specifying the main plot type (e.g., "sankey").
+#' @param flow Boolean value for plot arrangement.
+#' @param horizontal Boolean value. If TRUE the layout of the plot is horizontal.
+#' @param idx Index or grouping information for data.
+#' @param raw_y_min Minimum y-value for the raw plot.
+#' @param raw_y_range Range of y-values for the raw plot.
+#'
+#' @return A raw plot with the x-axis component added.
+#' @noRd
+add_x_axis_component_to_rawplot <- function(raw_plot, main_plot_type, flow, horizontal, idx, raw_y_min, raw_y_range) {
+  # computing df for axis redraw
+  if (main_plot_type == "sankey" && !(flow)) {
+    idx_for_xaxis_redraw <- remove_last_ele_from_nested_list(idx)
+    dfs_for_xaxis_redraw <- create_dfs_for_xaxis_redraw(idx_for_xaxis_redraw)
+    df_for_line <- dfs_for_xaxis_redraw$df_for_line
+    df_for_ticks <- dfs_for_xaxis_redraw$df_for_ticks
+
+    df_for_line <- df_for_line %>%
+      dplyr::mutate(
+        x = x + 0.5 + (x - 1),
+        xend = xend + 0.5 + (xend - 1)
+      )
+
+    df_for_ticks <- df_for_ticks %>%
+      dplyr::mutate(x = x + 0.5 + (x - 1))
+  } else {
+    idx_for_xaxis_redraw <- idx
+    dfs_for_xaxis_redraw <- create_dfs_for_xaxis_redraw(idx_for_xaxis_redraw)
+    df_for_line <- dfs_for_xaxis_redraw$df_for_line
+    df_for_ticks <- dfs_for_xaxis_redraw$df_for_ticks
+  }
+
+  y_line <- raw_y_min + raw_y_range / 40
+  yend_line <- raw_y_min + raw_y_range / 40
+  y_ticks <- raw_y_min + raw_y_range / 40
+  yend_ticks <- raw_y_min
+  if (horizontal) {
+    y_line <- raw_y_min
+    yend_line <- raw_y_min
+    y_ticks <- raw_y_min
+    yend_ticks <- raw_y_min - raw_y_range / 40
+  }
+  if (horizontal) {
+    raw_plot <- raw_plot +
+      horizontal_theme
+  } else {
+    raw_plot <- raw_plot +
+      non_float_contrast_theme
+  }
+  raw_plot <- raw_plot +
+    # Redraw xaxis line
+    ggplot2::geom_segment(
+      data = df_for_line,
+      linewidth = 0.5,
+      lineend = "square",
+      color = "black",
+      ggplot2::aes(
+        x = x,
+        xend = xend,
+        y = y_line,
+        yend = yend_line
+      )
+    ) +
+    # Redraw xaxis ticks
+    ggplot2::geom_segment(
+      data = df_for_ticks,
+      linewidth = 0.5,
+      lineend = "square",
+      color = "black",
+      ggplot2::aes(
+        x = x,
+        xend = x,
+        y = y_ticks,
+        yend = yend_ticks
+      )
+    )
+  return(raw_plot)
 }

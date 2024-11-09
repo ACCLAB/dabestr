@@ -217,6 +217,8 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
   raw_marker_side_shift <- plot_kwargs$raw_marker_side_shift
   asymmetric_side <- plot_kwargs$asymmetric_side
   asymmetric_side <- ifelse(asymmetric_side == "right", -1, 1)
+  asymmetric_x_adjustment <- asymmetric_side
+
   minimeta <- plot_kwargs$show_mini_meta
   delta2 <- plot_kwargs$show_delta2
   raw_x_max <- length(unlist(idx))
@@ -256,13 +258,14 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
     }
   }
 
+
   raw_plot <- switch(main_plot_type,
     "swarmplot" =
       ggplot2::ggplot() +
         ggbeeswarm::geom_beeswarm(
           data = raw_data,
           ggplot2::aes(
-            x = x_axis_raw + asymmetric_side * raw_marker_side_shift,
+            x = x_axis_raw + asymmetric_x_adjustment * raw_marker_side_shift,
             y = !!enquo_y,
             colour = !!enquo_colour
           ),
@@ -323,7 +326,12 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
   )
 
   #### Add scaling Component ####
-  raw_x_labels <- Ns$swarmticklabs
+  if (horizontal) {
+    raw_x_labels <- Ns$horizontal_swarmticklabs
+  } else {
+    raw_x_labels <- Ns$swarmticklabs
+  }
+
   if (main_plot_type == "sankey" && !(flow)) {
     raw_x_labels <- create_xlabs_for_sankey(idx, Ns, enquo_x)
   }
@@ -355,12 +363,21 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
       xlim = c(raw_x_min, raw_x_max + raw_x_scalar + delta_text_space),
       expand = FALSE,
       clip = "off"
-    ) +
-    ggplot2::scale_x_continuous(
-      breaks = c(x_axis_raw),
-      labels = raw_x_labels
     )
 
+  if (horizontal) {
+    raw_plot <- raw_plot +
+      ggplot2::scale_x_reverse(
+        breaks = c(x_axis_raw),
+        labels = raw_x_labels
+      )
+  } else {
+    raw_plot <- raw_plot +
+      ggplot2::scale_x_continuous(
+        breaks = c(x_axis_raw),
+        labels = raw_x_labels
+      )
+  }
   #### Add summary_lines component ####
   if (is_summary_lines) {
     raw_plot <- raw_plot +
