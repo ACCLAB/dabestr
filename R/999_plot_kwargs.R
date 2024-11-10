@@ -27,7 +27,7 @@
 #' - `es_line_size` Default 0.8. Numeric value determining the size of the ci line in the delta plot.
 #' - `raw_marker_alpha` Default 1. Numeric value determining the transparency of the points in the swarm plot.
 #' - `raw_bar_width` Default 0.3. Numeric value determining the width of the bar in the sankey diagram.
-#' - `raw_marker_spread` Default 2. The distance between the points if it is a swarm plot.
+#' - `raw_marker_spread` Default 2 and Default 2.5 for horizontal plots. The distance between the points if it is a swarm plot.
 #' - `raw_marker_side_shift` Default 0. The horizontal distance that the swarm plot points are moved in the
 #' direction of the `asymmetric_side`.
 #' - `asymmetric_side` Default "right". Can be either "right" or "left". Controls which side the swarm points are shown.
@@ -136,8 +136,13 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   if (!(is.null(plot_kwargs$raw_bar_width))) {
     raw_bar_width <- plot_kwargs$raw_bar_width
   }
+  if (!(is.null(plot_kwargs$horizontal))) {
+    horizontal <- plot_kwargs$horizontal
+  }
   if (!(is.null(plot_kwargs$raw_marker_spread))) {
     raw_marker_spread <- plot_kwargs$raw_marker_spread
+  } else if (horizontal) {
+    raw_marker_spread <- 2.5
   }
   if (!(is.null(plot_kwargs$sankey))) {
     sankey <- plot_kwargs$sankey
@@ -168,9 +173,6 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   }
   if (!(is.null(plot_kwargs$show_legend))) {
     show_legend <- plot_kwargs$show_legend
-  }
-  if (!(is.null(plot_kwargs$horizontal))) {
-    horizontal <- plot_kwargs$horizontal
   }
   if (!(is.null(plot_kwargs$asymmetric_side))) {
     asymmetric_side <- plot_kwargs$asymmetric_side

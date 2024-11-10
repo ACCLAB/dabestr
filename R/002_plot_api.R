@@ -151,7 +151,12 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     }
 
     ## Adjusting side shifting of tufte lines
-    tufte_side_adjust_value <- ifelse(proportional, 0, 0.05)
+    if (horizontal) {
+      tufte_side_adjust_value <- 0.08
+    } else {
+      tufte_side_adjust_value <- ifelse(proportional, 0, 0.05)
+    }
+
     row_num <- max(x_axis_raw)
     row_ref <- c(seq(1, row_num, 1)) +
       asymmetric_x_adjustment * tufte_side_adjust_value +
@@ -250,7 +255,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   ### Add swarm bars if plot type is compatible and requested ###
   swarm_bars <- plot_kwargs$swarm_bars
   valid_plots <- (main_plot_type == "slope") || (main_plot_type == "swarmplot")
-  if (valid_plots && (swarm_bars)) {
+  if (!horizontal && valid_plots && (swarm_bars)) {
     if (is_tufte_lines) {
       # the starting point of y needs to be computed using tufte_gap_value
       y_values <- tufte_lines_df$y_bot_start + tufte_gap_value
@@ -448,12 +453,6 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   } else {
     raw_ylim
   }
-
-  ## TODO horizontal
-  #   if horizontal:
-  #     ax_ylims = ax.get_xlim()
-  # else:
-  #     ax_ylims = ax.get_ylim()
 
   ### Preparing delta dots data
   delta_dots <- plot_kwargs$delta_dots
