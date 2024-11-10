@@ -165,8 +165,6 @@ create_dfs_for_sankey <- function(
 
   x_padding <- ifelse(float_contrast, 0.008, 0.006)
 
-  ind <- 1
-  x_start <- 1
 
   sankey_bars <- if (flow) {
     proportional_data
@@ -356,7 +354,6 @@ create_dfs_for_baseline_ec_violin <- function(boots, x_idx_position, float_contr
     )
 
     df_for_violin <- rbind(df_for_violin, temp_df_violin)
-
     curr_boot_idx <- curr_boot_idx + 1
   }
   df_for_violin <- df_for_violin %>%

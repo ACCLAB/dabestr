@@ -48,7 +48,6 @@ dabest_plot <- function(dabest_effectsize_obj,
   custom_palette <- plot_kwargs$custom_palette
 
   is_colour <- dabest_effectsize_obj$is_colour
-  is_deltadelta <- plot_kwargs$show_delta2
   is_mini_meta <- plot_kwargs$show_mini_meta
   show_legend <- plot_kwargs$show_legend
   idx <- dabest_effectsize_obj$idx
@@ -73,6 +72,7 @@ dabest_plot <- function(dabest_effectsize_obj,
     if (horizontal) {
       widths <- c(0.65, 0.35)
     }
+
     final_plot <- cowplot::plot_grid(
       plotlist = list(
         raw_plot + ggplot2::theme(legend.position = "none"),

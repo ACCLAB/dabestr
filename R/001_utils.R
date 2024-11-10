@@ -1,6 +1,21 @@
-#' Validate the input parameters for the load function
+#' Validates and loads parameters
 #'
-#' TODO Add documentation
+#' Performs validation checks on the input parameters for the load function.
+#'
+#' @param data Input data.
+#' @param name_x Name of the x-axis variable.
+#' @param name_y Name of the y-axis variable.
+#' @param id_col Name of the ID column.
+#' @param enquo_id_col Quoted name of the ID column.
+#' @param is_id_col Bool indicating if the ID column is present.
+#' @param colour Name of the column for color mapping.
+#' @param enquo_colour Quoted name of the color column.
+#' @param is_colour Bool indicating if color mapping is used.
+#' @param delta2 Value for delta calculation.
+#' @param idx Index or grouping information.
+#' @param paired Bool indicating if the data is paired.
+#' @param proportional Bool indicating if proportions are used.
+#'
 #' @noRd
 validate_load_params <- function(data, name_x, name_y,
                                  id_col, enquo_id_col, is_id_col,
@@ -90,7 +105,15 @@ validate_load_params <- function(data, name_x, name_y,
   }
 }
 
-#' TODO Add documentation
+#' Validates parameters for minimeta analysis
+#'
+#' Checks and validates parameters specific to the minimeta analysis.
+#'
+#' @param proportional Bool indicating if proportions are used.
+#' @param delta2 Boolean value determining if delta-delta analysis for
+#' 2 by 2 experimental designs is conducted.
+#' @param minimeta_idx_lengths Lengths of index vectors for minimeta analysis.
+#'
 #' @noRd
 validate_minimeta_params <- function(proportional, delta2, minimeta_idx_lengths) {
   if (proportional) {

@@ -20,7 +20,6 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   enquo_x <- dabest_effectsize_obj$enquo_x
   enquo_y <- dabest_effectsize_obj$enquo_y
   enquo_id_col <- dabest_effectsize_obj$enquo_id_col
-  enquo_colour <- dabest_effectsize_obj$enquo_colour
   proportional <- dabest_effectsize_obj$proportional
 
   proportional_data <- dabest_effectsize_obj$proportional_data
@@ -34,8 +33,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   Ns <- dabest_effectsize_obj$Ns
   raw_y_range_vector <- dabest_effectsize_obj$ylim
   horizontal <- plot_kwargs$horizontal
-  test_summary <- dabest_effectsize_obj$test_summary
-  control_summary <- dabest_effectsize_obj$control_summary
+
   is_paired <- dabest_effectsize_obj$is_paired
   is_colour <- dabest_effectsize_obj$is_colour
 
@@ -125,8 +123,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     sankey_df,
     sankey_bars,
     idx,
-    float_contrast,
-    horizontal
+    float_contrast
   )
   raw_plot <- output[[1]]
   raw_y_range <- output[[2]]
@@ -152,7 +149,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
 
     ## Adjusting side shifting of tufte lines
     if (horizontal) {
-      tufte_side_adjust_value <- ifelse(proportional, 0, 0.08)
+      tufte_side_adjust_value <- ifelse(proportional, 0, 0.07)
     } else {
       tufte_side_adjust_value <- ifelse(proportional, 0, 0.05)
     }

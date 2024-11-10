@@ -202,10 +202,24 @@ create_sankey_flows <- function(raw_data, enquo_x, enquo_y, enquo_id_col, idx, N
   ))
 }
 
-# TODO Add documentation
+#' Initializes the raw plot
+#'
+#' Sets up the initial raw plot with various components and data.
+#'
+#' @param plot_kwargs Keyword arguments for plot customization.
+#' @param plot_components List of components for the plot.
+#' @param dabest_effectsize_obj Object containing effect size data.
+#' @param df_for_proportion_bar Dataframe for proportion bars.
+#' @param sankey_df Dataframe for Sankey plot.
+#' @param sankey_bars Dataframe for Sankey bars.
+#' @param idx Index or grouping information.
+#' @param float_contrast Boolean value for plot customization.
+#'
+#' @return Initialized raw plot object.
+#' @noRd
 initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_obj,
                                 df_for_proportion_bar, sankey_df, sankey_bars, idx,
-                                float_contrast, horizontal) {
+                                float_contrast) {
   raw_data <- dabest_effectsize_obj$raw_data
   enquo_x <- dabest_effectsize_obj$enquo_x
   enquo_y <- dabest_effectsize_obj$enquo_y
@@ -218,7 +232,7 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
   asymmetric_side <- plot_kwargs$asymmetric_side
   asymmetric_side <- ifelse(asymmetric_side == "right", -1, 1)
   asymmetric_x_adjustment <- asymmetric_side
-
+  horizontal <- plot_kwargs$horizontal
   minimeta <- plot_kwargs$show_mini_meta
   delta2 <- plot_kwargs$show_delta2
   raw_x_max <- length(unlist(idx))
@@ -400,9 +414,6 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
         )
       )
   }
-  # if (horizontal) {
-  #   raw_plot <- raw_plot + ggplot2::coord_flip()
-  # }
   return(list(raw_plot, raw_y_range, raw_y_min, x_axis_raw))
 }
 
