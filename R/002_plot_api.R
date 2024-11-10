@@ -152,7 +152,7 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
 
     ## Adjusting side shifting of tufte lines
     if (horizontal) {
-      tufte_side_adjust_value <- 0.08
+      tufte_side_adjust_value <- ifelse(proportional, 0, 0.08)
     } else {
       tufte_side_adjust_value <- ifelse(proportional, 0, 0.05)
     }

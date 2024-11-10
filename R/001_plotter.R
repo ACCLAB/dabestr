@@ -71,7 +71,7 @@ dabest_plot <- function(dabest_effectsize_obj,
     widths <- c(0.75, 0.25)
 
     if (horizontal) {
-      widths <- c(0.5, 0.5)
+      widths <- c(0.65, 0.35)
     }
     final_plot <- cowplot::plot_grid(
       plotlist = list(
