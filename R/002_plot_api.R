@@ -503,7 +503,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     zero_dot_x_breaks <- zero_dot_x_breaks[-length(zero_dot_x_breaks)]
   }
 
-  if (is_zero_dot) {
+  if (is_zero_dot && !float_contrast) {
     delta_plot <- add_bootci_component_to_delta_plot(delta_plot, zero_dot_x_breaks, 0, 0, 0, es_marker_size, es_line_size)
   }
 
