@@ -285,9 +285,6 @@ plot_raw <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     }
   }
   if (horizontal) {
-    raw_y_range_vector <- dabest_effectsize_obj$ylim
-    raw_y_max <- raw_y_range_vector[2]
-    raw_y_min <- raw_y_range_vector[1]
     raw_plot <- raw_plot +
       # restore axis configuration components
       ggplot2::labs(y = raw_y_labels, x = "") + # Add x-axis title
@@ -325,7 +322,15 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   proportional <- dabest_effectsize_obj$proportional
   paired <- dabest_effectsize_obj$paired
   horizontal <- plot_kwargs$horizontal
-  delta_x_labels <- unlist(dabest_effectsize_obj$delta_x_labels)
+  if (horizontal) {
+    test_labels <- get_test_labels(dabest_effectsize_obj$delta_x_labels)
+    plot_raw_labels <- dabest_effectsize_obj$Ns$horizontal_swarmticklabs
+    delta_x_labels <- get_matching_labels(plot_raw_labels, test_labels)
+    print(paste("delta_x_labels", delta_x_labels))
+  } else {
+    delta_x_labels <- unlist(dabest_effectsize_obj$delta_x_labels)
+  }
+
   delta_y_labels <- plot_kwargs$contrast_label
 
   minimeta <- plot_kwargs$show_mini_meta
@@ -404,7 +409,8 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     delta_y_max,
     delta_y_min,
     flow,
-    show_zero_dot
+    show_zero_dot,
+    horizontal
   )
 
   df_for_violin <- violin_plot_components$df_for_violin
@@ -434,6 +440,8 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
           ggplot2::aes(x = y, y = x, group = tag)
         )
   )
+
+
 
   ## Add labels ##
   if (minimeta) {
@@ -500,7 +508,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     zero_dot_x_breaks <- zero_dot_x_breaks[-length(zero_dot_x_breaks)]
   }
 
-  if (is_zero_dot && !float_contrast) {
+  if (is_zero_dot && !float_contrast && !horizontal) {
     delta_plot <- add_bootci_component_to_delta_plot(delta_plot, zero_dot_x_breaks, 0, 0, 0, es_marker_size, es_line_size)
   }
 
@@ -578,7 +586,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     ggplot2::labs(y = delta_y_labels)
 
   #### Add extra_axis Componenet ####
-  if (is_deltadelta) {
+  if (is_deltadelta && !horizontal) {
     delta_plot <- delta_plot +
       ggplot2::scale_y_continuous(sec.axis = ggplot2::dup_axis(name = "delta-delta"))
   }
@@ -604,7 +612,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
 
   ### Add delta text if requested
   delta_text <- plot_kwargs$delta_text
-  if (delta_text) {
+  if (delta_text && !horizontal) {
     delta_plot <- add_delta_text_to_delta_plot(
       delta_plot,
       dabest_effectsize_obj,
@@ -625,6 +633,19 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       main_violin_type,
       delta_dots_data
     )
+  }
+  if (horizontal) {
+    delta_plot <- delta_plot +
+      # restore axis configuration components
+      ggplot2::labs(y = delta_y_labels, x = "") + # Add x-axis title
+      ggplot2::theme(
+        axis.line.y = ggplot2::element_blank(),
+        axis.line.x = ggplot2::element_line(),
+        axis.ticks.x = ggplot2::element_line(),
+        axis.title = ggplot2::element_text(size = contrast_y_text),
+        axis.title.y = ggplot2::element_text(size = contrast_y_text)
+      ) +
+      ggplot2::coord_flip()
   }
 
   return(list(delta_plot = delta_plot, delta_range = c(delta_y_min - delta_y_mean / 10, delta_y_max)))

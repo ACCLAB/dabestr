@@ -105,6 +105,7 @@ create_deltaplot_components <- function(proportional,
 #' @param delta_y_min Min y limits for the delta-delta plot
 #' @param flow Boolean value determining whether the bars will be plotted in pairs.
 #' @param zero_dot Boolean value determining if the zero dot will be constructed.
+#' @param horizontal Boolean. If TRUE the plots are generated using horizontal layout instead of vertical.
 #'
 #' @return List of components essential for the violinplot.
 #' @noRd
@@ -114,7 +115,8 @@ create_violinplot_components <- function(boots,
                                          delta_y_max,
                                          delta_y_min,
                                          flow = TRUE,
-                                         zero_dot = TRUE) {
+                                         zero_dot = TRUE,
+                                         horizontal = FALSE) {
   df_for_violin <- data.frame(x = NA, y = NA, tag = NA)
   x_axis_breaks <- c()
   zero_dot_x_breaks <- c()
@@ -145,8 +147,12 @@ create_violinplot_components <- function(boots,
       if (!float_contrast) {
         y_coords_ci <- y_coords_ci / 1.5
       }
+      if (horizontal) {
+        y_coords_ci <- curr_x_idx - x_axis_scalar - y_coords_ci # mirrowed value
+      } else {
+        y_coords_ci <- y_coords_ci + curr_x_idx - x_axis_scalar
+      }
 
-      y_coords_ci <- y_coords_ci + curr_x_idx - x_axis_scalar
 
       min_x_coords <- min(x_coords_ci)
       max_x_coords <- max(x_coords_ci)
@@ -251,7 +257,7 @@ add_scaling_component_to_delta_plot <- function(delta_plot, float_contrast,
                                                 delta_y_axis_params, summary_data, plot_kwargs) {
   minimeta <- plot_kwargs$show_mini_meta
   delta2 <- plot_kwargs$show_delta2
-
+  horizontal <- plot_kwargs$horizontal
   # summary control and test
   control_summary <- summary_data[[1]]
   test_summary <- summary_data[[2]]
@@ -290,7 +296,8 @@ add_scaling_component_to_delta_plot <- function(delta_plot, float_contrast,
         xlim = c(1.8, delta_x_max + 0.4 + delta_text_space),
         expand = FALSE,
         clip = "off"
-      ) +
+      )
+    delta_plot <- delta_plot +
       ggplot2::scale_x_continuous(
         breaks = c(2),
         labels = delta_x_labels
@@ -322,11 +329,22 @@ add_scaling_component_to_delta_plot <- function(delta_plot, float_contrast,
         xlim = c(delta_x_min, delta_x_max + delta_x_scalar + delta_text_space),
         expand = FALSE,
         clip = "off"
-      ) +
-      ggplot2::scale_x_continuous(
-        breaks = x_axis_breaks,
-        labels = delta_x_labels
       )
+    if (horizontal) {
+      print(delta_x_labels)
+      print(paste("x_axis_breaks", x_axis_breaks))
+      delta_plot <- delta_plot +
+        ggplot2::scale_x_reverse(
+          breaks = x_axis_breaks,
+          labels = delta_x_labels
+        )
+    } else {
+      delta_plot <- delta_plot +
+        ggplot2::scale_x_continuous(
+          breaks = x_axis_breaks,
+          labels = delta_x_labels
+        )
+    }
   }
 
   delta_y_params <- list(min_y_coords, delta_y_min, delta_y_max, delta_y_mean)

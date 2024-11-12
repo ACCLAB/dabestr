@@ -71,6 +71,16 @@ dabest_plot <- function(dabest_effectsize_obj,
 
     if (horizontal) {
       widths <- c(0.65, 0.35)
+      # THis is not working
+      # # Get the x-axis breaks and labels from delta_plot
+      # delta_x_scale <- ggplot2::layer_scales(delta_plot)$x
+      # delta_breaks <- delta_x_scale$breaks
+      # delta_labels <- delta_x_scale$labels
+      # print(paste("delta_breaks", delta_breaks))
+      # print(paste("delta_labels", delta_labels))
+      # # Modify raw_plot to use the same x-axis breaks and labels
+      # raw_plot <- raw_plot +
+      #   ggplot2::scale_x_continuous(breaks = delta_breaks, labels = delta_labels)
     }
 
     final_plot <- cowplot::plot_grid(

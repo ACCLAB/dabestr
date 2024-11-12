@@ -756,6 +756,24 @@ create_delta_dots_data <- function(dabest_effectsize_obj, x_axis_breaks) {
   return(delta_dots_data)
 }
 
+get_test_labels <- function(delta_x_labels) {
+  test_labels <- sapply(delta_x_labels, function(label) {
+    values <- strsplit(label, split = "\nminus\n")[[1]]
+    values[1]
+  })
+  print(paste("test_labels:", paste(test_labels, collapse = ", ")))
+  return(test_labels)
+}
+
+get_matching_labels <- function(plot_raw_labels, test_labels) {
+  matching_labels <- c()
+  for (test_label in test_labels) {
+    matches <- plot_raw_labels[startsWith(plot_raw_labels, test_label)]
+    matching_labels <- c(matching_labels, matches)
+  }
+  return(matching_labels)
+}
+
 #' Adds Delta Dots to a Delta Plot
 #'
 #' This function enhances a delta plot by adding delta dots using the provided parameters.

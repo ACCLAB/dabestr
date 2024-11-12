@@ -13,7 +13,6 @@ draw_group_halfviolin <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales)
 
   first_row <- coords[1, , drop = FALSE]
-
   violin <- grid::polygonGrob(
     x = coords$x,
     y = coords$y,
@@ -55,25 +54,53 @@ geom_halfviolin <- function(mapping = NULL, data = NULL, stat = "identity",
 draw_panel_boot_ci <- function(data, panel_scales, coord) {
   coords <- coord$transform(data, panel_scales)
 
-  ci_line <- grid::segmentsGrob(
-    x0 = coords$x,
-    x1 = coords$x,
-    y0 = coords$ymin,
-    y1 = coords$ymax,
-    gp = grid::gpar(
-      lwd = coords$linesize * .pt,
-      lineend = coords$lineend
+  # For flipped coordinates, we need to swap x and y coordinates
+  if (inherits(coord, "CoordFlip")) {
+    # Use y values where we previously used x
+    if (length(coords$y) > 0 && length(coords$middle) > 0) {
+      ci_line <- grid::segmentsGrob(
+        y0 = coords$y,
+        y1 = coords$y,
+        x0 = coords$xmin,
+        x1 = coords$xmax,
+        gp = grid::gpar(
+          lwd = coords$linesize * .pt,
+          lineend = coords$lineend
+        )
+      )
+      # Calculate the middle point position
+      middle_x <- (coords$xmin + coords$xmax) / 2
+      ci_dot <- grid::pointsGrob(
+        y = coords$y,
+        x = middle_x,
+        pch = coords$shape,
+        size = grid::unit(coords$dotsize, "char")
+      )
+      grid::gTree(children = grid::gList(ci_line, ci_dot))
+    } else {
+      warning("Non valid y and middle coordinates found")
+      grid::nullGrob()
+    }
+  } else {
+    ci_line <- grid::segmentsGrob(
+      x0 = coords$x,
+      x1 = coords$x,
+      y0 = coords$ymin,
+      y1 = coords$ymax,
+      gp = grid::gpar(
+        lwd = coords$linesize * .pt,
+        lineend = coords$lineend
+      )
     )
-  )
 
-  ci_dot <- grid::pointsGrob(
-    x = coords$x,
-    y = coords$middle,
-    pch = coords$shape,
-    size = grid::unit(coords$dotsize, "char")
-  )
-
-  grid::gTree(children = grid::gList(ci_line, ci_dot))
+    ci_dot <- grid::pointsGrob(
+      x = coords$x,
+      y = coords$middle,
+      pch = coords$shape,
+      size = grid::unit(coords$dotsize, "char")
+    )
+    grid::gTree(children = grid::gList(ci_line, ci_dot))
+  }
 }
 
 # TODO Add documentation
