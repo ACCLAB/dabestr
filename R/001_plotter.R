@@ -47,6 +47,7 @@ dabest_plot <- function(dabest_effectsize_obj,
   horizontal <- plot_kwargs$horizontal
   custom_palette <- plot_kwargs$custom_palette
 
+  is_delta2 <- plot_kwargs$show_delta2
   is_colour <- dabest_effectsize_obj$is_colour
   is_mini_meta <- plot_kwargs$show_mini_meta
   show_legend <- plot_kwargs$show_legend
@@ -70,23 +71,39 @@ dabest_plot <- function(dabest_effectsize_obj,
     widths <- c(0.75, 0.25)
 
     if (horizontal) {
-      widths <- c(0.65, 0.35)
-      # THis is not working
-      # # Get the x-axis breaks and labels from delta_plot
-      # delta_x_scale <- ggplot2::layer_scales(delta_plot)$x
-      # delta_breaks <- delta_x_scale$breaks
-      # delta_labels <- delta_x_scale$labels
-      # print(paste("delta_breaks", delta_breaks))
-      # print(paste("delta_labels", delta_labels))
-      # # Modify raw_plot to use the same x-axis breaks and labels
-      # raw_plot <- raw_plot +
-      #   ggplot2::scale_x_continuous(breaks = delta_breaks, labels = delta_labels)
+      widths <- c(1, 0.9)
+      # if (is_mini_meta || is_delta2) {
+      # Get the x-axis breaks and labels from delta_plot
+      delta_x_scale <- ggplot2::layer_scales(delta_plot)$x
+      delta_x_breaks <- delta_x_scale$breaks
+      delta_x_labels <- delta_x_scale$labels
+      raw_x_scale <- ggplot2::layer_scales(raw_plot)$x
+      raw_x_breaks <- raw_x_scale$breaks
+      raw_x_labels <- raw_x_scale$labels
+      raw_x_limits <- c(0.6, max(raw_x_breaks) + 0.5)
+      # extend the x-axis breaks/labels for the raw plot to align with the delta plot
+      raw_x_breaks <- append(raw_x_breaks, delta_x_breaks[length(delta_x_breaks)])
+      raw_x_labels <- append(raw_x_labels, delta_x_labels[length(delta_x_labels)])
+      raw_x_limits <- c(max(raw_x_breaks) + 0.5, 0.6)
+      # Modify raw_plot to use the same x-axis breaks and labels
+      raw_plot <- raw_plot +
+        ggplot2::scale_x_reverse(breaks = raw_x_breaks, labels = raw_x_labels, limits = raw_x_limits)
+      # }
+      delta_plot <- delta_plot +
+        ggplot2::theme(
+          axis.text.y = ggplot2::element_blank(), # Remove y-axis text
+          axis.ticks.y = ggplot2::element_blank(), # Remove y-axis ticks
+          axis.title.y = ggplot2::element_blank() # Remove y-axis title
+        )
     }
 
     final_plot <- cowplot::plot_grid(
       plotlist = list(
         raw_plot + ggplot2::theme(legend.position = "none"),
-        delta_plot + ggplot2::theme(legend.position = "none")
+        delta_plot +
+          ggplot2::theme(
+            legend.position = "none"
+          )
       ),
       nrow = 1,
       ncol = 2,
@@ -119,6 +136,7 @@ dabest_plot <- function(dabest_effectsize_obj,
   if (is_mini_meta) {
     plot_margin <- ggplot2::unit(c(0, 5.5, 0, 0), "pt")
   }
+
 
   final_plot <- cowplot::plot_grid(
     plotlist = list(

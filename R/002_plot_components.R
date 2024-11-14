@@ -331,8 +331,6 @@ add_scaling_component_to_delta_plot <- function(delta_plot, float_contrast,
         clip = "off"
       )
     if (horizontal) {
-      print(delta_x_labels)
-      print(paste("x_axis_breaks", x_axis_breaks))
       delta_plot <- delta_plot +
         ggplot2::scale_x_reverse(
           breaks = x_axis_breaks,

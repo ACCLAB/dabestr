@@ -326,7 +326,6 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
     test_labels <- get_test_labels(dabest_effectsize_obj$delta_x_labels)
     plot_raw_labels <- dabest_effectsize_obj$Ns$horizontal_swarmticklabs
     delta_x_labels <- get_matching_labels(plot_raw_labels, test_labels)
-    print(paste("delta_x_labels", delta_x_labels))
   } else {
     delta_x_labels <- unlist(dabest_effectsize_obj$delta_x_labels)
   }
@@ -441,11 +440,13 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
         )
   )
 
-
-
   ## Add labels ##
   if (minimeta) {
-    delta_x_labels <- append(delta_x_labels, "Weighted\nDelta")
+    if (horizontal) {
+      delta_x_labels <- append(delta_x_labels, "Weighted Delta")
+    } else {
+      delta_x_labels <- append(delta_x_labels, "Weighted\nDelta")
+    }
   }
   if (delta2) {
     delta_x_labels <- append(delta_x_labels, "delta-delta")
@@ -557,7 +558,7 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
         linewidth = 0.8,
         yintercept = min_y_coords
       )
-  } else {
+  } else if (!horizontal) {
     # Obtain xaxis line and ticks elements for xaxis redraw
     delta_plot <- adjust_x_axis_in_delta_plot(delta_plot, main_plot_type, flow, idx, x, delta_y_min, delta_y_mean)
   }
@@ -636,14 +637,13 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
   if (horizontal) {
     delta_plot <- delta_plot +
-      # restore axis configuration components
-      ggplot2::labs(y = delta_y_labels, x = "") + # Add x-axis title
+      ggplot2::labs(y = delta_y_labels, x = "") +
       ggplot2::theme(
         axis.line.y = ggplot2::element_blank(),
         axis.line.x = ggplot2::element_line(),
         axis.ticks.x = ggplot2::element_line(),
         axis.title = ggplot2::element_text(size = contrast_y_text),
-        axis.title.y = ggplot2::element_text(size = contrast_y_text)
+        axis.title.y = ggplot2::element_text(size = contrast_y_text, angle = 90)
       ) +
       ggplot2::coord_flip()
   }

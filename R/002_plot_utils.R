@@ -761,7 +761,6 @@ get_test_labels <- function(delta_x_labels) {
     values <- strsplit(label, split = "\nminus\n")[[1]]
     values[1]
   })
-  print(paste("test_labels:", paste(test_labels, collapse = ", ")))
   return(test_labels)
 }
 
