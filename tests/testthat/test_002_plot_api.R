@@ -35,7 +35,7 @@ describe("Testing plot_delta function", {
     plot_kwargs <- assign_plot_kwargs(dabest_effectsize_obj, plot_kwargs)
     result <- plot_delta(dabest_effectsize_obj, float_contrast, plot_kwargs)
     expect_type(result, "list")
-    expect_named(result, c("delta_plot", "delta_range"))
+    expect_named(result, c("delta_plot", "delta_range", "delta_text_plot"))
     # TODO Add specific expectations to check if the components are created correctly
   })
 })
