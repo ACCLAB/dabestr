@@ -656,8 +656,8 @@ add_delta_text_to_delta_plot <- function(delta_plot,
 
   # Prepare the text for each coordinate
   texts <- data.frame(
-    x = x_coordinates + x_adjust, # Replace with your specific x-coordinate
-    y = y_coordinates, # Replace with your specific y-coordinate
+    x = x_coordinates + x_adjust,
+    y = y_coordinates,
     text = sprintf("%+.2f", y_values),
     group = delta_text_colours
   )
@@ -919,4 +919,61 @@ adjust_x_axis_in_delta_plot <- function(delta_plot, main_plot_type, flow, idx, x
       )
     )
   return(delta_plot)
+}
+
+#' Generates horizontal delta texts with customization options.
+#'
+#' @param x_axis_breaks X-axis breaks for positioning the texts.
+#' @param y_values Y-values corresponding to the delta values.
+#' @param zero_line_xend max height of the rectangle.
+#' @param is_delta2 Bool TRUE if the plot is delta-delta
+#' @param colour Fill color for the delta texts. Default is "#FFFFD4", light yellow.
+#' @param alpha Transparency level for the delta texts. Default is 0.5.
+#' @param fontsize Font size for the delta texts. Default is 12.
+#' @param text_colour Color of the delta text. Default is "black".
+#' @param text_units Units for the delta values.
+#' @param label Label for the delta texts. Default is "Δ".
+#'
+#' @return List containing data and parameters for delta texts.
+#' @noRd
+create_horizontal_delta_texts <- function(x_axis_breaks, y_values, zero_line_xend,
+                                          is_delta2,
+                                          colour = "#FFFFD4",
+                                          alpha = 0.5, fontsize = 12, text_colour = "black",
+                                          text_units = NULL, label = "Δ") {
+  max_x <- zero_line_xend - 0.3
+  # Prepare the text for each coordinate
+  if (!is.null(text_units)) {
+    text_labels <- paste0(sprintf("%+.2f", y_values), text_units)
+  } else {
+    text_labels <- sprintf("%+.2f", y_values)
+  }
+
+  # get the correct position of the labels based on the extreme value of the x axis and the breaks
+  correct_position <- max_x - rev(x_axis_breaks)
+
+  texts <- data.frame(
+    x = rep(0.15, length(y_values)),
+    y = correct_position,
+    text = rev(text_labels)
+  )
+  min_y_value <- min(min(y_values), 0)
+  bar_plot <- ggplot2::ggplot() +
+    ggplot2::geom_rect(ggplot2::aes(xmin = 0, xmax = 0.35, ymin = min_y_value, ymax = zero_line_xend),
+      fill = colour
+    )
+
+  bar_plot <- bar_plot +
+    ggplot2::geom_text(
+      data = texts,
+      ggplot2::aes(x = x, y = y, label = text),
+      alpha = alpha,
+      check_overlap = TRUE,
+      size.unit = "pt",
+      size = fontsize
+    ) +
+    ggplot2::theme_void() +
+    ggplot2::labs(x = label) +
+    ggplot2::theme(axis.title.x = ggplot2::element_text())
+  return(bar_plot)
 }

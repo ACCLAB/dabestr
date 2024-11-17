@@ -60,7 +60,7 @@ dabest_plot <- function(dabest_effectsize_obj,
 
   raw_plot <- plot_raw(dabest_effectsize_obj, float_contrast, plot_kwargs)
   delta_plot <- plot_delta(dabest_effectsize_obj, float_contrast, plot_kwargs)
-
+  delta_text_plot <- delta_plot$delta_text_plot
   delta_plot <- delta_plot$delta_plot
 
   raw_plot <- apply_palette(raw_plot, custom_palette)
@@ -68,11 +68,7 @@ dabest_plot <- function(dabest_effectsize_obj,
 
 
   if (float_contrast || horizontal) {
-    widths <- c(0.75, 0.25)
-
     if (horizontal) {
-      widths <- c(1, 0.9)
-      # if (is_mini_meta || is_delta2) {
       # Get the x-axis breaks and labels from delta_plot
       delta_x_scale <- ggplot2::layer_scales(delta_plot)$x
       delta_x_breaks <- delta_x_scale$breaks
@@ -97,20 +93,39 @@ dabest_plot <- function(dabest_effectsize_obj,
         )
     }
 
-    final_plot <- cowplot::plot_grid(
-      plotlist = list(
-        raw_plot + ggplot2::theme(legend.position = "none"),
-        delta_plot +
-          ggplot2::theme(
-            legend.position = "none"
-          )
-      ),
-      nrow = 1,
-      ncol = 2,
-      rel_widths = widths,
-      axis = "lr",
-      align = "h"
-    )
+    if (horizontal) {
+      final_plot <- cowplot::plot_grid(
+        plotlist = list(
+          raw_plot + ggplot2::theme(legend.position = "none"),
+          delta_plot +
+            ggplot2::theme(
+              legend.position = "none"
+            ),
+          delta_text_plot
+        ),
+        nrow = 1,
+        ncol = 3,
+        rel_widths = c(1, 0.8, 0.2),
+        axis = "tblr",
+        align = "h"
+      )
+    } else {
+      final_plot <- cowplot::plot_grid(
+        plotlist = list(
+          raw_plot + ggplot2::theme(legend.position = "none"),
+          delta_plot +
+            ggplot2::theme(
+              legend.position = "none"
+            )
+        ),
+        nrow = 1,
+        ncol = 2,
+        rel_widths = c(0.75, 0.25),
+        axis = "lr",
+        align = "h"
+      )
+    }
+
 
     if (show_legend & is_colour) {
       raw_legend <- cowplot::get_legend(raw_plot +

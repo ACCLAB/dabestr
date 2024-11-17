@@ -635,7 +635,10 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       delta_dots_data
     )
   }
+  delta_text_plot <- NULL
   if (horizontal) {
+    delta_text_plot <- create_horizontal_delta_texts(x_axis_breaks, difference, zero_line_xend, is_deltadelta, proportional)
+
     delta_plot <- delta_plot +
       ggplot2::labs(y = delta_y_labels, x = "") +
       ggplot2::theme(
@@ -648,5 +651,9 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
       ggplot2::coord_flip()
   }
 
-  return(list(delta_plot = delta_plot, delta_range = c(delta_y_min - delta_y_mean / 10, delta_y_max)))
+  return(list(
+    delta_plot = delta_plot,
+    delta_range = c(delta_y_min - delta_y_mean / 10, delta_y_max),
+    delta_text_plot = delta_text_plot
+  ))
 }
