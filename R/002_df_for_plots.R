@@ -17,11 +17,11 @@ create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional, gap, e
   if (!is.logical(proportional)) {
     stop("'proportional' must be a logical value.")
   }
-  
+
   if (!is.numeric(gap)) {
     stop("'gap' must be a numeric value.")
   }
-  
+
   # Compute summary statistics
   tufte_lines_df <- raw_data %>%
     dplyr::group_by(!!enquo_x) %>%
@@ -32,19 +32,19 @@ create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional, gap, e
       lower_quartile = stats::quantile(!!enquo_y, names = FALSE)[2],
       upper_quartile = stats::quantile(!!enquo_y, names = FALSE)[4]
     )
-  
+
   # Adjust SD if proportional is TRUE
   if (proportional) {
     tufte_lines_df$sd <- tufte_lines_df$sd / 7
   }
-  
+
   # Compute lower and upper SD
   tufte_lines_df <- tufte_lines_df %>%
     dplyr::mutate(
       lower_sd = mean - sd,
       upper_sd = mean + sd
     )
-  
+
   # Compute additional columns based on effsize_type
   if (!is.null(effsize_type) && grepl("edian", effsize_type, ignore.case = TRUE)) {
     tufte_lines_df <- tufte_lines_df %>%
@@ -65,7 +65,7 @@ create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional, gap, e
         y_bot_end = dplyr::case_when(no_diff ~ NA, !no_diff ~ lower_sd)
       )
   }
-  
+
   return(tufte_lines_df)
 }
 
@@ -88,15 +88,15 @@ create_dfs_for_nonflow_tufte_lines <- function(idx,
   # Input validation
   if (is.null(idx)) {
     cli::cli_abort(c("Column {.field idx} is currently NULL.",
-                     "x" = "Please enter a valid entry for {.field idx}"
+      "x" = "Please enter a valid entry for {.field idx}"
     ))
   }
   if (!is.data.frame(tufte_lines_df)) {
     cli::cli_abort(c("Column {.field tufte_lines_df} is not a data frame",
-                     "x" = "Please enter a valid entry for {.field tufte_lines_df}"
+      "x" = "Please enter a valid entry for {.field tufte_lines_df}"
     ))
   }
-  
+
   new_tufte_lines_df <- tibble::tibble()
   total_length <- length(unlist(idx))
   temp_idx <- unlist(idx)
@@ -147,33 +147,33 @@ create_dfs_for_sankey <- function(
     flow = TRUE,
     N) {
   type <- ifelse(length(unlist(idx)) <= 2,
-                 "single sankey",
-                 "multiple sankeys"
+    "single sankey",
+    "multiple sankeys"
   )
-  
+
   flow_success_to_failure <- tibble::tibble()
   flow_success_to_success <- tibble::tibble()
   flow_failure_to_success <- tibble::tibble()
   flow_failure_to_failure <- tibble::tibble()
-  
+
   bar_width <- ifelse(float_contrast, 0.15, 0.03)
-  
+
   scale_factor_sig <- switch(type,
-                             "single sankey" = if (float_contrast) 0.72 else 0.95,
-                             "multiple sankeys" = 0.92
+    "single sankey" = if (float_contrast) 0.72 else 0.95,
+    "multiple sankeys" = 0.92
   )
-  
+
   x_padding <- ifelse(float_contrast, 0.008, 0.006)
-  
+
   ind <- 1
   x_start <- 1
-  
+
   sankey_bars <- if (flow) {
     proportional_data
   } else {
     create_sankey_bars(proportional_data, enquo_x, enquo_y, idx)
   }
-  
+
   means_c_t <- sankey_bars$proportion_success
   if (sankey) {
     sankey_flows <- create_sankey_flows(
@@ -189,7 +189,7 @@ create_dfs_for_sankey <- function(
       x_padding,
       scale_factor_sig
     )
-    
+
     flow_success_to_failure <- sankey_flows$flow_success_to_failure
     flow_success_to_success <- sankey_flows$flow_success_to_success
     flow_failure_to_success <- sankey_flows$flow_failure_to_success
@@ -200,7 +200,7 @@ create_dfs_for_sankey <- function(
     flow_success_to_success <- data.frame(x = NaN, y = NaN, tag = NaN)
     flow_failure_to_failure <- data.frame(x = NaN, y = NaN, tag = NaN)
   }
-  
+
   redraw_x_axis <- seq_along(unlist(idx))
   dfs_for_sankeys <- list(
     flow_success_to_failure = flow_success_to_failure,
@@ -210,7 +210,7 @@ create_dfs_for_sankey <- function(
     sankey_bars = sankey_bars,
     redraw_x_axis = redraw_x_axis
   )
-  
+
   return(dfs_for_sankeys)
 }
 
@@ -230,14 +230,14 @@ create_dfs_for_xaxis_redraw <- function(idx) {
   xaxis_line_x_vector <- c()
   xaxis_line_xend_vector <- c()
   xaxis_ticks_x_vector <- c()
-  
+
   for (j in 1:length(idx)) {
     # calculate xaxis line x coords
     x_coord <- x_axis_pointer + 1
     xaxis_line_x_vector <- append(xaxis_line_x_vector, x_coord)
     xend_coord <- x_axis_pointer + length(idx[[j]])
     xaxis_line_xend_vector <- append(xaxis_line_xend_vector, xend_coord)
-    
+
     # calculate xaxis ticks x coords
     for (k in 1:length(idx[[j]])) {
       x_coord <- x_axis_pointer + k
@@ -245,7 +245,7 @@ create_dfs_for_xaxis_redraw <- function(idx) {
     }
     x_axis_pointer <- x_axis_pointer + length(idx[[j]])
   }
-  
+
   dfs_for_xaxis_redraw <- list(
     df_for_line = data.frame(
       x = xaxis_line_x_vector,
@@ -253,7 +253,7 @@ create_dfs_for_xaxis_redraw <- function(idx) {
     ),
     df_for_ticks = data.frame(x = xaxis_ticks_x_vector)
   )
-  
+
   return(dfs_for_xaxis_redraw)
 }
 
@@ -275,28 +275,28 @@ create_dfs_for_proportion_bar <- function(proportion_success, bar_width = 0.3, g
     y_success = NA,
     tag = NA
   )
-  
+
   for (x in 1:length(proportion_success)) {
     y <- proportion_success[x]
     if ((y > 1) || (y < 0)) {
       cli::cli_abort(c("Proportion plots must be supplied with data of values between 0 and 1."))
     }
-    
+
     x_failure_success <- c(x - bar_width / 2, x + bar_width / 2, x + bar_width / 2, x - bar_width / 2)
     y_success <- c(y - gap / 2, y - gap / 2, 0, 0)
     y_failure <- c(1, 1, y + gap / 2, y + gap / 2)
-    
+
     # For treatment groups with all 1s/all 0s
     if (y == 0) {
       y_failure <- c(1, 1, 0, 0)
       y_success <- c(0, 0, 0, 0)
     }
-    
+
     if (y == 1) {
       y_success <- c(1, 1, 0, 0)
       y_failure <- c(0, 0, 0, 0)
     }
-    
+
     temp_df_proportion_bar <- data.frame(
       x_failure = x_failure_success,
       y_failure = y_failure,
@@ -304,11 +304,11 @@ create_dfs_for_proportion_bar <- function(proportion_success, bar_width = 0.3, g
       y_success = y_success,
       tag = rep(toString(x), 4)
     )
-    
+
     df_for_proportion_bar <- rbind(df_for_proportion_bar, temp_df_proportion_bar)
   }
   df_for_proportion_bar <- df_for_proportion_bar %>% stats::na.omit()
-  
+
   return(df_for_proportion_bar)
 }
 
@@ -332,35 +332,35 @@ create_dfs_for_baseline_ec_violin <- function(boots, x_idx_position, float_contr
   )
   x_axis_scalar <- ifelse(flow, 0, 0.5)
   curr_boot_idx <- 1
-  
+
   for (i in x_idx_position) {
     ci_coords <- stats::density(boots[[curr_boot_idx]])
-    
+
     x_coords_ci <- ci_coords$x
     y_coords_ci <- ci_coords$y
-    
+
     # Standardise y
     y_coords_ci <- (y_coords_ci - min(y_coords_ci)) / (max(y_coords_ci) - min(y_coords_ci))
     y_coords_ci <- y_coords_ci / 6
-    
+
     if (!(float_contrast)) {
       y_coords_ci <- y_coords_ci / 1.5
     }
-    
+
     y_coords_ci <- y_coords_ci + i - x_axis_scalar
-    
+
     temp_df_violin <- data.frame(
       x = x_coords_ci,
       y = y_coords_ci,
       tag = rep(toString(i), 512)
     )
-    
+
     df_for_violin <- rbind(df_for_violin, temp_df_violin)
-    
+
     curr_boot_idx <- curr_boot_idx + 1
   }
   df_for_violin <- df_for_violin %>%
     dplyr::arrange(tag, x, y)
-  
+
   return(df_for_violin)
 }
