@@ -440,7 +440,7 @@ add_swarm_bars_to_raw_plot <- function(dabest_effectsize_obj, plot_kwargs, x_val
   if (!is.null(custom_colour)) {
     return(ggplot2::geom_rect(
       data = rectangles,
-      ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+      ggplot2::aes(xmin = .data$xmin, xmax = .data$xmax, ymin = .data$ymin, ymax = .data$ymax),
       fill = custom_colour,
       alpha = alpha,
       show.legend = FALSE
@@ -448,7 +448,7 @@ add_swarm_bars_to_raw_plot <- function(dabest_effectsize_obj, plot_kwargs, x_val
   }
   return(ggplot2::geom_rect(
     data = rectangles,
-    ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = fill_colour),
+    ggplot2::aes(xmin = .data$xmin, xmax = .data$xmax, ymin = .data$ymin, ymax = .data$ymax, fill = .data$fill_colour),
     alpha = alpha,
     show.legend = FALSE
   ))
@@ -513,7 +513,7 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
   if (!is.null(custom_colour)) {
     return(ggplot2::geom_rect(
       data = rectangles,
-      ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+      ggplot2::aes(xmin = .data$xmin, xmax = .data$xmax, ymin = .data$ymin, ymax = .data$ymax),
       fill = custom_colour,
       alpha = alpha
     ))
@@ -521,7 +521,7 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
   if (main_violin_type == "multicolour") {
     return(ggplot2::geom_rect(
       data = rectangles,
-      ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = group),
+      ggplot2::aes(xmin = .data$xmin, xmax =.data$xmax, ymin = .data$ymin, ymax = .data$ymax, fill = .data$group),
       alpha = alpha
     ))
   }
@@ -529,7 +529,7 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
   # Single colour
   return(ggplot2::geom_rect(
     data = rectangles,
-    ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, group = group),
+    ggplot2::aes(xmin = .data$xmin, xmax = .data$xmax, ymin = .data$ymin, ymax = .data$ymax, group = .data$group),
     alpha = alpha
   ))
 }
@@ -634,7 +634,7 @@ add_delta_text_to_delta_plot <- function(delta_plot,
     delta_plot <- delta_plot +
       ggplot2::geom_text(
         data = texts,
-        ggplot2::aes(x = x, y = y, label = text),
+        ggplot2::aes(x = .data$x, y = .data$y, label = .data$text),
         colour = custom_colour,
         alpha = alpha,
         check_overlap = TRUE,
@@ -669,7 +669,7 @@ add_delta_text_to_delta_plot <- function(delta_plot,
     delta_plot <- delta_plot +
       ggplot2::geom_text(
         data = texts,
-        ggplot2::aes(x = x, y = y, label = text, group = group),
+        ggplot2::aes(x = .data$x, y = .data$y, label = .data$text, group = .data$group),
         alpha = alpha,
         check_overlap = TRUE,
         size.unit = "pt",
@@ -765,9 +765,9 @@ add_delta_dots_to_delta_plot <- function(delta_plot,
       ggbeeswarm::geom_beeswarm(
         data = delta_dots_data,
         ggplot2::aes(
-          x = x_var,
-          y = y_var,
-          color = colour_var,
+          x = .data$x_var,
+          y = .data$y_var,
+          color = .data$colour_var,
         ),
         cex = cex,
         method = "swarm",
@@ -783,9 +783,9 @@ add_delta_dots_to_delta_plot <- function(delta_plot,
         ggbeeswarm::geom_beeswarm(
           data = delta_dots_data,
           ggplot2::aes(
-            x = x_var,
-            y = y_var,
-            color = x_var,
+            x = .data$x_var,
+            y = .data$y_var,
+            color = .data$x_var,
           ),
           cex = cex,
           method = "swarm",
@@ -800,8 +800,8 @@ add_delta_dots_to_delta_plot <- function(delta_plot,
         ggbeeswarm::geom_beeswarm(
           data = delta_dots_data,
           ggplot2::aes(
-            x = x_var,
-            y = y_var,
+            x = .data$x_var,
+            y = .data$y_var,
           ),
           cex = cex,
           method = "swarm",
