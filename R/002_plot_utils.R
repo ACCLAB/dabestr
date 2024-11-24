@@ -521,7 +521,7 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
   if (main_violin_type == "multicolour") {
     return(ggplot2::geom_rect(
       data = rectangles,
-      ggplot2::aes(xmin = .data$xmin, xmax =.data$xmax, ymin = .data$ymin, ymax = .data$ymax, fill = .data$group),
+      ggplot2::aes(xmin = .data$xmin, xmax = .data$xmax, ymin = .data$ymin, ymax = .data$ymax, fill = .data$group),
       alpha = alpha
     ))
   }
