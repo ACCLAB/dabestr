@@ -300,7 +300,7 @@ load <- function(
 #'
 #' @noRd
 #'
-#' @param dabest_obj a list
+#' @param x a dabest object, set as x to tally with method signature for print functions
 #' @param ... S3 signature for generic plot function.
 #'
 #' @return A summary of the experimental designs.
@@ -319,7 +319,9 @@ load <- function(
 #' print(dabest_obj)
 #'
 #' @export
-print.dabest <- function(dabest_obj, ...) {
+print.dabest <- function(x, ...) {
+  dabest_obj <- x
+
   check_dabest_object(dabest_obj)
 
   print_greeting_header()
