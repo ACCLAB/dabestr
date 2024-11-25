@@ -3,6 +3,7 @@
 # Contains function `assign_plot_kwargs`.
 
 #' Adjustable Plot Aesthetics
+#'
 #' @name plot_kwargs
 #'
 #' @description
@@ -49,6 +50,13 @@
 #' - `swarm_bars` Default TRUE. Whether or not to display the swarm bars.
 #' - `params_swarm_bars`. Default value: list(color = NULL, alpha = 0.3). Pass relevant keyword arguments to the swarm bars.
 #'
+NULL
+
+
+#' @param dabest_effectsize_obj dabest_effsize_obj generated after applying effect_size function to dabest_obj
+#' @param plot_kwargs viable plot kwargs to alter plot elements being drawn
+#'
+#' @noRd
 #'
 assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   check_effectsize_object(dabest_effectsize_obj)

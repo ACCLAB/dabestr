@@ -2,11 +2,7 @@
 % Please edit documentation in R/999_plot_kwargs.R
 \name{plot_kwargs}
 \alias{plot_kwargs}
-\alias{assign_plot_kwargs}
 \title{Adjustable Plot Aesthetics}
-\usage{
-assign_plot_kwargs(dabest_effectsize_obj, plot_kwargs)
-}
 \description{
 These are the available plot kwargs for adjusting the plot aesthetics of your
 estimation plot:
