@@ -306,7 +306,7 @@ cohens_h <- function(dabest_obj, perm_count = 5000) {
 #'
 #' @noRd
 #'
-#' @param dabest_effectsize_obj a list object created by `effect_size()` functions
+#' @param x a dabest_effectsize_obj object, set as x to tally with method signature for print functions
 #' @param ... S3 signature for generic plot function.
 #'
 #' @return A summary of the effect sizes and respective confidence intervals.
@@ -327,7 +327,9 @@ cohens_h <- function(dabest_obj, perm_count = 5000) {
 #' print(dabest_obj.mean_diff)
 #'
 #' @export
-print.dabest_effectsize <- function(dabest_effectsize_obj, ...) {
+print.dabest_effectsize <- function(x, ...) {
+  dabest_effectsize_obj <- x
+
   check_effectsize_object(dabest_effectsize_obj)
 
   print_greeting_header()
