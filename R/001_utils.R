@@ -1,7 +1,21 @@
 #' Validate the input parameters for the load function
 #'
-#' TODO Add documentation
+#' TODO Add description of parameters
+#' @param data A tidy dataframe.
+#' @param name_x x Column in `data`
+#' @param name_y y Column in `data`
+#' @param id_col_params id Column in `data`
+#' @param colour_params Column in `data` that determines colour grouping
+#' @param delta2 boolean value
+#' @param idx List of control-test groupings for which the
+#' effect size will be computed for.
+#' @param paired Paired ("sequential" or "baseline"). Used for plots for experiments
+#' with repeated-measures designs.
+#' @param proportional boolean value
+#'
+#' @return no error if all parameters are fine
 #' @noRd
+#'
 validate_load_params <- function(data, name_x, name_y,
                                  id_col, enquo_id_col, is_id_col,
                                  colour, enquo_colour, is_colour,

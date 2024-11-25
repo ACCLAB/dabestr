@@ -29,8 +29,8 @@ create_df_for_tufte <- function(raw_data, enquo_x, enquo_y, proportional, gap, e
       mean = mean(!!enquo_y),
       median = stats::median(!!enquo_y),
       sd = stats::sd(!!enquo_y),
-      lower_quartile = stats::quantile(!!enquo_y)[2],
-      upper_quartile = stats::quantile(!!enquo_y)[4]
+      lower_quartile = stats::quantile(!!enquo_y, names = FALSE)[2],
+      upper_quartile = stats::quantile(!!enquo_y, names = FALSE)[4]
     )
 
   # Adjust SD if proportional is TRUE
@@ -261,7 +261,7 @@ create_dfs_for_xaxis_redraw <- function(idx) {
 #'
 #' This function generates data frames to
 #' represent bars with proportional data in a graphical display.
-#' @param proportion_success List of values containing percentages
+#' @param proportion_success Percentage value of dataset with success
 #' @param bar_width Numeric value determining the width of the bar in the sankey diagram.
 #' @param gap Integer value specifying the amount of gap for each tufte line.
 #'

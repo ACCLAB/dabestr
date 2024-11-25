@@ -383,13 +383,15 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
   }
   return(list(raw_plot, raw_y_range, raw_y_min, x_axis_raw))
 }
-
+#'
 #' Adds Swarm Bars to a Raw Data Plot
 #'
 #' This function takes a `dabest_effectsize_obj` and enhances its raw data plot by adding swarm bars.
 #' It utilizes the provided plotting parameters along with specific x and y values to customize the
 #' appearance and positioning of the swarm bars. The `y_min` parameter ensures that the swarm bars
 #' are appropriately placed within the plot's y-axis limits.
+#'
+#' @importFrom rlang .data
 #'
 #' @param dabest_effectsize_obj A `dabest_effectsize_obj` created by the [effect_size()] function.
 #' @param plot_kwargs A list of parameters used to adjust and control the appearance of the plot.
@@ -440,7 +442,7 @@ add_swarm_bars_to_raw_plot <- function(dabest_effectsize_obj, plot_kwargs, x_val
   if (!is.null(custom_colour)) {
     return(ggplot2::geom_rect(
       data = rectangles,
-      ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+      ggplot2::aes(xmin = .data$xmin, xmax = .data$xmax, ymin = .data$ymin, ymax = .data$ymax),
       fill = custom_colour,
       alpha = alpha,
       show.legend = FALSE
@@ -448,17 +450,19 @@ add_swarm_bars_to_raw_plot <- function(dabest_effectsize_obj, plot_kwargs, x_val
   }
   return(ggplot2::geom_rect(
     data = rectangles,
-    ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = fill_colour),
+    ggplot2::aes(xmin = .data$xmin, xmax = .data$xmax, ymin = .data$ymin, ymax = .data$ymax, fill = .data$fill_colour),
     alpha = alpha,
     show.legend = FALSE
   ))
 }
-
+#'
 #' Adds Contrast Bars to a Delta Plot
 #'
 #' This function takes a `dabest_effectsize_obj` and augments its delta plot by adding contrast bars.
 #' It utilizes the provided plotting parameters and specific x and y values to customize the appearance
 #' of the contrast bars based on the main violin plot type.
+#'
+#' @importFrom rlang .data
 #'
 #' @param dabest_effectsize_obj A `dabest_effectsize_obj` created by the [effect_size()] function.
 #' @param plot_kwargs A list of parameters used to adjust and control the appearance of the plot.
@@ -513,7 +517,7 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
   if (!is.null(custom_colour)) {
     return(ggplot2::geom_rect(
       data = rectangles,
-      ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+      ggplot2::aes(xmin = .data$xmin, xmax = .data$xmax, ymin = .data$ymin, ymax = .data$ymax),
       fill = custom_colour,
       alpha = alpha
     ))
@@ -521,7 +525,7 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
   if (main_violin_type == "multicolour") {
     return(ggplot2::geom_rect(
       data = rectangles,
-      ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = group),
+      ggplot2::aes(xmin = .data$xmin, xmax = .data$xmax, ymin = .data$ymin, ymax = .data$ymax, fill = .data$group),
       alpha = alpha
     ))
   }
@@ -529,16 +533,18 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
   # Single colour
   return(ggplot2::geom_rect(
     data = rectangles,
-    ggplot2::aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, group = group),
+    ggplot2::aes(xmin = .data$xmin, xmax = .data$xmax, ymin = .data$ymin, ymax = .data$ymax, group = .data$group),
     alpha = alpha
   ))
 }
-
+#'
 #' Adds Delta Text to a Delta Plot
 #'
 #' This function enhances a delta plot by adding delta text using the provided parameters.
 #' It takes a delta plot, a dabest_effectsize_obj, plotting parameters, and specific x and y values.
 #' The function also considers the main violin type and float contrast to customize the delta text.
+#'
+#' @importFrom rlang .data
 #'
 #' @param delta_plot A ggplot object representing the delta plot.
 #' @param dabest_effectsize_obj A dabest_effectsize_obj created by the effect_size() function.
@@ -634,7 +640,7 @@ add_delta_text_to_delta_plot <- function(delta_plot,
     delta_plot <- delta_plot +
       ggplot2::geom_text(
         data = texts,
-        ggplot2::aes(x = x, y = y, label = text),
+        ggplot2::aes(x = .data$x, y = .data$y, label = .data$text),
         colour = custom_colour,
         alpha = alpha,
         check_overlap = TRUE,
@@ -669,7 +675,7 @@ add_delta_text_to_delta_plot <- function(delta_plot,
     delta_plot <- delta_plot +
       ggplot2::geom_text(
         data = texts,
-        ggplot2::aes(x = x, y = y, label = text, group = group),
+        ggplot2::aes(x = .data$x, y = .data$y, label = .data$text, group = .data$group),
         alpha = alpha,
         check_overlap = TRUE,
         size.unit = "pt",
@@ -729,6 +735,8 @@ create_delta_dots_data <- function(dabest_effectsize_obj, x_axis_breaks) {
 #' It takes a delta plot, a dabest_effectsize_obj, plotting parameters, x-axis breaks,
 #' and delta dots data. The function also considers the main violin type to customize the delta dots.
 #'
+#' @importFrom rlang .data
+#'
 #' @param delta_plot A ggplot object representing the delta plot.
 #' @param dabest_effectsize_obj A dabest_effectsize_obj created by the effect_size() function.
 #' @param plot_kwargs A list of parameters used to adjust the appearance of the plot.
@@ -765,9 +773,9 @@ add_delta_dots_to_delta_plot <- function(delta_plot,
       ggbeeswarm::geom_beeswarm(
         data = delta_dots_data,
         ggplot2::aes(
-          x = x_var,
-          y = y_var,
-          color = colour_var,
+          x = .data$x_var,
+          y = .data$y_var,
+          color = .data$colour_var,
         ),
         cex = cex,
         method = "swarm",
@@ -783,9 +791,9 @@ add_delta_dots_to_delta_plot <- function(delta_plot,
         ggbeeswarm::geom_beeswarm(
           data = delta_dots_data,
           ggplot2::aes(
-            x = x_var,
-            y = y_var,
-            color = x_var,
+            x = .data$x_var,
+            y = .data$y_var,
+            color = .data$x_var,
           ),
           cex = cex,
           method = "swarm",
@@ -800,8 +808,8 @@ add_delta_dots_to_delta_plot <- function(delta_plot,
         ggbeeswarm::geom_beeswarm(
           data = delta_dots_data,
           ggplot2::aes(
-            x = x_var,
-            y = y_var,
+            x = .data$x_var,
+            y = .data$y_var,
           ),
           cex = cex,
           method = "swarm",
