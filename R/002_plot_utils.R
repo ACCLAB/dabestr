@@ -390,7 +390,7 @@ initialize_raw_plot <- function(plot_kwargs, plot_components, dabest_effectsize_
 #' It utilizes the provided plotting parameters along with specific x and y values to customize the
 #' appearance and positioning of the swarm bars. The `y_min` parameter ensures that the swarm bars
 #' are appropriately placed within the plot's y-axis limits.
-#' 
+#'
 #' @importFrom rlang .data
 #'
 #' @param dabest_effectsize_obj A `dabest_effectsize_obj` created by the [effect_size()] function.
@@ -461,7 +461,7 @@ add_swarm_bars_to_raw_plot <- function(dabest_effectsize_obj, plot_kwargs, x_val
 #' This function takes a `dabest_effectsize_obj` and augments its delta plot by adding contrast bars.
 #' It utilizes the provided plotting parameters and specific x and y values to customize the appearance
 #' of the contrast bars based on the main violin plot type.
-#' 
+#'
 #' @importFrom rlang .data
 #'
 #' @param dabest_effectsize_obj A `dabest_effectsize_obj` created by the [effect_size()] function.
@@ -543,7 +543,7 @@ add_contrast_bars_to_delta_plot <- function(dabest_effectsize_obj, plot_kwargs, 
 #' This function enhances a delta plot by adding delta text using the provided parameters.
 #' It takes a delta plot, a dabest_effectsize_obj, plotting parameters, and specific x and y values.
 #' The function also considers the main violin type and float contrast to customize the delta text.
-#' 
+#'
 #' @importFrom rlang .data
 #'
 #' @param delta_plot A ggplot object representing the delta plot.
@@ -734,7 +734,7 @@ create_delta_dots_data <- function(dabest_effectsize_obj, x_axis_breaks) {
 #' This function enhances a delta plot by adding delta dots using the provided parameters.
 #' It takes a delta plot, a dabest_effectsize_obj, plotting parameters, x-axis breaks,
 #' and delta dots data. The function also considers the main violin type to customize the delta dots.
-#' 
+#'
 #' @importFrom rlang .data
 #'
 #' @param delta_plot A ggplot object representing the delta plot.
