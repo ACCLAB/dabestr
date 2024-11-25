@@ -637,7 +637,11 @@ plot_delta <- function(dabest_effectsize_obj, float_contrast, plot_kwargs) {
   }
   delta_text_plot <- NULL
   if (horizontal) {
-    delta_text_plot <- create_horizontal_delta_texts(x_axis_breaks, difference, zero_line_xend, is_deltadelta, proportional)
+    delta_text_plot <- create_horizontal_delta_texts(
+      x_axis_breaks,
+      difference, zero_line_xend,
+      is_deltadelta
+    )
 
     delta_plot <- delta_plot +
       ggplot2::labs(y = delta_y_labels, x = "") +
