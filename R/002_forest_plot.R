@@ -173,7 +173,7 @@ forest_plot <- function(
     contrast_objects, contrast_labels,
     contrast_type = "delta2",
     effect_size = "mean_diff",
-    ylabel = "effect size", title = "ΔΔ Forest",
+    ylabel = "effect size", title = "DeltaDelta Forest",
     fontsize = 12,
     title_font_size = 16,
     violin_kwargs = NULL,
