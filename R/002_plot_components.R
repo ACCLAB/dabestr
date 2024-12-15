@@ -77,7 +77,7 @@ create_deltaplot_components <- function(proportional,
   is_summary_lines <- float_contrast
   is_bootci <- TRUE
   is_deltadelta <- delta2
-  is_zero_dot <- show_zero_dot && flow
+  is_zero_dot <- show_zero_dot && flow && !float_contrast
   is_baseline_ec <- show_baseline_ec
 
   plot_component <- list(
