@@ -6,6 +6,7 @@
 #' @param effect_size Type of effect size (e.g., "mean_diff", "median_diff").
 #'
 #' @return The list of updated dabest effectsize objects
+#' @noRd
 #'
 apply_effectsize <- function(contrast_objects, effect_size = "mean_diff") {
   effect_attr_map <- list(
@@ -50,7 +51,7 @@ check_contrast_attributes <- function(contrasts, contrast_type) {
     )
     condition <- condition_to_check[[contrast_type]]
     if (condition) {
-      cli::cli_abort(c("The contrast type {.field} contrast_type}
+      cli::cli_abort(c("The contrast type {.field contrast_type}
             is not TRUE in the given contrast object"))
     }
   }
@@ -155,7 +156,7 @@ create_violin_plot <- function(df_for_violin, violin_kwargs, alpha_violin_plot, 
 #'   variable (Y-axis for vertical layout, X-axis for horizontal layout).
 #'    The default is "value".
 #' @param title Character string specifying the title for the forest plot.
-#'   The default is "ΔΔ Forest".
+#'   The default is "Delta delta Forest".
 #' @param fontsize Font size for text elements in the plot. Default is 12.
 #' @param title_font_size Font size for text of plot title. Defaults is 16.
 #' @param violin_kwargs Additional arguments for violin plot customization. Default is NULL
@@ -168,12 +169,14 @@ create_violin_plot <- function(df_for_violin, violin_kwargs, alpha_violin_plot, 
 #' @param horizontal Bool. If TRUE the forest plot is painted horizontally. Default FALSE.
 #' @return A ggplot object representing the forest plot.
 #'
-#' @noRd
+#' @export forest_plot
+#'
 forest_plot <- function(
     contrast_objects, contrast_labels,
     contrast_type = "delta2",
     effect_size = "mean_diff",
-    ylabel = "effect size", title = "DeltaDelta Forest",
+    ylabel = "effect size",
+    title = "Delta Delta Forest",
     fontsize = 12,
     title_font_size = 16,
     violin_kwargs = NULL,
