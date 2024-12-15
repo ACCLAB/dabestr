@@ -45,11 +45,15 @@ devtools::install_github(repo = "ACCLAB/dabestr", ref = "dev")
 
 ## Usage
 
-```{r, warning = FALSE, message = FALSE}
+```{r, warning = FALSE, message = FALSE, eval = FALSE}
 library(dabestr)
 ```
 
-```{r, dpi = 500}
+```{r, include = FALSE}
+devtools::load_all(".")
+```
+
+```{r, dpi = 500, warning = FALSE}
 data("non_proportional_data")
 
 dabest_obj.mean_diff <- load(
