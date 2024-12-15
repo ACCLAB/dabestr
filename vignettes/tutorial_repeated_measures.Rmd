@@ -96,7 +96,7 @@ print(two_groups_paired_sequential.mean_diff)
 print(two_groups_paired_baseline.mean_diff)
 ```
 
-For paired data, we use [slopegraphs](https://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0003nk%3E) (another innovation from Edward Tufte) to connect paired observations. Both Gardner-Altman and Cumming plots support this.
+For paired data, we use [slopegraphs](http://www.edwardtufte.com/notes-sketches/?msg_id=0003nk%3E) (another innovation from Edward Tufte) to connect paired observations. Both Gardner-Altman and Cumming plots support this.
 
 ```{r}
 dabest_plot(two_groups_paired_sequential.mean_diff,
