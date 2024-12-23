@@ -17,7 +17,7 @@ describe("Testing create_df_for_tufte function", {
       expect_equal(result$y_bot_end[1], 2.855177, tolerance = 1e-5)
     })
   })
-  
+
   describe("Given effsize_type is NOT median_diff", {
     test_that("it should return calculations for tufte lines based on mean", {
       np_dataset <- generate_non_proportional_dataset()
@@ -46,7 +46,7 @@ describe("Testing create_dfs_for_nonflow_tufte_lines function", {
         Group = c("Control 1", "Test 1", "Test 2"),
         value = c(1, 2, 3)
       )
-      
+
       result <- create_dfs_for_nonflow_tufte_lines(
         idx = idx,
         tufte_lines_df = tufte_lines_df,
@@ -69,13 +69,13 @@ describe("Testing create_dfs_for_xaxis_redraw function", {
       result <- create_dfs_for_xaxis_redraw(idx)
       expect_type(result, "list")
       expect_equal(length(result), 2) # 2 data frames returned
-      
+
       # Check df_for_line
       expect_type(result$df_for_line, "list")
       expect_equal(nrow(result$df_for_line), length(idx))
       expect_equal(ncol(result$df_for_line), 2)
       expect_equal(sum(is.na(result$df_for_line)), 0)
-      
+
       # Check df_for_ticks
       expect_type(result$df_for_ticks, "list")
       expect_equal(nrow(result$df_for_ticks), sum(lengths(idx)))
@@ -95,7 +95,7 @@ describe("Testing create_dfs_for_proportion_bar function", {
       expect_equal(nrow(result), 4)
       expect_equal(ncol(result), 5)
       expect_equal(sum(is.na(result)), 0)
-      
+
       # Test case 2: proportion_success contains 0 and 1
       proportion_success <- c(0, 1)
       result <- create_dfs_for_proportion_bar(proportion_success)
@@ -105,7 +105,7 @@ describe("Testing create_dfs_for_proportion_bar function", {
       expect_equal(sum(is.na(result)), 0)
     })
   })
-  
+
   describe("Given proportion_success has at least a value outside [0, 1]", {
     test_that("it should throw an error when proportion_success contains values outside [0, 1]", {
       proportion_success <- c(0.5, 1.5, 0.75)

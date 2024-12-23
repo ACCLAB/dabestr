@@ -39,8 +39,9 @@ An estimation plot has two key features.
 2.  It presents the **effect size** as a **bootstrap 95% confidence
     interval** on a **separate but aligned axes**.
 
-DABEST powers [estimationstats.com](http://estimationstats.com),
-allowing everyone access to high-quality estimation plots.
+The `dabestr` package powers
+[estimationstats.com](http://estimationstats.com), allowing everyone
+access to high-quality estimation plots.
 
 ## Installation
 
@@ -73,11 +74,11 @@ dabest_obj.mean_diff <- load(
 dabest_plot(dabest_obj.mean_diff, TRUE)
 ```
 
-![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
 
 Please refer to the official
-[tutorial](https://acclab.github.io/dabestr/) for more useful code
-snippets.
+[tutorial](https://acclab.github.io/dabestr/articles/tutorial_basics.html)
+for more useful code snippets.
 
 ## Citation
 
