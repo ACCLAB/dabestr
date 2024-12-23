@@ -22,6 +22,9 @@ forest_plot(
 )
 }
 \arguments{
+\item{contrast_objects}{A list of contrast objects. These objects should contain the
+statistical information for each comparison (e.g., estimates, standard errors).}
+
 \item{contrast_labels}{A list of labels for the contrast objects. E.g.,
 \link{'Drug1', 'Drug2', 'Drug3'} These labels will be used to identify each comparison on the plot.}
 
@@ -50,17 +53,12 @@ The default is "Delta delta Forest".}
 
 \item{ci_line_width}{Width of confidence interval lines. Default is 2.5.}
 
-\item{custom_palette}{A list or dictionary of colors, one for each contrast object.
-E.g., \link{'gray', 'blue', 'green'} or {'Drug1':'gray', 'Drug2':'blue', 'Drug3':'green'}. Default NULL.}
+\item{custom_palette}{A list or key:value pair of colors, one for each contrast object.
+E.g., \link{'gray', 'blue', 'green'} or c('Drug1'='gray', 'Drug2'='blue', 'Drug3'='green'). Default NULL.}
 
 \item{rotation_for_xlabels}{Rotation angle for x-axis labels, improving readability. Default is 45.}
 
 \item{alpha_violin_plot}{Transparency level for violin plots. Default is 0.8}
-
-\item{contrasts}{A list of contrast objects. These objects should contain the
-statistical information for each comparison (e.g., estimates, standard errors).}
-
-\item{horizontal}{Bool. If TRUE the forest plot is painted horizontally. Default FALSE.}
 }
 \value{
 A ggplot object representing the forest plot.

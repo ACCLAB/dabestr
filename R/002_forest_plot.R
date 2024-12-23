@@ -142,7 +142,7 @@ create_violin_plot <- function(df_for_violin, violin_kwargs, alpha_violin_plot, 
 #'
 #'  This function creates a forest plot summarizing a list of contrasts.
 #'
-#' @param contrasts A list of contrast objects. These objects should contain the
+#' @param contrast_objects A list of contrast objects. These objects should contain the
 #'   statistical information for each comparison (e.g., estimates, standard errors).
 #' @param contrast_labels A list of labels for the contrast objects. E.g.,
 #'   ['Drug1', 'Drug2', 'Drug3'] These labels will be used to identify each comparison on the plot.
@@ -162,17 +162,17 @@ create_violin_plot <- function(df_for_violin, violin_kwargs, alpha_violin_plot, 
 #' @param violin_kwargs Additional arguments for violin plot customization. Default is NULL
 #' @param marker_size Marker size for plotting mean differences or effect sizes. Default is 20.
 #' @param ci_line_width Width of confidence interval lines. Default is 2.5.
-#' @param custom_palette A list or dictionary of colors, one for each contrast object.
-#' E.g., ['gray', 'blue', 'green'] or {'Drug1':'gray', 'Drug2':'blue', 'Drug3':'green'}. Default NULL.
+#' @param custom_palette A list or key:value pair of colors, one for each contrast object.
+#' E.g., ['gray', 'blue', 'green'] or c('Drug1'='gray', 'Drug2'='blue', 'Drug3'='green'). Default NULL.
 #' @param rotation_for_xlabels Rotation angle for x-axis labels, improving readability. Default is 45.
 #' @param alpha_violin_plot Transparency level for violin plots. Default is 0.8
-#' @param horizontal Bool. If TRUE the forest plot is painted horizontally. Default FALSE.
 #' @return A ggplot object representing the forest plot.
 #'
 #' @export forest_plot
 #'
 forest_plot <- function(
-    contrast_objects, contrast_labels,
+    contrast_objects, 
+    contrast_labels,
     contrast_type = "delta2",
     effect_size = "mean_diff",
     ylabel = "effect size",
