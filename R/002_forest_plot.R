@@ -85,9 +85,9 @@ get_forest_plot_data <- function(contrast_objects, contrast_type, x_axis_breaks)
     boot_result <- dabest_effectsize_obj$boot_result
     #  Get the row specific for the contrast_type
     if (contrast_type == "delta2") {
-      row <- boot_result %>% dplyr::filter(grepl("Delta2", control_group))
+      row <- boot_result %>% dplyr::filter(grepl("Delta2", .data$control_group))
     } else {
-      row <- boot_result %>% dplyr::filter(grepl("Minimeta", control_group))
+      row <- boot_result %>% dplyr::filter(grepl("Minimeta", .data$control_group))
     }
     bootstraps[[i]] <- row$bootstraps[[1]]
     differences <- c(differences, row$difference)
@@ -145,7 +145,7 @@ create_violin_plot <- function(df_for_violin, violin_kwargs, alpha_violin_plot, 
 #' @param contrast_objects A list of contrast objects. These objects should contain the
 #'   statistical information for each comparison (e.g., estimates, standard errors).
 #' @param contrast_labels A list of labels for the contrast objects. E.g.,
-#'   ['Drug1', 'Drug2', 'Drug3'] These labels will be used to identify each comparison on the plot.
+#'   c('Drug1', 'Drug2', 'Drug3') These labels will be used to identify each comparison on the plot.
 #' @param contrast_type Select between "delta2" (for delta-delta) or "minimeta"
 #'   for mini-meta analysis. This determines the type of effect size calculation
 #'   used in the plot.
@@ -163,7 +163,7 @@ create_violin_plot <- function(df_for_violin, violin_kwargs, alpha_violin_plot, 
 #' @param marker_size Marker size for plotting mean differences or effect sizes. Default is 20.
 #' @param ci_line_width Width of confidence interval lines. Default is 2.5.
 #' @param custom_palette A list or key:value pair of colors, one for each contrast object.
-#' E.g., ['gray', 'blue', 'green'] or c('Drug1'='gray', 'Drug2'='blue', 'Drug3'='green'). Default NULL.
+#' E.g., c('gray', 'blue', 'green') or c('Drug1'='gray', 'Drug2'='blue', 'Drug3'='green'). Default NULL.
 #' @param rotation_for_xlabels Rotation angle for x-axis labels, improving readability. Default is 45.
 #' @param alpha_violin_plot Transparency level for violin plots. Default is 0.8
 #' @return A ggplot object representing the forest plot.

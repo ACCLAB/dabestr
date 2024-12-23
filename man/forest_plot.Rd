@@ -26,7 +26,7 @@ forest_plot(
 statistical information for each comparison (e.g., estimates, standard errors).}
 
 \item{contrast_labels}{A list of labels for the contrast objects. E.g.,
-\link{'Drug1', 'Drug2', 'Drug3'} These labels will be used to identify each comparison on the plot.}
+c('Drug1', 'Drug2', 'Drug3') These labels will be used to identify each comparison on the plot.}
 
 \item{contrast_type}{Select between "delta2" (for delta-delta) or "minimeta"
 for mini-meta analysis. This determines the type of effect size calculation
@@ -54,7 +54,7 @@ The default is "Delta delta Forest".}
 \item{ci_line_width}{Width of confidence interval lines. Default is 2.5.}
 
 \item{custom_palette}{A list or key:value pair of colors, one for each contrast object.
-E.g., \link{'gray', 'blue', 'green'} or c('Drug1'='gray', 'Drug2'='blue', 'Drug3'='green'). Default NULL.}
+E.g., c('gray', 'blue', 'green') or c('Drug1'='gray', 'Drug2'='blue', 'Drug3'='green'). Default NULL.}
 
 \item{rotation_for_xlabels}{Rotation angle for x-axis labels, improving readability. Default is 45.}
 
