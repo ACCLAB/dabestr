@@ -1,17 +1,20 @@
 Type: Package
 Package: dabestr
 Title: Data Analysis using Bootstrap-Coupled Estimation
-Version: 2023.9.12
+Version: 2024.12.24
 Authors@R: c(
     person("Joses W.", "Ho", , "joseshowh@gmail.com", role = "aut",
            comment = c(ORCID = "0000-0002-9186-6322")),
     person("Kah Seng", "Lian", , "kahseng@u.nus.edu", role = "aut"),
+    person("Ana Rosa", "Castillo", , "arosacastillo@protonmail.com", role = "aut"),
     person("Zhuoyu", "Wang", , "wzhuoyu21@u.nus,edu", role = "aut"),
     person("Jun Yang", "Liao", , "name@example.com", role = "aut"),
     person("Felicia", "Low", , "lowminhuifelicia@gmail.com", role = "aut"),
     person("Tayfun", "Tumkaya", role = "aut",
            comment = c(ORCID = "0000-0001-8425-3360")),
-    person("Yishan", "Mai", , "maiyishan@u.duke.nus.edu", role = c("cre", "ctb"),
+    person("Jonathan", "Anns", role = "ctb",
+           comment = c(ORCID = "0009-0005-8349-4986")),
+    person("Yishan", "Mai", , "maiyishan@u.duke.nus.edu", role = c("cre", "ctb") 
            comment = c(ORCID = "0000-0002-7199-380X")),
     person("Sangyu", "Xu", role = "ctb",
            comment = c(ORCID = "0000-0002-4927-9204")),

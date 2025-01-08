@@ -47,6 +47,7 @@ reference:
   - load
   - effect_size
   - dabest_plot
+  - forest_plot
 - subtitle: Adjusting plot aesthetics
 - contents: plot_kwargs
 authors:
