@@ -169,9 +169,8 @@ create_violin_plot <- function(df_for_violin, violin_kwargs, alpha_violin_plot, 
 #' @return A ggplot object representing the forest plot.
 #'
 #' @export forest_plot
-#'
 forest_plot <- function(
-    contrast_objects, 
+    contrasts, 
     contrast_labels,
     contrast_type = "delta2",
     effect_size = "mean_diff",
@@ -185,8 +184,10 @@ forest_plot <- function(
     custom_palette = NULL,
     rotation_for_xlabels = 0,
     alpha_violin_plot = 0.8) {
+  contrast_objects <- contrasts # keeping the interface of using contrasts as param but contrast_objects interally for clarity.
+  
   if (is.null(contrast_objects)) {
-    stop("Error: no contrast objects parameter was found")
+    stop("Error: no contrast parameter was found")
   }
   if (is.null(contrast_labels)) {
     stop("Error: no contrast labels parameter was found")

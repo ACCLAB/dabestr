@@ -33,7 +33,7 @@ describe("Testing forest_plot function", {
       #### MEAN DIFF ####
       it("should generate the correct plot", {
         minimeta_contrast_forest_plot <- dabestr::forest_plot(
-          contrast_objects = contrasts_minimeta,
+          contrasts = contrasts_minimeta,
           contrast_labels = c("Drug 1", "Drug 2", "Drug 3"),
           contrast_type = "minimeta"
         )
@@ -45,7 +45,7 @@ describe("Testing forest_plot function", {
       #### MEDIAN DIFF ####
       it("should generate the correct plot", {
         minimeta_contrast_forest_plot_median_diff <- dabestr::forest_plot(
-          contrast_objects = contrasts_minimeta,
+          contrasts = contrasts_minimeta,
           contrast_labels = c("Drug 1", "Drug 2", "Drug 3"),
           contrast_type = "minimeta",
           effect_size = "median_diff"
@@ -57,7 +57,7 @@ describe("Testing forest_plot function", {
     describe("Given plot kwargs", {
       it("should generate the correct plot", {
         minimeta_contrast_forest_plot_with_plot_kwargs <- dabestr::forest_plot(
-          contrast_objects = contrasts_minimeta,
+          contrasts = contrasts_minimeta,
           contrast_labels = c("Drug X", "Drug Y", "Drug Z"),
           contrast_type = "minimeta",
           custom_palette = c("orange", "gray", "purple"),
@@ -93,7 +93,7 @@ describe("Testing forest_plot function", {
       #### MEAN DIFF ####
       it("should generate the correct plot", {
         deltadelta_contrast_forest_plot <- dabestr::forest_plot(
-          contrast_objects = contrasts_deltadelta,
+          contrasts = contrasts_deltadelta,
           contrast_labels = c("Drug 1", "Drug 2", "Drug 3"),
         )
         vdiffr::expect_doppelganger("deltadelta forest plot mean diff", deltadelta_contrast_forest_plot)
@@ -103,7 +103,7 @@ describe("Testing forest_plot function", {
     describe("Given plot kwargs", {
       it("should generate the correct plot", {
         deltadelta_contrast_forest_plot_with_plot_kwargs <- dabestr::forest_plot(
-          contrast_objects = contrasts_deltadelta,
+          contrasts = contrasts_deltadelta,
           contrast_labels = c("Drug X", "Drug Y", "Drug Z"),
           custom_palette = c("orange", "gray", "purple"),
           alpha_violin_plot = 0.4,

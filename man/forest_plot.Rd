@@ -5,7 +5,7 @@
 \title{Generates a Forest Plot}
 \usage{
 forest_plot(
-  contrast_objects,
+  contrasts,
   contrast_labels,
   contrast_type = "delta2",
   effect_size = "mean_diff",
@@ -22,9 +22,6 @@ forest_plot(
 )
 }
 \arguments{
-\item{contrast_objects}{A list of contrast objects. These objects should contain the
-statistical information for each comparison (e.g., estimates, standard errors).}
-
 \item{contrast_labels}{A list of labels for the contrast objects. E.g.,
 c('Drug1', 'Drug2', 'Drug3') These labels will be used to identify each comparison on the plot.}
 
@@ -59,6 +56,9 @@ E.g., c('gray', 'blue', 'green') or c('Drug1'='gray', 'Drug2'='blue', 'Drug3'='g
 \item{rotation_for_xlabels}{Rotation angle for x-axis labels, improving readability. Default is 45.}
 
 \item{alpha_violin_plot}{Transparency level for violin plots. Default is 0.8}
+
+\item{contrast_objects}{A list of contrast objects. These objects should contain the
+statistical information for each comparison (e.g., estimates, standard errors).}
 }
 \value{
 A ggplot object representing the forest plot.
