@@ -2,22 +2,22 @@
 
 <details>
 
-* Version: 1.3.1
+* Version: 1.3.2
 * GitHub: NA
 * Source code: https://github.com/cran/permubiome
-* Date/Publication: 2020-07-31 06:40:03 UTC
-* Number of recursive dependencies: 54
+* Date/Publication: 2023-10-16 13:10:02 UTC
+* Number of recursive dependencies: 46
 
 Run `revdepcheck::revdep_details(, "permubiome")` for more info
 
 </details>
 
-## Newly broken
+## In both
 
 *   checking whether package ‘permubiome’ can be installed ... ERROR
     ```
     Installation failed.
-    See ‘/Users/liankahseng/Desktop/Work/dabestr/revdep/checks.noindex/permubiome/new/permubiome.Rcheck/00install.out’ for details.
+    See ‘/Users/liankahseng/Desktop/00_work/dabestr/revdep/checks.noindex/permubiome/new/permubiome.Rcheck/00install.out’ for details.
     ```
 
 ## Installation
@@ -31,10 +31,12 @@ Run `revdepcheck::revdep_details(, "permubiome")` for more info
 ** R
 ** inst
 ** byte-compile and prepare package for lazy loading
-Error: object ‘dabest’ is not exported by 'namespace:dabestr'
+Error in loadNamespace(i, c(lib.loc, .libPaths()), versionCheck = vI[[i]]) : 
+  namespace ‘scales’ 1.2.1 is being loaded, but >= 1.3.0 is required
+Calls: <Anonymous> ... asNamespace -> loadNamespace -> namespaceImport -> loadNamespace
 Execution halted
 ERROR: lazy loading failed for package ‘permubiome’
-* removing ‘/Users/liankahseng/Desktop/Work/dabestr/revdep/checks.noindex/permubiome/new/permubiome.Rcheck/permubiome’
+* removing ‘/Users/liankahseng/Desktop/00_work/dabestr/revdep/checks.noindex/permubiome/new/permubiome.Rcheck/permubiome’
 
 
 ```
@@ -47,13 +49,12 @@ ERROR: lazy loading failed for package ‘permubiome’
 ** R
 ** inst
 ** byte-compile and prepare package for lazy loading
-** help
-*** installing help indices
-** building package indices
-** testing if installed package can be loaded from temporary location
-** testing if installed package can be loaded from final location
-** testing if installed package keeps a record of temporary installation path
-* DONE (permubiome)
+Error in loadNamespace(i, c(lib.loc, .libPaths()), versionCheck = vI[[i]]) : 
+  namespace ‘scales’ 1.2.1 is being loaded, but >= 1.3.0 is required
+Calls: <Anonymous> ... asNamespace -> loadNamespace -> namespaceImport -> loadNamespace
+Execution halted
+ERROR: lazy loading failed for package ‘permubiome’
+* removing ‘/Users/liankahseng/Desktop/00_work/dabestr/revdep/checks.noindex/permubiome/old/permubiome.Rcheck/permubiome’
 
 
 ```
