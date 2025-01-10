@@ -36,7 +36,7 @@ articles:
   - tutorial_proportion_plots
   - tutorial_minimeta
   - tutorial_deltadelta
-  - datasets
+  - sample_datasets
 news:
   cran_dates: true 
 reference:
