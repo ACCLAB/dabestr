@@ -10,19 +10,19 @@ Authors@R: c(
     person("Zhuoyu", "Wang", , "wzhuoyu21@u.nus,edu", role = "aut"),
     person("Jun Yang", "Liao", , "name@example.com", role = "aut"),
     person("Felicia", "Low", , "lowminhuifelicia@gmail.com", role = "aut"),
-    person("Tayfun", "Tumkaya", role = "aut",
+    person("Tayfun", "Tumkaya", , role = "aut",
            comment = c(ORCID = "0000-0001-8425-3360")),
-    person("Jonathan", "Anns", role = "ctb",
+    person("Jonathan", "Anns", , role = "ctb",
            comment = c(ORCID = "0009-0005-8349-4986")),
     person("Yishan", "Mai", , "maiyishan@u.duke.nus.edu", role = c("cre", "ctb"), 
            comment = c(ORCID = "0000-0002-7199-380X")),
-    person("Sangyu", "Xu", role = "ctb",
+    person("Sangyu", "Xu", , role = "ctb",
            comment = c(ORCID = "0000-0002-4927-9204")),
-    person("Hyungwon", "Choi", role = "ctb",
+    person("Hyungwon", "Choi", , role = "ctb",
            comment = c(ORCID = "0000-0002-6687-3088")),
-    person("Adam", "Claridge-Chang", role = "ctb",
+    person("Adam", "Claridge-Chang", , role = "ctb",
            comment = c(ORCID = "0000-0002-4583-3650")),
-    person("ACCLAB", role = c("cph", "fnd"))
+    person("ACCLAB", , role = c("cph", "fnd"))
   )
 Description: Data Analysis using Bootstrap-Coupled ESTimation.  Estimation
     statistics is a simple framework that avoids the pitfalls of
