@@ -142,7 +142,7 @@ create_violin_plot <- function(df_for_violin, violin_kwargs, alpha_violin_plot, 
 #'
 #'  This function creates a forest plot summarizing a list of contrasts.
 #'
-#' @param contrast_objects A list of contrast objects. These objects should contain the
+#' @param contrasts A list of contrast objects. These objects should contain the
 #'   statistical information for each comparison (e.g., estimates, standard errors).
 #' @param contrast_labels A list of labels for the contrast objects. E.g.,
 #'   c('Drug1', 'Drug2', 'Drug3') These labels will be used to identify each comparison on the plot.
@@ -184,6 +184,7 @@ forest_plot <- function(
     custom_palette = NULL,
     rotation_for_xlabels = 0,
     alpha_violin_plot = 0.8) {
+
   contrast_objects <- contrasts # keeping the interface of using contrasts as param but contrast_objects interally for clarity.
   
   if (is.null(contrast_objects)) {
