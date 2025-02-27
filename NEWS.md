@@ -1,3 +1,10 @@
+# dabestr v2025.3.14
+This release implements quite a couple of new features, matching up with the current DABEST in python.
+
+### New features
+* Plots now include swarm bars, contrast bars and delta dots
+* Forest plots
+
 # dabestr v2023.9.12
 This release is a complete rebuild of dabestr. 
 
