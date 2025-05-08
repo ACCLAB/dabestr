@@ -1,78 +1,29 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://acclab.github.io/dabestr/404.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/CODE_OF_CONDUCT.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/CONTRIBUTING.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/articles/datasets.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/articles/plot_aesthetics.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/articles/tutorial_basics.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/articles/tutorial_deltadelta.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/articles/tutorial_minimeta.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/articles/tutorial_proportion_plots.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/articles/tutorial_repeated_measures.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/index.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/reference/dabest_plot.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/reference/deltadelta_data.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/reference/effect_size.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/reference/load.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/reference/minimeta_data.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/reference/non_proportional_data.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/reference/plot_kwargs.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/reference/proportional_data.html</loc>
-  </url>
-  <url>
-    <loc>https://acclab.github.io/dabestr/reference/reexports.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://acclab.github.io/dabestr/404.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/CODE_OF_CONDUCT.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/CONTRIBUTING.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/LICENSE.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/articles/index.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/articles/plot_aesthetics.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/articles/sample_datasets.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/articles/tutorial_basics.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/articles/tutorial_deltadelta.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/articles/tutorial_minimeta.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/articles/tutorial_proportion_plots.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/articles/tutorial_repeated_measures.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/authors.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/index.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/news/index.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/reference/dabest_plot.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/reference/deltadelta_data.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/reference/effect_size.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/reference/forest_plot.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/reference/index.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/reference/load.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/reference/minimeta_data.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/reference/non_proportional_data.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/reference/plot_kwargs.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/reference/proportional_data.html</loc></url>
+<url><loc>https://acclab.github.io/dabestr/reference/reexports.html</loc></url>
 </urlset>
+

@@ -5,79 +5,61 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="dabestr">
 <title>Tutorial: Delta-Delta • dabestr</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Tutorial: Delta-Delta">
-<meta property="og:description" content="dabestr">
-<meta property="og:image" content="https://acclab.github.io/dabestr/logo.svg">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Tutorial: Delta-Delta">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
-    
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
-    
+
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+
     <a class="navbar-brand me-2" href="../index.html">dabestr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2023.9.12</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2025.3.14</small>
 
-    
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
-  <a class="nav-link" href="../reference/index.html">Reference</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/plot_aesthetics.html">Controlling Plot Aesthetics</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Tutorials</h6>
-    <a class="dropdown-item" href="../articles/tutorial_basics.html">Tutorial: Basics</a>
-    <a class="dropdown-item" href="../articles/tutorial_repeated_measures.html">Tutorial: Repeated Measures</a>
-    <a class="dropdown-item" href="../articles/tutorial_proportion_plots.html">Tutorial: Proportion Plots</a>
-    <a class="dropdown-item" href="../articles/tutorial_minimeta.html">Tutorial: Mini-Meta Delta</a>
-    <a class="dropdown-item" href="../articles/tutorial_deltadelta.html">Tutorial: Delta-Delta</a>
-    <a class="dropdown-item" href="../articles/datasets.html">Sample Datasets</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="../articles/plot_aesthetics.html">Controlling Plot Aesthetics</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Tutorials</h6></li>
+    <li><a class="dropdown-item" href="../articles/tutorial_basics.html">Tutorial: Basics</a></li>
+    <li><a class="dropdown-item" href="../articles/tutorial_repeated_measures.html">Tutorial: Repeated Measures</a></li>
+    <li><a class="dropdown-item" href="../articles/tutorial_proportion_plots.html">Tutorial: Proportion Plots</a></li>
+    <li><a class="dropdown-item" href="../articles/tutorial_minimeta.html">Tutorial: Mini-Meta Delta</a></li>
+    <li><a class="dropdown-item" href="../articles/tutorial_deltadelta.html">Tutorial: Delta-Delta</a></li>
+    <li><a class="dropdown-item" href="../articles/sample_datasets.html">Sample Datasets</a></li>
+  </ul>
 </li>
-<li class="nav-item">
-  <a class="nav-link" href="../news/index.html">Changelog</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
-<form class="form-inline my-2 my-lg-0" role="search">
-        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
-</form>
-
-      <ul class="navbar-nav">
-<li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/ACCLAB/dabestr/" aria-label="github">
-    <span class="fab fa fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
+<ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
+</form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ACCLAB/dabestr/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
-    
+
   </div>
 </nav><div class="container template-article">
 
@@ -89,7 +71,7 @@
       <img src="../logo.svg" class="logo" alt=""><h1>Tutorial: Delta-Delta</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ACCLAB/dabestr/blob/HEAD/vignettes/tutorial_deltadelta.Rmd" class="external-link"><code>vignettes/tutorial_deltadelta.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ACCLAB/dabestr/blob/master/vignettes/tutorial_deltadelta.Rmd" class="external-link"><code>vignettes/tutorial_deltadelta.Rmd</code></a></small>
       <div class="d-none name"><code>tutorial_deltadelta.Rmd</code></div>
     </div>
 
@@ -102,20 +84,22 @@ independent categorical variables.</p>
 <p>Many experimental designs investigate the effects of two interacting
 independent variables on a dependent variable. The delta-delta effect
 size lets us distill the net effect of the two variables. To illustrate
-this, let’s delve into the following problem.</p>
+this, let’s delve into the following problem…</p>
+<blockquote>
 <p>Consider an experiment where we test the efficacy of a drug named
 <code>Drug</code> on a disease-causing mutation <code>M</code> based on
-disease metric <code>Y</code>. The greater value <code>Y</code> has the
-more severe the disease phenotype is. Phenotype <code>Y</code> has been
-shown to be caused by a gain of function mutation <code>M</code>, so we
-expect a difference between wild type (<code>W</code>) subjects and
-mutant subjects (<code>M</code>). Now, we want to know whether this
-effect is ameliorated by the administration of <code>Drug</code>
-treatment. We also administer a placebo as a control. In theory, we only
-expect <code>Drug</code> to have an effect on the <code>M</code> group,
-although in practice many drugs have non-specific effects on healthy
-populations too.</p>
-<p>Effectively, we have 4 groups of subjects for comparison.</p>
+a disease metric <code>Y</code>. In this experiment, the greater the
+value <code>Y</code>is, the more severe the disease phenotype is. The
+phenotype <code>Y</code> has been shown to be caused by a gain of the
+function mutation <code>M</code>, so we expect a difference between the
+wild type (<code>W</code>) subjects and the mutant subjects
+(<code>M</code>). We want to know whether this effect is ameliorated by
+the administration of a <code>Drug</code> treatment. We also administer
+a placebo as a control. In theory, we only expect the <code>Drug</code>
+to have an effect on the <code>M</code> group, although in practice,
+many drugs have non-specific effects on healthy populations as well.</p>
+</blockquote>
+<p>Effectively, we have 4 groups of subjects for comparison:</p>
 <table class="table">
 <thead><tr>
 <th style="text-align:left;">
@@ -133,10 +117,10 @@ Mutant
 Drug
 </td>
 <td style="text-align:left;border-right:1px solid;">
-<span class="math inline">\(X_D, W\)</span>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>X</mi><mi>D</mi></msub><mo>,</mo><mi>W</mi></mrow><annotation encoding="application/x-tex">X_D, W</annotation></semantics></math>
 </td>
 <td style="text-align:left;">
-<span class="math inline">\(X_D, M\)</span>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>X</mi><mi>D</mi></msub><mo>,</mo><mi>M</mi></mrow><annotation encoding="application/x-tex">X_D, M</annotation></semantics></math>
 </td>
 </tr>
 <tr>
@@ -144,27 +128,28 @@ Drug
 Placebo
 </td>
 <td style="text-align:left;border-right:1px solid;">
-<span class="math inline">\(X_P, W\)</span>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>X</mi><mi>P</mi></msub><mo>,</mo><mi>W</mi></mrow><annotation encoding="application/x-tex">X_P, W</annotation></semantics></math>
 </td>
 <td style="text-align:left;">
-<span class="math inline">\(X_P, M\)</span>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>X</mi><mi>P</mi></msub><mo>,</mo><mi>M</mi></mrow><annotation encoding="application/x-tex">X_P, M</annotation></semantics></math>
 </td>
 </tr>
 </tbody>
 </table>
-<p>There are 2 <code>Treatment</code> conditions, <code>Placebo</code>
-(control group) and <code>Drug</code> (test group). There are 2
-<code>Genotypes</code>: <code>W</code> (wild type population) and
-<code>M</code> (mutant population). In addition, each experiment was
-done twice (<code>Rep1</code> and <code>Rep2</code>). We shall do a few
-analyses to visualise these differences in a simulated dataset.</p>
+<p>There are 2 <code>Treatment</code> conditions: the
+<code>Placebo</code> (control group) and the <code>Drug</code> (test
+group). There are 2 <code>Genotypes</code>: <code>W</code> (wild type
+population) and <code>M</code> (mutant population). Additionally, each
+experiment was conducted twice (<code>Rep1</code> and
+<code>Rep2</code>). We will perform a few analyses to visualise these
+differences in a simulated dataset.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ACCLAB/dabestr" class="external-link">dabestr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="create-dataset-for-demo">Create dataset for demo<a class="anchor" aria-label="anchor" href="#create-dataset-for-demo"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12345</span><span class="op">)</span> <span class="co"># Fix the seed so the results are replicable.</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12345</span><span class="op">)</span> <span class="co"># Fix the seed so the results are reproducible.</span></span>
 <span><span class="co"># pop_size = 10000 # Size of each population.</span></span>
 <span><span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">20</span> <span class="co"># The number of samples taken from each population</span></span>
 <span></span>
@@ -197,125 +182,55 @@ analyses to visualise these differences in a simulated dataset.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
-<thead><tr>
-<th style="text-align:left;">
-Genotype
-</th>
-<th style="text-align:right;">
-ID
-</th>
-<th style="text-align:left;">
-Rep
-</th>
-<th style="text-align:left;">
-Treatment
-</th>
-<th style="text-align:right;">
-Measurement
-</th>
+<thead><tr class="header">
+<th align="left">Genotype</th>
+<th align="right">ID</th>
+<th align="left">Rep</th>
+<th align="left">Treatment</th>
+<th align="right">Measurement</th>
 </tr></thead>
 <tbody>
-<tr>
-<td style="text-align:left;">
-M
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-Rep1
-</td>
-<td style="text-align:left;">
-Placebo
-</td>
-<td style="text-align:right;">
-4.234211
-</td>
+<tr class="odd">
+<td align="left">M</td>
+<td align="right">1</td>
+<td align="left">Rep1</td>
+<td align="left">Placebo</td>
+<td align="right">4.234211</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-M
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-Rep2
-</td>
-<td style="text-align:left;">
-Placebo
-</td>
-<td style="text-align:right;">
-4.283786
-</td>
+<tr class="even">
+<td align="left">M</td>
+<td align="right">2</td>
+<td align="left">Rep2</td>
+<td align="left">Placebo</td>
+<td align="right">4.283786</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-M
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:left;">
-Rep1
-</td>
-<td style="text-align:left;">
-Placebo
-</td>
-<td style="text-align:right;">
-3.956279
-</td>
+<tr class="odd">
+<td align="left">M</td>
+<td align="right">3</td>
+<td align="left">Rep1</td>
+<td align="left">Placebo</td>
+<td align="right">3.956279</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-M
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:left;">
-Rep2
-</td>
-<td style="text-align:left;">
-Placebo
-</td>
-<td style="text-align:right;">
-3.818601
-</td>
+<tr class="even">
+<td align="left">M</td>
+<td align="right">4</td>
+<td align="left">Rep2</td>
+<td align="left">Placebo</td>
+<td align="right">3.818601</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-M
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:left;">
-Rep1
-</td>
-<td style="text-align:left;">
-Placebo
-</td>
-<td style="text-align:right;">
-4.242355
-</td>
+<tr class="odd">
+<td align="left">M</td>
+<td align="right">5</td>
+<td align="left">Rep1</td>
+<td align="left">Placebo</td>
+<td align="right">4.242355</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-M
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:left;">
-Rep2
-</td>
-<td style="text-align:left;">
-Placebo
-</td>
-<td style="text-align:right;">
-3.272818
-</td>
+<tr class="even">
+<td align="left">M</td>
+<td align="right">6</td>
+<td align="left">Rep2</td>
+<td align="left">Placebo</td>
+<td align="right">3.272818</td>
 </tr>
 </tbody>
 </table>
@@ -324,13 +239,12 @@ Placebo
 <h2 id="loading-data">Loading Data<a class="anchor" aria-label="anchor" href="#loading-data"></a>
 </h2>
 <p>To make a delta-delta plot, you need to simply set
-<code>delta2 = TRUE</code> in the <code><a href="../reference/load.html">load()</a></code> function.
-<code>colour</code> will be used to determine the colour of dots for
-scattered plots or the colour of lines for slopegraphs. The
-<code>experiment</code> input will be used to specify grouping of the
-data.</p>
-<p>For delta-delta plots, the <code>idx</code> is a non-compulsory
-input.</p>
+<code>delta2 = TRUE</code> in the <code><a href="../reference/load.html">load()</a></code> function. The
+<code>colour</code> parameter will be used to determine the colour of
+dots for the scattered plots or the colour of lines for the slopegraphs.
+The <code>experiment</code> parameter will be used to specify the
+grouping of the data. For delta-delta plots, the <code>idx</code>
+parameter is optional. Here’s an example:</p>
 </div>
 <div class="section level2">
 <h2 id="unpaired-data">Unpaired Data<a class="anchor" aria-label="anchor" href="#unpaired-data"></a>
@@ -345,13 +259,13 @@ input.</p>
 object:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unpaired_delta2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DABESTR v2023.9.12</span></span>
+<span><span class="co">#&gt; DABESTR v2025.3.14</span></span>
 <span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 06:04 AM on Tuesday December 12, 2023.</span></span>
+<span><span class="co">#&gt; The current time is 09:52 AM on Thursday May 08, 2025.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Effect size(s) with 95% confidence intervals will be computed for:</span></span>
+<span><span class="co">#&gt; ffect size(s) with 95% confidence intervals will be computed for:</span></span>
 <span><span class="co">#&gt; 1. M Placebo minus W Placebo</span></span>
 <span><span class="co">#&gt; 2. M Drug minus W Drug</span></span>
 <span><span class="co">#&gt; 3. Drug minus Placebo (only for mean difference)</span></span>
@@ -362,17 +276,17 @@ object:</p>
 <code class="sourceCode R"><span><span class="va">unpaired_delta2.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="va">unpaired_delta2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unpaired_delta2.mean_diff</span><span class="op">)</span></span>
-<span><span class="co">#&gt; DABESTR v2023.9.12</span></span>
+<span><span class="co">#&gt; DABESTR v2025.3.14</span></span>
 <span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 06:04 AM on Tuesday December 12, 2023.</span></span>
+<span><span class="co">#&gt; The current time is 09:52 AM on Thursday May 08, 2025.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; The unpaired mean difference between M Placebo and W Placebo is 1.032 [95%CI 0.731, 1.279].</span></span>
+<span><span class="co">#&gt; The character(0) mean difference between M Placebo and W Placebo is 1.032 [95%CI 0.731, 1.279].</span></span>
 <span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 0.0000, calculated for legacy purposes only.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; The unpaired mean difference between M Drug and W Drug is 0.244 [95%CI -0.136, 0.666].</span></span>
-<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 0.3527, calculated for legacy purposes only.</span></span>
+<span><span class="co">#&gt; The character(0) mean difference between M Drug and W Drug is 0.244 [95%CI -0.136, 0.666].</span></span>
+<span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 0.2695, calculated for legacy purposes only.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 5000 bootstrap samples were taken; the confidence interval is bias-corrected and accelerated.</span></span>
 <span><span class="co">#&gt; Any p-value reported is the probability of observing the effect size (or greater),</span></span>
@@ -381,40 +295,42 @@ object:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">unpaired_delta2.mean_diff</span><span class="op">)</span></span></code></pre></div>
 <p><img src="tutorial_deltadelta_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
-<p>In the above plot, the horizontal axis represents the
-<code>Genotype</code> condition and the dot colour is also specified by
-<code>Genotype</code>. The left pair of scattered plots is based on the
-<code>Placebo</code> group while the right pair is based on the
+<p>The horizontal axis in the above plot represents the
+<code>Genotype</code> condition, and the dot colour is also specified by
+<code>Genotype</code>. The left pair of scattered plots corresponds to
+the <code>Placebo</code> group, while the right pair is based on the
 <code>Drug</code> group. The bottom left axis contains the two primary
-deltas: the <code>Placebo</code> delta and the <code>Drug</code> delta.
-We can easily see that when only the placebo was administered, the
-mutant phenotype is around 1.23 [95%CI 0.948, 1.52]. This difference was
-shrunken to around 0.326 [95%CI 0.0934, 0.584] when the drug was
-administered. This gives us some indication that the drug is effective
-in amiliorating the disease phenotype. Since the <code>Drug</code> did
-not completely eliminate the mutant phenotype, we have to calculate how
-much net effect the drug had. This is where delta-delta comes in. We use
-the <code>Placebo</code> delta as a reference for how much the mutant
+deltas: the <code>Placebo</code> delta and the <code>Drug</code>
+delta.</p>
+<p>It is evident that when only the placebo was administered, the mutant
+phenotype was around 1.23 [95% CI: 0.948, 1.52]. However, this
+difference was reduced to approximately 0.326 [95% CI: 0.0934, 0.584]
+when the drug was administered, indicating that the drug is effective in
+ameliorating the disease phenotype. Since the <code>Drug</code> did not
+completely eliminate the mutant phenotype, we need to calculate the net
+effect of the drug.</p>
+<p>Delta-delta comes in handy in this situation. We use the
+<code>Placebo</code> delta as a reference for how much the mutant
 phenotype is supposed to be, and we subtract the <code>Drug</code> delta
 from it. The bootstrapped mean differences (delta-delta) between the
 <code>Placebo</code> and <code>Drug</code> group are plotted at the
-right bottom with a separate y-axis from other bootstrap plots. This
-effect size, at about -0.903 [95%CI -1.28, -0.513], is the net effect
-size of the drug treatment. That is to say that treatment with drug A
-reduced disease phenotype by 0.903.</p>
-<p>Mean difference between mutants and wild types given the placebo
+bottom right with a separate y-axis from other bootstrap plots. This
+effect size, at about -0.903 [95% CI: -1.28, -0.513], represents the net
+effect size of the drug treatment. In other words, treatment with drug A
+reduced the disease phenotype by 0.903.</p>
+<p>The mean difference between mutants and wild types given the placebo
 treatment is:</p>
-<p><span class="math display">\[\Delta_1 =
-\bar{X}_{P,M}-\bar{X}_{P,W}\]</span></p>
-<p>Mean difference between mutants and wild types given the drug
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Δ</mi><mn>1</mn></msub><mo>=</mo><msub><mover><mi>X</mi><mo accent="true">‾</mo></mover><mrow><mi>P</mi><mo>,</mo><mi>M</mi></mrow></msub><mo>−</mo><msub><mover><mi>X</mi><mo accent="true">‾</mo></mover><mrow><mi>P</mi><mo>,</mo><mi>W</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\Delta_1 = \bar{X}_{P,M}-\bar{X}_{P,W}</annotation></semantics></math></p>
+<p>The mean difference between mutants and wild types given the drug
 treatment is:</p>
-<p><span class="math display">\[\Delta_2 =
-\bar{X}_{D,M}-\bar{X}_{D,W}\]</span> The net effect of the drug on
-mutants is:</p>
-<p><span class="math display">\[\Delta_\Delta = \Delta_1 -
-\Delta_2\]</span> where <span class="math inline">\(\bar{X}\)</span> is
-the sample mean, <span class="math inline">\(\Delta\)</span> is the mean
-difference.</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Δ</mi><mn>2</mn></msub><mo>=</mo><msub><mover><mi>X</mi><mo accent="true">‾</mo></mover><mrow><mi>D</mi><mo>,</mo><mi>M</mi></mrow></msub><mo>−</mo><msub><mover><mi>X</mi><mo accent="true">‾</mo></mover><mrow><mi>D</mi><mo>,</mo><mi>W</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\Delta_2 = \bar{X}_{D,M}-\bar{X}_{D,W}</annotation></semantics></math>
+The net effect of the drug on mutants is:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Δ</mi><mi>Δ</mi></msub><mo>=</mo><msub><mi>Δ</mi><mn>1</mn></msub><mo>−</mo><msub><mi>Δ</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">\Delta_\Delta = \Delta_1 - \Delta_2</annotation></semantics></math>
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>X</mi><mo accent="true">‾</mo></mover><annotation encoding="application/x-tex">\bar{X}</annotation></semantics></math>
+is the sample mean,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Δ</mi><annotation encoding="application/x-tex">\Delta</annotation></semantics></math>
+is the mean difference.</p>
 </div>
 <div class="section level2">
 <h2 id="specifying-grouping-for-comparisons">Specifying Grouping for Comparisons<a class="anchor" aria-label="anchor" href="#specifying-grouping-for-comparisons"></a>
@@ -439,18 +355,20 @@ horizontal axis variable by setting <code>experiment_label</code> and
 <div class="section level2">
 <h2 id="paired-data">Paired Data<a class="anchor" aria-label="anchor" href="#paired-data"></a>
 </h2>
-<p>The delta - delta function also supports paired data, which is useful
-for us to visualise the data in an alternate way. Assuming that the
-placebo and drug treatment were done on the same subjects, our data is
-paired between the treatment conditions. We can specify this by using
-<code>Treatment</code> as <code>x</code> and <code>Genotype</code> as
-<code>experiment</code>, and we further specify that <code>id_col</code>
-is <code>ID</code>, linking data from the same subject with each other.
-Since we have done two replicates of the experiments, we can also colour
-the slope lines according to <code>Rep</code>.</p>
-<p>Although the <code>idx</code> is a non-compulsory parameter, it is
-still possible to have it as an input to adjust the order as opposed to
-using <code>experiment_label</code> and <code>x1_level</code>.</p>
+<p>The <code>delta-delta</code> function also supports paired data,
+which can be useful for visualizing the data in an alternative way. If
+the placebo and drug treatment were administered to the same subjects,
+our data is paired between the treatment conditions. We can specify this
+by using <code>Treatment</code> as <code>x</code> and
+<code>Genotype</code> as <code>experiment</code>. Additionally, we can
+link data from the same subject with each other by specifying
+<code>ID</code> as <code>id_col</code>.</p>
+<p>Since we have conducted two replicates of the experiments, we can
+colour the slope lines according to <code>Rep</code> to differentiate
+between the replicates.</p>
+<p>Although <code>idx</code> is an optional parameter, it can still be
+included as an input to adjust the order of the data as opposed to using
+<code>experiment_label</code> and <code>x1_level</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">paired_delta2.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>,</span>
 <span>  x <span class="op">=</span> <span class="va">Treatment</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
@@ -469,40 +387,40 @@ using <code>experiment_label</code> and <code>x1_level</code>.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="tutorial_deltadelta_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
 <p>We see that the drug had a non-specific effect of -0.125 [95%CI
--0.486 , 0.214] on wild type subjects even when they were not sick, and
-it had a bigger effect of -0.913 [95%CI -1.24 , -0.577] in mutant
-subjects. In this visualisation, we can see the delta-delta value of
--0.789 [95%CI -1.3 , -0.317] as the net effect of the drug accounting
-for non-specific actions in healthy individuals</p>
-<p>Mean difference between drug and placebo treatments in wild type
+-0.486 , 0.214] on the wild type subjects even when they were not sick,
+and it had a bigger effect of -0.913 [95%CI -1.24 , -0.577] in the
+mutant subjects. In this visualisation, we can see the delta-delta value
+of -0.789 [95%CI -1.3 , -0.317] as the net effect of the drug accounting
+for non-specific actions in healthy individuals.</p>
+<p>The mean difference between drug and placebo treatments in wild type
 subjects is:</p>
-<p><span class="math display">\[\Delta_1 =
-\bar{X}_{D,M}-\bar{X}_{P,W}\]</span></p>
-<p>Mean difference between drug and placebo treatments in mutant
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Δ</mi><mn>1</mn></msub><mo>=</mo><msub><mover><mi>X</mi><mo accent="true">‾</mo></mover><mrow><mi>D</mi><mo>,</mo><mi>M</mi></mrow></msub><mo>−</mo><msub><mover><mi>X</mi><mo accent="true">‾</mo></mover><mrow><mi>P</mi><mo>,</mo><mi>W</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\Delta_1 = \bar{X}_{D,M}-\bar{X}_{P,W}</annotation></semantics></math></p>
+<p>The mean difference between drug and placebo treatments in mutant
 subjects is:</p>
-<p><span class="math display">\[\Delta_2 =
-\bar{X}_{D,M}-\bar{X}_{P,W}\]</span> The net effect of the drug on
-mutants is:</p>
-<p><span class="math display">\[\Delta_\Delta = \Delta_2 -
-\Delta_1\]</span> where <span class="math inline">\(\bar{X}\)</span> is
-the sample mean, <span class="math inline">\(\Delta\)</span> is the mean
-difference.</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Δ</mi><mn>2</mn></msub><mo>=</mo><msub><mover><mi>X</mi><mo accent="true">‾</mo></mover><mrow><mi>D</mi><mo>,</mo><mi>M</mi></mrow></msub><mo>−</mo><msub><mover><mi>X</mi><mo accent="true">‾</mo></mover><mrow><mi>P</mi><mo>,</mo><mi>W</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\Delta_2 = \bar{X}_{D,M}-\bar{X}_{P,W}</annotation></semantics></math>
+The net effect of the drug on mutants is:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Δ</mi><mi>Δ</mi></msub><mo>=</mo><msub><mi>Δ</mi><mn>2</mn></msub><mo>−</mo><msub><mi>Δ</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">\Delta_\Delta = \Delta_2 - \Delta_1</annotation></semantics></math>
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>X</mi><mo accent="true">‾</mo></mover><annotation encoding="application/x-tex">\bar{X}</annotation></semantics></math>
+is the sample mean,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Δ</mi><annotation encoding="application/x-tex">\Delta</annotation></semantics></math>
+is the mean difference.</p>
 </div>
 <div class="section level2">
 <h2 id="connection-to-anova">Connection to ANOVA<a class="anchor" aria-label="anchor" href="#connection-to-anova"></a>
 </h2>
-<p>The configuration of comparison we performed above is reminiscent of
-a two-way ANOVA. In fact, the delta - delta is an effect size estimated
-for the interaction term between <code>Treatment</code> and
-<code>Genotype</code>. Main effects of <code>Treatment</code> and
-<code>Genotype</code>, on the other hand, can be determined by simpler,
-univariate contrast plots.</p>
+<p>The comparison we conducted earlier is reminiscent of a two-way
+ANOVA. In fact, the delta-delta is an effect size estimated for the
+interaction term between <code>Treatment</code> and
+<code>Genotype</code>. On the other hand, main effects of
+<code>Treatment</code> and <code>Genotype</code> can be determined
+through simpler, univariate contrast plots.</p>
 </div>
 <div class="section level2">
 <h2 id="omitting-delta-delta-plot">Omitting Delta-delta Plot<a class="anchor" aria-label="anchor" href="#omitting-delta-delta-plot"></a>
 </h2>
 <p>If for some reason you don’t want to display the delta-delta plot,
-you can easily do so by</p>
+you can easily do so by setting <code>show_delta2</code> to FALSE:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">unpaired_delta2.mean_diff</span>, show_delta2 <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="tutorial_deltadelta_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
@@ -519,8 +437,8 @@ bootstrap plot.</p>
 <div class="section level2">
 <h2 id="statistics">Statistics<a class="anchor" aria-label="anchor" href="#statistics"></a>
 </h2>
-<p>You can find all outputs of the delta - delta calculation by
-assessing the column named <code>boot_result</code> of the
+<p>You can find all the outputs of the delta - delta calculation by
+assessing the column named <code>boot_result</code> of the object
 <code>dabest_effectsize_obj</code>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unpaired_delta2.mean_diff</span><span class="op">$</span><span class="va">boot_result</span><span class="op">)</span></span>
@@ -533,128 +451,124 @@ assessing the column named <code>boot_result</code> of the
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: pct_ci_high &lt;dbl&gt;, ci &lt;dbl&gt;, difference &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   weight &lt;dbl&gt;</span></span></span></code></pre></div>
 <p>If you want to extract the permutations, permutation test’s p values,
-the statistical tests and the p value results, you can access it with
+the statistical tests and the p value results, you can access them using
 the columns <code>permutation_test_results</code>,
 <code>pval_permtest</code>, <code>pval_for_tests</code> and
 <code>pvalues</code> respectively.</p>
-<p>P values for permutation tests <code>pval_permtest</code> (and the
-permutation calculations and results accessed by running the commented
-out session).</p>
+<p>For instance, the P values for permutation tests
+<code>pval_permtest</code>:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># print(unpaired_delta2.mean_diff$permtest_pvals$permutation_test_results)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unpaired_delta2.mean_diff</span><span class="op">$</span><span class="va">permtest_pvals</span><span class="op">$</span><span class="va">pval_permtest</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.0000 0.2728</span></span></code></pre></div>
-<p>An representative p value for statistical tests
-(<code>pval_for_tests</code>)</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unpaired_delta2.mean_diff</span><span class="op">$</span><span class="va">permtest_pvals</span><span class="op">$</span><span class="va">pval_permtest</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.0000 0.2628</span></span></code></pre></div>
+<p>Or the permutation calculations and results could be accessed by:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unpaired_delta2.mean_diff</span><span class="op">$</span><span class="va">permtest_pvals</span><span class="op">$</span><span class="va">pval_for_tests</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $pvalue_wilcoxon</span></span>
-<span><span class="co">#&gt; [1] 2.165018e-05</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $pvalue_wilcoxon</span></span>
-<span><span class="co">#&gt; [1] 0.3526814</span></span></code></pre></div>
-<p>Statistical test results and <code>pvalues</code>.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unpaired_delta2.mean_diff</span><span class="op">$</span><span class="va">permtest_pvals</span><span class="op">$</span><span class="va">permutation_test_results</span><span class="op">)</span></span></code></pre></div>
+<p>A representative <em>p value</em> for statistical tests
+<code>pval_for_tests</code>:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unpaired_delta2.mean_diff</span><span class="op">$</span><span class="va">permtest_pvals</span><span class="op">$</span><span class="va">pval_for_tests</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $pvalue_welch</span></span>
+<span><span class="co">#&gt; [1] 1.650881e-06</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $pvalue_welch</span></span>
+<span><span class="co">#&gt; [1] 0.2694873</span></span></code></pre></div>
+<p>Finally here the statistical test results and
+<code>pvalues</code>:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">unpaired_delta2.mean_diff</span><span class="op">$</span><span class="va">permtest_pvals</span><span class="op">$</span><span class="va">pvalues</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span>
-<span><span class="co">#&gt; [[1]]$pvalue_wilcoxon</span></span>
-<span><span class="co">#&gt; [1] 2.165018e-05</span></span>
+<span><span class="co">#&gt; [[1]]$pvalue_welch</span></span>
+<span><span class="co">#&gt; [1] 1.650881e-06</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[1]]$wilcoxon</span></span>
+<span><span class="co">#&gt; [[1]]$statistic_welch</span></span>
+<span><span class="co">#&gt;         t </span></span>
+<span><span class="co">#&gt; -6.971633 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  Wilcoxon rank sum exact test</span></span>
+<span><span class="co">#&gt; [[1]]$students_t</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Welch Two Sample t-test</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; data:  control and test</span></span>
-<span><span class="co">#&gt; W = 1, p-value = 2.165e-05</span></span>
-<span><span class="co">#&gt; alternative hypothesis: true location shift is not equal to 0</span></span>
+<span><span class="co">#&gt; t = -6.9716, df = 17.979, p-value = 1.651e-06</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true difference in means is not equal to 0</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval:</span></span>
+<span><span class="co">#&gt;  -1.3435832 -0.7212793</span></span>
+<span><span class="co">#&gt; sample estimates:</span></span>
+<span><span class="co">#&gt; mean of x mean of y </span></span>
+<span><span class="co">#&gt;  2.914391  3.946822 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[1]]$statistic_wilcoxon</span></span>
+<span><span class="co">#&gt; [[1]]$pvalue_students_t</span></span>
+<span><span class="co">#&gt; [1] 1.650881e-06</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[1]]$statistic_students_t</span></span>
+<span><span class="co">#&gt;         t </span></span>
+<span><span class="co">#&gt; -6.971633 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[1]]$pvalue_mann_whitney</span></span>
+<span><span class="co">#&gt; [1] 0.0002461281</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[1]]$statistic_mann_whitney</span></span>
 <span><span class="co">#&gt; W </span></span>
 <span><span class="co">#&gt; 1 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[1]]$paired_t</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  Paired t-test</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; data:  control and test</span></span>
-<span><span class="co">#&gt; t = -6.1826, df = 9, p-value = 0.0001622</span></span>
-<span><span class="co">#&gt; alternative hypothesis: true mean difference is not equal to 0</span></span>
-<span><span class="co">#&gt; 95 percent confidence interval:</span></span>
-<span><span class="co">#&gt;  -1.4101885 -0.6546739</span></span>
-<span><span class="co">#&gt; sample estimates:</span></span>
-<span><span class="co">#&gt; mean difference </span></span>
-<span><span class="co">#&gt;       -1.032431 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[1]]$pvalue_paired_students_t</span></span>
-<span><span class="co">#&gt; [1] 0.0001622227</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[1]]$statistic_paired_students_t</span></span>
-<span><span class="co">#&gt;         t </span></span>
-<span><span class="co">#&gt; -6.182598 </span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[2]]</span></span>
-<span><span class="co">#&gt; [[2]]$pvalue_wilcoxon</span></span>
-<span><span class="co">#&gt; [1] 0.3526814</span></span>
+<span><span class="co">#&gt; [[2]]$pvalue_welch</span></span>
+<span><span class="co">#&gt; [1] 0.2694873</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[2]]$wilcoxon</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  Wilcoxon rank sum exact test</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; data:  control and test</span></span>
-<span><span class="co">#&gt; W = 37, p-value = 0.3527</span></span>
-<span><span class="co">#&gt; alternative hypothesis: true location shift is not equal to 0</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[2]]$statistic_wilcoxon</span></span>
-<span><span class="co">#&gt;  W </span></span>
-<span><span class="co">#&gt; 37 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[2]]$paired_t</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  Paired t-test</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; data:  control and test</span></span>
-<span><span class="co">#&gt; t = -1.1419, df = 9, p-value = 0.283</span></span>
-<span><span class="co">#&gt; alternative hypothesis: true mean difference is not equal to 0</span></span>
-<span><span class="co">#&gt; 95 percent confidence interval:</span></span>
-<span><span class="co">#&gt;  -0.7262822  0.2390283</span></span>
-<span><span class="co">#&gt; sample estimates:</span></span>
-<span><span class="co">#&gt; mean difference </span></span>
-<span><span class="co">#&gt;       -0.243627 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[2]]$pvalue_paired_students_t</span></span>
-<span><span class="co">#&gt; [1] 0.2829828</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[2]]$statistic_paired_students_t</span></span>
+<span><span class="co">#&gt; [[2]]$statistic_welch</span></span>
 <span><span class="co">#&gt;         t </span></span>
-<span><span class="co">#&gt; -1.141855</span></span></code></pre></div>
+<span><span class="co">#&gt; -1.139429 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[2]]$students_t</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Welch Two Sample t-test</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  control and test</span></span>
+<span><span class="co">#&gt; t = -1.1394, df = 17.968, p-value = 0.2695</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true difference in means is not equal to 0</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval:</span></span>
+<span><span class="co">#&gt;  -0.6928931  0.2056392</span></span>
+<span><span class="co">#&gt; sample estimates:</span></span>
+<span><span class="co">#&gt; mean of x mean of y </span></span>
+<span><span class="co">#&gt;  2.789728  3.033355 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[2]]$pvalue_students_t</span></span>
+<span><span class="co">#&gt; [1] 0.2694873</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[2]]$statistic_students_t</span></span>
+<span><span class="co">#&gt;         t </span></span>
+<span><span class="co">#&gt; -1.139429 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[2]]$pvalue_mann_whitney</span></span>
+<span><span class="co">#&gt; [1] 0.3447042</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[2]]$statistic_mann_whitney</span></span>
+<span><span class="co">#&gt;  W </span></span>
+<span><span class="co">#&gt; 37</span></span></code></pre></div>
 </div>
-  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
 
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p>
-<p>Developed by Joses W. Ho, <a href="https://github.com/sunroofgod" class="external-link">Kah Seng Lian</a>, Zhuoyu Wang, <a href="https://github.com/junyangliao" class="external-link">Jun Yang Liao</a>, Felicia Low, Tayfun Tumkaya, Yishan Mai, Sangyu Xu, Hyungwon Choi, Adam Claridge-Chang.</p>
+  <p>Developed by Joses W. Ho, <a href="https://github.com/sunroofgod" class="external-link">Kah Seng Lian</a>, Ana Rosa Castillo, Zhuoyu Wang, <a href="https://github.com/junyangliao" class="external-link">Jun Yang Liao</a>, Felicia Low, Tayfun Tumkaya, Jonathan Anns, Yishan Mai, Sangyu Xu, Hyungwon Choi, Adam Claridge-Chang.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer>
 </div>
 
-  
 
-  
+
+
 
   </body>
 </html>
