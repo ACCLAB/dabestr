@@ -3,6 +3,7 @@
 # Contains function `apply_palette`.
 
 # Applies palettes to <ggplot> objects
+# TODO add proper documentation.
 apply_palette <- function(ggplot_object, palette_name) {
   ggplot_object <- switch(palette_name,
     "npg" =
@@ -38,4 +39,26 @@ apply_palette <- function(ggplot_object, palette_name) {
   )
 
   return(ggplot_object)
+}
+
+get_palette_colours <- function(palette_name, num_colours) {
+  # palette function by name
+  colours <- switch(palette_name,
+    "npg" = ggsci::pal_npg()(num_colours),
+    "aaas" = ggsci::pal_aaas()(num_colours),
+    "nejm" = ggsci::pal_nejm()(num_colours),
+    "lancet" = ggsci::pal_lancet()(num_colours),
+    "jama" = ggsci::pal_jama()(num_colours),
+    "jco" = ggsci::pal_jco()(num_colours),
+    "ucscgb" = ggsci::pal_ucscgb()(num_colours),
+    "d3" = ggsci::pal_d3()(num_colours),
+    "locuszoom" = ggsci::pal_locuszoom()(num_colours),
+    "igv" = ggsci::pal_igv()(num_colours),
+    "cosmic" = ggsci::pal_cosmic()(num_colours),
+    "uchicago" = ggsci::pal_uchicago()(num_colours),
+    "brewer" = RColorBrewer::brewer.pal()(num_colours),
+    "ordinal" = viridisLite::viridis(n = num_colours, option = "viridis"),
+    "viridis_d" = viridisLite::viridis(n = num_colours, option = "viridis")
+  )
+  return(colours)
 }

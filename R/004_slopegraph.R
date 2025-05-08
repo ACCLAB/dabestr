@@ -4,7 +4,11 @@
 
 
 # Function that plots slopegraph
+# TODO add proper documentation
+
 plot_slopegraph <- function(dabest_effectsize_obj, plot_kwargs) {
+  check_effectsize_object(dabest_effectsize_obj)
+
   raw_data <- dabest_effectsize_obj$raw_data
 
   raw_marker_size <- plot_kwargs$raw_marker_size

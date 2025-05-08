@@ -1,14 +1,29 @@
-# Obtain permutation tests, permutations and p values
-
+#' Generates permutation test results.
+#'
+#' This function returns a list that include permutations results:
+#' its corresponding permutations, variance of permutations, p value and effect size
+#' (depending on the effect size).
+#'
+#' @param control Vector, the control group data.
+#' @param test Vector, the test group data.
+#' @param effect_size String. Any one of the following are accepted inputs:
+#' 'mean_diff', 'median_diff', 'cohens_d', 'hedges_g', or 'cliffs_delta'.
+#' @param is_paired Boolean value as initially passed to [load()].
+#' @param permutation_count Integer value specifying the number of permutations being carried out.
+#' @param random_seed Integer value specifying the random seed for permutations to be carried out.
+#' @param ef_size_fn A function that calculates the specific type of effect size.
+#'
+#' @returns a list for permutation test results for a pair of control and test data points.
+#' @noRd
 PermutationTest <- function(control,
                             test,
                             effect_size,
-                            is_paired = NULL,
+                            is_paired,
                             permutation_count = 5000,
                             random_seed = 12345,
                             ef_size_fn) {
   # Check if the arrays have the same length for paired test
-  if (!is.null(is_paired) && length(control) != length(test)) {
+  if (is_paired && (length(control) != length(test))) {
     stop("The two arrays do not have the same length.")
   }
 
@@ -19,6 +34,7 @@ PermutationTest <- function(control,
   control <- as.numeric(control)
   test <- as.numeric(test)
 
+  # TODO do you really need these copies? if not you can manipulate directly control and test.
   control_sample <- control
   test_sample <- test
 
@@ -30,7 +46,7 @@ PermutationTest <- function(control,
   permutations_var <- vector("numeric", length = permutation_count)
 
   for (i in 1:permutation_count) {
-    if (!is.null(is_paired)) {
+    if (is_paired) {
       # Select which control-test pairs to swap.
       random_idx <- sample(1:CONTROL_LEN,
         size = sample(1:CONTROL_LEN, 1),
@@ -78,17 +94,30 @@ PermutationTest <- function(control,
   return(perm_results)
 }
 
-# p values
-
+#' Generates statistical test results for possible hypothesis testings.
+#'
+#' This function returns a list that include statistical test results:
+#' its corresponding statistics and p values
+#'
+#' @param control Vector, the control group data.
+#' @param test Vector, the test group data.
+#' @param is_paired Boolean value as initially passed to [load()].
+#' @param proportional Boolean value as initially passed to [load()].
+#' @param effect_size String. Any one of the following are accepted inputs:
+#' 'mean_diff', 'median_diff', 'cohens_d', 'hedges_g', or 'cliffs_delta'.
+#'
+#' @returns a list for statistical test results and p values for the
+#' corresponding tests of a pair of control and test data points.
+#' @noRd
 pvals_statistics <- function(control,
                              test,
                              is_paired,
                              proportional,
                              effect_size) {
   pvals_stats <- list()
-  if (!is.null(is_paired) && !proportional) {
+  if (is_paired && !proportional) {
     # Wilcoxon test (non-parametric version of the paired T-test)
-    wilcoxon <- stats::wilcox.test(control, test)
+    wilcoxon <- stats::wilcox.test(control, test, exact = FALSE)
     pvalue_wilcoxon <- wilcoxon$p.value
     statistic_wilcoxon <- wilcoxon$statistic
 
@@ -110,7 +139,7 @@ pvals_statistics <- function(control,
       pvalue_paired_students_t = pvalue_paired_students_t,
       statistic_paired_students_t = statistic_paired_students_t
     )
-  } else if (!is.null(is_paired) && proportional) {
+  } else if (is_paired && proportional) {
     # McNemar's test for binary paired data
     table <- matrix(
       c(
@@ -159,7 +188,7 @@ pvals_statistics <- function(control,
     # Mann-Whitney test: non-parametric, does not assume normality of distributions
     tryCatch(
       {
-        mann_whitney <- stats::wilcox.test(control, test, alternative = "two.sided")
+        mann_whitney <- stats::wilcox.test(control, test, alternative = "two.sided", exact = FALSE)
         pvalue_mann_whitney <- mann_whitney$p.value
         statistic_mann_whitney <- mann_whitney$statistic
       },
@@ -173,26 +202,17 @@ pvals_statistics <- function(control,
     standardized_es <- effsize::cohen.d(control, test, is_paired = NULL)
 
     # Cohen's h calculation for binary categorical data
-    tryCatch(
-      {
-        cohens_h_cal <- function(control, test) {
-          # remove nas and nulls later on
-          prop_control <- mean(control)
-          prop_test <- mean(test)
-
-          # Arcsine transformation
-          phi_control <- 2 * asin(sqrt(prop_control))
-          phi_test <- 2 * asin(sqrt(prop_test))
-          result <- phi_test - phi_control
-          return(result)
+    if (proportional) {
+      tryCatch(
+        {
+          proportional_difference <- cohens_h_cal(control, test)
+        },
+        error = function(e) {
+          # Occur only when the data consists not only 0's and 1's.
+          proportional_difference <- NA
         }
-        proportional_difference <- cohens_h_cal(control, test)
-      },
-      error = function(e) {
-        # Occur only when the data consists not only 0's and 1's.
-        proportional_difference <- NA
-      }
-    )
+      )
+    }
 
     pvals_stats <- list(
       pvalue_welch = pvalue_welch,
@@ -210,9 +230,26 @@ pvals_statistics <- function(control,
 
   return(pvals_stats)
 }
-
-# collate permtest and p values with function "Pvalues_statistics"
-
+#' Generates collated permutaion test results and statistical test results.
+#'
+#' This function returns a tibble (list) that includes statistical test results:
+#' its corresponding statistics and p values.
+#'
+#' @param dabest_object A "dabest_obj" list created by loading in dataset along with other
+#' specified parameters with the [load()] function.
+#' @param seed Integer specifying random seed that will be passed to the
+#' [PermutationTest()] function.
+#' @param permutation_count Integer value specifying the number of permutations
+#'  being carried out in the [PermutationTest()] function.
+#' @param ef_size_fn The effect size function passed to [PermutationTest()] that
+#'  help calculate the specific type of effect size.
+#' @param effect_size_type String. Any one of the following are accepted inputs:
+#' 'mean_diff', 'median_diff', 'cohens_d', 'hedges_g', or 'cliffs_delta'.
+#'
+#' @returns Tibble for statistical test and permutation test results for
+#' all pairs of control and test datasets based on the experimental design
+#' initially specified when passed to the [load()] function.
+#' @noRd
 Pvalues_statistics <- function(dabest_object,
                                seed = 12345,
                                perm_count = 5000,
@@ -228,12 +265,11 @@ Pvalues_statistics <- function(dabest_object,
   raw_data <- dabest_object$raw_data
   idx <- dabest_object$idx
 
-  if (isFALSE(is.list(idx))) {
+  if (!(is.list(idx))) {
     idx <- list(idx)
   }
   enquo_x <- dabest_object$enquo_x
   enquo_y <- dabest_object$enquo_y
-  ci <- dabest_object$ci
   paired <- dabest_object$paired
   is_paired <- dabest_object$is_paired
 
@@ -242,10 +278,7 @@ Pvalues_statistics <- function(dabest_object,
   quoname_x <- rlang::as_name(enquo_x)
   quoname_y <- rlang::as_name(enquo_y)
 
-  minimeta <- dabest_object$minimeta
-  delta2 <- dabest_object$delta2
-
-  if (isFALSE(is_paired) || isTRUE(paired == "baseline")) {
+  if (!(is_paired) || (paired == "baseline")) {
     for (group in idx) {
       control_group <- group[1]
       group_length <- length(group)
@@ -262,10 +295,6 @@ Pvalues_statistics <- function(dabest_object,
           dplyr::filter(!!enquo_x == !!test_group)
 
         test_measurement <- test_tibble[[quoname_y]]
-
-        xlabels <- paste(test_group, group[1], sep = "\nminus\n")
-
-        test_size <- length(test_measurement)
 
         es <- ef_size_fn(ctrl_measurement, test_measurement, paired = is_paired)
 
@@ -315,24 +344,6 @@ Pvalues_statistics <- function(dabest_object,
           dplyr::filter(!!enquo_x == !!test_group)
         test_measurement <- test_tibble[[quoname_y]]
 
-        xlabels <- paste(test_group, control_group, sep = "\nminus\n")
-
-        control_test_measurement <- list(
-          control = ctrl_measurement,
-          test = test_measurement
-        )
-        # add weights column
-        ctrl_size <- length(ctrl_measurement)
-        ctrl_var <- var_w_df(ctrl_measurement, ctrl_size)
-        test_size <- length(test_measurement)
-        test_var <- var_w_df(test_measurement, test_size)
-        grp_var <- calculate_group_variance(
-          ctrl_var = ctrl_var,
-          ctrl_N = ctrl_size,
-          test_var = test_var,
-          test_N = test_size
-        )
-
         es <- ef_size_fn(ctrl_measurement, test_measurement, paired)
 
         # do permutation tests accordingly
@@ -369,4 +380,17 @@ Pvalues_statistics <- function(dabest_object,
   }
 
   return(list(permtest_pvals = permtest_pvals))
+}
+
+# TODO Add documentation for this auxiliary function
+cohens_h_cal <- function(control, test) {
+  # remove nas and nulls later on
+  prop_control <- mean(control)
+  prop_test <- mean(test)
+
+  # Arcsine transformation
+  phi_control <- 2 * asin(sqrt(prop_control))
+  phi_test <- 2 * asin(sqrt(prop_test))
+  result <- phi_test - phi_control
+  return(result)
 }

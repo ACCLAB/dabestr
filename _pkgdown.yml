@@ -36,7 +36,7 @@ articles:
   - tutorial_proportion_plots
   - tutorial_minimeta
   - tutorial_deltadelta
-  - datasets
+  - sample_datasets
 news:
   cran_dates: true 
 reference:
@@ -47,6 +47,7 @@ reference:
   - load
   - effect_size
   - dabest_plot
+  - forest_plot
 - subtitle: Adjusting plot aesthetics
 - contents: plot_kwargs
 authors:

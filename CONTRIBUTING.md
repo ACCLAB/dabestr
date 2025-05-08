@@ -12,13 +12,13 @@ Please note that dabestr is released with a [Contributor Code of Conduct](CODE_O
 
 Ensure the bug was not already reported by searching in [Issues](https://github.com/ACCLAB/dabestr/issues). Be sure to also check that the bug hasn't been addressed in a closed issue.
 
-If the bug isn't being addressed, open a new one. 
+If the bug isn't being addressed, open a new issue using the Bug report template. 
 
-Be sure to include a title and clear description, and a [minimally reproducible code sample](http://adv-r.had.co.nz/Reproducibility.html) demonstrating the expected behavior that is not occurring. 
+Be sure to fill in the necessary information, and a [minimally reproducible code sample](http://adv-r.had.co.nz/Reproducibility.html) demonstrating the expected behavior that is not occurring. 
 
 ## Feature Requests
 
-You may suggest by opening an issue and adding an Enhancement tag.
+You may suggest by opening an issue using the Feature request template.
 
 ## Pull requests
 

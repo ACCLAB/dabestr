@@ -102,116 +102,32 @@ load <- function(
   enquo_id_col <- rlang::enquo(id_col)
   enquo_colour <- rlang::enquo(colour)
 
-  is_colour <- isFALSE(rlang::quo_is_null(enquo_colour))
-  is_id_col <- isFALSE(rlang::quo_is_null(enquo_id_col))
-  is_paired <- isFALSE(is.null(paired))
+  is_colour <- !(rlang::quo_is_null(enquo_colour))
+  is_id_col <- !(rlang::quo_is_null(enquo_id_col))
+  is_paired <- !(is.null(paired))
 
   name_x <- rlang::as_name(enquo_x)
   name_y <- rlang::as_name(enquo_y)
 
   #### Checking Validity of params ####
-  if (isFALSE(name_x %in% colnames(data))) {
-    cli::cli_abort(c("Column {.field x} is {.emph not} in {.field data}.",
-      "x" = "Please enter a valid entry for {.field x} in {.fun load}."
-    ))
-  }
-  if (isFALSE(name_y %in% colnames(data))) {
-    cli::cli_abort(c("Column {.field y} is {.strong not} in {.field data}.",
-      "x" = "Please enter a valid entry for {.field y} in {.fun load}."
-    ))
-  }
-  if (isTRUE(is_id_col)) {
-    if (isFALSE(rlang::as_name(enquo_id_col) %in% colnames(data))) {
-      cli::cli_abort(c("Column {.field id_col} is {.strong not} in {.field data}.",
-        "x" = "Please enter a valid entry for {.field id_col} in {.fun load}."
-      ))
-    }
-  }
-  if (isTRUE(is_colour)) {
-    if (isFALSE(rlang::as_name(enquo_colour) %in% colnames(data))) {
-      cli::cli_abort(c("Column {.field colour} is {.strong not} in {.field data}.",
-        "x" = "Please enter a valid entry for {.field colour} in {.fun load}."
-      ))
-    }
-  }
-  if (isFALSE(delta2)) {
-    if (is.null(idx)) {
-      cli::cli_abort(c("Column {.field idx} is currently NULL.",
-        "x" = "Please enter a valid entry for {.field idx} in {.fun load}."
-      ))
-    }
-    if (is.list(idx)) {
-      general_idx_lengths <- sapply(idx, length)
-      if (any(general_idx_lengths < 2) == TRUE) {
-        cli::cli_abort(c("Some {.field idx} does not consist of at least 2 groups",
-          "x" = "Make sure each nested group in {.field idx} has length >=2."
-        ))
-      }
-    } else {
-      general_idx_lengths <- length(idx)
-      if (any(general_idx_lengths < 2) == TRUE) {
-        cli::cli_abort(c("Some {.field idx} does not consist of at least 2 groups",
-          "x" = "Make sure each nested group in {.field idx} has length >=2."
-        ))
-      }
-    }
-  }
+  validate_load_params(data, name_x, name_y, id_col, enquo_id_col, is_id_col, colour, enquo_colour, is_colour, delta2, idx, paired, proportional)
 
-
-  ## Check that data is proportional
-  if (isTRUE(proportional)) {
-    values <- unique(data[[name_y]])
-    if (isFALSE(setequal(c(0, 1), values))) {
-      cli::cli_abort(c("{.field proportional} is {.strong TRUE} but {.field data} is not proportional.",
-        "x" = "{.field y} Column of {.field data} should only contain 1 and 0."
-      ))
-    }
-  }
-
-  ## Check that id_col is not NULL if is_paired is TRUE
-  if (isTRUE(is_paired) & isFALSE(is_id_col)) {
-    cli::cli_abort(c("{.field paired} is {.strong TRUE} but no {.field id_col} was supplied.",
-      "x" = "Please enter an entry for {.field id_col} in {.fun load}."
-    ))
-  }
-
-  ## Check that paired must be either "baseline" or "sequential"
-  if (isTRUE(is_paired)) {
-    if (isFALSE(paired %in% c("baseline", "sequential"))) {
-      cli::cli_abort(c("{.field paired} is not 'baseline' or 'sequential'.",
-        "x" = "{.field paired} can only be 'baseline' or 'sequential'."
-      ))
-    }
-  }
 
   ## Make idx into a list if it is a vector
-  if (typeof(idx) != "list" && isFALSE(is.null(idx))) {
+  if (typeof(idx) != "list" && !(is.null(idx))) {
     idx <- list(idx)
   }
 
   ## Check for valid mini-meta
-  if (isTRUE(minimeta)) {
-    if (isTRUE(proportional)) {
-      cli::cli_abort(c("{.field proportional} is {.strong TRUE} but {.field minimeta} is also {.strong TRUE}.",
-        "x" = "{.field proportional} and {.field minimeta} cannot be {.strong TRUE} at the same time."
-      ))
-    } else if (isTRUE(delta2)) {
-      cli::cli_abort(c("{.field delta2} is {.strong TRUE} but {.field minimeta} is also {.strong TRUE}.",
-        "x" = "{.field delta2} and {.field minimeta} cannot be {.strong TRUE} at the same time."
-      ))
-    }
-
+  if (minimeta) {
     minimeta_idx_lengths <- sapply(idx, length)
-    if (any(minimeta_idx_lengths != 2) == TRUE) {
-      cli::cli_abort(c("{.field minimeta} is {.strong TRUE}, but some {.field idx} does not consist of exactly 2 groups",
-        "x" = "You can only put in exactly 2 groups in {.field idx} when {.field minimeta} is {.strong TRUE}."
-      ))
-    }
+    validate_minimeta_params(proportional, delta2, minimeta_idx_lengths)
   }
 
-  if (isTRUE(delta2)) {
-    if (isTRUE(proportional)) {
-      cli::cli_abort(c("{.field delta2} is {.strong TRUE} but {.field proportional} is also {.strong TRUE}.",
+  if (delta2) {
+    if (proportional) {
+      cli::cli_abort(c(
+        "{.field delta2} is {.strong TRUE} but {.field proportional} is also {.strong TRUE}.",
         "x" = "{.field delta2} and {.field proportional} cannot be {.strong TRUE} at the same time."
       ))
     }
@@ -221,22 +137,25 @@ load <- function(
 
     # Make sure that data is a 2x2 ANOVA case
     if (length(unique(data[[name_experiment]])) != 2) {
-      cli::cli_abort(c("{.field experiment} does not have a length of 2.",
+      cli::cli_abort(c(
+        "{.field experiment} does not have a length of 2.",
         "x" = "There can only be 2 groups in {.field experiment} when {.field delta2} is {.strong TRUE}."
       ))
-    } else if (length(unique(data[[name_x]])) != 2) {
-      cli::cli_abort(c("{.field x} does not have a length of 2.",
+    }
+    if (length(unique(data[[name_x]])) != 2) {
+      cli::cli_abort(c(
+        "{.field x} does not have a length of 2.",
         "x" = "There can only be 2 groups in {.field x} when {.field delta2} is {.strong TRUE}."
       ))
     }
 
     # Check for idx, experiment_label and x1_level
-    if (isTRUE(is.null(idx))) {
+    if (is.null(idx)) {
       # Set levels for experiment and x if they are present
-      if (isFALSE(is.null(experiment_label))) {
+      if (!(is.null(experiment_label))) {
         data[[name_experiment]] <- factor(x = data[[name_experiment]], levels = experiment_label)
       }
-      if (isFALSE(is.null(x1_level))) {
+      if (!(is.null(x1_level))) {
         data[[name_x]] <- factor(x = data[[name_x]], levels = x1_level)
       }
       data <- data %>%
@@ -257,7 +176,7 @@ load <- function(
     is_colour <- TRUE
 
     # Obtain idx if is null
-    if (isTRUE(is.null(idx))) {
+    if (is.null(idx)) {
       spread_idx <- unique(data[[name_experiment]])
       idx <- list()
       delta_group_size <- 2
@@ -281,9 +200,10 @@ load <- function(
   ## Check to ensure that each treatment group in idx is present in the x column
   unique_x <- unique(data[[name_x]])
   for (i in 1:length(unlist_idx)) {
-    if (isFALSE(unlist_idx[i] %in% unique_x)) {
-      cli::cli_abort(c("{.field idx} contains treatment groups not present in {.field x}.",
-        "x" = "Ensure that idx does not have any treatment groups not present in dataset."
+    if (!(unlist_idx[i] %in% unique_x)) {
+      cli::cli_abort(c(
+        "{unlist_idx[i]} not present in {.field x}.",
+        "x" = "Ensure that idx does not have any control/treatment groups not present in dataset."
       ))
     }
   }
@@ -310,11 +230,20 @@ load <- function(
     dplyr::count()
   Ns$swarmticklabs <- do.call(paste, c(Ns[c(name_x, "n")], sep = "\nN = "))
 
+  ## Check to ensure control & treatment groups have the same sample size if is_paired is TRUE
+  if (is_paired) {
+    if (length(unique(Ns$n)) > 1) {
+      cli::cli_abort(c("{.field data} is paired, as indicated by {.field paired} but size of control and treatment groups are not equal.",
+        "x" = "Ensure that the size of control and treatment groups are the same for paired comparisons."
+      ))
+    }
+  }
+
   # Extending ylim for plotting
   ylim[1] <- ylim[1] - (ylim[2] - ylim[1]) / 25
   ylim[2] <- ylim[2] + (ylim[2] - ylim[1]) / 25
 
-  if (isTRUE(proportional)) {
+  if (proportional) {
     proportional_data <- raw_data %>%
       dplyr::select(!!enquo_x, !!enquo_y, !!enquo_id_col, !!enquo_colour) %>%
       dplyr::group_by(!!enquo_x) %>%
@@ -371,7 +300,7 @@ load <- function(
 #'
 #' @noRd
 #'
-#' @param dabest_obj a list
+#' @param x a dabest object, set as x to tally with method signature for print functions
 #' @param ... S3 signature for generic plot function.
 #'
 #' @return A summary of the experimental designs.
@@ -391,35 +320,25 @@ load <- function(
 #'
 #' @export
 print.dabest <- function(x, ...) {
-  if (class(x)[1] != "dabest") {
-    cli::cli_abort(c("Only dabest class can be used.",
-      "x" = "Please enter a valid entry into the function."
-    ))
-  }
-
   dabest_obj <- x
+
+  check_dabest_object(dabest_obj)
+
   print_greeting_header()
 
   paired <- dabest_obj$paired
   ci <- dabest_obj$ci
 
-  if (is.null(paired)) {
-    rm_status <- ""
-  } else if (paired == "sequential") {
-    rm_status <- "for the sequential design of repeated-measures experiment \n"
-  } else if (paired == "baseline") {
-    rm_status <- "for repeated measures against baseline \n"
-  }
+  # Use a lookup table for rm_status and paired_status
+  rm_status_lookup <- c(NULL = "", "sequential" = "for the sequential design of repeated-measures experiment \\n", "baseline" = "for repeated measures against baseline \\n")
+  paired_status_lookup <- c(NULL = "E", "sequential" = "Paired e", "baseline" = "Paired e")
 
-  if (is.null(paired)) {
-    paired_status <- "E"
-  } else if (paired == "sequential") {
-    paired_status <- "Paired e"
-  } else if (paired == "baseline") {
-    paired_status <- "Paired e"
-  }
-  line1 <- paste(paired_status, "ffect size(s) ", rm_status, sep = "")
-  line2 <- paste("with ", ci, "% confidence intervals will be computed for:", sep = "")
+  rm_status <- rm_status_lookup[paired]
+  paired_status <- paired_status_lookup[paired]
+
+  # Create strings
+  line1 <- paste0(paired_status, "ffect size(s) ", rm_status)
+  line2 <- paste0("with ", ci, "% confidence intervals will be computed for:")
   cat(line1)
   cat(line2)
   cat("\n")

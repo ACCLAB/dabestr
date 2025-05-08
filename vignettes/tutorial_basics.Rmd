@@ -15,11 +15,9 @@ knitr::opts_chunk$set(
 ```
 
 This vignette documents the basic functionalities of dabestr. It illustrates the 
-order in which the functions are meant to be used - procedurally. 
+order in which the functions are meant to be used procedurally. 
 
-The dataset is first processed into the dabestr format via `load()`. The effect sizes are then 
-calculated via `effect_size()`. Lastly, the estimation plots are produced via
-`dabest_plot()`
+The dataset is first processed into the dabestr format using the `load()` function. Next, the effect sizes are calculated using the effect_size() function. Finally, the estimation plots are generated using `dabest_plot()`.
 
 ```{r setup, warning = FALSE, message = FALSE}
 library(dabestr)
@@ -62,17 +60,17 @@ df <- df %>%
   tidyr::gather(key = Group, value = Measurement, -ID, -Gender)
 ```
 
-Note that we have 9 groups (3 Control samples and 6 Test samples). Our dataset also has a non-numerical column indicating gender, and another column indicating the identity of each observation.
+Note that we have 9 groups (3 *Control* samples and 6 *Test* samples). Our dataset also has a non-numerical column indicating gender, and another column indicating the identity of each observation.
 
-This is known as a ‘long’ dataset. See this [writeup](https://simonejdemyr.com/r-tutorials/basics/wide-and-long/) for more details.
+This is known as a *long* dataset. See this [writeup](https://simonejdemyr.com/r-tutorials/basics/wide-and-long/) for more details.
 ```{r}
 knitr::kable(head(df))
 ```
 
-## Loading Data (Step 1)
-Before we create estimation plots and obtain confidence intervals for our effect sizes, we need to load the data and the relevant groups.
+## Step 1: Loading Data
+Before generating estimation plots and deriving confidence intervals for our effect sizes, we must first load the data and the corresponding groups.
 
-We simply supply the DataFrame to `load()` along with x and y - the columns in the DataFrame that contains the treatment groups and measurement values respectively. We also must supply the two groups you want to compare in the `idx` argument as a vector or list.
+To achieve this, we merely provide the DataFrame to the `load()` function, along with 'x' and 'y' representing the columns containing the treatment groups and measurement values, respectively. Additionally, we need to specify the two groups you wish to compare in the `idx` argument, either as a vector or a list.
 ```{r}
 two_groups_unpaired <- load(df,
   x = Group, y = Measurement,
@@ -98,8 +96,8 @@ two_groups_unpaired_ci90 <- load(df,
 print(two_groups_unpaired_ci90)
 ```
 
-## Effect sizes (Step 2)
-`dabestr` now features a range of effect sizes:
+## Step 2: Effect sizes
+`dabestr` features a range of effect sizes:
 
 - the mean difference (`mean_diff()`)
 - the median difference (`median_diff()`)
@@ -116,23 +114,28 @@ two_groups_unpaired.mean_diff <- mean_diff(two_groups_unpaired)
 print(two_groups_unpaired.mean_diff)
 ```
 
-For each comparison, the type of effect size is reported (here, it’s the “unpaired mean difference”). The confidence interval is reported as: _[confidenceIntervalWidth LowerBound, UpperBound]_
+For each comparison, the type of effect size is reported (here, it’s the “unpaired mean difference”). The confidence interval is reported as: 
 
-This confidence interval is generated through bootstrap resampling. See Bootstrap Confidence Intervals for more details.
+_[confidenceIntervalWidth LowerBound, UpperBound]_
+
+This confidence interval is generated through bootstrap resampling. See [Bootstrap Confidence Intervals](https://acclab.github.io/DABEST-python/blog/posts/bootstraps/bootstraps.html) for more details.
 
 ### P-values and statistical tests
-Permutation P values are only provided to allow analysts to satisfy a customary requirement of scientific journals. DABEST's provision of P values does not constitute an endorsement of P values or null-hypothesis significance testing (NHST). If users need to include these in a study, we recommend that they (1) avoid performing NHST, i.e. do not compare P to an alpha, (2) never refer to the P values in the Results text, and (3) state in their Methods section that "No null-hypothesis significance testing was performed; P values are provided for legacy purposes only."
+Permutation P values are only provided to allow analysts to satisfy a customary requirement of scientific journals. DABEST's provision of P values does not constitute an endorsement of P values or null-hypothesis significance testing (NHST). If users need to include these in a study, we recommend that they:
 
-## Producing estimation plots (Step 3)
-To produce a **Gardner-Altman estimation plot**, simply use the `dabest_plot()`. You can read more about its genesis and design inspiration at Robust and Beautiful Statistical Visualization. 
+1. avoid performing NHST, i.e. do not compare P to an alpha. 
+2. never refer to the P values in the 'Results' text. 
+3. state in their Methods section that *"No null-hypothesis significance testing was performed; P values are provided for legacy purposes only."*
 
-`dabest_plot()` only requires one compulsory parameter to run: the `dabest_effectsize_obj` obtained from the `effect_size()` function. This means you can quickly create plots for different effect sizes easily.
+## Step 3: Producing estimation plots
+To produce a **Gardner-Altman estimation plot**, simply use the `dabest_plot()` function. You can read more about its genesis and design inspiration at [Robust and Beautiful Statistical Visualization](https://acclab.github.io/DABEST-python/blog/posts/robust-beautiful/robust-beautiful.html). 
+
+`dabest_plot()` requires only one compulsory parameter to run: the `dabest_effectsize_obj` obtained from the `effect_size()` function. This means that you can quickly create plots for various effect sizes with ease.
 ```{r}
 dabest_plot(two_groups_unpaired.mean_diff)
-# dabest_plot(two_groups_unpaired.hedges_g)
 ```
 
-Instead of a Gardner-Altman plot, you can produce a **Cumming estimation plot** by setting `float_contrast = FALSE` in the `dabest_plot()` function This will plot the bootstrap effect sizes below the raw data, and also displays the the mean (gap) and ± standard deviation of each group (vertical ends) as gapped lines. This design was inspired by Edward Tufte’s dictum to maximise the data-ink ratio.
+Instead of a Gardner-Altman plot, you can produce a **Cumming estimation plot** by setting `float_contrast = FALSE` in the `dabest_plot()` function. This will plot the bootstrap effect sizes below the raw data, and will also display the mean (gap) and ± standard deviation of each group (vertical ends) as gapped lines. This design was inspired by Edward Tufte’s dictum to maximise the data-ink ratio.
 
 ```{r, eval = FALSE}
 dabest_plot(two_groups_unpaired.mean_diff,
@@ -155,13 +158,13 @@ cowplot::plot_grid(
 )
 ```
 
-The `dabestr` package also implements a range of estimation plot designs aimed at depicting common experimental designs.
+The `dabestr` package also implements a variety of estimation plot designs aimed at depicting common experimental designs.
 
-The **multi-two-group estimation plot** tiles two or more Cumming plots horizontally, and is created by passing a _nested list_ to `idx` when `load()` is first invoked.
+The **multi-two-group estimation plot** tiles two or more Cumming plots horizontally. To create this plot, you can pass a _nested list_ to the `idx` parameter when invoking the `load()` function for the first time.
 
-Thus, the lower axes in the Cumming plot is effectively a [forest plot](https://en.wikipedia.org/wiki/Forest_plot), used in meta-analyses to aggregate and compare data from different experiments.
+As a result, the lower axes in the Cumming plot is effectively a [forest plot](https://en.wikipedia.org/wiki/Forest_plot), commonly used in meta-analyses to aggregate and compare data from different experiments.
 
-```{r}
+```{r, warning = FALSE}
 multi_2group <- load(df,
   x = Group, y = Measurement,
   idx = list(
@@ -176,8 +179,8 @@ multi_2group %>%
 
 The **shared control plot** displays another common experimental paradigm, where several test samples are compared against a common reference sample.
 
-This type of Cumming plot is automatically generated if the vector passed to `idx` has more than two data columns.
-```{r}
+This type of Cumming plot is automatically generated if the vector passed to the parameter `idx` has more than two data columns.
+```{r, warnings = FALSE}
 shared_control <- load(df,
   x = Group, y = Measurement,
   idx = c(
@@ -189,7 +192,7 @@ shared_control <- load(df,
 print(shared_control)
 ```
 
-```{r}
+```{r, warnings = FALSE}
 shared_control.mean_diff <- mean_diff(shared_control)
 
 print(shared_control.mean_diff)
@@ -199,8 +202,9 @@ print(shared_control.mean_diff)
 dabest_plot(shared_control.mean_diff)
 ```
 
-`dabestr` thus empowers you to robustly perform and elegantly present complex visualizations and statistics.
-```{r}
+The `dabestr` package empowers you to robustly perform statistical analyses and elegantly present complex visualizations.
+
+```{r, warnings = FALSE}
 multi_groups <- load(df,
   x = Group, y = Measurement,
   idx = list(
@@ -213,15 +217,18 @@ multi_groups <- load(df,
 print(multi_groups)
 ```
 
-```{r}
+```{r, warnings = FALSE}
 multi_groups.mean_diff <- mean_diff(multi_groups)
 
 print(multi_groups.mean_diff)
 ```
 
-```{r}
+```{r, warnings = FALSE}
 dabest_plot(multi_groups.mean_diff)
 ```
- 
-## Using wide datasets
-`dabestr` does not currently support the use of 'wide' data. To convert datasets from 'wide' to 'long'/'tidy', consider taking a look at [gather()](https://tidyr.tidyverse.org/reference/gather.html) as part of the [tidyr](https://tidyr.tidyverse.org) package.
+
+***
+## **NOTE: Using wide datasets**
+
+>Currently `dabestr` does not support the use of 'wide' data. To convert datasets from 'wide' to 'long'/'tidy', consider taking a look at [gather()](https://tidyr.tidyverse.org/reference/gather.html) as part of the [tidyr](https://tidyr.tidyverse.org) package.
+

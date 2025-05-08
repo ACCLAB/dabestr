@@ -1,3 +1,12 @@
+get_gender_column <- function(N) {
+  return(c(rep("Male", N / 2), rep("Female", N / 2)))
+}
+
+get_genotype_column <- function(N) {
+  return(c(rep("M", N / 2), rep("W", N / 2)))
+}
+
+# TODO Add documentation
 generate_non_proportional_dataset <- function(N = 40, seed = 12345) {
   set.seed(seed) # Fix the seed so the results are replicable.
   # pop_size = 10000 # Size of each population.
@@ -16,7 +25,7 @@ generate_non_proportional_dataset <- function(N = 40, seed = 12345) {
   t6 <- rnorm(N, mean = 3.25, sd = 0.4)
 
   # Add a `gender` column for coloring the data.
-  gender <- c(rep("Male", N / 2), rep("Female", N / 2))
+  gender <- get_gender_column(N)
 
   # Add an `id` column for paired data plotting.
   id <- 1:N
@@ -34,6 +43,7 @@ generate_non_proportional_dataset <- function(N = 40, seed = 12345) {
   return(df)
 }
 
+# TODO Add documentation
 generate_proportional_dataset <- function(N = 40, seed = 12345) {
   set.seed(seed) # Fix the seed so the results are replicable.
   N <- 40 # The number of samples taken from each population
@@ -54,7 +64,7 @@ generate_proportional_dataset <- function(N = 40, seed = 12345) {
   t8 <- c(rep(0, N))
 
   # Add a `gender` column for coloring the data.
-  gender <- c(rep("Male", N / 2), rep("Female", N / 2))
+  gender <- get_gender_column(N)
 
   # Add an `id` column for paired data plotting.
   id <- 1:N
@@ -73,6 +83,7 @@ generate_proportional_dataset <- function(N = 40, seed = 12345) {
   return(df)
 }
 
+# TODO Add documentation
 generate_deltadelta_dataset <- function(N = 40, seed = 12345) {
   set.seed(seed) # Fix the seed so the results are replicable.
   # pop_size = 10000 # Size of each population.
@@ -83,7 +94,7 @@ generate_deltadelta_dataset <- function(N = 40, seed = 12345) {
   drug <- rnorm(N, mean = 3.5, sd = 0.75)
 
   # Add a `Genotype` column as the second variable
-  genotype <- c(rep("M", N / 2), rep("W", N / 2))
+  genotype <- get_genotype_column(N)
 
   # Add an `id` column for paired data plotting.
   id <- 1:N
