@@ -301,6 +301,7 @@ load <- function(
 #' @noRd
 #'
 #' @param x a dabest object, set as x to tally with method signature for print functions
+#' @param print_greet_end a boolean value for printing with greeting/ending.
 #' @param ... S3 signature for generic plot function.
 #'
 #' @return A summary of the experimental designs.
@@ -319,29 +320,35 @@ load <- function(
 #' print(dabest_obj)
 #'
 #' @export
-print.dabest <- function(x, ...) {
+print.dabest <- function(x, print_greet_end = TRUE, ...) {
+
   dabest_obj <- x
 
   check_dabest_object(dabest_obj)
-
-  print_greeting_header()
+  cat("\n")
+  if (print_greet_end) {
+    print_greeting_header()
+  }
+  else cat("\n")
 
   paired <- dabest_obj$paired
   ci <- dabest_obj$ci
 
   # Use a lookup table for rm_status and paired_status
-  rm_status_lookup <- c(NULL = "", "sequential" = "for the sequential design of repeated-measures experiment \\n", "baseline" = "for repeated measures against baseline \\n")
-  paired_status_lookup <- c(NULL = "E", "sequential" = "Paired e", "baseline" = "Paired e")
+  rm_status_lookup <- c(NULL = "", "sequential" = "for the sequential design of repeated-measures experiment \n", "baseline" = "for repeated measures against baseline \n")
+  paired_status_lookup <- c(NULL = "Unpaired ", "sequential" = "Paired ", "baseline" = "Paired ")
 
-  rm_status <- rm_status_lookup[paired]
-  paired_status <- paired_status_lookup[paired]
+  rm_status <- rm_status_lookup[[format(paired)]]
+  paired_status <- paired_status_lookup[[format(paired)]]
 
   # Create strings
-  line1 <- paste0(paired_status, "ffect size(s) ", rm_status)
+  line1 <- paste0(paired_status, "effect size(s) ", rm_status)
   line2 <- paste0("with ", ci, "% confidence intervals will be computed for:")
   cat(line1)
   cat(line2)
   cat("\n")
   print_each_comparism(dabest_obj)
-  print_ending(dabest_obj)
+  if (print_greet_end) {
+    print_ending(dabest_obj)
+  }
 }

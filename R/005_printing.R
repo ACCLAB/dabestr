@@ -107,11 +107,11 @@ print_each_comparism_effectsize <- function(dabest_effectsize_obj, effectsize) {
   pvalue <- dabest_effectsize_obj$permtest_pvals$pval_for_tests
 
   # Use a lookup table for rm_status and paired_status
-  rm_status_lookup <- c(NULL = "", "sequential" = "for the sequential design of repeated-measures experiment \\n", "baseline" = "for repeated measures against baseline \\n")
+  rm_status_lookup <- c(NULL = "", "sequential" = "for the sequential design of repeated-measures experiment \n", "baseline" = "for repeated measures against baseline \n")
   paired_status_lookup <- c(NULL = "unpaired", "sequential" = "paired", "baseline" = "paired")
 
-  rm_status <- rm_status_lookup[paired]
-  paired_status <- paired_status_lookup[paired]
+  rm_status <- rm_status_lookup[[format(paired)]] # make sure even NULL gets converted to string
+  paired_status <- paired_status_lookup[[format(paired)]] # make sure even NULL gets converted to string
 
   if (is.list(dabest_effectsize_obj$idx)) {
     for (group in dabest_effectsize_obj$idx) {
@@ -133,7 +133,7 @@ print_each_comparism_effectsize <- function(dabest_effectsize_obj, effectsize) {
           current_ci <- ci[i]
           current_pval <- pvalue[i]
 
-          cat(stringr::str_interp("The ${paired_status} ${es} between ${current_test_group} and ${control_group} is ${current_difference} [${current_ci}%CI ${current_bca_low}, ${current_bca_high}].\n"))
+          cat(stringr::str_interp("The ${paired_status} ${es} between ${current_test_group} and ${control_group} is ${current_difference}, ${current_ci}% CI [${current_bca_low}, ${current_bca_high}].\n"))
           cat(stringr::str_interp("The p-value of the two-sided permutation t-test is ${sprintf(current_pval, fmt = '%#.4f')}, calculated for legacy purposes only."))
           cat("\n\n")
           i <- i + 1
@@ -149,7 +149,7 @@ print_each_comparism_effectsize <- function(dabest_effectsize_obj, effectsize) {
           current_ci <- ci[i]
           current_pval <- pvalue[i]
 
-          cat(stringr::str_interp("The ${paired_status} ${es} between ${current_group} and ${previous_group} is ${current_difference} [${current_ci}%CI ${current_bca_low}, ${current_bca_high}].\n"))
+          cat(stringr::str_interp("The ${paired_status} ${es} between ${current_group} and ${previous_group} is ${current_difference}, ${current_ci}% CI [${current_bca_low}, ${current_bca_high}].\n"))
           cat(stringr::str_interp("The p-value of the two-sided permutation t-test is ${sprintf(current_pval, fmt = '%#.4f')}, calculated for legacy purposes only."))
           cat("\n\n")
           i <- i + 1
@@ -161,7 +161,7 @@ print_each_comparism_effectsize <- function(dabest_effectsize_obj, effectsize) {
     test_groups <- dabest_effectsize_obj$idx[2:length(dabest_effectsize_obj$idx)]
 
     for (current_test_group in test_groups) {
-      cat(stringr::str_interp("The ${paired_status} ${es} between ${current_test_group} and ${control_group} is ${difference} [${ci}%CI ${bca_low}, ${bca_high}].\n"))
+      cat(stringr::str_interp("The ${paired_status} ${es} between ${current_test_group} and ${control_group} is ${difference}, ${ci}% CI [${bca_low}, ${bca_high}].\n"))
       cat(stringr::str_interp("The p-value of the two-sided permutation t-test is ${sprintf(current_pval, fmt = '%#.4f')}, calculated for legacy purposes only.\n"))
     }
   }
