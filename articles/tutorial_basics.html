@@ -203,7 +203,7 @@ greeting, as well as the comparisons that can be computed.</p>
 <span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 09:52 AM on Thursday May 08, 2025.</span></span>
+<span><span class="co">#&gt; The current time is 08:45 AM on Monday September 15, 2025.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ffect size(s) with 95% confidence intervals will be computed for:</span></span>
 <span><span class="co">#&gt; 1. Test 1 minus Control 1</span></span>
@@ -225,7 +225,7 @@ produced by manipulating the <code>ci</code> argument.</p>
 <span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 09:52 AM on Thursday May 08, 2025.</span></span>
+<span><span class="co">#&gt; The current time is 08:45 AM on Monday September 15, 2025.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ffect size(s) with 90% confidence intervals will be computed for:</span></span>
 <span><span class="co">#&gt; 1. Test 1 minus Control 1</span></span>
@@ -255,7 +255,7 @@ as a parameter.</p>
 <span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 09:52 AM on Thursday May 08, 2025.</span></span>
+<span><span class="co">#&gt; The current time is 08:45 AM on Monday September 15, 2025.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The character(0) mean difference between Test 1 and Control 1 is 0.585 [95%CI 0.307, 0.869].</span></span>
 <span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 0.0004, calculated for legacy purposes only.</span></span>
@@ -315,8 +315,6 @@ data-ink ratio.</p>
 <span>  float_contrast <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  contrast_ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.3</span>, <span class="fl">1.3</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; Warning in get_plot_component(plot, "guide-box"): Multiple components found;</span></span>
-<span><span class="co">#&gt; returning the first one. To return all, use `return_all = TRUE`.</span></span></code></pre>
 <p><img src="tutorial_basics_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
 <p>The <code>dabestr</code> package also implements a variety of
 estimation plot designs aimed at depicting common experimental
@@ -328,7 +326,7 @@ more Cumming plots horizontally. To create this plot, you can pass a
 <p>As a result, the lower axes in the Cumming plot is effectively a <a href="https://en.wikipedia.org/wiki/Forest_plot" class="external-link">forest plot</a>,
 commonly used in meta-analyses to aggregate and compare data from
 different experiments.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">multi_2group</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>,</span>
 <span>  x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
 <span>  idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -346,7 +344,7 @@ common reference sample.</p>
 <p>This type of Cumming plot is automatically generated if the vector
 passed to the parameter <code>idx</code> has more than two data
 columns.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">shared_control</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>,</span>
 <span>  x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
 <span>  idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -360,7 +358,7 @@ columns.</p>
 <span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 09:52 AM on Thursday May 08, 2025.</span></span>
+<span><span class="co">#&gt; The current time is 08:45 AM on Monday September 15, 2025.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ffect size(s) with 95% confidence intervals will be computed for:</span></span>
 <span><span class="co">#&gt; 1. Test 1 minus Control 1</span></span>
@@ -371,7 +369,7 @@ columns.</p>
 <span><span class="co">#&gt; 6. Test 6 minus Control 1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 5000 resamples will be used to generate the effect size bootstraps.</span></span></code></pre></div>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">shared_control.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="va">shared_control</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">shared_control.mean_diff</span><span class="op">)</span></span>
@@ -379,7 +377,7 @@ columns.</p>
 <span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 09:52 AM on Thursday May 08, 2025.</span></span>
+<span><span class="co">#&gt; The current time is 08:45 AM on Monday September 15, 2025.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The character(0) mean difference between Test 1 and Control 1 is 0.585 [95%CI 0.307, 0.869].</span></span>
 <span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 0.0004, calculated for legacy purposes only.</span></span>
@@ -403,14 +401,12 @@ columns.</p>
 <span><span class="co">#&gt; Any p-value reported is the probability of observing the effect size (or greater),</span></span>
 <span><span class="co">#&gt; assuming the null hypothesis of zero difference is true.</span></span>
 <span><span class="co">#&gt; For each p-value, 5000 reshuffles of the control and test labels were performed.</span></span></code></pre></div>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">shared_control.mean_diff</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in get_plot_component(plot, "guide-box"): Multiple components found;</span></span>
-<span><span class="co">#&gt; returning the first one. To return all, use `return_all = TRUE`.</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">shared_control.mean_diff</span><span class="op">)</span></span></code></pre></div>
 <p><img src="tutorial_basics_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
 <p>The <code>dabestr</code> package empowers you to robustly perform
 statistical analyses and elegantly present complex visualizations.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">multi_groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>,</span>
 <span>  x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Measurement</span>,</span>
 <span>  idx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -425,7 +421,7 @@ statistical analyses and elegantly present complex visualizations.</p>
 <span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 09:52 AM on Thursday May 08, 2025.</span></span>
+<span><span class="co">#&gt; The current time is 08:45 AM on Monday September 15, 2025.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ffect size(s) with 95% confidence intervals will be computed for:</span></span>
 <span><span class="co">#&gt; 1. Test 1 minus Control 1</span></span>
@@ -436,7 +432,7 @@ statistical analyses and elegantly present complex visualizations.</p>
 <span><span class="co">#&gt; 6. Test 6 minus Control 3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 5000 resamples will be used to generate the effect size bootstraps.</span></span></code></pre></div>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">multi_groups.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="va">multi_groups</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">multi_groups.mean_diff</span><span class="op">)</span></span>
@@ -444,7 +440,7 @@ statistical analyses and elegantly present complex visualizations.</p>
 <span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 09:52 AM on Thursday May 08, 2025.</span></span>
+<span><span class="co">#&gt; The current time is 08:45 AM on Monday September 15, 2025.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The character(0) mean difference between Test 1 and Control 1 is 0.585 [95%CI 0.307, 0.869].</span></span>
 <span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 0.0004, calculated for legacy purposes only.</span></span>
@@ -468,10 +464,8 @@ statistical analyses and elegantly present complex visualizations.</p>
 <span><span class="co">#&gt; Any p-value reported is the probability of observing the effect size (or greater),</span></span>
 <span><span class="co">#&gt; assuming the null hypothesis of zero difference is true.</span></span>
 <span><span class="co">#&gt; For each p-value, 5000 reshuffles of the control and test labels were performed.</span></span></code></pre></div>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">multi_groups.mean_diff</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in get_plot_component(plot, "guide-box"): Multiple components found;</span></span>
-<span><span class="co">#&gt; returning the first one. To return all, use `return_all = TRUE`.</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">multi_groups.mean_diff</span><span class="op">)</span></span></code></pre></div>
 <p><img src="tutorial_basics_files/figure-html/unnamed-chunk-18-1.png" width="700"></p>
 <hr>
 </div>
@@ -497,7 +491,7 @@ part of the <a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
