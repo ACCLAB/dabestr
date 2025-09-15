@@ -12,7 +12,7 @@ describe("Testing add_scaling_component_to_delta_plot function", {
     expect_type(result, "list")
     expect_equal(length(result), 3) # 3 components returned
     # Check delta_plot component
-    expect_type(result[[1]], "list")
+    expect_true(ggplot2::is_ggplot(result[[1]]))
     # TODO Add specific expectations to check if the components are created correctly
   })
 })
