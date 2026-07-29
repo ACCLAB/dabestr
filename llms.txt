@@ -1,0 +1,167 @@
+# dabestr
+
+dabestr is a package for **D**ata **A**nalysis using
+**B**ootstrap-Coupled **EST**imation.
+
+[Estimation
+statistics](https://en.wikipedia.org/wiki/Estimation_statistics "Estimation Stats on Wikipedia")
+is a [simple
+framework](https://thenewstatistics.com/itns/ "Introduction to the New Statistics")
+that avoids the
+[pitfalls](https://www.nature.com/articles/nmeth.3288 "The fickle P value generates irreproducible results, Halsey et al 2015")
+of significance testing. It uses familiar statistical concepts: means,
+mean differences, and error bars. More importantly, it focuses on the
+effect size of one’s experiment/intervention, as opposed to a false
+dichotomy engendered by *P* values.
+
+An estimation plot has two key features.
+
+1.  It **presents all datapoints** as a swarmplot, which orders each
+    point to display the underlying distribution.
+
+2.  It presents the **effect size** as a **bootstrap 95% confidence
+    interval** on a **separate but aligned axes**.
+
+The `dabestr` package powers
+[estimationstats.com](http://estimationstats.com), allowing everyone
+access to high-quality estimation plots.
+
+## Installation
+
+``` r
+
+# Install it from CRAN
+install.packages("dabestr")
+
+# Or the development version from GitHub:
+# install.packages("devtools")
+devtools::install_github(repo = "ACCLAB/dabestr", ref = "dev")
+```
+
+## Usage
+
+``` r
+
+library(dabestr)
+```
+
+``` r
+
+data("non_proportional_data")
+
+dabest_obj.mean_diff <- load(
+  data = non_proportional_data,
+  x = Group,
+  y = Measurement,
+  idx = c("Control 1", "Test 1")
+) %>%
+  mean_diff()
+
+dabest_plot(dabest_obj.mean_diff, TRUE)
+```
+
+![](reference/figures/README-unnamed-chunk-5-1.png)
+
+Please refer to the official
+[tutorial](https://acclab.github.io/dabestr/articles/tutorial_basics.html)
+for more useful code snippets.
+
+## Citation
+
+**Moving beyond P values: Everyday data analysis with estimation plots**
+
+*Joses Ho, Tayfun Tumkaya, Sameer Aryal, Hyungwon Choi, Adam
+Claridge-Chang*
+
+Nature Methods 2019, 1548-7105.
+[10.1038/s41592-019-0470-3](http://dx.doi.org/10.1038/s41592-019-0470-3)
+
+[Paywalled publisher
+site](https://www.nature.com/articles/s41592-019-0470-3); [Free-to-view
+PDF](https://www.nature.com/articles/s41592-019-0470-3.epdf?author_access_token=Euy6APITxsYA3huBKOFBvNRgN0jAjWel9jnR3ZoTv0Pr6zJiJ3AA5aH4989gOJS_dajtNr1Wt17D0fh-t4GFcvqwMYN03qb8C33na_UrCUcGrt-Z0J9aPL6TPSbOxIC-pbHWKUDo2XsUOr3hQmlRew%3D%3D)
+
+## Contributing
+
+Please report any bugs on the [Github issue
+tracker](https://github.com/ACCLAB/dabestr/issues/new).
+
+All contributions are welcome; please read the [Guidelines for
+contributing](https://github.com/ACCLAB/dabestr/blob/master/CONTRIBUTING.md)
+first.
+
+We also have a [Code of
+Conduct](https://github.com/ACCLAB/dabestr/blob/master/CODE_OF_CONDUCT.md)
+to foster an inclusive and productive space.
+
+## Acknowledgements
+
+We would like to thank alpha testers from the [Claridge-Chang
+lab](https://www.claridgechang.net/): [Sangyu
+Xu](https://github.com/sangyu), [Xianyuan
+Zhang](https://github.com/XYZfar), [Farhan
+Mohammad](https://github.com/farhan8igib), Jurga Mituzaitė, and
+Stanislav Ott.
+
+## DABEST in other languages
+
+DABEST is also available in Python
+([DABEST-python](https://github.com/ACCLAB/DABEST-python "DABEST-Python on Github"))
+and Matlab
+([DABEST-Matlab](https://github.com/ACCLAB/DABEST-Matlab "DABEST-Matlab on Github")).
+
+# Package index
+
+### Main API
+
+Functions responsible for producing an estimation plot. They have been
+sequentially organised for their intended procedural utilisation.
+
+- [`load()`](https://acclab.github.io/dabestr/reference/load.md) :
+  Loading data with dabestr
+- [`mean_diff()`](https://acclab.github.io/dabestr/reference/effect_size.md)
+  [`median_diff()`](https://acclab.github.io/dabestr/reference/effect_size.md)
+  [`cohens_d()`](https://acclab.github.io/dabestr/reference/effect_size.md)
+  [`hedges_g()`](https://acclab.github.io/dabestr/reference/effect_size.md)
+  [`cliffs_delta()`](https://acclab.github.io/dabestr/reference/effect_size.md)
+  [`cohens_h()`](https://acclab.github.io/dabestr/reference/effect_size.md)
+  : Calculating effect sizes
+- [`dabest_plot()`](https://acclab.github.io/dabestr/reference/dabest_plot.md)
+  : Producing an estimation plot
+- [`forest_plot()`](https://acclab.github.io/dabestr/reference/forest_plot.md)
+  : Generates a Forest Plot
+
+### Adjusting plot aesthetics
+
+- [`plot_kwargs`](https://acclab.github.io/dabestr/reference/plot_kwargs.md)
+  : Adjustable Plot Aesthetics
+
+# Articles
+
+### Misc
+
+- [Controlling Plot
+  Aesthetics](https://acclab.github.io/dabestr/articles/plot_aesthetics.md):
+
+  Loading in of sample datasets for dabestr.
+
+### Tutorials
+
+- [Tutorial:
+  Basics](https://acclab.github.io/dabestr/articles/tutorial_basics.md):
+
+- [Tutorial: Repeated
+  Measures](https://acclab.github.io/dabestr/articles/tutorial_repeated_measures.md):
+
+- [Tutorial: Proportion
+  Plots](https://acclab.github.io/dabestr/articles/tutorial_proportion_plots.md):
+
+- [Tutorial: Mini-Meta
+  Delta](https://acclab.github.io/dabestr/articles/tutorial_minimeta.md):
+
+- [Tutorial:
+  Delta-Delta](https://acclab.github.io/dabestr/articles/tutorial_deltadelta.md):
+
+- [Sample
+  Datasets](https://acclab.github.io/dabestr/articles/sample_datasets.md):
+
+  Loading in of sample datasets for dabestr.

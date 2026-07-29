@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Tutorial: Proportion Plots">
 </head>
@@ -89,7 +89,8 @@ proportion data that contains non-numeric values, such as strings like
 ‘yes’ and ‘no’.</p>
 </blockquote>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ACCLAB/dabestr" class="external-link">dabestr</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ACCLAB/dabestr" class="external-link">dabestr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="create-dataset-for-demo">Create dataset for demo<a class="anchor" aria-label="anchor" href="#create-dataset-for-demo"></a>
 </h2>
@@ -193,7 +194,7 @@ proportion data that contains non-numeric values, such as strings like
 <span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 08:45 AM on Monday September 15, 2025.</span></span>
+<span><span class="co">#&gt; The current time is 07:06 AM on Wednesday July 29, 2026.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ffect size(s) with 95% confidence intervals will be computed for:</span></span>
 <span><span class="co">#&gt; 1. Test 1 minus Control 1</span></span>
@@ -219,7 +220,7 @@ as a parameter.</p>
 <span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 08:45 AM on Monday September 15, 2025.</span></span>
+<span><span class="co">#&gt; The current time is 07:06 AM on Wednesday July 29, 2026.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The character(0) mean difference between Test 1 and Control 1 is 0.35 [95%CI 0.15, 0.55].</span></span>
 <span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 0.0008, calculated for legacy purposes only.</span></span>
@@ -237,7 +238,7 @@ as a parameter.</p>
 <span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 08:45 AM on Monday September 15, 2025.</span></span>
+<span><span class="co">#&gt; The current time is 07:06 AM on Wednesday July 29, 2026.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The character(0) NA between Test 1 and Control 1 is 0.758 [95%CI 0.311, 1.217].</span></span>
 <span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 0.0008, calculated for legacy purposes only.</span></span>
@@ -258,10 +259,10 @@ the <code><a href="../reference/effect_size.html">effect_size()</a></code> funct
 easily create plots for different effect sizes.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">two_groups_unpaired.mean_diff</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
+<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">two_groups_unpaired.cohens_h</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-7-2.png" width="700"></p>
+<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-7-2.png" class="r-plt" alt="" width="700"></p>
 <p>The white portion of the bar represents the proportion of
 observations in the dataset that do not belong to the category, which is
 equivalent to the proportion of 0 in the data. The colored portion, on
@@ -278,13 +279,13 @@ function. This will plot the bootstrap effect sizes below the raw
 data.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">two_groups_unpaired.mean_diff</span>, float_contrast <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="700"></p>
 <p>You can also modify the width of bars by setting the parameter
 <code>raw_bar_width</code> in the <code><a href="../reference/dabest_plot.html">dabest_plot()</a></code>
 function.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">two_groups_unpaired.mean_diff</span>, raw_bar_width <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="700"></p>
 <p>The parameters <code>swarm_label</code> and
 <code>contrast_label</code> can be used to set labels for the y-axis of
 the bar plot and the contrast plot.</p>
@@ -292,7 +293,7 @@ the bar plot and the contrast plot.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">two_groups_unpaired.mean_diff</span>,</span>
 <span>  swarm_label <span class="op">=</span> <span class="st">"success"</span>, contrast_label <span class="op">=</span> <span class="st">"difference"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="generating-sankey-plots-for-paired-proportions">Generating Sankey plots for paired proportions<a class="anchor" aria-label="anchor" href="#generating-sankey-plots-for-paired-proportions"></a>
@@ -316,14 +317,14 @@ data.</p>
 <span>  <span class="fu"><a href="../reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">two_groups_baseline.mean_diff</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
+<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="700"></p>
 <p>The paired proportional plot also supports the
 <code>float_contrast</code> parameter, which can be set to
 <code>FALSE</code> to produce a <strong>Cumming estimation
 plot</strong>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">two_groups_baseline.mean_diff</span>, float_contrast <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
+<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="700"></p>
 <p>The upper part (grey section) of the bar represents the proportion of
 observations in the dataset that do not belong to the category,
 equivalent to the proportion of 0 in the data. The lower part,
@@ -358,7 +359,7 @@ refer to <code><a href="../articles/tutorial_repeated_measures.html">vignette("t
 <span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">multi_group_baseline.mean_diff</span>,</span>
 <span>  swarm_y_text <span class="op">=</span> <span class="fl">11</span>, contrast_y_text <span class="op">=</span> <span class="fl">11</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
+<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-15-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">multi_group_sequential.mean_diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load.html">load</a></span><span class="op">(</span><span class="va">df</span>,</span>
 <span>  x <span class="op">=</span> <span class="va">Group</span>, y <span class="op">=</span> <span class="va">Success</span>,</span>
@@ -380,7 +381,7 @@ refer to <code><a href="../articles/tutorial_repeated_measures.html">vignette("t
 <span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">multi_group_sequential.mean_diff</span>,</span>
 <span>  swarm_y_text <span class="op">=</span> <span class="fl">11</span>, contrast_y_text <span class="op">=</span> <span class="fl">11</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-16-1.png" width="700"></p>
+<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="" width="700"></p>
 <p>If you want to specify the order of the groups, you can use the
 <code>idx</code> parameter in the <code><a href="../reference/load.html">load()</a></code> function.</p>
 <p>For all the groups to be compared together, you can put all the
@@ -403,7 +404,7 @@ function in a singular vector/non-nested list.</p>
 <span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">multi_group_baseline_specify.mean_diff</span>,</span>
 <span>  swarm_y_text <span class="op">=</span> <span class="fl">11</span>, contrast_y_text <span class="op">=</span> <span class="fl">11</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-17-1.png" width="700"></p>
+<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-17-1.png" class="r-plt" alt="" width="700"></p>
 <div class="section level3">
 <h3 id="adjustment-parameters">Adjustment parameters<a class="anchor" aria-label="anchor" href="#adjustment-parameters"></a>
 </h3>
@@ -432,19 +433,19 @@ comparison.</p>
 <span>  <span class="fu"><a href="../reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">separate_control.mean_diff</span>, swarm_y_text <span class="op">=</span> <span class="fl">11</span>, contrast_y_text <span class="op">=</span> <span class="fl">11</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-18-1.png" width="700"></p>
+<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">separate_control.mean_diff</span>,</span>
 <span>  swarm_y_text <span class="op">=</span> <span class="fl">11</span>, contrast_y_text <span class="op">=</span> <span class="fl">11</span>,</span>
 <span>  sankey <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-18-2.png" width="700"></p>
+<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-18-2.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">separate_control.mean_diff</span>,</span>
 <span>  swarm_y_text <span class="op">=</span> <span class="fl">11</span>, contrast_y_text <span class="op">=</span> <span class="fl">11</span>,</span>
 <span>  flow <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-18-3.png" width="700"></p>
+<p><img src="tutorial_proportion_plots_files/figure-html/unnamed-chunk-18-3.png" class="r-plt" alt="" width="700"></p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -458,7 +459,7 @@ comparison.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

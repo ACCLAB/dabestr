@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Tutorial: Mini-Meta Delta">
 </head>
@@ -88,7 +88,7 @@ interpretation.</p>
 calculate the effect size, as follows:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>θ</mi><mrow><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><mi>t</mi><mi>e</mi><mi>d</mi></mrow></msub><mo>=</mo><mfrac><mrow><mo>∑</mo><mover><msub><mi>θ</mi><mi>i</mi></msub><mo accent="true">̂</mo></mover><msub><mi>w</mi><mi>i</mi></msub></mrow><mrow><mo>∑</mo><msub><mi>w</mi><mi>i</mi></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">\theta_{weighted} = \frac{\sum{\hat{\theta_i}}w_i}{\sum{w_i}}</annotation></semantics></math>
 where:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><msub><mi>θ</mi><mi>i</mi></msub><mo accent="true">̂</mo></mover><mo>=</mo><mrow><mtext mathvariant="normal">Mean difference for replicate </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">\hat{\theta_i}=\text{Mean difference for replicate } i</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mi>i</mi></msub><mo>=</mo><mrow><mtext mathvariant="normal">Weight for replicate </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mo>=</mo><mfrac><mn>1</mn><msubsup><mi>s</mi><mi>i</mi><mn>2</mn></msubsup></mfrac></mrow><annotation encoding="application/x-tex">w_i=\text{Weight for replicate } i = \frac{1}{s_i^2}</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>s</mi><mi>i</mi><mn>2</mn></msubsup><mo>=</mo><mrow><mtext mathvariant="normal">Pooled variance for replicate </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mo>=</mo><mfrac><mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>n</mi><mrow><mi>t</mi><mi>e</mi><mi>s</mi><mi>t</mi></mrow></msub><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><msubsup><mi>s</mi><mrow><mi>t</mi><mi>e</mi><mi>s</mi><mi>t</mi></mrow><mn>2</mn></msubsup><mo>+</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>n</mi><mrow><mi>c</mi><mi>o</mi><mi>n</mi><mi>t</mi><mi>r</mi><mi>o</mi><mi>l</mi></mrow></msub><mo>−</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><msubsup><mi>s</mi><mrow><mi>c</mi><mi>o</mi><mi>n</mi><mi>t</mi><mi>r</mi><mi>o</mi><mi>l</mi></mrow><mn>2</mn></msubsup></mrow><mrow><msub><mi>n</mi><mrow><mi>t</mi><mi>e</mi><mi>s</mi><mi>t</mi></mrow></msub><mo>+</mo><msub><mi>n</mi><mrow><mi>c</mi><mi>o</mi><mi>n</mi><mi>t</mi><mi>r</mi><mi>o</mi><mi>l</mi></mrow></msub><mo>−</mo><mn>2</mn></mrow></mfrac></mrow><annotation encoding="application/x-tex">s_i^2=\text{Pooled variance for replicate } i = \frac{(n_{test}-1)s_{test}^2 + (n_{control}-1)s_{control}^2} {n_{test}+n_{control}-2}</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mrow><mtext mathvariant="normal">sample size and </mtext><mspace width="0.333em"></mspace></mrow><msup><mi>s</mi><mn>2</mn></msup><mo>=</mo><mtext mathvariant="normal">variance for control/test</mtext></mrow><annotation encoding="application/x-tex">n = \text{sample size and } s^2 = \text{variance for control/test}</annotation></semantics></math>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><msub><mi>θ</mi><mi>i</mi></msub><mo accent="true">̂</mo></mover><mo>=</mo><mrow><mtext mathvariant="normal">Mean difference for replicate </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">\hat{\theta_i}=\text{Mean difference for replicate } i</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mi>i</mi></msub><mo>=</mo><mrow><mtext mathvariant="normal">Weight for replicate </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mo>=</mo><mfrac><mn>1</mn><msubsup><mi>s</mi><mi>i</mi><mn>2</mn></msubsup></mfrac></mrow><annotation encoding="application/x-tex">w_i=\text{Weight for replicate } i = \frac{1}{s_i^2}</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>s</mi><mi>i</mi><mn>2</mn></msubsup><mo>=</mo><mrow><mtext mathvariant="normal">Pooled variance for replicate </mtext><mspace width="0.333em"></mspace></mrow><mi>i</mi><mo>=</mo><mfrac><mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>n</mi><mrow><mi>t</mi><mi>e</mi><mi>s</mi><mi>t</mi></mrow></msub><mo>−</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><msubsup><mi>s</mi><mrow><mi>t</mi><mi>e</mi><mi>s</mi><mi>t</mi></mrow><mn>2</mn></msubsup><mo>+</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>n</mi><mrow><mi>c</mi><mi>o</mi><mi>n</mi><mi>t</mi><mi>r</mi><mi>o</mi><mi>l</mi></mrow></msub><mo>−</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><msubsup><mi>s</mi><mrow><mi>c</mi><mi>o</mi><mi>n</mi><mi>t</mi><mi>r</mi><mi>o</mi><mi>l</mi></mrow><mn>2</mn></msubsup></mrow><mrow><msub><mi>n</mi><mrow><mi>t</mi><mi>e</mi><mi>s</mi><mi>t</mi></mrow></msub><mo>+</mo><msub><mi>n</mi><mrow><mi>c</mi><mi>o</mi><mi>n</mi><mi>t</mi><mi>r</mi><mi>o</mi><mi>l</mi></mrow></msub><mo>−</mo><mn>2</mn></mrow></mfrac></mrow><annotation encoding="application/x-tex">s_i^2=\text{Pooled variance for replicate } i = \frac{(n_{test}-1)s_{test}^2 + (n_{control}-1)s_{control}^2} {n_{test}+n_{control}-2}</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mrow><mtext mathvariant="normal">sample size and </mtext><mspace width="0.333em"></mspace></mrow><msup><mi>s</mi><mn>2</mn></msup><mo>=</mo><mtext mathvariant="normal">variance for control/test</mtext></mrow><annotation encoding="application/x-tex">n = \text{sample size and } s^2 = \text{variance for control/test}</annotation></semantics></math>
 Note that <code>dabestr</code> uses the <em>fixed-effects</em> model of
 meta-analysis, as opposed to the random-effects model. This means that
 all variation between the results of each replicate is assumed to be due
@@ -102,7 +102,8 @@ such as <em>Cohen’s d</em>.</p>
 <p>For more information on meta-analysis, please refer to <a href="https://training.cochrane.org/handbook/current/chapter-10" class="external-link">Chapter
 10</a> of the <em>Cochrane</em> handbook:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ACCLAB/dabestr" class="external-link">dabestr</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ACCLAB/dabestr" class="external-link">dabestr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="create-dataset-for-demo">Create dataset for demo<a class="anchor" aria-label="anchor" href="#create-dataset-for-demo"></a>
 </h2>
@@ -218,7 +219,7 @@ for the mean difference.</p>
 <span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 08:45 AM on Monday September 15, 2025.</span></span>
+<span><span class="co">#&gt; The current time is 07:06 AM on Wednesday July 29, 2026.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ffect size(s) with 95% confidence intervals will be computed for:</span></span>
 <span><span class="co">#&gt; 1. Test 1 minus Control 1</span></span>
@@ -239,7 +240,7 @@ group as well as the weighted delta by printing the
 <span><span class="co">#&gt; ==================</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Good morning!</span></span>
-<span><span class="co">#&gt; The current time is 08:45 AM on Monday September 15, 2025.</span></span>
+<span><span class="co">#&gt; The current time is 07:06 AM on Wednesday July 29, 2026.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The character(0) mean difference between Test 1 and Control 1 is 0.585 [95%CI 0.307, 0.869].</span></span>
 <span><span class="co">#&gt; The p-value of the two-sided permutation t-test is 0.0004, calculated for legacy purposes only.</span></span>
@@ -278,13 +279,13 @@ each experimental replicate as well as the calculated weighted
 delta.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">unpaired.mean_diff</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_minimeta_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<p><img src="tutorial_minimeta_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="700"></p>
 <p>You can also hide the weighted delta by passing the argument
 <code>show_mini_meta = FALSE</code>. In this case, the resulting graph
 would be identical to a multiple two-groups plot:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">unpaired.mean_diff</span>, show_mini_meta <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_minimeta_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+<p><img src="tutorial_minimeta_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="paired-data">Paired Data<a class="anchor" aria-label="anchor" href="#paired-data"></a>
@@ -309,7 +310,7 @@ during the <code><a href="../reference/load.html">load()</a></code> step, as fol
 <span>  <span class="fu"><a href="../reference/effect_size.html">mean_diff</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">paired.mean_diff</span>, raw_marker_size <span class="op">=</span> <span class="fl">0.5</span>, raw_marker_alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_minimeta_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<p><img src="tutorial_minimeta_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="700"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -322,7 +323,7 @@ during the <code><a href="../reference/load.html">load()</a></code> step, as fol
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Controlling Plot Aesthetics">
 <meta name="description" content="Loading in of sample datasets for dabestr.
@@ -136,7 +136,7 @@ of the y-axis of the contrast plot. The default value is 15.</li>
 <span>  contrast_x_text <span class="op">=</span> <span class="fl">30</span>,</span>
 <span>  contrast_y_text <span class="op">=</span> <span class="fl">5</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plot_aesthetics_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+<p><img src="plot_aesthetics_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="content">Content<a class="anchor" aria-label="anchor" href="#content"></a>
@@ -163,7 +163,7 @@ in the swarm plot. The default value is NULL.</li>
 <span>  swarm_label <span class="op">=</span> <span class="st">"I love estimation statistics."</span>,</span>
 <span>  contrast_label <span class="op">=</span> <span class="st">"I love it more than you do!"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plot_aesthetics_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
+<p><img src="plot_aesthetics_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 </div>
 <div class="section level2">
@@ -225,7 +225,7 @@ ci line in the delta plot. The default value is 0.8.</li>
 <span>  ncol <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  labels <span class="op">=</span> <span class="st">"AUTO"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plot_aesthetics_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
+<p><img src="plot_aesthetics_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="axes">Axes<a class="anchor" aria-label="anchor" href="#axes"></a>
@@ -253,7 +253,7 @@ indicates a better outcome), you can invert the vector passed to
 <span>  contrast_label <span class="op">=</span> <span class="st">"More negative is better!"</span>,</span>
 <span>  swarm_ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>, contrast_ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.7</span>, <span class="op">-</span><span class="fl">1.2</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plot_aesthetics_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+<p><img src="plot_aesthetics_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="palettes">Palettes<a class="anchor" aria-label="anchor" href="#palettes"></a>
@@ -290,7 +290,7 @@ uchicago, brewer, ordinal and viridis_d.</li>
 <span>  nrow <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  ncol <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plot_aesthetics_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
+<p><img src="plot_aesthetics_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="misc">Misc<a class="anchor" aria-label="anchor" href="#misc"></a>
@@ -303,7 +303,7 @@ TRUE.</li>
 </ul>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">dabest_paired_props.mean_diff</span>, sankey <span class="op">=</span> <span class="cn">FALSE</span>, raw_bar_width <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span></span></code></pre></div>
-<p><img src="plot_aesthetics_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<p><img src="plot_aesthetics_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="700"></p>
 <ul>
 <li>
 <code>flow</code>: this is a boolean value determining whether the
@@ -311,7 +311,7 @@ bars will be plotted in pairs. The default value is TRUE.</li>
 </ul>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/dabest_plot.html">dabest_plot</a></span><span class="op">(</span><span class="va">dabest_paired_props.mean_diff</span>, flow <span class="op">=</span> <span class="cn">FALSE</span>, raw_bar_width <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span></span></code></pre></div>
-<p><img src="plot_aesthetics_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+<p><img src="plot_aesthetics_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="700"></p>
 <ul>
 <li>
 <code>asymmetric_side</code>: this is a string value that controls
@@ -335,7 +335,7 @@ or “left”. The default one is “right”.</li>
 <span>  nrow <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  ncol <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plot_aesthetics_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<p><img src="plot_aesthetics_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="700"></p>
 <ul>
 <li>
 <code>show_delta2</code>: this is a boolean value determining if the
@@ -358,7 +358,7 @@ whether the baseline curve is shown. The default value is FALSE.</li>
 <span>  float_contrast <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show_baseline_ec <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plot_aesthetics_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<p><img src="plot_aesthetics_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -372,7 +372,7 @@ whether the baseline curve is shown. The default value is FALSE.</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>
