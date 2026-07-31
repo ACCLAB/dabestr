@@ -307,6 +307,7 @@ cohens_h <- function(dabest_obj, perm_count = 5000) {
 #' @noRd
 #'
 #' @param x a dabest_effectsize_obj object, set as x to tally with method signature for print functions
+#' @param print_greet_end a boolean value for printing greeting/ending.
 #' @param ... S3 signature for generic plot function.
 #'
 #' @return A summary of the effect sizes and respective confidence intervals.
@@ -327,14 +328,18 @@ cohens_h <- function(dabest_obj, perm_count = 5000) {
 #' print(dabest_obj.mean_diff)
 #'
 #' @export
-print.dabest_effectsize <- function(x, ...) {
+print.dabest_effectsize <- function(x, print_greet_end = TRUE, ...) {
   dabest_effectsize_obj <- x
 
   check_effectsize_object(dabest_effectsize_obj)
-
-  print_greeting_header()
+  if (print_greet_end) {
+    print_greeting_header()
+  }
+  else cat("\n")
 
   es <- dabest_effectsize_obj$effect_size_type
   print_each_comparism_effectsize(dabest_effectsize_obj, es)
-  print_ending(dabest_effectsize_obj)
+  if (print_greet_end) {
+    print_ending(dabest_effectsize_obj)
+  }
 }

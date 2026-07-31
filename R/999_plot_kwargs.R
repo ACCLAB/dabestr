@@ -44,7 +44,8 @@
 #' paired proportion plot.
 #' - `flow` Default TRUE. Boolean value determining whether the bars will be plotted in pairs.
 #' - `custom_palette` Default "d3". String. The following palettes are available for use:
-#' npg, aaas, nejm, lancet, jama, jco, ucscgb, d3, locuszoom, igv, cosmic, uchicago, brewer, ordinal, viridis_d.
+#' npg, aaas, nejm, lancet, jama, jco, ucscgb, d3, locuszoom, igv, cosmic, uchicago, brewer, ordinal, viridis_d, manual.
+#' - `palette_values` Default NULL. A vector of colors to be used, when the manual palette is selected.
 #' - `contrast_bars` Default TRUE. Whether or not to display the contrast bars at the delta plot.
 #' - `params_contrast_bars`. Default value: list(color = NULL, alpha = 0.3). Pass relevant keyword arguments to the contrast bars.
 #' - `swarm_bars` Default TRUE. Whether or not to display the swarm bars.
@@ -61,6 +62,7 @@ NULL
 assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   check_effectsize_object(dabest_effectsize_obj)
   custom_palette <- "d3"
+  palette_values <- NULL
 
   swarm_label <- dabest_effectsize_obj$raw_y_labels
   contrast_label <- dabest_effectsize_obj$delta_y_labels
@@ -104,6 +106,9 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
   }
   if (!(is.null(plot_kwargs$custom_palette))) {
     custom_palette <- plot_kwargs$custom_palette
+  }
+  if (!(is.null(plot_kwargs$palette_values))) {
+    palette_values <- plot_kwargs$palette_values
   }
   if (!(is.null(plot_kwargs$swarm_ylim))) {
     swarm_ylim <- plot_kwargs$swarm_ylim
@@ -271,6 +276,7 @@ assign_plot_kwargs <- function(dabest_effectsize_obj, plot_kwargs) {
     swarm_label = swarm_label,
     contrast_label = contrast_label,
     custom_palette = custom_palette,
+    palette_values = palette_values,
     swarm_ylim = swarm_ylim,
     contrast_ylim = contrast_ylim,
     delta2_ylim = delta2_ylim,

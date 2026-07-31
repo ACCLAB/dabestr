@@ -41,7 +41,8 @@ the zero line of the effect size for the control-control group.
 paired proportion plot.
 \item \code{flow} Default TRUE. Boolean value determining whether the bars will be plotted in pairs.
 \item \code{custom_palette} Default "d3". String. The following palettes are available for use:
-npg, aaas, nejm, lancet, jama, jco, ucscgb, d3, locuszoom, igv, cosmic, uchicago, brewer, ordinal, viridis_d.
+npg, aaas, nejm, lancet, jama, jco, ucscgb, d3, locuszoom, igv, cosmic, uchicago, brewer, ordinal, viridis_d, manual.
+\item \code{palette_values} Default NULL. A vector of colors to be used, when the manual palette is selected.
 \item \code{contrast_bars} Default TRUE. Whether or not to display the contrast bars at the delta plot.
 \item \code{params_contrast_bars}. Default value: list(color = NULL, alpha = 0.3). Pass relevant keyword arguments to the contrast bars.
 \item \code{swarm_bars} Default TRUE. Whether or not to display the swarm bars.
