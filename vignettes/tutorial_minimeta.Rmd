@@ -33,6 +33,7 @@ For more information on meta-analysis, please refer to [Chapter 10](https://trai
 
 ```{r setup, warning = FALSE, message = FALSE}
 library(dabestr)
+library(dplyr)
 ```
 
 ## Create dataset for demo

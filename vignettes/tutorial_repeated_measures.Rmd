@@ -25,6 +25,7 @@ To use these features, simply declare the `paired` argument as either "sequentia
 
 ```{r setup, warning = FALSE, message = FALSE}
 library(dabestr)
+library(dplyr)
 ```
 
 ## Create dataset for demo
@@ -219,5 +220,54 @@ multi_baseline_repeated_measures.mean_diff <- load(df,
 
 dabest_plot(multi_baseline_repeated_measures.mean_diff,
   raw_marker_size = 0.5, raw_marker_alpha = 0.3
+)
+```
+
+## Paired groups with different sample sizes across comparisons
+
+Repeated-measures plots also work when different comparison pairs have different sample sizes, as long as each pair is internally balanced.
+
+```{r}
+set.seed(12345)
+N1 <- 20
+N2 <- 10
+
+df_unequal_pairs <- tibble::tibble(
+  Group = rep(c("Control 1", "Test 1", "Control 2", "Test 2"), c(N1, N1, N2, N2)),
+  Measurement = c(
+    rnorm(N1, mean = 3, sd = 0.4),   # Control 1
+    rnorm(N1, mean = 3.5, sd = 0.5), # Test 1
+    rnorm(N2, mean = 2.5, sd = 0.4), # Control 2
+    rnorm(N2, mean = 3.0, sd = 0.5)  # Test 2
+  ),
+  ID = c(1:N1, 1:N1, 1:N2, 1:N2)
+)
+```
+
+```{r, warning = FALSE}
+# Each pair is internally balanced even though the two pairs differ in size.
+multi_unequal_pairs.mean_diff <- load(df_unequal_pairs,
+  x = Group, y = Measurement,
+  idx = list(c("Control 1", "Test 1"), c("Control 2", "Test 2")),
+  paired = "sequential", id_col = ID
+) %>%
+  mean_diff()
+
+dabest_plot(multi_unequal_pairs.mean_diff,
+  raw_marker_size = 0.5, raw_marker_alpha = 0.3
+)
+```
+
+An unbalanced pair (different n *within* a pair) is still caught as an error:
+
+```{r, error = TRUE}
+# Remove one row from Test 1 so Control 1 (n=20) and Test 1 (n=19) are mismatched within the pair.
+df_bad_pair <- df_unequal_pairs %>%
+  dplyr::filter(!(Group == "Test 1" & ID == 1))
+
+load(df_bad_pair,
+  x = Group, y = Measurement,
+  idx = list(c("Control 1", "Test 1"), c("Control 2", "Test 2")),
+  paired = "sequential", id_col = ID
 )
 ```

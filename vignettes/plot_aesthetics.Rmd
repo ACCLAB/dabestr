@@ -14,6 +14,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+library(dplyr)
 ```
 
 Controlling plot aesthetics is straightforward in `dabestr`. A key feature of `dabestr` is the ability for users to freely customize various components of a `dabestr` estimation plot, allowing for the creation of an optimal-looking plot.

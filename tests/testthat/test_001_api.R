@@ -1,3 +1,21 @@
+describe("Given non-valid params", {
+  # since this is more of an integration test, this unit test logic is repeated in test_001_utils.R
+  np_dataset <- generate_non_proportional_dataset()
+  p_dataset <- generate_proportional_dataset()
+
+  # for paired data test
+  np_dataset_trunc <- np_dataset[-2, ]
+
+  test_that("it should detect invalid x value", {
+    expect_error(
+      dabestr::load(np_dataset,
+        x = Grou, y = Measurement,
+        idx = c("Control 1", "Test 1")
+      ),
+      regexp = "Column x is not in data"
+    )
+  })
+
 describe("Testing load function", {
   describe("Given valid params", {
     describe("Given non proportional dataset", {
@@ -36,20 +54,7 @@ describe("Testing load function", {
     })
   })
 
-  describe("Given non-valid params", {
-    # since this is more of an integration test, this unit test logic is repeated in test_001_utils.R
-    np_dataset <- generate_non_proportional_dataset()
-    p_dataset <- generate_proportional_dataset()
 
-    test_that("it should detect invalid x value", {
-      expect_error(
-        dabestr::load(np_dataset,
-          x = Grou, y = Measurement,
-          idx = c("Control 1", "Test 1")
-        ),
-        regexp = "Column x is not in data"
-      )
-    })
 
     test_that("it should detect invalid y value", {
       expect_error(
@@ -147,7 +152,7 @@ describe("Testing load function", {
 
       test_that("it should detect invalid dataset size", {
         expect_error(
-          dabestr::load(np_dataset[-2, ],
+          dabestr::load(np_dataset_trunc,
             x = Group, y = Measurement,
             idx = c("Control 1", "Test 1", "Test 2"), paired = "sequential",
             id_col = ID

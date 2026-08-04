@@ -232,12 +232,19 @@ load <- function(
 
   ## Check to ensure control & treatment groups have the same sample size if is_paired is TRUE
   if (is_paired) {
-    if (length(unique(Ns$n)) > 1) {
-      cli::cli_abort(c("{.field data} is paired, as indicated by {.field paired} but size of control and treatment groups are not equal.",
+    for(i in idx) {
+      unlisted_pair <- unlist(i)
+      filter_df <- data %>%
+        dplyr::filter(!!enquo_x %in% unlisted_pair)
+      check_ns <- filter_df %>%
+        dplyr::count(!!enquo_x)
+      if (length(unique(check_ns$n)) > 1) {
+        cli::cli_abort(c("{.field data} is paired, as indicated by {.field paired} but size of control and treatment groups are not equal.",
         "x" = "Ensure that the size of control and treatment groups are the same for paired comparisons."
       ))
     }
   }
+}
 
   # Extending ylim for plotting
   ylim[1] <- ylim[1] - (ylim[2] - ylim[1]) / 25
@@ -301,6 +308,7 @@ load <- function(
 #' @noRd
 #'
 #' @param x a dabest object, set as x to tally with method signature for print functions
+#' @param print_greet_end a boolean value for printing with greeting/ending.
 #' @param ... S3 signature for generic plot function.
 #'
 #' @return A summary of the experimental designs.
@@ -319,29 +327,35 @@ load <- function(
 #' print(dabest_obj)
 #'
 #' @export
-print.dabest <- function(x, ...) {
+print.dabest <- function(x, print_greet_end = TRUE, ...) {
+
   dabest_obj <- x
 
   check_dabest_object(dabest_obj)
-
-  print_greeting_header()
+  cat("\n")
+  if (print_greet_end) {
+    print_greeting_header()
+  }
+  else cat("\n")
 
   paired <- dabest_obj$paired
   ci <- dabest_obj$ci
 
   # Use a lookup table for rm_status and paired_status
-  rm_status_lookup <- c(NULL = "", "sequential" = "for the sequential design of repeated-measures experiment \\n", "baseline" = "for repeated measures against baseline \\n")
-  paired_status_lookup <- c(NULL = "E", "sequential" = "Paired e", "baseline" = "Paired e")
+  rm_status_lookup <- c(NULL = "", "sequential" = "for the sequential design of repeated-measures experiment \n", "baseline" = "for repeated measures against baseline \n")
+  paired_status_lookup <- c(NULL = "Unpaired ", "sequential" = "Paired ", "baseline" = "Paired ")
 
-  rm_status <- rm_status_lookup[paired]
-  paired_status <- paired_status_lookup[paired]
+  rm_status <- rm_status_lookup[[format(paired)]]
+  paired_status <- paired_status_lookup[[format(paired)]]
 
   # Create strings
-  line1 <- paste0(paired_status, "ffect size(s) ", rm_status)
+  line1 <- paste0(paired_status, "effect size(s) ", rm_status)
   line2 <- paste0("with ", ci, "% confidence intervals will be computed for:")
   cat(line1)
   cat(line2)
   cat("\n")
   print_each_comparism(dabest_obj)
-  print_ending(dabest_obj)
+  if (print_greet_end) {
+    print_ending(dabest_obj)
+  }
 }

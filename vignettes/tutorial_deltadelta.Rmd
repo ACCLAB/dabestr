@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 
 ```{r, include = FALSE, warning = FALSE, message = FALSE}
 library(dabestr)
+library(dplyr)
 ```
 
 This vignette documents how `dabestr` is able to compute the calculation of delta-delta, an experimental function that allows the comparison between two bootstrapped effect sizes computed from two independent categorical variables.

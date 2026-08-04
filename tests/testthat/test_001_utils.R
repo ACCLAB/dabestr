@@ -3,6 +3,9 @@ describe("Testing validate_load_params function", {
   np_dataset <- generate_non_proportional_dataset()
   p_dataset <- generate_proportional_dataset()
 
+  # for paired data test
+  np_dataset_trunc <- np_dataset[-2, ]  
+
   test_that("it should detect invalid x value", {
     expect_error(
       dabestr::load(np_dataset,
@@ -109,7 +112,7 @@ describe("Testing validate_load_params function", {
 
     test_that("it should detect invalid dataset size", {
       expect_error(
-        dabestr::load(np_dataset[-2, ],
+        dabestr::load(np_dataset_trunc,
           x = Group, y = Measurement,
           idx = c("Control 1", "Test 1", "Test 2"), paired = "sequential",
           id_col = ID

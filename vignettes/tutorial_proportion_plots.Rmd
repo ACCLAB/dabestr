@@ -24,6 +24,7 @@ This vignette documents how the `dabestr` package is able to generate proportion
 
 ```{r setup, warning = FALSE, message = FALSE}
 library(dabestr)
+library(dplyr)
 ```
 
 ## Create dataset for demo

@@ -21,6 +21,7 @@ The dataset is first processed into the dabestr format using the `load()` functi
 
 ```{r setup, warning = FALSE, message = FALSE}
 library(dabestr)
+library(dplyr)
 ```
 
 ## Create dataset for demo
